@@ -1,0 +1,342 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+		143413FA09B8192E180A01B9 = {isa = PBXBuildFile; fileRef = 0B6B0ADE03F106F0106D0C41 ;};
+		11CF00380C0A10810A8506C1 = {isa = PBXBuildFile; fileRef = 0E7711ED139417D0016003A8 ;};
+		0F6F051602D800AF05100A16 = {isa = PBXBuildFile; fileRef = 096810F002F4029003510549 ;};
+		1174191005341842046D0DE1 = {isa = PBXBuildFile; fileRef = 1625182A0AF201C40E8B0555 ;};
+		0BE4149F16ED044809B1153A = {isa = PBXBuildFile; fileRef = 081B02640BD617DE1821138F ;};
+		11FD07E4079D07A803A713CC = {isa = PBXBuildFile; fileRef = 138D02A014FB05F1168110FC ;};
+
+		03A9031F05A416F80936130D = {isa = PBXBuildFile; fileRef = 1346025905E90E5C03E10EE4 ; };
+		07CA1556152C0DCE01AA0690 = {isa = PBXBuildFile; fileRef = 02A500570D48056814FA0EEF ; };
+		019B06360AAE11220C170FC1 = {isa = PBXBuildFile; fileRef = 140C0F9E0D330DDD13E112CA ; };
+		106F157418ED0D1F0A06174E = {isa = PBXBuildFile; fileRef = 0D580467011D11BC175402F0 ; };
+		071E19440BDF012609300F9C = {isa = PBXBuildFile; fileRef = 10530EEF0C0611CE10A403E1 ; };
+		092F178F0FF306540FE305E9 = {isa = PBXBuildFile; fileRef = 10790973184916EC022E0E7B ; };
+		16F70A880FD410A2043E090C = {isa = PBXBuildFile; fileRef = 0E97141412E604A5107B0EA5 ; };
+		123D111D03340B6A058F058E = {isa = PBXBuildFile; fileRef = 167405430EF7167700090B9B ; };
+		139B135312E713D808700533 = {isa = PBXBuildFile; fileRef = 01B50D6A0A86179506210B10 ; };
+		05FE0A130F62125E077605CA = {isa = PBXBuildFile; fileRef = 126F02ED0AD8125812FD052E ; };
+		06F3057403B713B6022300FA = {isa = PBXBuildFile; fileRef = 0F0E0899198500830E090A9D ; };
+		14E0168D065209F8010100A1 = {isa = PBXBuildFile; fileRef = 072E13E914EB0B7C0F0D1561 ; };
+		15FD0F260B5A159214F70856 = {isa = PBXBuildFile; fileRef = 05F714FE15D00D030F3C17D8 ; };
+		0DFF02D716CD0FFE0B600B18 = {isa = PBXBuildFile; fileRef = 052E143913D904EE0A9F0E5C ; };
+		147709D10D760C8607920472 = {isa = PBXBuildFile; fileRef = 1901006B0C6700CE158D101D ; };
+
+		09B90FBE1439006B13510C9D = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libTKXDESTEP.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+
+		0B6B0ADE03F106F0106D0C41 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = STEPCAFControl_ActorWrite.cxx; path = ../../../src/STEPCAFControl/STEPCAFControl_ActorWrite.cxx; sourceTree = "<group>"; };
+		0E7711ED139417D0016003A8 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = STEPCAFControl_Controller.cxx; path = ../../../src/STEPCAFControl/STEPCAFControl_Controller.cxx; sourceTree = "<group>"; };
+		096810F002F4029003510549 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = STEPCAFControl_ExternFile.cxx; path = ../../../src/STEPCAFControl/STEPCAFControl_ExternFile.cxx; sourceTree = "<group>"; };
+		1625182A0AF201C40E8B0555 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = STEPCAFControl_GDTProperty.cxx; path = ../../../src/STEPCAFControl/STEPCAFControl_GDTProperty.cxx; sourceTree = "<group>"; };
+		081B02640BD617DE1821138F = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = STEPCAFControl_Reader.cxx; path = ../../../src/STEPCAFControl/STEPCAFControl_Reader.cxx; sourceTree = "<group>"; };
+		138D02A014FB05F1168110FC = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = STEPCAFControl_Writer.cxx; path = ../../../src/STEPCAFControl/STEPCAFControl_Writer.cxx; sourceTree = "<group>"; };
+
+		1346025905E90E5C03E10EE4 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKBRep.dylib; path = libTKBRep.dylib; sourceTree = "<group>"; };
+		02A500570D48056814FA0EEF = {isa = PBXFileReference; lastKnownFileType = file; name = libTKSTEPAttr.dylib; path = libTKSTEPAttr.dylib; sourceTree = "<group>"; };
+		140C0F9E0D330DDD13E112CA = {isa = PBXFileReference; lastKnownFileType = file; name = libTKernel.dylib; path = libTKernel.dylib; sourceTree = "<group>"; };
+		0D580467011D11BC175402F0 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKMath.dylib; path = libTKMath.dylib; sourceTree = "<group>"; };
+		10530EEF0C0611CE10A403E1 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKXSBase.dylib; path = libTKXSBase.dylib; sourceTree = "<group>"; };
+		10790973184916EC022E0E7B = {isa = PBXFileReference; lastKnownFileType = file; name = libTKTopAlgo.dylib; path = libTKTopAlgo.dylib; sourceTree = "<group>"; };
+		0E97141412E604A5107B0EA5 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKG2d.dylib; path = libTKG2d.dylib; sourceTree = "<group>"; };
+		167405430EF7167700090B9B = {isa = PBXFileReference; lastKnownFileType = file; name = libTKCAF.dylib; path = libTKCAF.dylib; sourceTree = "<group>"; };
+		01B50D6A0A86179506210B10 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKSTEPBase.dylib; path = libTKSTEPBase.dylib; sourceTree = "<group>"; };
+		126F02ED0AD8125812FD052E = {isa = PBXFileReference; lastKnownFileType = file; name = libTKCDF.dylib; path = libTKCDF.dylib; sourceTree = "<group>"; };
+		0F0E0899198500830E090A9D = {isa = PBXFileReference; lastKnownFileType = file; name = libTKLCAF.dylib; path = libTKLCAF.dylib; sourceTree = "<group>"; };
+		072E13E914EB0B7C0F0D1561 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKG3d.dylib; path = libTKG3d.dylib; sourceTree = "<group>"; };
+		05F714FE15D00D030F3C17D8 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKXCAF.dylib; path = libTKXCAF.dylib; sourceTree = "<group>"; };
+		052E143913D904EE0A9F0E5C = {isa = PBXFileReference; lastKnownFileType = file; name = libTKSTEP.dylib; path = libTKSTEP.dylib; sourceTree = "<group>"; };
+		1901006B0C6700CE158D101D = {isa = PBXFileReference; lastKnownFileType = file; name = libTKShHealing.dylib; path = libTKShHealing.dylib; sourceTree = "<group>"; };
+
+		089A18B201E9000C19040174 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03A9031F05A416F80936130D ,
+				07CA1556152C0DCE01AA0690 ,
+				019B06360AAE11220C170FC1 ,
+				106F157418ED0D1F0A06174E ,
+				071E19440BDF012609300F9C ,
+				092F178F0FF306540FE305E9 ,
+				16F70A880FD410A2043E090C ,
+				123D111D03340B6A058F058E ,
+				139B135312E713D808700533 ,
+				05FE0A130F62125E077605CA ,
+				06F3057403B713B6022300FA ,
+				14E0168D065209F8010100A1 ,
+				15FD0F260B5A159214F70856 ,
+				0DFF02D716CD0FFE0B600B18 ,
+				147709D10D760C8607920472 ,
+
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		0B530C4B042313FA06DF1821 = {
+			isa = PBXGroup;
+			children = (
+				0B6B0ADE03F106F0106D0C41 ,
+				0E7711ED139417D0016003A8 ,
+				096810F002F4029003510549 ,
+				1625182A0AF201C40E8B0555 ,
+				081B02640BD617DE1821138F ,
+				138D02A014FB05F1168110FC ,
+			);
+			name = STEPCAFControl;
+			sourceTree = "<group>";
+		};
+
+		080602890283126214770042 = {
+			isa = PBXGroup;
+			children = (
+				1346025905E90E5C03E10EE4 ,
+				02A500570D48056814FA0EEF ,
+				140C0F9E0D330DDD13E112CA ,
+				0D580467011D11BC175402F0 ,
+				10530EEF0C0611CE10A403E1 ,
+				10790973184916EC022E0E7B ,
+				0E97141412E604A5107B0EA5 ,
+				167405430EF7167700090B9B ,
+				01B50D6A0A86179506210B10 ,
+				126F02ED0AD8125812FD052E ,
+				0F0E0899198500830E090A9D ,
+				072E13E914EB0B7C0F0D1561 ,
+				05F714FE15D00D030F3C17D8 ,
+				052E143913D904EE0A9F0E5C ,
+				1901006B0C6700CE158D101D ,
+
+				033F17D112A204941750065A ,
+				09B90FBE1439006B13510C9D ,
+			);
+			sourceTree = "<group>";
+		};
+		033F17D112A204941750065A = {
+			isa = PBXGroup;
+			children = (
+				0B530C4B042313FA06DF1821 ,
+			);
+			name = "Source files";
+			sourceTree = "<group>";
+		};
+
+		14DE125A1885144B0D930135 = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		0F3C000407370E600A930273 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 070217C816C010CE0CF002A1 ;
+			buildPhases = (
+				129113BB12D6055604F71247 ,
+				089A18B201E9000C19040174 ,
+				14DE125A1885144B0D930135 ,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TKXDESTEP;
+			productName = TKXDESTEP;
+			productReference = 09B90FBE1439006B13510C9D ;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+
+		0ECE05DE0BE40F5E04E00609 = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 189B19360676128A189B0210 ;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 080602890283126214770042;
+			productRefGroup = 080602890283126214770042;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0F3C000407370E600A930273 ,
+			);
+		};
+
+		129113BB12D6055604F71247 = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				143413FA09B8192E180A01B9 ,
+				11CF00380C0A10810A8506C1 ,
+				0F6F051602D800AF05100A16 ,
+				1174191005341842046D0DE1 ,
+				0BE4149F16ED044809B1153A ,
+				11FD07E4079D07A803A713CC ,
+
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		10A916D60063069A191603E1 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_LDFLAGS = "$(CSF_OPT_LNK64D)"; 
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		18BB0537075B0CE012D30D31 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				DEAD_CODE_STRIPPING = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_LDFLAGS = "$(CSF_OPT_LNK64)";
+			};
+			name = Release;
+		};
+		09D80A41054C05DD0FA2138D = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					OCC_CONVERT_SIGNALS ,
+				);
+				HEADER_SEARCH_PATHS = (
+					../../../inc,
+					/usr/local/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include,
+					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc,
+					"$(CSF_OPT_INC)",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr,
+					/usr/lib,
+					/Users/mnt/tools/WOK680/site/../3rdparty/mac64/gl2ps/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/lib,
+					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/adm/mac/xcd/build/Release,
+				);
+				OTHER_CFLAGS = (
+					"$(CSF_OPT_CMPL)",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = " ../../../inc /usr/local/include /Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include /Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype /Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include /Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc";
+				WRAPPER_EXTENSION = dylib;
+			};
+			name = Debug;
+		};
+		01C314EC0C740D9F0B5A03F2 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					OCC_CONVERT_SIGNALS ,
+				);
+				HEADER_SEARCH_PATHS = (
+					../../../inc,
+					/usr/local/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include,
+					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc,
+					"$(CSF_OPT_INC)",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr,
+					/usr/lib,
+					/Users/mnt/tools/WOK680/site/../3rdparty/mac64/gl2ps/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/lib,
+					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/adm/mac/xcd/build/Release,
+				);
+				OTHER_CFLAGS = (
+					"$(CSF_OPT_CMPL)",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = " ../../../inc /usr/local/include /Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include /Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype /Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include /Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc";
+				WRAPPER_EXTENSION = dylib;
+			};
+			name = Release;
+		};
+
+		189B19360676128A189B0210 = {
+			isa = XCConfigurationList;
+		buildConfigurations = (
+				10A916D60063069A191603E1 ,
+				18BB0537075B0CE012D30D31 ,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		070217C816C010CE0CF002A1 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				09D80A41054C05DD0FA2138D ,
+				01C314EC0C740D9F0B5A03F2 ,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+
+	};
+	rootObject = 0ECE05DE0BE40F5E04E00609 ;
+}

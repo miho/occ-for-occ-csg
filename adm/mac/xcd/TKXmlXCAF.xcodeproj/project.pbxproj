@@ -1,0 +1,422 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+		01D0152D15F9156900381688 = {isa = PBXBuildFile; fileRef = 057607D9180B0CF005D91523 ;};
+		0624122B027E08BF16F4172C = {isa = PBXBuildFile; fileRef = 0CE808E201BB050B0FEC0A43 ;};
+		0B8D13DB165A161D03FA0C37 = {isa = PBXBuildFile; fileRef = 08750FE115620923055016A7 ;};
+		09AE02E7005B0A3603541897 = {isa = PBXBuildFile; fileRef = 0EE003CD0BF00DD802220CA8 ;};
+		0E740FAB0FF10F1A098A06CE = {isa = PBXBuildFile; fileRef = 0861011C03020124007510DC ;};
+		0F980A020D9B17E00353034C = {isa = PBXBuildFile; fileRef = 079A0D69192D09EA138E1457 ;};
+		141209420E0C14BD0A1502A4 = {isa = PBXBuildFile; fileRef = 0D5A15980A901396175D0597 ;};
+		11201863163D0DB003720520 = {isa = PBXBuildFile; fileRef = 05BB13D10924051805E3157E ;};
+		0F2F13D703FE02F30FE60210 = {isa = PBXBuildFile; fileRef = 0C1E0901084901EC1940076F ;};
+		0008052C07EC06DA0DC00112 = {isa = PBXBuildFile; fileRef = 1491130B099A165A16C401AD ;};
+		1671195C0450066F00ED0EAF = {isa = PBXBuildFile; fileRef = 08E7179C18EF11A1032C08DF ;};
+		13A01665179B09D205540693 = {isa = PBXBuildFile; fileRef = 18BE177C138318AC07AD1555 ;};
+		0DFC18840E3D0402033905A4 = {isa = PBXBuildFile; fileRef = 0DE40925033A069B03A40A5B ;};
+		051909EC0142043701BB10EB = {isa = PBXBuildFile; fileRef = 195F12D114EB0A58023A0A2B ;};
+		088607E20EFE0BE502FA14B9 = {isa = PBXBuildFile; fileRef = 0EFA12D8133F15070BD402C3 ;};
+		027805ED114C172E144F081A = {isa = PBXBuildFile; fileRef = 13B8084F0A060DE00C140EF7 ;};
+		0BF1004614BB060F13EB0855 = {isa = PBXBuildFile; fileRef = 051001EA035604B10FCB0EEA ;};
+		1445081B0D0C03F617F21028 = {isa = PBXBuildFile; fileRef = 105D0583010B102808AA0A99 ;};
+		13350ADF1851125A085F18B6 = {isa = PBXBuildFile; fileRef = 0493155A0E6E04D60B6D105F ;};
+		134C04FF0FB90781060C05E7 = {isa = PBXBuildFile; fileRef = 001D008A092A100F07940EBF ;};
+		0C730BF40191069E0A50179B = {isa = PBXBuildFile; fileRef = 08DF1885040B193A17EB0A69 ;};
+		02920AC001C20C7703881848 = {isa = PBXBuildFile; fileRef = 18FB1206164B054B05AF06F6 ;};
+		148301F9143C0728035107BF = {isa = PBXBuildFile; fileRef = 07E013260E5F175105901487 ;};
+		129A032407B8035303A91699 = {isa = PBXBuildFile; fileRef = 03E20210027600C404461525 ;};
+		13E1112D000F0CC4170D0E30 = {isa = PBXBuildFile; fileRef = 1222118706710F8C0AF708C8 ;};
+		05E2134407DE0AA00EFE0E18 = {isa = PBXBuildFile; fileRef = 06FA1801135F0D0F14CE0B3D ;};
+		17580BEB02A312B6117A0329 = {isa = PBXBuildFile; fileRef = 0DCA0BA31767021312160149 ;};
+
+		11A102B90A7611D114B517BE = {isa = PBXBuildFile; fileRef = 10B5085605E214BF08D21132 ; };
+		03A9031F05A416F80936130D = {isa = PBXBuildFile; fileRef = 1346025905E90E5C03E10EE4 ; };
+		05FE0A130F62125E077605CA = {isa = PBXBuildFile; fileRef = 126F02ED0AD8125812FD052E ; };
+		106F157418ED0D1F0A06174E = {isa = PBXBuildFile; fileRef = 0D580467011D11BC175402F0 ; };
+		019B06360AAE11220C170FC1 = {isa = PBXBuildFile; fileRef = 140C0F9E0D330DDD13E112CA ; };
+		16F70A880FD410A2043E090C = {isa = PBXBuildFile; fileRef = 0E97141412E604A5107B0EA5 ; };
+		01FE13290ACD0D790B6A00D0 = {isa = PBXBuildFile; fileRef = 04DC100B0112023C14B80956 ; };
+		123D111D03340B6A058F058E = {isa = PBXBuildFile; fileRef = 167405430EF7167700090B9B ; };
+		14E0168D065209F8010100A1 = {isa = PBXBuildFile; fileRef = 072E13E914EB0B7C0F0D1561 ; };
+		06F3057403B713B6022300FA = {isa = PBXBuildFile; fileRef = 0F0E0899198500830E090A9D ; };
+		15FD0F260B5A159214F70856 = {isa = PBXBuildFile; fileRef = 05F714FE15D00D030F3C17D8 ; };
+		0CE2052A08F6063D037C0136 = {isa = PBXBuildFile; fileRef = 08341341147B09D915D6186F ; };
+
+		10A20CB91169021105820E9D = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libTKXmlXCAF.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+
+		057607D9180B0CF005D91523 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc.cxx; sourceTree = "<group>"; };
+		0CE808E201BB050B0FEC0A43 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_AreaDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_AreaDriver.cxx; sourceTree = "<group>"; };
+		08750FE115620923055016A7 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_AssemblyItemRefDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_AssemblyItemRefDriver.cxx; sourceTree = "<group>"; };
+		0EE003CD0BF00DD802220CA8 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_CentroidDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_CentroidDriver.cxx; sourceTree = "<group>"; };
+		0861011C03020124007510DC = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_ClippingPlaneToolDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_ClippingPlaneToolDriver.cxx; sourceTree = "<group>"; };
+		079A0D69192D09EA138E1457 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_ColorDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_ColorDriver.cxx; sourceTree = "<group>"; };
+		0D5A15980A901396175D0597 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_ColorToolDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_ColorToolDriver.cxx; sourceTree = "<group>"; };
+		05BB13D10924051805E3157E = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_DatumDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_DatumDriver.cxx; sourceTree = "<group>"; };
+		0C1E0901084901EC1940076F = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_DimTolDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_DimTolDriver.cxx; sourceTree = "<group>"; };
+		1491130B099A165A16C401AD = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_DimTolToolDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_DimTolToolDriver.cxx; sourceTree = "<group>"; };
+		08E7179C18EF11A1032C08DF = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_DocumentToolDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_DocumentToolDriver.cxx; sourceTree = "<group>"; };
+		18BE177C138318AC07AD1555 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_GraphNodeDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_GraphNodeDriver.cxx; sourceTree = "<group>"; };
+		0DE40925033A069B03A40A5B = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_LayerToolDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_LayerToolDriver.cxx; sourceTree = "<group>"; };
+		195F12D114EB0A58023A0A2B = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_LocationDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_LocationDriver.cxx; sourceTree = "<group>"; };
+		0EFA12D8133F15070BD402C3 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_MaterialDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_MaterialDriver.cxx; sourceTree = "<group>"; };
+		13B8084F0A060DE00C140EF7 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_MaterialToolDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_MaterialToolDriver.cxx; sourceTree = "<group>"; };
+		051001EA035604B10FCB0EEA = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_NoteBalloonDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_NoteBalloonDriver.cxx; sourceTree = "<group>"; };
+		105D0583010B102808AA0A99 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_NoteBinDataDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_NoteBinDataDriver.cxx; sourceTree = "<group>"; };
+		0493155A0E6E04D60B6D105F = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_NoteCommentDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_NoteCommentDriver.cxx; sourceTree = "<group>"; };
+		001D008A092A100F07940EBF = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_NoteDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_NoteDriver.cxx; sourceTree = "<group>"; };
+		08DF1885040B193A17EB0A69 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_NotesToolDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_NotesToolDriver.cxx; sourceTree = "<group>"; };
+		18FB1206164B054B05AF06F6 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_ShapeToolDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_ShapeToolDriver.cxx; sourceTree = "<group>"; };
+		07E013260E5F175105901487 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_ViewToolDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_ViewToolDriver.cxx; sourceTree = "<group>"; };
+		03E20210027600C404461525 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlMXCAFDoc_VolumeDriver.cxx; path = ../../../src/XmlMXCAFDoc/XmlMXCAFDoc_VolumeDriver.cxx; sourceTree = "<group>"; };
+		1222118706710F8C0AF708C8 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlXCAFDrivers.cxx; path = ../../../src/XmlXCAFDrivers/XmlXCAFDrivers.cxx; sourceTree = "<group>"; };
+		06FA1801135F0D0F14CE0B3D = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlXCAFDrivers_DocumentRetrievalDriver.cxx; path = ../../../src/XmlXCAFDrivers/XmlXCAFDrivers_DocumentRetrievalDriver.cxx; sourceTree = "<group>"; };
+		0DCA0BA31767021312160149 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = XmlXCAFDrivers_DocumentStorageDriver.cxx; path = ../../../src/XmlXCAFDrivers/XmlXCAFDrivers_DocumentStorageDriver.cxx; sourceTree = "<group>"; };
+
+		10B5085605E214BF08D21132 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKXmlL.dylib; path = libTKXmlL.dylib; sourceTree = "<group>"; };
+		1346025905E90E5C03E10EE4 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKBRep.dylib; path = libTKBRep.dylib; sourceTree = "<group>"; };
+		126F02ED0AD8125812FD052E = {isa = PBXFileReference; lastKnownFileType = file; name = libTKCDF.dylib; path = libTKCDF.dylib; sourceTree = "<group>"; };
+		0D580467011D11BC175402F0 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKMath.dylib; path = libTKMath.dylib; sourceTree = "<group>"; };
+		140C0F9E0D330DDD13E112CA = {isa = PBXFileReference; lastKnownFileType = file; name = libTKernel.dylib; path = libTKernel.dylib; sourceTree = "<group>"; };
+		0E97141412E604A5107B0EA5 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKG2d.dylib; path = libTKG2d.dylib; sourceTree = "<group>"; };
+		04DC100B0112023C14B80956 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKGeomBase.dylib; path = libTKGeomBase.dylib; sourceTree = "<group>"; };
+		167405430EF7167700090B9B = {isa = PBXFileReference; lastKnownFileType = file; name = libTKCAF.dylib; path = libTKCAF.dylib; sourceTree = "<group>"; };
+		072E13E914EB0B7C0F0D1561 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKG3d.dylib; path = libTKG3d.dylib; sourceTree = "<group>"; };
+		0F0E0899198500830E090A9D = {isa = PBXFileReference; lastKnownFileType = file; name = libTKLCAF.dylib; path = libTKLCAF.dylib; sourceTree = "<group>"; };
+		05F714FE15D00D030F3C17D8 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKXCAF.dylib; path = libTKXCAF.dylib; sourceTree = "<group>"; };
+		08341341147B09D915D6186F = {isa = PBXFileReference; lastKnownFileType = file; name = libTKXml.dylib; path = libTKXml.dylib; sourceTree = "<group>"; };
+
+		148115990D2500F30BAA1531 = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11A102B90A7611D114B517BE ,
+				03A9031F05A416F80936130D ,
+				05FE0A130F62125E077605CA ,
+				106F157418ED0D1F0A06174E ,
+				019B06360AAE11220C170FC1 ,
+				16F70A880FD410A2043E090C ,
+				01FE13290ACD0D790B6A00D0 ,
+				123D111D03340B6A058F058E ,
+				14E0168D065209F8010100A1 ,
+				06F3057403B713B6022300FA ,
+				15FD0F260B5A159214F70856 ,
+				0CE2052A08F6063D037C0136 ,
+
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		0FB7004010391152014700C6 = {
+			isa = PBXGroup;
+			children = (
+				057607D9180B0CF005D91523 ,
+				0CE808E201BB050B0FEC0A43 ,
+				08750FE115620923055016A7 ,
+				0EE003CD0BF00DD802220CA8 ,
+				0861011C03020124007510DC ,
+				079A0D69192D09EA138E1457 ,
+				0D5A15980A901396175D0597 ,
+				05BB13D10924051805E3157E ,
+				0C1E0901084901EC1940076F ,
+				1491130B099A165A16C401AD ,
+				08E7179C18EF11A1032C08DF ,
+				18BE177C138318AC07AD1555 ,
+				0DE40925033A069B03A40A5B ,
+				195F12D114EB0A58023A0A2B ,
+				0EFA12D8133F15070BD402C3 ,
+				13B8084F0A060DE00C140EF7 ,
+				051001EA035604B10FCB0EEA ,
+				105D0583010B102808AA0A99 ,
+				0493155A0E6E04D60B6D105F ,
+				001D008A092A100F07940EBF ,
+				08DF1885040B193A17EB0A69 ,
+				18FB1206164B054B05AF06F6 ,
+				07E013260E5F175105901487 ,
+				03E20210027600C404461525 ,
+			);
+			name = XmlMXCAFDoc;
+			sourceTree = "<group>";
+		};
+		08D50F4811C5001C0A760FCE = {
+			isa = PBXGroup;
+			children = (
+				1222118706710F8C0AF708C8 ,
+				06FA1801135F0D0F14CE0B3D ,
+				0DCA0BA31767021312160149 ,
+			);
+			name = XmlXCAFDrivers;
+			sourceTree = "<group>";
+		};
+
+		078A171D12C80DA104B40122 = {
+			isa = PBXGroup;
+			children = (
+				10B5085605E214BF08D21132 ,
+				1346025905E90E5C03E10EE4 ,
+				126F02ED0AD8125812FD052E ,
+				0D580467011D11BC175402F0 ,
+				140C0F9E0D330DDD13E112CA ,
+				0E97141412E604A5107B0EA5 ,
+				04DC100B0112023C14B80956 ,
+				167405430EF7167700090B9B ,
+				072E13E914EB0B7C0F0D1561 ,
+				0F0E0899198500830E090A9D ,
+				05F714FE15D00D030F3C17D8 ,
+				08341341147B09D915D6186F ,
+
+				0830072A0A56191B137404C6 ,
+				10A20CB91169021105820E9D ,
+			);
+			sourceTree = "<group>";
+		};
+		0830072A0A56191B137404C6 = {
+			isa = PBXGroup;
+			children = (
+				0FB7004010391152014700C6 ,
+				08D50F4811C5001C0A760FCE ,
+			);
+			name = "Source files";
+			sourceTree = "<group>";
+		};
+
+		0C5D0253002D0E0B0AFD0D73 = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		167F13F310970CAC18D10087 = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0A41108F1472072818DA1544 ;
+			buildPhases = (
+				13420E550065026F09E7074D ,
+				148115990D2500F30BAA1531 ,
+				0C5D0253002D0E0B0AFD0D73 ,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TKXmlXCAF;
+			productName = TKXmlXCAF;
+			productReference = 10A20CB91169021105820E9D ;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+
+		0AB50FCF14DB0B940E610350 = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = 01DC133D11610BC70B920C5B ;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 078A171D12C80DA104B40122;
+			productRefGroup = 078A171D12C80DA104B40122;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				167F13F310970CAC18D10087 ,
+			);
+		};
+
+		13420E550065026F09E7074D = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				01D0152D15F9156900381688 ,
+				0624122B027E08BF16F4172C ,
+				0B8D13DB165A161D03FA0C37 ,
+				09AE02E7005B0A3603541897 ,
+				0E740FAB0FF10F1A098A06CE ,
+				0F980A020D9B17E00353034C ,
+				141209420E0C14BD0A1502A4 ,
+				11201863163D0DB003720520 ,
+				0F2F13D703FE02F30FE60210 ,
+				0008052C07EC06DA0DC00112 ,
+				1671195C0450066F00ED0EAF ,
+				13A01665179B09D205540693 ,
+				0DFC18840E3D0402033905A4 ,
+				051909EC0142043701BB10EB ,
+				088607E20EFE0BE502FA14B9 ,
+				027805ED114C172E144F081A ,
+				0BF1004614BB060F13EB0855 ,
+				1445081B0D0C03F617F21028 ,
+				13350ADF1851125A085F18B6 ,
+				134C04FF0FB90781060C05E7 ,
+				0C730BF40191069E0A50179B ,
+				02920AC001C20C7703881848 ,
+				148301F9143C0728035107BF ,
+				129A032407B8035303A91699 ,
+				13E1112D000F0CC4170D0E30 ,
+				05E2134407DE0AA00EFE0E18 ,
+				17580BEB02A312B6117A0329 ,
+
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+		00AA0CF800BA0C140C4F151B = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_LDFLAGS = "$(CSF_OPT_LNK64D)"; 
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		00E30A90093A1614168E1426 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				DEAD_CODE_STRIPPING = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_LDFLAGS = "$(CSF_OPT_LNK64)";
+			};
+			name = Release;
+		};
+		13A114A011C602C9145114AE = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					OCC_CONVERT_SIGNALS ,
+				);
+				HEADER_SEARCH_PATHS = (
+					../../../inc,
+					/usr/local/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include,
+					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc,
+					"$(CSF_OPT_INC)",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr,
+					/usr/lib,
+					/Users/mnt/tools/WOK680/site/../3rdparty/mac64/gl2ps/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/lib,
+					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/adm/mac/xcd/build/Release,
+				);
+				OTHER_CFLAGS = (
+					"$(CSF_OPT_CMPL)",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = " ../../../inc /usr/local/include /Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include /Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype /Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include /Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc";
+				WRAPPER_EXTENSION = dylib;
+			};
+			name = Debug;
+		};
+		10780781033118F7089B0A64 = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				EXECUTABLE_EXTENSION = dylib;
+				EXECUTABLE_PREFIX = lib;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					OCC_CONVERT_SIGNALS ,
+				);
+				HEADER_SEARCH_PATHS = (
+					../../../inc,
+					/usr/local/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include,
+					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc,
+					"$(CSF_OPT_INC)",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr,
+					/usr/lib,
+					/Users/mnt/tools/WOK680/site/../3rdparty/mac64/gl2ps/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/lib,
+					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/lib,
+					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/adm/mac/xcd/build/Release,
+				);
+				OTHER_CFLAGS = (
+					"$(CSF_OPT_CMPL)",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = " ../../../inc /usr/local/include /Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include /Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype /Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include /Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc";
+				WRAPPER_EXTENSION = dylib;
+			};
+			name = Release;
+		};
+
+		01DC133D11610BC70B920C5B = {
+			isa = XCConfigurationList;
+		buildConfigurations = (
+				00AA0CF800BA0C140C4F151B ,
+				00E30A90093A1614168E1426 ,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0A41108F1472072818DA1544 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				13A114A011C602C9145114AE ,
+				10780781033118F7089B0A64 ,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+
+	};
+	rootObject = 0AB50FCF14DB0B940E610350 ;
+}

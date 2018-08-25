@@ -1,0 +1,7 @@
+<map id="NCollection_UBTree&lt; TheObjType, TheBndType &gt;::Selector" name="NCollection_UBTree&lt; TheObjType, TheBndType &gt;::Selector">
+<area shape="rect" id="node2" href="$class_b_o_p_tools___box_selector.html" title="Template Selector for the unbalanced binary tree of overlapped bounding boxes. " alt="" coords="270,5,429,47"/>
+<area shape="rect" id="node3" href="$class_b_rep_builder_a_p_i___bnd_box_tree_selector.html" title="Class BRepBuilderAPI_BndBoxTreeSelector derived from UBTree::Selector This class is used to select ov..." alt="" coords="253,71,446,112"/>
+<area shape="rect" id="node4" href="$class_b_rep_class3d___bnd_box_tree_selector_point.html" title="BRepClass3d_BndBoxTreeSelector\lPoint" alt="" coords="236,136,463,177"/>
+<area shape="rect" id="node5" href="$class_b_rep_mesh___wire_checker_1_1_bnd_box2d_tree_selector.html" title="Selector. Used to identify segments with overlapped bounding boxes. Note that instance of selector ca..." alt="" coords="265,201,433,243"/>
+<area shape="rect" id="node6" href="$class_shape_analysis___box_bnd_tree_selector.html" title="ShapeAnalysis_BoxBndTree\lSelector" alt="" coords="256,267,443,308"/>
+</map>

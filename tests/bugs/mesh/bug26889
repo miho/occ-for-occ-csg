@@ -1,0 +1,26 @@
+puts "========="
+puts "CR26889"
+puts "========="
+puts ""
+###############################################
+# Very poor mesh result from shape
+###############################################
+
+pload XDE
+
+stepread [locate_data_file bug26889_export.step] a *
+
+dlog reset
+dlog on
+
+dchrono t restart
+incmesh a_1 0.1 1
+dchrono t stop counter incmesh
+
+checktrinfo a_1 -tri -nod
+
+vinit
+vsetdispmode 1
+vdisplay a_1
+vfit
+checkview -screenshot -3d -path ${imagedir}/${test_image}.png

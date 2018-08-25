@@ -1,0 +1,52 @@
+puts "TODO OCC27711 ALL: Error: tolerance"
+puts "========"
+puts "OCC27711"
+puts "========"
+puts ""
+#####################################
+# Blend-on-blend corrupts the shape
+#####################################
+
+smallview
+
+restore [locate_data_file bug27711.brep] s
+
+clear
+display s
+fit
+xwd $imagedir/${casename}_step_0.png
+
+explode s e
+blend result s 0.5 s_12 0.5 s_11
+set bug_info [string trim [checkshape result]]
+if {$bug_info != "This shape seems to be valid"} {
+  puts "ERROR: Problem of test case functionality. Should be additionally investigated."
+}
+clear
+display result
+xwd $imagedir/${casename}_step_1.png
+
+explode result e
+# The correct command format should be following:
+# blend res res 0.5 res_7 0.5 res_11
+# but it does not work properly on win64 vc 10
+# so for automated test case following command format was used:
+blend result result 0.5 result_11
+set bug_info [string trim [checkshape result]]
+if {$bug_info != "This shape seems to be valid"} {
+  puts "ERROR: Problem of test case functionality. Should be additionally investigated."
+}
+clear
+display result
+xwd $imagedir/${casename}_step_2.png
+
+explode result e
+blend result result 0.35 result_4 0.25 ressult_15 0.2 result_27
+set bug_info [string trim [checkshape result]]
+if {$bug_info != "This shape seems to be valid"} {
+  puts "ERROR: OCC27711 is reproduced. Result of blend operation is WRONG."
+}
+checkmaxtol result -min_tol 1.e-3
+clear
+display result
+xwd $imagedir/${casename}_step_3.png

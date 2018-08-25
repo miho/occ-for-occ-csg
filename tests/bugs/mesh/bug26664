@@ -1,0 +1,18 @@
+puts "========"
+puts "OCC26664"
+puts "========"
+puts ""
+#################################
+# Triangulating a very small polygon fails
+#################################
+
+restore [locate_data_file bug26664_f.brep] a
+
+# adaptive meshing is OK
+tclean a
+incmesh a 1e-4 -adaptive
+
+# non-adaptive meshing fails
+puts "TODO 26664 ALL: Meshing statuses: Failure"
+tclean a
+incmesh a 1e-4

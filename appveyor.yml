@@ -63,10 +63,12 @@ build_script:
   - cd %APPVEYOR_BUILD_FOLDER%\dependencies\freetype
   - dir
   - if not exist build mkdir build
-  - if not exist APPVEYOR_BUILD_FOLDER%\dependencies-installation\ mkdir dependencies-installation
+  - if not exist %APPVEYOR_BUILD_FOLDER%\dependencies-installation\ mkdir %APPVEYOR_BUILD_FOLDER%\dependencies-installation
   - cd build
   - cmake .. -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:BOOL=false -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\dependencies-installation
   - MSBuild .\INSTALL.vcxproj  /property:Configuration=Release /property:Platform=x64
+  
+  - dir %APPVEYOR_BUILD_FOLDER%\dependencies-installation
   
   # install OCE 0.18.3 
   #- curl -LfsS -o OCE-0.18.3.tar.gz https://github.com/miho/oce/archive/OCE-0.18.3.tar.gz
@@ -82,7 +84,7 @@ build_script:
   - if not exist build mkdir build
   - if not exist %APPVEYOR_BUILD_FOLDER%\opencascade-installation mkdir %APPVEYOR_BUILD_FOLDER%\opencascade-installation
   - cd build
-  - cmake .. -G "Visual Studio 15 2017 Win64" -DBUILD_LIBRARY_TYPE=Static -DCMAKE_BUILD_TYPE=Release -DBUILD_Module_Draw:BOOL=OFF -D3RDPARTY_DIR=%APPVEYOR_BUILD_FOLDER%\dependencies-installation -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\opencascade-installation" -DINSTALL_FREETYPE:BOOL=true
+  - cmake .. -G "Visual Studio 15 2017 Win64" -DBUILD_LIBRARY_TYPE=Static -DCMAKE_BUILD_TYPE=Release -DBUILD_Module_Draw:BOOL=false -D3RDPARTY_DIR=%APPVEYOR_BUILD_FOLDER%\dependencies-installation -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\opencascade-installation" -DINSTALL_FREETYPE:BOOL=true
   - MSBuild .\INSTALL.vcxproj  /property:Configuration=Release /property:Platform=x64
 
 after_build:

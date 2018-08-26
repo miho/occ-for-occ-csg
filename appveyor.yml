@@ -64,8 +64,9 @@ build_script:
   - dir
   - if not exist build mkdir build
   - if not exist %APPVEYOR_BUILD_FOLDER%\dependencies-installation\ mkdir %APPVEYOR_BUILD_FOLDER%\dependencies-installation
+  - if not exist %APPVEYOR_BUILD_FOLDER%\dependencies-installation\freetype mkdir %APPVEYOR_BUILD_FOLDER%\dependencies-installation\freetype
   - cd build
-  - cmake .. -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:BOOL=false -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\dependencies-installation
+  - cmake .. -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:BOOL=false -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\dependencies-installation\freetype
   - MSBuild .\INSTALL.vcxproj  /property:Configuration=Release /property:Platform=x64
   
   - dir %APPVEYOR_BUILD_FOLDER%\dependencies-installation

@@ -1,1 +1,141 @@
 
+# Build worker image (VM template)
+image: Visual Studio 2017
+
+# scripts that are called at very beginning, before repo cloning
+init:
+  - date /T & time /T
+  - git config --global core.autocrlf input
+  - cmake --version
+
+#branches:
+#  only:
+#  - master
+
+clone_depth: 5
+
+version: '{build}'
+
+platform:
+  - x64
+
+configuration:
+  - Release
+
+environment:
+  MSBUILD_FLAGS: /verbosity:minimal /maxcpucount
+  matrix:
+    - generator: "Visual Studio 15 2017 Win64"    
+
+matrix:
+  fast_finish: true
+
+cache:
+  - C:\projects\occ-for-occ-csg\freetype-2.7.1\
+  - C:\projects\occ-for-occ-csg\
+
+install:
+  - vswhere -property installationPath
+  
+  # find installation dir, replacement for %VS150COMNTOOLS%
+  - |-
+       REM crappy windows batch replacement for bash's var=`mycommand` 
+       for /f "usebackq tokens=*" %%a in (`vswhere -property installationPath`) do set InstallDir=%%a
+      
+       echo %InstallDir%\VC\Auxiliary\Build\
+       
+       dir "%InstallDir%\VC\Auxiliary\Build\"
+  
+       REM if exist "%InstallDir%\VC\Auxiliary\Build\Microsoft.VCRedistVersion.default.txt" (
+         set /p RedistVersion=<"%InstallDir%\VC\Auxiliary\Build\Microsoft.VCRedistVersion.default.txt"
+       REM )
+       
+       echo "%InstallDir%\VC\Redist\MSVC\%RedistVersion%\"
+       dir "%InstallDir%\VC\Redist\MSVC\%RedistVersion%\"
+       set "REDIST_DIR=%InstallDir%\VC\Redist\MSVC\%RedistVersion%\"
+     
+  
+  - echo %VS150COMNTOOLS%
+     
+  # install FreeType 2.7.1
+  - curl -LfsS -o freetype-2.7.1.tar.gz https://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.gz
+  - cmd.exe '/C 7z x "freetype-2.7.1.tar.gz" -so | 7z x -aoa -si -ttar -o%APPVEYOR_BUILD_FOLDER%\freetype-2.7.1 -y > nul
+  - cd %APPVEYOR_BUILD_FOLDER%\freetype-2.7.1\freetype-2.7.1
+  - dir
+  - if not exist build mkdir build
+  - if not exist installation mkdir installation
+  - cd build
+  - cmake .. -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS:BOOL=false -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\freetype-2.7.1\freetype-2.7.1\installation\
+  - MSBuild .\INSTALL.vcxproj  /property:Configuration=Release /property:Platform=x64
+  
+  # install OCE 0.18.3 
+  #- curl -LfsS -o OCE-0.18.3.tar.gz https://github.com/miho/oce/archive/OCE-0.18.3.tar.gz
+  #- cmd.exe '/C 7z x "OCE-0.18.3.tar.gz" -so | 7z x -aoa -si -ttar -o%APPVEYOR_BUILD_FOLDER%\OCE-0.18.3 -y > nul
+  - cd %APPVEYOR_BUILD_FOLDER%\
+  - if not exist occ git clone --branch OCE-0.18.3 --depth 1 https://github.com/tpaviot/oce.git oce
+  #- git clone https://github.com/tpaviot/oce.git oce
+  #- cd %APPVEYOR_BUILD_FOLDER%\
+  - dir
+  - cd %APPVEYOR_BUILD_FOLDER%\oce
+  #- git checkout OCE-0.18.3
+  - dir
+  - if not exist build mkdir build
+  - if not exist installation mkdir installation
+  - cd build
+  - cmake .. -G "Visual Studio 15 2017 Win64" -DOCE_BUILD_SHARED_LIB=OFF -DCMAKE_BUILD_TYPE=Release -DOCE_USE_TCL_TEST_FRAMEWORK=OFF -DOCE_TESTING=OFF -DOCE_DRAW=OFF -DOCE_VISUALISATION=ON -DOCE_OCAF=ON -DOCE_DATAEXCHANGE=ON -DOCE_COPY_HEADERS_BUILD=ON -DOCE_MULTITHREAD_LIBRARY=OPENMP -DFREETYPE_INCLUDE_DIR_freetype2=%APPVEYOR_BUILD_FOLDER%\freetype-2.7.1\freetype-2.7.1\installation\include\freetype2\freetype\config -DFREETYPE_INCLUDE_DIR_ft2build=%APPVEYOR_BUILD_FOLDER%\freetype-2.7.1\freetype-2.7.1\installation\include\freetype2 -DFREETYPE_LIBRARY_RELEASE=%APPVEYOR_BUILD_FOLDER%\freetype-2.7.1\freetype-2.7.1\installation\lib\freetype.lib -DOCE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\oce\installation\"
+  - MSBuild .\OCE.sln  /property:Configuration=Release /property:Platform=x64
+  - MSBuild .\INSTALL.vcxproj  /property:Configuration=Release /property:Platform=x64
+build_script:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  #- dir
+  ## create folder for an out-of-source-tree build: "c:\projects\build"
+  #- cd.. 
+  - if not exist build mkdir build
+  - cd build
+  # generate build script
+  - dir %APPVEYOR_BUILD_FOLDER%\oce\installation\
+  - cmake .. -G "%generator%" -DOCE_DIR=%APPVEYOR_BUILD_FOLDER%\oce\installation\cmake
+  - MSBuild .\occ-csg-prj.sln  /property:Configuration=Release /property:Platform=x64
+  - bin\Release\occ-csg.exe --help
+
+after_build:
+  # create folder structure for release
+  - if not exist %APPVEYOR_BUILD_FOLDER%\release mkdir %APPVEYOR_BUILD_FOLDER%\release
+  - if not exist %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64 mkdir %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64
+  - if not exist %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64\bin mkdir %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64\bin
+  
+  # copy redist dlls to release folder
+  - dir "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Redist\"
+  - echo "%REDIST_DIR%\x64\"
+  - dir "%REDIST_DIR%\x64\"
+  - cp "%REDIST_DIR%\x64\Microsoft.VC141.CRT\vcruntime140.dll" %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64\bin
+  - cp "%REDIST_DIR%\x64\Microsoft.VC141.CRT\vccorlib140.dll" %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64\bin
+  - cp "%REDIST_DIR%\x64\Microsoft.VC141.CRT\msvcp140.dll" %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64\bin
+  - cp "%REDIST_DIR%\x64\Microsoft.VC141.CRT\concrt140.dll" %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64\bin
+  - cp "%REDIST_DIR%\x64\Microsoft.VC141.OpenMP\vcomp140.dll" %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64\bin
+  
+  # copy README and LICENSE files to release folder
+  - cp %APPVEYOR_BUILD_FOLDER%\LICENSE %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64
+  - cp %APPVEYOR_BUILD_FOLDER%\THIRDPARTY-LICENSES %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64
+  - cp %APPVEYOR_BUILD_FOLDER%\README.md %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64
+  - cp %APPVEYOR_BUILD_FOLDER%\build\bin\Release\occ-csg.exe %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64\bin
+  
+  # package the release
+  - 7z a -tzip %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64.zip %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64\
+  
+  # push final release archive as artifact
+  - appveyor PushArtifact %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64.zip
+  
+
+deploy:
+
+  - provider: GitHub
+    name: production
+    
+    on:
+      appveyor_repo_tag: true
+      
+    auth_token:
+      secure: R+KuFwD7fxyhPRJUEDg4raWGX1H4NZiEN1LM74aADv8pCa3Rz0CXzKBixMK8gxwQ
+      
+    # artifact: %APPVEYOR_BUILD_FOLDER%\release\occ-csg-%APPVEYOR_REPO_TAG_NAME%-windows-x64.zip

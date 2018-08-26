@@ -85,14 +85,14 @@ build_script:
   - if not exist build mkdir build
   - if not exist %APPVEYOR_BUILD_FOLDER%\opencascade-installation mkdir %APPVEYOR_BUILD_FOLDER%\opencascade-installation
   - cd build
-  - cmake .. -G "Visual Studio 15 2017 Win64" -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=%APPVEYOR_BUILD_FOLDER%\dependencies-installation -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\opencascade-installation -DINSTALL_FREETYPE:BOOL=true
+  - cmake .. -G "Visual Studio 15 2017 Win64" -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=%APPVEYOR_BUILD_FOLDER%\dependencies-installation -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\opencascade-installation -DINSTALL_FREETYPE:BOOL=false
   - MSBuild .\INSTALL.vcxproj  /property:Configuration=Release /property:Platform=x64
 
 after_build:
   # create folder structure for release
   - if not exist %APPVEYOR_BUILD_FOLDER%\release mkdir %APPVEYOR_BUILD_FOLDER%\release
   - if not exist %APPVEYOR_BUILD_FOLDER%\release\opencascade-%APPVEYOR_REPO_TAG_NAME%-windows-x64 rmdir /S /Q %APPVEYOR_BUILD_FOLDER%\release\opencascade-%APPVEYOR_REPO_TAG_NAME%-windows-x64
-  
+  - cp %APPVEYOR_BUILD_FOLDER%\dependencies-installation\freetype\lib\freetype.lib %APPVEYOR_BUILD_FOLDER%\opencascade-installation\win64\vc14\lib
   - xcopy %APPVEYOR_BUILD_FOLDER%\opencascade-installation %APPVEYOR_BUILD_FOLDER%\release\opencascade-%APPVEYOR_REPO_TAG_NAME%-windows-x64 /e /i /h
   
   # package the release

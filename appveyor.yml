@@ -65,7 +65,7 @@ build_script:
   - if not exist build mkdir build
   - if not exist APPVEYOR_BUILD_FOLDER%\dependencies-installation\ mkdir dependencies-installation
   - cd build
-  - cmake .. -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS:BOOL=false -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\dependencies-installation
+  - cmake .. -G "Visual Studio 15 2017 Win64" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:BOOL=false -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%\dependencies-installation
   - MSBuild .\INSTALL.vcxproj  /property:Configuration=Release /property:Platform=x64
   
   # install OCE 0.18.3 

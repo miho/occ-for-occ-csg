@@ -77,7 +77,8 @@ script:
     #       ">> skipping build until ccache and compilation of oce works. restart task or schedule new task."
     #    TODO: is there a workaround for build jobs that take longer than 50 minutes?
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then travis_wait 30 make -j4 || export BUILD_SUCCESS=false ; fi
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then echo "INSTALL"; make install > install_out.txt ; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ] && [ "$BUILD_SUCCESS" == true ]; then echo "INSTALL"; make install > install_out.txt ; fi
+    - (! $BUILD_SUCCESS && echo ">> skipping build until ccache and compilation of occ works. restart task or schedule new task.") 
     # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then travis_wait 30 timeout -s SIGTERM $TIMEOUT_BUILD make -j4 install > install_out.txt || export BUILD_SUCCESS=false ; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then travis_wait 30 make -j8 && make install > install_out.txt || export BUILD_SUCCESS=false; fi
     # show last 30 lines of install output
@@ -85,13 +86,14 @@ script:
     
     - echo "HOME:" && ls $OUR_DIR
     
-    - echo "INSTALL:" && ls $OUR_DIR/opencascade-installation/
+    - echo "INSTALL:"
+    - ls $OUR_DIR/opencascade-installation/
     
     
     # finally build and test occ-csg
     #- cd $OUR_DIR
     #- mkdir -p build && cd build
-    #- (! $BUILD_SUCCESS && echo ">> skipping build until ccache and compilation of oce works. restart task or schedule new task.") || cmake .. -DOCE_DIR=$OCE_INSTALL_DIR
+    - (! $BUILD_SUCCESS && echo ">> skipping build until ccache and compilation of oce works. restart task or schedule new task.") || cmake .. -DOCE_DIR=$OCE_INSTALL_DIR
     #- (! $BUILD_SUCCESS && echo ">> skipping build until ccache and compilation of oce works. restart task or schedule new task.") || make && bin/occ-csg --help       
 
 before_deploy:

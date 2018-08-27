@@ -49,6 +49,7 @@ script:
     #- wget https://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.gz
     #- tar xzf freetype-2.7.1.tar.gz
     #- cd freetype-2.7.1; mkdir -p build; cd build;
+    - mkdir -p $OUR_DIR/dependencies-installation/freetype
     - cd $OUR_DIR/dependencies/freetype  
     - cmake .. -DWITH_ZLIB=OFF -DWITH_HarfBuzz=OFF -DWITH_PNG=OFF -DWITH_BZip2=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$OUR_DIR/dependencies-installation;
     - make -j2 && make install

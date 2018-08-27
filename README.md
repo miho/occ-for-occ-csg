@@ -1,2 +1,2 @@
 # occ-for-occ-csg
-Dependency for OCC
+Dependency for OCC-CSG

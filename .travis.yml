@@ -82,6 +82,10 @@ script:
     # show last 30 lines of install output
     - tail -n 30 install_out.txt
     
+    - echo "HOME:" && ls $OUR_DIR
+    
+    - echo "INSTALL:" && ls $OUR_DIR/opencascade-installation/
+    
     
     # finally build and test occ-csg
     #- cd $OUR_DIR

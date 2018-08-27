@@ -83,7 +83,7 @@ script:
     # show last 30 lines of install output
     - tail -n 30 install_out.txt
     
-    - (! $BUILD_SUCCESS && echo ">> skipping build until ccache and compilation of occ works. restart task or schedule new task.") 
+    - if [ "$BUILD_SUCCESS" != true ]; then echo ">> skipping build until ccache and compilation of occ works. restart task or schedule new task."; fi
     
     - echo "HOME:" && ls $OUR_DIR
     

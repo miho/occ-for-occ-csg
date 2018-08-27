@@ -52,7 +52,7 @@ script:
     - mkdir -p $OUR_DIR/dependencies-installation/freetype
     - cd $OUR_DIR/dependencies/freetype  
     - mkdir -p build; cd build;
-    - cmake .. -DWITH_ZLIB=OFF -DWITH_HarfBuzz=OFF -DWITH_PNG=OFF -DWITH_BZip2=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$OUR_DIR/dependencies-installation;
+    - cmake .. -DWITH_ZLIB=OFF -DWITH_HarfBuzz=OFF -DWITH_PNG=OFF -DWITH_BZip2=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$OUR_DIR/dependencies-installation/freetype;
     - make -j2 && make install
     - cd $OUR_DIR
     

@@ -94,7 +94,7 @@ before_deploy:
     - mkdir release && cd release
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then mkdir -p opencascade-$TRAVIS_TAG-macos/; cp -r $OUR_DIR/opencascade-installation/* opencascade-$TRAVIS_TAG-macos; fi
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then zip -r opencascade-$TRAVIS_TAG-macos.zip opencascade-$TRAVIS_TAG-macos/; fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mkdir -p opencascade-$TRAVIS_TAG-linux-x64/; cp $OUR_DIR/opencascade-installation/* opencascade-$TRAVIS_TAG-linux-x64/; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mkdir -p opencascade-$TRAVIS_TAG-linux-x64/; cp -r $OUR_DIR/opencascade-installation/* opencascade-$TRAVIS_TAG-linux-x64/; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then zip -r opencascade-$TRAVIS_TAG-linux-x64.zip opencascade-$TRAVIS_TAG-linux-x64/; fi   
 
 deploy:

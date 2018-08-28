@@ -83,8 +83,8 @@ script:
     #    is fully built. The output will indicate that by showing 
     #       ">> skipping build until ccache and compilation of oce works. restart task or schedule new task."
     #    TODO: is there a workaround for build jobs that take longer than 50 minutes?
-    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then travis_wait 30 make -j4 || export BUILD_SUCCESS=false ; fi
-    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then travis_wait 30 make -j4 || export BUILD_SUCCESS=false ; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then travis_wait 30 make -j8 || export BUILD_SUCCESS=false ; fi
+    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then travis_wait 30 make -j8 || export BUILD_SUCCESS=false ; fi
     - if [ "$BUILD_SUCCESS" == true ]; then echo "INSTALL"; make install > install_out.txt ; fi
 
     # show last 30 lines of install output

@@ -41,7 +41,12 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export PATH="/usr/local/opt/ccache/libexec:$PATH"; fi
   # adding timeout command to path for os x
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then PATH="$PATH:/usr/local/opt/coreutils/libexec/gnubin"; fi
-  
+
+before_script:
+ - ccache --version
+ - ccache -p || true
+ - ccache --show-stats || true
+
 script: 
     - export OUR_DIR=$(pwd)
     - echo "home directory $OUR_DIR"
@@ -53,8 +58,8 @@ script:
     - mkdir -p $OUR_DIR/dependencies-installation/freetype
     - cd $OUR_DIR/dependencies/freetype  
     - mkdir -p build; cd build;
-    - cmake .. -DWITH_ZLIB=OFF -DWITH_HarfBuzz=OFF -DWITH_PNG=OFF -DWITH_BZip2=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$OUR_DIR/dependencies-installation/freetype;
-    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cmake .. -DCMAKE_CXX_COMPILER=/usr/local/opt/ccache/libexec/clang++ -DCMAKE_C_COMPILER=/usr/local/opt/ccache/libexec/clang ; fi
+    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then cmake .. -DWITH_ZLIB=OFF -DWITH_HarfBuzz=OFF -DWITH_PNG=OFF -DWITH_BZip2=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$OUR_DIR/dependencies-installation/freetype ; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cmake .. -DWITH_ZLIB=OFF -DWITH_HarfBuzz=OFF -DWITH_PNG=OFF -DWITH_BZip2=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$OUR_DIR/dependencies-installation/freetype -DCMAKE_CXX_COMPILER=/usr/local/opt/ccache/libexec/clang++ -DCMAKE_C_COMPILER=/usr/local/opt/ccache/libexec/clang ; fi
     - make -j2 && make install
     - cd $OUR_DIR
     
@@ -70,8 +75,8 @@ script:
     # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export OCE_INSTALL_DIR=$(pwd)/../opencascade-installation/lib/oce-0.18/; fi
     
     # configuring OCE via cmake
-    - cmake .. -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=$OUR_DIR/dependencies-installation -DCMAKE_INSTALL_PREFIX=$OUR_DIR/opencascade-installation -DINSTALL_FREETYPE:BOOL=true
-    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cmake .. -DCMAKE_CXX_COMPILER=/usr/local/opt/ccache/libexec/clang++ -DCMAKE_C_COMPILER=/usr/local/opt/ccache/libexec/clang ; fi
+    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then cmake .. -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=$OUR_DIR/dependencies-installation -DCMAKE_INSTALL_PREFIX=$OUR_DIR/opencascade-installation -DINSTALL_FREETYPE:BOOL=true ; fi
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cmake .. -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=$OUR_DIR/dependencies-installation -DCMAKE_INSTALL_PREFIX=$OUR_DIR/opencascade-installation -DINSTALL_FREETYPE:BOOL=true -DCMAKE_CXX_COMPILER=/usr/local/opt/ccache/libexec/clang++ -DCMAKE_C_COMPILER=/usr/local/opt/ccache/libexec/clang ; fi
     # now we build OCE
     # -> On macOS we use a timeout to prevent travis from terminating our build job
     #    without saving the ccache and OCE directories. We rerun the job until OCE

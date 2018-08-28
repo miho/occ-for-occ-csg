@@ -16,7 +16,7 @@ matrix:
       install: true
     - os: osx
       language: c++
-      osx_image: xcode9.2
+      osx_image: xcode9.4
       install: true
 
 cache:
@@ -27,7 +27,7 @@ cache:
    # TODO: how can we do conditional caching of directories (depending on OS)
    #- /home/travis/build/miho/OCC-CSG/oce-OCE-0.18.3
    - /Users/travis/build/miho/occ-for-occ-csg/opencascade/build
-   - /Users/travis/build/miho/occ-for-occ-csg/dependencies/freetzpe/build
+   - /Users/travis/build/miho/occ-for-occ-csg/dependencies/freetype/build
 
 env:
   global:

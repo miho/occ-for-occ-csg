@@ -88,6 +88,7 @@ script:
     - if [ "$BUILD_SUCCESS" == true ]; then echo "INSTALL"; make install > install_out.txt ; fi
 
     # show last 30 lines of install output
+    - touch install_out.txt
     - tail -n 30 install_out.txt
     
     - if [ "$BUILD_SUCCESS" != true ]; then echo ">> skipping build until ccache and compilation of occ works. restart task or schedule new task."; fi

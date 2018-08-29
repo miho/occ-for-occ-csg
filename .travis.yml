@@ -53,10 +53,6 @@ script:
     - export OUR_DIR=$(pwd)
     - echo "home directory $OUR_DIR"
     
-    # downloading and building static freetype
-    #- wget https://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.gz
-    #- tar xzf freetype-2.7.1.tar.gz
-    #- cd freetype-2.7.1; mkdir -p build; cd build;
     - mkdir -p $OUR_DIR/dependencies-installation/freetype
     - cd $OUR_DIR/dependencies/freetype  
     - mkdir -p build; cd build;

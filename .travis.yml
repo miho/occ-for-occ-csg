@@ -7,7 +7,8 @@ addons:
        - cmake-data
        - cmake
        - libglu1-mesa-dev
-       - libgl1-mesa-dev 
+       - libgl1-mesa-dev
+       - clang
 
 matrix:
     include:
@@ -75,7 +76,7 @@ script:
     # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export OCE_INSTALL_DIR=$(pwd)/../opencascade-installation/lib/oce-0.18/; fi
     
     # configuring OCE via cmake
-    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then cmake .. -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=$OUR_DIR/dependencies-installation -DCMAKE_INSTALL_PREFIX=$OUR_DIR/opencascade-installation -DINSTALL_FREETYPE:BOOL=true -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++ -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc ; fi
+    - if [ "$TRAVIS_OS_NAME" == "linux" ]; then cmake .. -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=$OUR_DIR/dependencies-installation -DCMAKE_INSTALL_PREFIX=$OUR_DIR/opencascade-installation -DINSTALL_FREETYPE:BOOL=true -DCMAKE_CXX_COMPILER=/usr/lib/ccache/clang++ -DCMAKE_C_COMPILER=/usr/lib/ccache/clang ; fi
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cmake .. -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=$OUR_DIR/dependencies-installation -DCMAKE_INSTALL_PREFIX=$OUR_DIR/opencascade-installation -DINSTALL_FREETYPE:BOOL=true -DCMAKE_CXX_COMPILER=/usr/local/opt/ccache/libexec/clang++ -DCMAKE_C_COMPILER=/usr/local/opt/ccache/libexec/clang ; fi
     # now we build OCE
     # -> On macOS we use a timeout to prevent travis from terminating our build job

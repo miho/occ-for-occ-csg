@@ -7,7 +7,7 @@ The purpose of this repository is to provide OpenCascade and required dependenci
 All file locations mentioned below are relative to the opencascade folder inside this preository.
 
 Open CASCADE Technology
-=======================
+-----------------------
 
 This directory contains sources of Open CASCADE Technology (OCCT), a software
 development platform providing services for 3D surface and solid modeling, CAD 

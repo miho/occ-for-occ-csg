@@ -61,14 +61,10 @@ script:
     - make -j2 && make install
     - cd $OUR_DIR
     
-    # downloading OCE
-    #- if [ ! -f OCE-0.18.3.tar.gz ]; then wget https://github.com/miho/oce/archive/OCE-0.18.3.tar.gz; fi
-    #- if [ ! -f oce-OCE-0.18.3 ]; then tar xzf OCE-0.18.3.tar.gz; fi
-    #- cd oce-OCE-0.18.3
     - cd opencascade
     - mkdir -p build && mkdir -p $OUR_DIR/opencascade-installation && cd build
     
-    # setting OCE install dir
+    # setting OCC install dir
     # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export OCE_INSTALL_DIR=$(pwd)/../opencascade-installation/OCE.framework/Versions/0.18/Resources; fi
     # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export OCE_INSTALL_DIR=$(pwd)/../opencascade-installation/lib/oce-0.18/; fi
     

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -91,6 +91,8 @@ Inheritance diagram for AIS_ManipulatorOwner:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a62d4d80797fc3ca2cc22720042579780"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___manipulator_owner.html#a62d4d80797fc3ca2cc22720042579780">AIS_ManipulatorOwner</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___selectable_object.html">SelectMgr_SelectableObject</a> &gt; &amp;theSelObject, const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theIndex, const <a class="el" href="_a_i_s___manipulator_mode_8hxx.html#aab63332b0385c72f3c2f93af038cae6f">AIS_ManipulatorMode</a> theMode, const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> thePriority=0)</td></tr>
 <tr class="separator:a62d4d80797fc3ca2cc22720042579780"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad909aef2a11980a229e508fa2d386982"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___manipulator_owner.html#ad909aef2a11980a229e508fa2d386982">~AIS_ManipulatorOwner</a> ()</td></tr>
+<tr class="separator:ad909aef2a11980a229e508fa2d386982"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ead793d02008be03813cc89d8e95daf"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___manipulator_owner.html#a9ead793d02008be03813cc89d8e95daf">HilightWithColor</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_prs_mgr___presentation_manager3d_8hxx.html#abf0b70d35c36f63efe5029ef4b5bf3d3">PrsMgr_PresentationManager3d</a> &gt; &amp;thePM, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_prs3d___drawer.html">Prs3d_Drawer</a> &gt; &amp;theStyle, const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theMode) override</td></tr>
 <tr class="memdesc:a9ead793d02008be03813cc89d8e95daf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Highlights selectable object's presentation with mode theMode in presentation manager with given highlight style. Also a check for auto-highlight is performed - if selectable object manages highlighting on its own, execution will be passed to <a class="el" href="class_select_mgr___selectable_object.html#ae22bdeb00acd2c29fc776aa7b818e97c" title="Method which hilight an owner belonging to this selectable object ( for fast presentation draw ) ...">SelectMgr_SelectableObject::HilightOwnerWithColor</a> method.  <a href="#a9ead793d02008be03813cc89d8e95daf">More...</a><br /></td></tr>
 <tr class="separator:a9ead793d02008be03813cc89d8e95daf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -299,6 +301,31 @@ Additional Inherited Members</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad909aef2a11980a229e508fa2d386982"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad909aef2a11980a229e508fa2d386982">&#9670;&nbsp;</a></span>~AIS_ManipulatorOwner()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual AIS_ManipulatorOwner::~AIS_ManipulatorOwner </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>

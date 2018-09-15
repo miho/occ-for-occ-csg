@@ -22,7 +22,7 @@
 #include <BinMDF_ADriverTable.hxx>
 #include <BinMDocStd.hxx>
 #include <BinMFunction.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Plugin_Macro.hxx>
 #include <Standard_Failure.hxx>
 #include <Standard_GUID.hxx>
@@ -81,7 +81,7 @@ void BinLDrivers::DefineFormat (const Handle(TDocStd_Application)& theApp)
 //=======================================================================
 
 Handle(BinMDF_ADriverTable) BinLDrivers::AttributeDrivers 
-                         (const Handle(Message_Messenger)& aMsgDrv)
+                         (const Handle(CDM_MessageDriver)& aMsgDrv)
 {
   Handle(BinMDF_ADriverTable) aTable = new BinMDF_ADriverTable;
 

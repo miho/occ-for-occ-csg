@@ -56,8 +56,10 @@ static Handle(TDataStd_ReferenceList) SetAttr(const TDF_Label&       label,
 //function : TDataStd_ReferenceList
 //purpose  : Empty Constructor
 //=======================================================================
-TDataStd_ReferenceList::TDataStd_ReferenceList() : myID(GetID())
-{}
+TDataStd_ReferenceList::TDataStd_ReferenceList() 
+{
+
+}
 
 //=======================================================================
 //function : Set

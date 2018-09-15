@@ -17,6 +17,22 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__FSD_DLL" />
+					<Add option="-D__MMgt_DLL" />
+					<Add option="-D__OSD_DLL" />
+					<Add option="-D__Plugin_DLL" />
+					<Add option="-D__Quantity_DLL" />
+					<Add option="-D__Resource_DLL" />
+					<Add option="-D__Standard_DLL" />
+					<Add option="-D__StdFail_DLL" />
+					<Add option="-D__Storage_DLL" />
+					<Add option="-D__TColStd_DLL" />
+					<Add option="-D__TCollection_DLL" />
+					<Add option="-D__TShort_DLL" />
+					<Add option="-D__Units_DLL" />
+					<Add option="-D__UnitsAPI_DLL" />
+					<Add option="-D__NCollection_DLL" />
+					<Add option="-D__Message_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKernel_obj.link" />
@@ -35,6 +51,22 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__FSD_DLL" />
+					<Add option="-D__MMgt_DLL" />
+					<Add option="-D__OSD_DLL" />
+					<Add option="-D__Plugin_DLL" />
+					<Add option="-D__Quantity_DLL" />
+					<Add option="-D__Resource_DLL" />
+					<Add option="-D__Standard_DLL" />
+					<Add option="-D__StdFail_DLL" />
+					<Add option="-D__Storage_DLL" />
+					<Add option="-D__TColStd_DLL" />
+					<Add option="-D__TCollection_DLL" />
+					<Add option="-D__TShort_DLL" />
+					<Add option="-D__Units_DLL" />
+					<Add option="-D__UnitsAPI_DLL" />
+					<Add option="-D__NCollection_DLL" />
+					<Add option="-D__Message_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKernel_objd.link" />
@@ -116,12 +148,6 @@
 		<Unit filename="../../../src/OSD/OSD_Parallel.cxx">
 			<Option link="0" />
 		</Unit>
-		<Unit filename="../../../src/OSD/OSD_Parallel_TBB.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/OSD/OSD_Parallel_Threads.cxx">
-			<Option link="0" />
-		</Unit>
 		<Unit filename="../../../src/OSD/OSD_Path.cxx">
 			<Option link="0" />
 		</Unit>
@@ -153,6 +179,9 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Quantity/Quantity_Color.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Quantity/Quantity_Convert.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Quantity/Quantity_Date.cxx">
@@ -221,16 +250,19 @@
 		<Unit filename="../../../src/Standard/Standard_Real.cxx">
 			<Option link="0" />
 		</Unit>
-		<Unit filename="../../../src/Standard/Standard_ShortReal.cxx">
+		<Unit filename="../../../src/Standard/Standard_SStream.cxx">
 			<Option link="0" />
 		</Unit>
-		<Unit filename="../../../src/Standard/Standard_Strtod.cxx">
+		<Unit filename="../../../src/Standard/Standard_ShortReal.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Standard/Standard_Transient.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Standard/Standard_Type.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Standard/Standard_UUID.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Standard/Standard_math.cxx">
@@ -272,7 +304,13 @@
 		<Unit filename="../../../src/Storage/Storage_TypedCallBack.cxx">
 			<Option link="0" />
 		</Unit>
+		<Unit filename="../../../src/Storage/Storage_stCONSTclCOM.cxx">
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../../src/TColStd/TColStd_HPackedMapOfInteger.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/TColStd/TColStd_MapIteratorOfPackedMapOfInteger.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/TColStd/TColStd_PackedMapOfInteger.cxx">

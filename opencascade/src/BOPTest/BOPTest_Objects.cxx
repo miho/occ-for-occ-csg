@@ -21,7 +21,6 @@
 #include <BOPAlgo_CellsBuilder.hxx>
 #include <BOPAlgo_Splitter.hxx>
 #include <NCollection_BaseAllocator.hxx>
-#include <Precision.hxx>
 
 static Handle(NCollection_BaseAllocator)& Allocator1();
 
@@ -53,11 +52,9 @@ class BOPTest_Session {
     myBuilder=myBuilderDefault;
     myRunParallel=Standard_False;
     myNonDestructive = Standard_False;
-    myFuzzyValue = Precision::Confusion();
+    myFuzzyValue = 0.;
     myGlue = BOPAlgo_GlueOff;
     myDrawWarnShapes = Standard_False;
-    myCheckInverted = Standard_True;
-    myUseOBB = Standard_False;
   };
   //
   // Clear
@@ -97,11 +94,11 @@ class BOPTest_Session {
     myBuilder=myBuilderDefault;
   };
   //
-  TopTools_ListOfShape& Shapes() {
+  BOPCol_ListOfShape& Shapes() {
     return myShapes;
   }
   //
-  TopTools_ListOfShape& Tools() {
+  BOPCol_ListOfShape& Tools() {
     return myTools;
   }
   //
@@ -145,21 +142,6 @@ class BOPTest_Session {
     return myDrawWarnShapes;
   };
   //
-  void SetCheckInverted(const Standard_Boolean bCheck) {
-    myCheckInverted = bCheck;
-  };
-  //
-  Standard_Boolean CheckInverted() const {
-    return myCheckInverted;
-  };
-  //
-  void SetUseOBB(const Standard_Boolean bUse) {
-    myUseOBB = bUse;
-  };
-  //
-  Standard_Boolean UseOBB() const {
-    return myUseOBB;
-  };
 protected:
   //
   BOPTest_Session(const BOPTest_Session&);
@@ -171,15 +153,13 @@ protected:
   BOPAlgo_Builder* myBuilder;
   BOPAlgo_Builder* myBuilderDefault;
   //
-  TopTools_ListOfShape myShapes;
-  TopTools_ListOfShape myTools;
+  BOPCol_ListOfShape myShapes;
+  BOPCol_ListOfShape myTools;
   Standard_Boolean myRunParallel;
   Standard_Boolean myNonDestructive;
   Standard_Real myFuzzyValue;
   BOPAlgo_GlueEnum myGlue;
   Standard_Boolean myDrawWarnShapes;
-  Standard_Boolean myCheckInverted;
-  Standard_Boolean myUseOBB;
 };
 //
 //=======================================================================
@@ -297,7 +277,7 @@ BOPAlgo_Splitter& BOPTest_Objects::Splitter()
 //function : Shapes
 //purpose  : 
 //=======================================================================
-TopTools_ListOfShape& BOPTest_Objects::Shapes()
+BOPCol_ListOfShape& BOPTest_Objects::Shapes()
 {
   return GetSession().Shapes();
 }
@@ -305,7 +285,7 @@ TopTools_ListOfShape& BOPTest_Objects::Shapes()
 //function : Tools
 //purpose  : 
 //=======================================================================
-TopTools_ListOfShape& BOPTest_Objects::Tools()
+BOPCol_ListOfShape& BOPTest_Objects::Tools()
 {
   return GetSession().Tools();
 }
@@ -388,38 +368,6 @@ void BOPTest_Objects::SetDrawWarnShapes(const Standard_Boolean bDraw)
 Standard_Boolean BOPTest_Objects::DrawWarnShapes()
 {
   return GetSession().DrawWarnShapes();
-}
-//=======================================================================
-//function : SetCheckInverted
-//purpose  : 
-//=======================================================================
-void BOPTest_Objects::SetCheckInverted(const Standard_Boolean bCheck)
-{
-  GetSession().SetCheckInverted(bCheck);
-}
-//=======================================================================
-//function : CheckInverted
-//purpose  : 
-//=======================================================================
-Standard_Boolean BOPTest_Objects::CheckInverted()
-{
-  return GetSession().CheckInverted();
-}
-//=======================================================================
-//function : SetUseOBB
-//purpose  : 
-//=======================================================================
-void BOPTest_Objects::SetUseOBB(const Standard_Boolean bUseOBB)
-{
-  GetSession().SetUseOBB(bUseOBB);
-}
-//=======================================================================
-//function : UseOBB
-//purpose  : 
-//=======================================================================
-Standard_Boolean BOPTest_Objects::UseOBB()
-{
-  return GetSession().UseOBB();
 }
 //=======================================================================
 //function : Allocator1

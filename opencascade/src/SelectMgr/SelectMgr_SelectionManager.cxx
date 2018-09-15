@@ -14,12 +14,12 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#include <SelectMgr_SelectionManager.hxx>
 
 #include <OSD_Environment.hxx>
 #include <SelectMgr_DataMapIteratorOfDataMapOfObjectSelectors.hxx>
 #include <SelectMgr_SelectableObject.hxx>
 #include <SelectMgr_Selection.hxx>
+#include <SelectMgr_SelectionManager.hxx>
 #include <SelectMgr_SequenceOfSelector.hxx>
 #include <SelectMgr_ViewerSelector.hxx>
 #include <Standard_Type.hxx>
@@ -30,30 +30,25 @@
 
 IMPLEMENT_STANDARD_RTTIEXT(SelectMgr_SelectionManager,Standard_Transient)
 
-namespace
+static Standard_Integer FindIndex (const SelectMgr_SequenceOfSelector& theSelectorsSeq,
+                                   const Handle(SelectMgr_ViewerSelector)& theSelector)
 {
-  static bool containsSelector (const SelectMgr_SequenceOfSelector& theSelectorsSeq,
-                                const Handle(SelectMgr_ViewerSelector)& theSelector)
+  Standard_Integer aFoundIdx = 0;
+
+  for (Standard_Integer anIdx = 1; anIdx <= theSelectorsSeq.Length() && aFoundIdx==0; anIdx++)
   {
-    for (SelectMgr_SequenceOfSelector::Iterator aSelectorIter (theSelectorsSeq); aSelectorIter.More(); aSelectorIter.Next())
-    {
-      if (aSelectorIter.Value() == theSelector)
-      {
-        return true;
-      }
-    }
-    return false;
+    if (theSelector == theSelectorsSeq.Value (anIdx))
+      aFoundIdx = anIdx;
   }
+
+  return aFoundIdx;
 }
 
 //==================================================
 // Function: Create
 // Purpose :
 //==================================================
-SelectMgr_SelectionManager::SelectMgr_SelectionManager()
-{
-  //
-}
+SelectMgr_SelectionManager::SelectMgr_SelectionManager() {}
 
 //==================================================
 // Function: Add
@@ -73,17 +68,13 @@ void SelectMgr_SelectionManager::Remove (const Handle(SelectMgr_ViewerSelector)&
   for (SelectMgr_DataMapIteratorOfDataMapOfObjectSelectors aSelIter (myLocal); aSelIter.More(); aSelIter.Next())
   {
     SelectMgr_SequenceOfSelector& theSelectors = myLocal.ChangeFind (aSelIter.Key());
-    for (SelectMgr_SequenceOfSelector::Iterator aSelectorIter (theSelectors); aSelectorIter.More(); aSelectorIter.Next())
-    {
-      if (aSelectorIter.Value() == theSelector)
-      {
-        theSelectors.Remove (aSelectorIter);
-        break;
-      }
-    }
+    Standard_Integer aRank = FindIndex (theSelectors, theSelector);
+    if (aRank != 0 && aRank <= theSelectors.Length())
+      theSelectors.Remove (aRank);
   }
 
-  mySelectors.Remove (theSelector);
+  if (mySelectors.Contains (theSelector))
+    mySelectors.Remove (theSelector);
 }
 
 //==================================================
@@ -101,8 +92,13 @@ Standard_Boolean SelectMgr_SelectionManager::Contains (const Handle(SelectMgr_Vi
 //==================================================
 Standard_Boolean SelectMgr_SelectionManager::Contains (const Handle(SelectMgr_SelectableObject)& theObject) const
 {
-  return myGlobal.Contains (theObject)
-      || myLocal.IsBound (theObject);
+  if (myGlobal.Contains (theObject))
+    return Standard_True;
+
+  if (myLocal.IsBound (theObject))
+    return Standard_True;
+
+  return Standard_False;
 }
 
 //==================================================
@@ -124,9 +120,10 @@ void SelectMgr_SelectionManager::Load (const Handle(SelectMgr_SelectableObject)&
     return;
 
   myGlobal.Add(theObject);
-  for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
+  for (TColStd_MapIteratorOfMapOfTransient aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
   {
-    const Handle(SelectMgr_ViewerSelector)& aSelector = aSelectorsIter.Key();
+    Handle(SelectMgr_ViewerSelector) aSelector =
+      Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorsIter.Key());
     if (!aSelector->Contains (theObject) && theObject->HasOwnPresentations())
     {
       aSelector->AddSelectableObject (theObject);
@@ -145,22 +142,23 @@ void SelectMgr_SelectionManager::Load (const Handle(SelectMgr_SelectableObject)&
                                        const Handle(SelectMgr_ViewerSelector)& theSelector,
                                        const Standard_Integer theMode)
 {
-  mySelectors.Add (theSelector);
-  if (theMode != -1)
+  if (!mySelectors.Contains (theSelector))
   {
-    loadMode (theObject, theMode, theSelector);
+    mySelectors.Add (theSelector);
   }
+
+  if (theMode != -1)
+    loadMode (theObject, theMode, theSelector);
 
   if (theObject->HasOwnPresentations())
-  {
     theSelector->AddSelectableObject (theObject);
-  }
 
-  if (SelectMgr_SequenceOfSelector* aSelectors = myLocal.ChangeSeek (theObject))
+  if (myLocal.IsBound (theObject))
   {
-    if (!containsSelector (*aSelectors, theSelector))
+    SelectMgr_SequenceOfSelector& aSelectors = myLocal.ChangeFind (theObject);
+    if (FindIndex (aSelectors, theSelector) == 0)
     {
-      aSelectors->Append (theSelector);
+        aSelectors.Append (theSelector);
     }
   }
   else
@@ -174,12 +172,13 @@ void SelectMgr_SelectionManager::Load (const Handle(SelectMgr_SelectableObject)&
       if (!theObject->HasOwnPresentations())
         return;
 
-      SelectMgr_SequenceOfSelector aGlobSelectors;
-      aGlobSelectors.Append (theSelector);
-      myLocal.Bind (theObject, aGlobSelectors);
+      SelectMgr_SequenceOfSelector aSelectors;
+      aSelectors.Append (theSelector);
+      myLocal.Bind (theObject, aSelectors);
     }
   }
 }
+
 
 //==================================================
 // Function: Remove
@@ -197,36 +196,37 @@ void SelectMgr_SelectionManager::Remove (const Handle(SelectMgr_SelectableObject
 
   if (myGlobal.Contains (theObject))
   {
-    for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
+    for (TColStd_MapIteratorOfMapOfTransient aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
     {
-      const Handle(SelectMgr_ViewerSelector)& aCurSelector = aSelectorsIter.Key();
-      if (!aCurSelector->Contains (theObject))
-      {
-        continue;
-      }
+      Handle(SelectMgr_ViewerSelector) aCurSelector =
+        Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorsIter.Key());
 
-      for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObject->Selections()); aSelIter.More(); aSelIter.Next())
+      if (!aCurSelector->Contains (theObject))
+        continue;
+
+      for (theObject->Init(); theObject->More(); theObject->Next())
       {
-        aCurSelector->RemoveSelectionOfObject (theObject, aSelIter.Value());
-        aSelIter.Value()->UpdateBVHStatus (SelectMgr_TBU_Remove);
+        aCurSelector->RemoveSelectionOfObject (theObject, theObject->CurrentSelection());
+        theObject->CurrentSelection()->UpdateBVHStatus (SelectMgr_TBU_Remove);
       }
       aCurSelector->RemoveSelectableObject (theObject);
     }
 
     myGlobal.Remove (theObject);
   }
-  else if (SelectMgr_SequenceOfSelector* aSelectors = myLocal.ChangeSeek (theObject))
+  else if (myLocal.IsBound (theObject))
   {
-    for (SelectMgr_SequenceOfSelector::Iterator aSelectorIter (*aSelectors); aSelectorIter.More(); aSelectorIter.Next())
+    SelectMgr_SequenceOfSelector& aSelectors = myLocal.ChangeFind (theObject);
+    for (Standard_Integer aSelectorsIdx = 1; aSelectorsIdx <= aSelectors.Length(); aSelectorsIdx++)
     {
-      const Handle(SelectMgr_ViewerSelector)& aCurSelector = aSelectorIter.Value();
+      Handle(SelectMgr_ViewerSelector) aCurSelector = aSelectors (aSelectorsIdx);
       if (!aCurSelector->Contains (theObject))
         continue;
 
-      for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObject->Selections()); aSelIter.More(); aSelIter.Next())
+      for (theObject->Init(); theObject->More(); theObject->Next())
       {
-        aCurSelector->RemoveSelectionOfObject (theObject, aSelIter.Value());
-        aSelIter.Value()->UpdateBVHStatus (SelectMgr_TBU_Remove);
+        aCurSelector->RemoveSelectionOfObject (theObject, theObject->CurrentSelection());
+        theObject->CurrentSelection()->UpdateBVHStatus (SelectMgr_TBU_Remove);
       }
       aCurSelector->RemoveSelectableObject (theObject);
     }
@@ -251,28 +251,31 @@ void SelectMgr_SelectionManager::Remove (const Handle(SelectMgr_SelectableObject
   {
     Remove (Handle(SelectMgr_SelectableObject)::DownCast (anChildrenIter.Value()), theSelector);
   }
+
   if (!theObject->HasOwnPresentations())
     return;
 
-  for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObject->Selections()); aSelIter.More(); aSelIter.Next())
+  for (theObject->Init(); theObject->More(); theObject->Next())
   {
-    theSelector->RemoveSelectionOfObject (theObject, aSelIter.Value());
-    aSelIter.Value()->UpdateBVHStatus (SelectMgr_TBU_Remove);
+    theSelector->RemoveSelectionOfObject (theObject, theObject->CurrentSelection());
+    theObject->CurrentSelection()->UpdateBVHStatus (SelectMgr_TBU_Remove);
   }
+
   theSelector->RemoveSelectableObject (theObject);
 
-  if (SelectMgr_SequenceOfSelector* aSelectors = myLocal.ChangeSeek (theObject))
+  if (myLocal.IsBound (theObject))
   {
-    for (SelectMgr_SequenceOfSelector::Iterator aSelectorIter (*aSelectors); aSelectorIter.More(); aSelectorIter.Next())
+    SelectMgr_SequenceOfSelector& aSelectors = myLocal.ChangeFind (theObject);
+    for (Standard_Integer aSelectorIdx = 1; aSelectorIdx <= aSelectors.Length(); aSelectorIdx++)
     {
-      if (aSelectorIter.Value() == theSelector)
+      if (aSelectors (aSelectorIdx) == theSelector)
       {
-        aSelectors->Remove (aSelectorIter);
+        aSelectors.Remove (aSelectorIdx);
         break;
       }
     }
 
-    if (aSelectors->IsEmpty())
+    if (aSelectors.IsEmpty())
     {
       myLocal.UnBind (theObject);
     }
@@ -297,96 +300,89 @@ void SelectMgr_SelectionManager::Activate (const Handle(SelectMgr_SelectableObje
   {
     Activate (Handle(SelectMgr_SelectableObject)::DownCast (anChildIter.Value()), theMode, theSelector);
   }
+
   if (!theObject->HasOwnPresentations())
     return;
 
   Standard_Boolean isComputed = Standard_False;
-  if (const Handle(SelectMgr_Selection)& aSelOld = theObject->Selection (theMode))
+  if (theObject->HasSelection (theMode))
   {
-    isComputed = !aSelOld->IsEmpty();
+    isComputed = theObject->Selection (theMode)->IsEmpty() ? 0 : 1;
   }
+
   if (!isComputed)
-  {
     loadMode (theObject, theMode);
-  }
 
   if (theSelector.IsNull())
   {
     if (myGlobal.Contains (theObject))
     {
-      for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
+      for (TColStd_MapIteratorOfMapOfTransient aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
       {
-        const Handle(SelectMgr_ViewerSelector)& aCurSelector = aSelectorsIter.Key();
+        Handle(SelectMgr_ViewerSelector) aCurSelector =
+          Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorsIter.Key());
         Activate (theObject, theMode, aCurSelector);
       }
     }
-    else if (SelectMgr_SequenceOfSelector* aSelectors = myLocal.ChangeSeek (theObject))
+    else if (myLocal.IsBound (theObject))
     {
-      for (SelectMgr_SequenceOfSelector::Iterator aSelectorIter (*aSelectors); aSelectorIter.More(); aSelectorIter.Next())
+      SelectMgr_SequenceOfSelector& theSelectors = myLocal.ChangeFind (theObject);
+      for (Standard_Integer aSelectorIdx = 1; aSelectorIdx <= theSelectors.Length(); aSelectorIdx++)
       {
-        Handle(SelectMgr_ViewerSelector) aCurSelector = aSelectorIter.Value();
+        Handle(SelectMgr_ViewerSelector) aCurSelector = theSelectors (aSelectorIdx);
         Activate (theObject, theMode, aCurSelector);
       }
     }
   }
 
   const Handle(SelectMgr_Selection)& aSelection = theObject->Selection (theMode);
+
   switch (aSelection->UpdateStatus())
   {
-    case SelectMgr_TOU_Full:
-    {
-      if (theObject->HasSelection (theMode))
-      {
-        theSelector->RemoveSelectionOfObject (theObject, aSelection);
-      }
-      theObject->RecomputePrimitives (theMode);
-      // pass through SelectMgr_TOU_Partial
-    }
-    Standard_FALLTHROUGH
-    case SelectMgr_TOU_Partial:
-    {
+  case SelectMgr_TOU_Full:
+    if (theObject->HasSelection (theMode))
+      theSelector->RemoveSelectionOfObject (theObject, aSelection);
+    theObject->RecomputePrimitives (theMode);
+  case SelectMgr_TOU_Partial:
+    if(theObject->HasTransformation())
       theObject->UpdateTransformations (aSelection);
-      theSelector->RebuildObjectsTree();
-      break;
-    }
-    default:
-      break;
+    theSelector->RebuildObjectsTree();
+    break;
+  default:
+    break;
   }
   aSelection->UpdateStatus(SelectMgr_TOU_None);
 
   switch (aSelection->BVHUpdateStatus())
   {
-    case SelectMgr_TBU_Add:
-    case SelectMgr_TBU_Renew:
-    {
+  case SelectMgr_TBU_Add:
+  case SelectMgr_TBU_Renew:
+    theSelector->AddSelectionToObject (theObject, aSelection);
+    break;
+  case SelectMgr_TBU_Remove:
+    if (aSelection->GetSelectionState() == SelectMgr_SOS_Deactivated)
       theSelector->AddSelectionToObject (theObject, aSelection);
-      break;
-    }
-    case SelectMgr_TBU_Remove:
-    {
-      if (aSelection->GetSelectionState() == SelectMgr_SOS_Deactivated)
-      {
-        theSelector->AddSelectionToObject (theObject, aSelection);
-      }
-      break;
-    }
-    default:
-      break;
+    break;
+  default:
+    break;
   }
   aSelection->UpdateBVHStatus (SelectMgr_TBU_None);
 
   if (myGlobal.Contains (theObject))
   {
+    const Standard_Integer aGlobalSelMode = theObject->GlobalSelectionMode();
+    if (theMode != aGlobalSelMode && theSelector->IsActive (theObject, aGlobalSelMode))
+    {
+      theSelector->Deactivate (theObject->Selection (aGlobalSelMode));
+    }
     theSelector->Activate (theObject->Selection (theMode));
   }
   else
   {
-    if (SelectMgr_SequenceOfSelector* aSelectors = myLocal.ChangeSeek (theObject))
+    if (myLocal.IsBound (theObject))
     {
-      if (!containsSelector (*aSelectors, theSelector))
-      {
-        aSelectors->Append (theSelector);
-      }
+      if (FindIndex (myLocal.Find (theObject), theSelector) == 0)
+        (myLocal.ChangeFind (theObject)).Append (theSelector);
       theSelector->Activate (theObject->Selection (theMode));
     }
   }
@@ -404,47 +400,48 @@ void SelectMgr_SelectionManager::Deactivate (const Handle(SelectMgr_SelectableOb
   {
     Deactivate (Handle(SelectMgr_SelectableObject)::DownCast (anChildrenIter.Value()), theMode, theSelector);
   }
+
   if (!theObject->HasOwnPresentations())
-  {
     return;
-  }
-  if (!myGlobal.Contains(theObject)
-   && !myLocal.IsBound  (theObject))
-  {
-    return;
-  }
 
-  const Handle(SelectMgr_Selection)& aSel = theObject->Selection (theMode);
-  if (!theSelector.IsNull())
+  Standard_Boolean isInGlobal = myGlobal.Contains (theObject);
+  Standard_Boolean hasSelection = theMode == -1 ? Standard_True : theObject->HasSelection (theMode);
+
+  if (theSelector.IsNull())
+  {
+    Handle(SelectMgr_ViewerSelector) aSelector;
+    for (TColStd_MapIteratorOfMapOfTransient aSelectorIter (mySelectors); aSelectorIter.More(); aSelectorIter.Next())
+    {
+      aSelector = Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorIter.Key());
+      if (isInGlobal || myLocal.IsBound (theObject))
+      {
+        if (theMode == -1)
+        {
+          for (theObject->Init(); theObject->More(); theObject->Next())
+          {
+            aSelector->Deactivate (theObject->CurrentSelection());
+          }
+        }
+        else
+        {
+          if (hasSelection)
+            aSelector->Deactivate (theObject->Selection (theMode));
+        }
+      }
+    }
+  }
+  else
   {
     if (theMode == -1)
     {
-      for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObject->Selections()); aSelIter.More(); aSelIter.Next())
+      for (theObject->Init(); theObject->More(); theObject->Next())
       {
-        theSelector->Deactivate (aSelIter.Value());
+        theSelector->Deactivate (theObject->CurrentSelection());
       }
     }
-    else if (!aSel.IsNull())
-    {
-      theSelector->Deactivate (aSel);
-    }
-    return;
-  }
-
-  for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorIter (mySelectors); aSelectorIter.More(); aSelectorIter.Next())
-  {
-    const Handle(SelectMgr_ViewerSelector)& aSelector = aSelectorIter.Key();
-    if (theMode == -1)
-    {
-      for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObject->Selections()); aSelIter.More(); aSelIter.Next())
-      {
-        aSelector->Deactivate (aSelIter.Value());
-      }
-    }
-    else if (!aSel.IsNull())
-    {
-      aSelector->Deactivate (aSel);
-    }
+    else
+      if (hasSelection)
+        theSelector->Deactivate (theObject->Selection (theMode));
   }
 }
 
@@ -461,47 +458,42 @@ Standard_Boolean SelectMgr_SelectionManager::IsActivated (const Handle(SelectMgr
     if (IsActivated (Handle(SelectMgr_SelectableObject)::DownCast (anChildrenIter.Value()), theMode, theSelector))
       return Standard_True;
   }
+
   if (!theObject->HasOwnPresentations())
-  {
     return Standard_False;
-  }
-  if (!myGlobal.Contains(theObject)
-   && !myLocal.IsBound  (theObject))
-  {
+
+  if (!(myGlobal.Contains (theObject) || myLocal.IsBound (theObject)))
     return Standard_False;
-  }
 
   if (theMode == -1 && theSelector.IsNull())
   {
-    for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObject->Selections()); aSelIter.More(); aSelIter.Next())
+    for (theObject->Init(); theObject->More(); theObject->Next())
     {
-      if (IsActivated (theObject, aSelIter.Value()->Mode()))
-      {
+      if (IsActivated (theObject, theObject->CurrentSelection()->Mode()))
         return Standard_True;
-      }
     }
+
     return Standard_False;
   }
+
+  if (!theObject->HasSelection (theMode))
+    return Standard_False;
 
   const Handle(SelectMgr_Selection)& aSelection = theObject->Selection (theMode);
-  if (aSelection.IsNull())
+  if (theSelector.IsNull())
   {
-    return Standard_False;
+    for (TColStd_MapIteratorOfMapOfTransient aSelectorIter (mySelectors); aSelectorIter.More(); aSelectorIter.Next())
+    {
+      Handle(SelectMgr_ViewerSelector) aSelector (Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorIter.Key()));
+      if (aSelector->Status (aSelection) == SelectMgr_SOS_Activated)
+        return Standard_True;
+    }
   }
-
-  if (!theSelector.IsNull())
+  else
   {
     return theSelector->Status (aSelection) == SelectMgr_SOS_Activated;
   }
 
-  for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorIter (mySelectors); aSelectorIter.More(); aSelectorIter.Next())
-  {
-    const Handle(SelectMgr_ViewerSelector)& aSelector = aSelectorIter.Key();
-    if (aSelector->Status (aSelection) == SelectMgr_SOS_Activated)
-    {
-      return Standard_True;
-    }
-  }
   return Standard_False;
 }
 
@@ -521,43 +513,49 @@ void SelectMgr_SelectionManager::ClearSelectionStructures (const Handle(SelectMg
   }
 
   if (!theObj->HasOwnPresentations())
-  {
     return;
-  }
-  if (!myGlobal.Contains(theObj)
-   && !myLocal.IsBound  (theObj))
-  {
-    return;
-  }
 
   if (theSelector.IsNull())
   {
-    for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
-    {
-      const Handle(SelectMgr_ViewerSelector)& aSelector = aSelectorsIter.Key();
-      ClearSelectionStructures (theObj, theMode, aSelector);
-    }
-    return;
-  }
+    if (!(myGlobal.Contains (theObj) || myLocal.IsBound(theObj)))
+      return;
 
-  if (theMode != -1)
-  {
-    if (const Handle(SelectMgr_Selection)& aSelection = theObj->Selection (theMode))
+    TColStd_MapIteratorOfMapOfTransient aSelectorsIter (mySelectors);
+    Handle(SelectMgr_ViewerSelector) aSelector;
+    for( ; aSelectorsIter.More(); aSelectorsIter.Next())
     {
-      theSelector->RemoveSelectionOfObject (theObj, aSelection);
-      aSelection->UpdateBVHStatus (SelectMgr_TBU_Add);
+      aSelector = Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorsIter.Key());
+      ClearSelectionStructures (theObj, theMode, aSelector);
     }
   }
   else
   {
-    for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObj->Selections()); aSelIter.More(); aSelIter.Next())
+    if (!(myGlobal.Contains (theObj) || myLocal.IsBound (theObj)))
+      return;
+
+    if (theMode != -1)
     {
-      const Handle(SelectMgr_Selection)& aSelection = aSelIter.Value();
-      theSelector->RemoveSelectionOfObject (theObj, aSelection);
-      aSelection->UpdateBVHStatus (SelectMgr_TBU_Add);
+      if (theObj->HasSelection (theMode))
+      {
+        const Handle(SelectMgr_Selection)& aSelection = theObj->Selection (theMode);
+        if (theObj->HasSelection (theMode))
+        {
+          theSelector->RemoveSelectionOfObject (theObj, aSelection);
+          aSelection->UpdateBVHStatus (SelectMgr_TBU_Add);
+        }
+      }
     }
+    else
+    {
+      for (theObj->Init(); theObj->More(); theObj->Next())
+      {
+        const Handle(SelectMgr_Selection)& aSelection = theObj->CurrentSelection();
+        theSelector->RemoveSelectionOfObject (theObj, aSelection);
+        aSelection->UpdateBVHStatus (SelectMgr_TBU_Add);
+      }
+    }
+    theSelector->RebuildObjectsTree();
   }
-  theSelector->RebuildObjectsTree();
 }
 
 //=======================================================================
@@ -573,44 +571,51 @@ void SelectMgr_SelectionManager::RestoreSelectionStructures (const Handle(Select
   {
     RestoreSelectionStructures (Handle(SelectMgr_SelectableObject)::DownCast (anChildrenIter.Value()), theMode, theSelector);
   }
+
   if (!theObj->HasOwnPresentations())
-  {
     return;
-  }
-  if (!myGlobal.Contains(theObj)
-   && !myLocal.IsBound  (theObj))
-  {
-    return;
-  }
 
   if (theSelector.IsNull())
   {
-    for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
-    {
-      const Handle(SelectMgr_ViewerSelector)& aSelector = aSelectorsIter.Key();
-      RestoreSelectionStructures (theObj, theMode, aSelector);
-    }
-    return;
-  }
+    if (!(myGlobal.Contains (theObj) || myLocal.IsBound(theObj)))
+      return;
 
-  if (theMode != -1)
-  {
-    if (const Handle(SelectMgr_Selection)& aSelection = theObj->Selection (theMode))
+    TColStd_MapIteratorOfMapOfTransient aSelectorsIter (mySelectors);
+    Handle(SelectMgr_ViewerSelector) aSelector;
+    for( ; aSelectorsIter.More(); aSelectorsIter.Next())
     {
-      theSelector->AddSelectionToObject (theObj, aSelection);
-      aSelection->UpdateBVHStatus (SelectMgr_TBU_None);
+      aSelector = Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorsIter.Key());
+      RestoreSelectionStructures (theObj, theMode, aSelector);
     }
   }
   else
   {
-    for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObj->Selections()); aSelIter.More(); aSelIter.Next())
+    if (!(myGlobal.Contains (theObj) || myLocal.IsBound (theObj)))
+      return;
+
+    if (theMode != -1)
     {
-      const Handle(SelectMgr_Selection)& aSelection = aSelIter.Value();
-      theSelector->AddSelectionToObject (theObj, aSelection);
-      aSelection->UpdateBVHStatus (SelectMgr_TBU_None);
+      if (theObj->HasSelection (theMode))
+      {
+        const Handle(SelectMgr_Selection)& aSelection = theObj->Selection (theMode);
+        if (theObj->HasSelection (theMode))
+        {
+          theSelector->AddSelectionToObject (theObj, aSelection);
+          aSelection->UpdateBVHStatus (SelectMgr_TBU_None);
+        }
+      }
     }
+    else
+    {
+      for (theObj->Init(); theObj->More(); theObj->Next())
+      {
+        const Handle(SelectMgr_Selection)& aSelection = theObj->CurrentSelection();
+        theSelector->AddSelectionToObject (theObj, aSelection);
+        aSelection->UpdateBVHStatus (SelectMgr_TBU_None);
+      }
+    }
+    theSelector->RebuildObjectsTree();
   }
-  theSelector->RebuildObjectsTree();
 }
 
 //=======================================================================
@@ -620,16 +625,18 @@ void SelectMgr_SelectionManager::RestoreSelectionStructures (const Handle(Select
 //=======================================================================
 void SelectMgr_SelectionManager::rebuildSelectionStructures (const Handle(SelectMgr_ViewerSelector)& theSelector)
 {
-  if (!theSelector.IsNull())
+  if (theSelector.IsNull())
+  {
+    Handle(SelectMgr_ViewerSelector) aSelector;
+    for(TColStd_MapIteratorOfMapOfTransient aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
+    {
+      aSelector = Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorsIter.Key());
+      rebuildSelectionStructures (aSelector);
+    }
+  }
+  else
   {
     theSelector->RebuildObjectsTree();
-    return;
-  }
-
-  for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
-  {
-    const Handle(SelectMgr_ViewerSelector)& aSelector = aSelectorsIter.Key();
-    rebuildSelectionStructures (aSelector);
   }
 }
 
@@ -643,9 +650,9 @@ void SelectMgr_SelectionManager::recomputeSelectionMode (const Handle(SelectMgr_
 {
   theSelection->UpdateStatus (SelectMgr_TOU_Full);
 
-  for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorIter (mySelectors); aSelectorIter.More(); aSelectorIter.Next())
+  for (TColStd_MapIteratorOfMapOfTransient aSelectorIter (mySelectors); aSelectorIter.More(); aSelectorIter.Next())
   {
-    const Handle(SelectMgr_ViewerSelector)& aCurSelector = aSelectorIter.Key();
+    Handle(SelectMgr_ViewerSelector) aCurSelector = Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorIter.Key());
 
     ClearSelectionStructures (theObject, theMode, aCurSelector);
     theObject->RecomputePrimitives (theMode);
@@ -686,31 +693,29 @@ void SelectMgr_SelectionManager::RecomputeSelection (const Handle(SelectMgr_Sele
   {
     RecomputeSelection (Handle(SelectMgr_SelectableObject)::DownCast (anChildrenIter.Value()), theIsForce, theMode);
   }
+
   if (!theObject->HasOwnPresentations())
-  {
     return;
-  }
-  if (!myGlobal.Contains (theObject)
-   && !myLocal.IsBound (theObject))
-  {
+
+  if (!(myGlobal.Contains (theObject) || myLocal.IsBound (theObject)))
     return;
-  }
 
   if (theMode == -1)
   {
-    for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObject->Selections()); aSelIter.More(); aSelIter.Next())
+    for (theObject->Init(); theObject->More(); theObject->Next())
     {
-      const Handle(SelectMgr_Selection)& aSelection = aSelIter.Value();
-      const Standard_Integer aSelMode = aSelection->Mode();
+      const Handle(SelectMgr_Selection)& aSelection = theObject->CurrentSelection();
+      Standard_Integer aSelMode = aSelection->Mode();
       recomputeSelectionMode (theObject, aSelection, aSelMode);
     }
   }
   else
   {
-    if (const Handle(SelectMgr_Selection)& aSelection = theObject->Selection (theMode))
-    {
-      recomputeSelectionMode (theObject, aSelection, theMode);
-    }
+    if (!theObject->HasSelection (theMode))
+      return;
+
+    const Handle(SelectMgr_Selection)& aSelection = theObject->Selection (theMode);
+    recomputeSelectionMode (theObject, aSelection, theMode);
   }
 }
 
@@ -728,42 +733,35 @@ void SelectMgr_SelectionManager::Update (const Handle(SelectMgr_SelectableObject
   {
     Update (Handle(SelectMgr_SelectableObject)::DownCast (aChildIter.Value()), theIsForce);
   }
-  if (!theObject->HasOwnPresentations())
-  {
-    return;
-  }
 
-  for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObject->Selections()); aSelIter.More(); aSelIter.Next())
+  if (!theObject->HasOwnPresentations())
+    return;
+
+  for (theObject->Init(); theObject->More(); theObject->Next())
   {
-    const Handle(SelectMgr_Selection)& aSelection = aSelIter.Value();
+    const Handle(SelectMgr_Selection)& aSelection = theObject->CurrentSelection();
     if (theIsForce)
     {
       switch (aSelection->UpdateStatus())
       {
-        case SelectMgr_TOU_Full:
-        {
-          ClearSelectionStructures (theObject, aSelection->Mode());
-          theObject->RecomputePrimitives (aSelection->Mode()); // no break on purpose...
-          RestoreSelectionStructures (theObject, aSelection->Mode());
-          // pass through SelectMgr_TOU_Partial
-        }
-        Standard_FALLTHROUGH
-        case SelectMgr_TOU_Partial:
-        {
-          theObject->UpdateTransformations (aSelection);
-          rebuildSelectionStructures();
-          break;
-        }
-        default:
-          break;
+      case SelectMgr_TOU_Full:
+        ClearSelectionStructures (theObject, aSelection->Mode());
+        theObject->RecomputePrimitives (aSelection->Mode()); // no break on purpose...
+        RestoreSelectionStructures (theObject, aSelection->Mode());
+      case SelectMgr_TOU_Partial:
+        theObject->UpdateTransformations (aSelection);
+        rebuildSelectionStructures();
+        break;
+      default:
+        break;
       }
       aSelection->UpdateStatus (SelectMgr_TOU_None);
       aSelection->UpdateBVHStatus (SelectMgr_TBU_None);
     }
 
-    for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorIter (mySelectors); aSelectorIter.More(); aSelectorIter.Next())
+    for (TColStd_MapIteratorOfMapOfTransient aSelectorIter (mySelectors); aSelectorIter.More(); aSelectorIter.Next())
     {
-      const Handle(SelectMgr_ViewerSelector)& aSelector = aSelectorIter.Key();
+      Handle(SelectMgr_ViewerSelector) aSelector (Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorIter.Key()));
       Update (theObject, aSelector, Standard_False);
     }
   }
@@ -778,52 +776,39 @@ void SelectMgr_SelectionManager::Update (const Handle(SelectMgr_SelectableObject
                                          const Standard_Boolean theIsForce)
 {
   if (!mySelectors.Contains (theSelector))
-  {
     return;
-  }
 
-  if (!myGlobal.Contains (theObject))
-  {
-    const SelectMgr_SequenceOfSelector* aSelectors = myLocal.Seek (theObject);
-    if (aSelectors == NULL
-    || !containsSelector (*aSelectors, theSelector))
-    {
-      return;
-    }
-  }
+  Standard_Boolean isKnown = myGlobal.Contains (theObject);
+  if (!isKnown)
+    isKnown = (myLocal.IsBound (theObject) && (FindIndex (myLocal.Find (theObject), theSelector) != 0));
+  if (!isKnown)
+    return;
 
   for (PrsMgr_ListOfPresentableObjectsIter aChildIter (theObject->Children()); aChildIter.More(); aChildIter.Next())
   {
     Update (Handle(SelectMgr_SelectableObject)::DownCast (aChildIter.Value()), theSelector, theIsForce);
   }
-  if (!theObject->HasOwnPresentations())
-  {
-    return;
-  }
 
-  for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObject->Selections()); aSelIter.More(); aSelIter.Next())
+  if (!theObject->HasOwnPresentations())
+    return;
+
+  for (theObject->Init(); theObject->More(); theObject->Next())
   {
-    const Handle(SelectMgr_Selection)& aSelection = aSelIter.Value();
+    const Handle(SelectMgr_Selection)& aSelection = theObject->CurrentSelection();
     if (theIsForce)
     {
       switch (aSelection->UpdateStatus())
       {
-        case SelectMgr_TOU_Full:
-        {
-          ClearSelectionStructures (theObject, aSelection->Mode());
-          theObject->RecomputePrimitives (aSelection->Mode());
-          RestoreSelectionStructures (theObject, aSelection->Mode());
-          // pass through SelectMgr_TOU_Partial
-        }
-        Standard_FALLTHROUGH
-        case SelectMgr_TOU_Partial:
-        {
-          theObject->UpdateTransformations (aSelection);
-          rebuildSelectionStructures();
-          break;
-        }
-        default:
-          break;
+      case SelectMgr_TOU_Full:
+        ClearSelectionStructures (theObject, aSelection->Mode());
+        theObject->RecomputePrimitives (aSelection->Mode());
+        RestoreSelectionStructures (theObject, aSelection->Mode());
+      case SelectMgr_TOU_Partial:
+        theObject->UpdateTransformations (aSelection);
+        rebuildSelectionStructures();
+        break;
+      default:
+        break;
       }
       aSelection->UpdateStatus (SelectMgr_TOU_None);
       aSelection->UpdateBVHStatus (SelectMgr_TBU_None);
@@ -833,25 +818,22 @@ void SelectMgr_SelectionManager::Update (const Handle(SelectMgr_SelectableObject
     {
       switch (aSelection->UpdateStatus())
       {
-        case SelectMgr_TOU_Full:
-        {
-          ClearSelectionStructures (theObject, aSelection->Mode(), theSelector);
-          theObject->RecomputePrimitives (aSelection->Mode());
-          RestoreSelectionStructures (theObject, aSelection->Mode(), theSelector);
-          // pass through SelectMgr_TOU_Partial
-        }
-        Standard_FALLTHROUGH
-        case SelectMgr_TOU_Partial:
+      case SelectMgr_TOU_Full:
+        ClearSelectionStructures (theObject, aSelection->Mode(), theSelector);
+        theObject->RecomputePrimitives (aSelection->Mode());
+        RestoreSelectionStructures (theObject, aSelection->Mode(), theSelector);
+      case SelectMgr_TOU_Partial:
+        if (theObject->HasTransformation())
         {
           theObject->UpdateTransformations (aSelection);
           theSelector->RebuildObjectsTree();
-          break;
         }
-        default:
-          break;
+        break;
+      default:
+        break;
       }
 
-      aSelection->UpdateStatus (SelectMgr_TOU_None);
+      aSelection->UpdateStatus(SelectMgr_TOU_None);
       aSelection->UpdateBVHStatus (SelectMgr_TBU_None);
     }
   }
@@ -866,49 +848,49 @@ void SelectMgr_SelectionManager::loadMode (const Handle(SelectMgr_SelectableObje
                                            const Handle(SelectMgr_ViewerSelector)& theSelector)
 {
   if (theMode == -1)
-  {
     return;
-  }
 
-  if (const Handle(SelectMgr_Selection)& aSelOld = theObject->Selection (theMode))
+  if (!theObject->HasSelection (theMode))
   {
-    if (aSelOld->IsEmpty())
+    Handle(SelectMgr_Selection) aNewSel = new SelectMgr_Selection (theMode);
+    theObject->AddSelection (aNewSel, theMode);
+    if (theSelector.IsNull())
     {
-      if (aSelOld->BVHUpdateStatus() == SelectMgr_TBU_Remove)
+      if (myGlobal.Contains (theObject))
       {
-        Handle(SelectMgr_Selection) aNewSel = new SelectMgr_Selection (theMode);
-        theObject->AddSelection (aNewSel, theMode);
-        aNewSel->UpdateBVHStatus (SelectMgr_TBU_Remove);
-        aNewSel->SetSelectionState (SelectMgr_SOS_Deactivated);
+        TColStd_MapIteratorOfMapOfTransient aSelectorIter (mySelectors);
+        for ( ; aSelectorIter.More(); aSelectorIter.Next())
+        {
+          Handle(SelectMgr_ViewerSelector) aSelector =
+            Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorIter.Key());
+          aSelector->AddSelectionToObject (theObject, aNewSel);
+          aNewSel->UpdateBVHStatus (SelectMgr_TBU_None);
+        }
+      }
+      else if (myLocal.IsBound (theObject))
+      {
+        const SelectMgr_SequenceOfSelector& aSelectors = myLocal (theObject);
+        for (Standard_Integer aSelectorIdx = 1; aSelectorIdx <= aSelectors.Length(); ++aSelectorIdx)
+        {
+          aSelectors (aSelectorIdx)->AddSelectionToObject (theObject, aNewSel);
+          aNewSel->UpdateBVHStatus (SelectMgr_TBU_None);
+        }
       }
     }
-    return;
-  }
-
-  Handle(SelectMgr_Selection) aNewSel = new SelectMgr_Selection (theMode);
-  theObject->AddSelection (aNewSel, theMode);
-  if (!theSelector.IsNull())
-  {
-    theSelector->AddSelectionToObject (theObject, aNewSel);
-    aNewSel->UpdateBVHStatus (SelectMgr_TBU_None);
-    return;
-  }
-
-  if (myGlobal.Contains (theObject))
-  {
-    for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorIter (mySelectors); aSelectorIter.More(); aSelectorIter.Next())
+    else
     {
-      const Handle(SelectMgr_ViewerSelector)& aSelector = aSelectorIter.Key();
-      aSelector->AddSelectionToObject (theObject, aNewSel);
+      theSelector->AddSelectionToObject (theObject, aNewSel);
       aNewSel->UpdateBVHStatus (SelectMgr_TBU_None);
     }
   }
-  else if (SelectMgr_SequenceOfSelector* aSelectors = myLocal.ChangeSeek (theObject))
+  else if (theObject->Selection (theMode)->IsEmpty())
   {
-    for (SelectMgr_SequenceOfSelector::Iterator aSelectorIter (*aSelectors); aSelectorIter.More(); aSelectorIter.Next())
+    if (theObject->Selection (theMode)->BVHUpdateStatus() == SelectMgr_TBU_Remove)
     {
-      aSelectorIter.Value()->AddSelectionToObject (theObject, aNewSel);
-      aNewSel->UpdateBVHStatus (SelectMgr_TBU_None);
+      Handle(SelectMgr_Selection) aNewSel = new SelectMgr_Selection (theMode);
+      theObject->AddSelection (aNewSel, theMode);
+      theObject->Selection (theMode)->UpdateBVHStatus (SelectMgr_TBU_Remove);
+      theObject->Selection (theMode)->SetSelectionState (SelectMgr_SOS_Deactivated);
     }
   }
 }
@@ -920,10 +902,8 @@ void SelectMgr_SelectionManager::loadMode (const Handle(SelectMgr_SelectableObje
 void SelectMgr_SelectionManager::SetUpdateMode (const Handle(SelectMgr_SelectableObject)& theObject,
                                                 const SelectMgr_TypeOfUpdate theType)
 {
-  for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theObject->Selections()); aSelIter.More(); aSelIter.Next())
-  {
-    aSelIter.Value()->UpdateStatus (theType);
-  }
+  for (theObject->Init(); theObject->More(); theObject->Next())
+    theObject->CurrentSelection()->UpdateStatus (theType);
 }
 
 //=======================================================================
@@ -934,10 +914,8 @@ void SelectMgr_SelectionManager::SetUpdateMode (const Handle(SelectMgr_Selectabl
                                                 const Standard_Integer theMode,
                                                 const SelectMgr_TypeOfUpdate theType)
 {
-  if (const Handle(SelectMgr_Selection)& aSel = theObject->Selection (theMode))
-  {
-    aSel->UpdateStatus (theType);
-  }
+  if (theObject->HasSelection (theMode))
+    theObject->Selection (theMode)->UpdateStatus (theType);
 }
 
 //=======================================================================
@@ -950,25 +928,24 @@ void SelectMgr_SelectionManager::SetSelectionSensitivity (const Handle(SelectMgr
                                                           const Standard_Integer theMode,
                                                           const Standard_Integer theNewSens)
 {
-  Standard_ASSERT_RAISE (theNewSens > 0, "Error! Selection sensitivity have positive value.");
-  if (theObject.IsNull())
-  {
-    return;
-  }
+  Standard_ASSERT_RAISE (theNewSens > 0,
+    "Error! Selection sensitivity have positive value.");
 
-  const Handle(SelectMgr_Selection)& aSel = theObject->Selection (theMode);
-  if (aSel.IsNull())
-  {
+  if (theObject.IsNull() || !theObject->HasSelection (theMode))
     return;
-  }
 
+  Handle(SelectMgr_Selection) aSel = theObject->Selection (theMode);
   const Standard_Integer aPrevSens = aSel->Sensitivity();
   aSel->SetSensitivity (theNewSens);
+
+  if (!(myGlobal.Contains (theObject) || myLocal.IsBound (theObject)))
+    return;
+
   if (myGlobal.Contains (theObject))
   {
-    for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
+    for (TColStd_MapIteratorOfMapOfTransient aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
     {
-      const Handle(SelectMgr_ViewerSelector)& aSelector = aSelectorsIter.Key();
+      Handle(SelectMgr_ViewerSelector) aSelector = Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorsIter.Key());
       if (aSelector->Contains (theObject))
       {
         aSelector->myTolerances.Decrement (aPrevSens);
@@ -998,9 +975,9 @@ void SelectMgr_SelectionManager::UpdateSelection (const Handle(SelectMgr_Selecta
 {
   if (myGlobal.Contains (theObject))
   {
-    for (NCollection_Map<Handle(SelectMgr_ViewerSelector)>::Iterator aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
+    for (TColStd_MapIteratorOfMapOfTransient aSelectorsIter (mySelectors); aSelectorsIter.More(); aSelectorsIter.Next())
     {
-      const Handle(SelectMgr_ViewerSelector)& aSelector = aSelectorsIter.Key();
+      Handle(SelectMgr_ViewerSelector) aSelector = Handle(SelectMgr_ViewerSelector)::DownCast (aSelectorsIter.Key());
       if (aSelector->Contains (theObject))
       {
         aSelector->MoveSelectableObject (theObject);

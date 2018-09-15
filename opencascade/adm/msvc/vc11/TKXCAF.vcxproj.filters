@@ -2,25 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{DBA124A3-0D65-0768-1880-D2339F3B22B6}</UniqueIdentifier>
+      <UniqueIdentifier>{8015315E-04F0-0BBF-0192-471DF800AEFB}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\XCAFApp">
-      <UniqueIdentifier>{63E934D6-167E-186D-125C-348CCE083D01}</UniqueIdentifier>
+      <UniqueIdentifier>{DFFF005D-03E7-1577-1731-57C1405075DA}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\XCAFDimTolObjects">
-      <UniqueIdentifier>{DD15E6BC-07EC-04D0-0F11-5B4755A83226}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\XCAFNoteObjects">
-      <UniqueIdentifier>{745D2048-17A6-02E8-1690-245DAA814DB7}</UniqueIdentifier>
+      <UniqueIdentifier>{69796F2A-169E-0CB9-0BD2-E3CF383965FC}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\XCAFDoc">
-      <UniqueIdentifier>{15465C6B-0877-0412-08DE-DBDC9C709828}</UniqueIdentifier>
+      <UniqueIdentifier>{56BAE650-024D-0029-1814-4A9EDA03386C}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\XCAFPrs">
-      <UniqueIdentifier>{15868783-03F9-0801-0382-9C8892CA4126}</UniqueIdentifier>
+      <UniqueIdentifier>{6D43B127-0B88-1445-060A-09B7A7F871FF}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\XCAFView">
-      <UniqueIdentifier>{7B39AF50-1190-16D6-058F-DF93B85B364E}</UniqueIdentifier>
+      <UniqueIdentifier>{042C3B9F-1650-0F5C-188D-EE36BC4B9EC4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -38,9 +35,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\XCAFDimTolObjects\XCAFDimTolObjects_Tool.cxx">
       <Filter>Source files\XCAFDimTolObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\XCAFNoteObjects\XCAFNoteObjects_NoteObject.cxx">
-      <Filter>Source files\XCAFNoteObjects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\XCAFDoc\XCAFDoc.cxx">
       <Filter>Source files\XCAFDoc</Filter>

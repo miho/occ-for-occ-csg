@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -66,7 +66,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-types">Protected Types</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">IntTools_Context Class Reference</div>  </div>
@@ -92,8 +91,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa028f933dd89a148ee54027739590eaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4adb53cd95222ea215c17db54ae5bad4"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a4adb53cd95222ea215c17db54ae5bad4">~IntTools_Context</a> ()</td></tr>
 <tr class="separator:a4adb53cd95222ea215c17db54ae5bad4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2bb2188538922d93c956d4c6fa87810f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a2bb2188538922d93c956d4c6fa87810f">IntTools_Context</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_n_collection___base_allocator.html">NCollection_BaseAllocator</a> &gt; &amp;theAllocator)</td></tr>
-<tr class="separator:a2bb2188538922d93c956d4c6fa87810f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fed8f6d02eef1b19cb1f38119385044"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a0fed8f6d02eef1b19cb1f38119385044">IntTools_Context</a> (const <a class="el" href="_b_o_p_col___base_allocator_8hxx.html#ac8e7d56bf5bcc63be08e775c91f3fb36">BOPCol_BaseAllocator</a> &amp;theAllocator)</td></tr>
+<tr class="separator:a0fed8f6d02eef1b19cb1f38119385044"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ea33f0b564c44dbfe8c38df9d90fbda"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___f_class2d.html">IntTools_FClass2d</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a1ea33f0b564c44dbfe8c38df9d90fbda">FClass2d</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF)</td></tr>
 <tr class="memdesc:a1ea33f0b564c44dbfe8c38df9d90fbda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to point classifier for given face.  <a href="#a1ea33f0b564c44dbfe8c38df9d90fbda">More...</a><br /></td></tr>
 <tr class="separator:a1ea33f0b564c44dbfe8c38df9d90fbda"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -118,9 +117,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:afb85290f597fcacbf91201e8ba6646d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_b_rep_adaptor___surface.html">BRepAdaptor_Surface</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#afb85290f597fcacbf91201e8ba6646d1">SurfaceAdaptor</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theFace)</td></tr>
 <tr class="memdesc:afb85290f597fcacbf91201e8ba6646d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to surface adaptor for given face.  <a href="#afb85290f597fcacbf91201e8ba6646d1">More...</a><br /></td></tr>
 <tr class="separator:afb85290f597fcacbf91201e8ba6646d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42ce0e70f33998df6f2babf74256c968"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_bnd___o_b_b.html">Bnd_OBB</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a42ce0e70f33998df6f2babf74256c968">OBB</a> (const <a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a> &amp;theShape, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theFuzzyValue=<a class="el" href="class_precision.html#a94f8d5777a3e8e1c61bd7bbfa8dfc0eb">Precision::Confusion</a>())</td></tr>
-<tr class="memdesc:a42ce0e70f33998df6f2babf74256c968"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds and stores an Oriented Bounding Box for the shape. Returns a reference to OBB.  <a href="#a42ce0e70f33998df6f2babf74256c968">More...</a><br /></td></tr>
-<tr class="separator:a42ce0e70f33998df6f2babf74256c968"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9c974e9f4282879e2eb006aeb1efc0e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#ac9c974e9f4282879e2eb006aeb1efc0e">UVBounds</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theFace, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;UMin, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;UMax, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;VMin, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;VMax)</td></tr>
 <tr class="memdesc:ac9c974e9f4282879e2eb006aeb1efc0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the boundaries of the face using surface adaptor.  <a href="#ac9c974e9f4282879e2eb006aeb1efc0e">More...</a><br /></td></tr>
 <tr class="separator:ac9c974e9f4282879e2eb006aeb1efc0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,37 +216,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ad50aac4b364cfcdadd80c2bed3b8c00a inherit pub_methods_class_standard___transient"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrements the reference counter of this object; returns the decremented value.  <a href="class_standard___transient.html#ad50aac4b364cfcdadd80c2bed3b8c00a">More...</a><br /></td></tr>
 <tr class="separator:ad50aac4b364cfcdadd80c2bed3b8c00a inherit pub_methods_class_standard___transient"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
-Protected Types</h2></td></tr>
-<tr class="memitem:a294a2be126c58028f36d84ac9c3bcf6f"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_n_collection___data_map.html">NCollection_DataMap</a>&lt; <a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a>, <a class="el" href="_standard___type_def_8hxx.html#af78960a4034c65ad98ee041d96dae5fb">Standard_Address</a>, <a class="el" href="class_top_tools___shape_map_hasher.html">TopTools_ShapeMapHasher</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a></td></tr>
-<tr class="separator:a294a2be126c58028f36d84ac9c3bcf6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35d8dbdb873ac143d1861216b2e8159d"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_n_collection___data_map.html">NCollection_DataMap</a>&lt; <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_standard___transient.html">Standard_Transient</a> &gt;, <a class="el" href="_standard___type_def_8hxx.html#af78960a4034c65ad98ee041d96dae5fb">Standard_Address</a>, <a class="el" href="_t_col_std___map_transient_hasher_8hxx.html#a10088ceaabefb9d16eb23a8d6c5cf29c">TColStd_MapTransientHasher</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a35d8dbdb873ac143d1861216b2e8159d">DataMapOfTransientAddress</a></td></tr>
-<tr class="separator:a35d8dbdb873ac143d1861216b2e8159d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:ae0c01295635bca0361a4822f757cfecb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_n_collection___base_allocator.html">NCollection_BaseAllocator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#ae0c01295635bca0361a4822f757cfecb">myAllocator</a></td></tr>
-<tr class="separator:ae0c01295635bca0361a4822f757cfecb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae22d22929533d742f7aa0a3187ecc370"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#ae22d22929533d742f7aa0a3187ecc370">myFClass2dMap</a></td></tr>
-<tr class="separator:ae22d22929533d742f7aa0a3187ecc370"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a496a980c32441749a5359d31759fd038"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a496a980c32441749a5359d31759fd038">myProjPSMap</a></td></tr>
-<tr class="separator:a496a980c32441749a5359d31759fd038"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74114fe452e098b63c91c88f41473f67"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a74114fe452e098b63c91c88f41473f67">myProjPCMap</a></td></tr>
-<tr class="separator:a74114fe452e098b63c91c88f41473f67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4b8829fa2076795e6328c7fdba12c2b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#ad4b8829fa2076795e6328c7fdba12c2b">mySClassMap</a></td></tr>
-<tr class="separator:ad4b8829fa2076795e6328c7fdba12c2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad00174977cbbb6b4252f58f1cb086159"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___context.html#a35d8dbdb873ac143d1861216b2e8159d">DataMapOfTransientAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#ad00174977cbbb6b4252f58f1cb086159">myProjPTMap</a></td></tr>
-<tr class="separator:ad00174977cbbb6b4252f58f1cb086159"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac621b445abfcdb9cdd904048b754d027"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#ac621b445abfcdb9cdd904048b754d027">myHatcherMap</a></td></tr>
-<tr class="separator:ac621b445abfcdb9cdd904048b754d027"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc685ec18362dee4d4323ebd4df4a17f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#abc685ec18362dee4d4323ebd4df4a17f">myProjSDataMap</a></td></tr>
-<tr class="separator:abc685ec18362dee4d4323ebd4df4a17f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c97f91273fbb218f7c2812a2c98d25a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a3c97f91273fbb218f7c2812a2c98d25a">myBndBoxDataMap</a></td></tr>
-<tr class="separator:a3c97f91273fbb218f7c2812a2c98d25a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7529b92b180b5c73ace54c1797d2da9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#aa7529b92b180b5c73ace54c1797d2da9">mySurfAdaptorMap</a></td></tr>
-<tr class="separator:aa7529b92b180b5c73ace54c1797d2da9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9467761b45546232fd21f92289e5869a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a9467761b45546232fd21f92289e5869a">myOBBMap</a></td></tr>
-<tr class="separator:a9467761b45546232fd21f92289e5869a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb44297afb78df9f8a2dbd12aa94fdbe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_b_o_p_col___base_allocator_8hxx.html#ac8e7d56bf5bcc63be08e775c91f3fb36">BOPCol_BaseAllocator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#afb44297afb78df9f8a2dbd12aa94fdbe">myAllocator</a></td></tr>
+<tr class="separator:afb44297afb78df9f8a2dbd12aa94fdbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab96fb9217b5705775906e2afa9bf0198"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#ab96fb9217b5705775906e2afa9bf0198">myFClass2dMap</a></td></tr>
+<tr class="separator:ab96fb9217b5705775906e2afa9bf0198"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a7ed01ea3f901706afde08c635480ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a9a7ed01ea3f901706afde08c635480ba">myProjPSMap</a></td></tr>
+<tr class="separator:a9a7ed01ea3f901706afde08c635480ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a929dbdf41b12b5887ef8b1d852d7a554"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a929dbdf41b12b5887ef8b1d852d7a554">myProjPCMap</a></td></tr>
+<tr class="separator:a929dbdf41b12b5887ef8b1d852d7a554"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a587e10859aa1a42d6c1c43cb77a96dd4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a587e10859aa1a42d6c1c43cb77a96dd4">mySClassMap</a></td></tr>
+<tr class="separator:a587e10859aa1a42d6c1c43cb77a96dd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8edec3481f22fc0b6149f0b648eac9fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_b_o_p_col___data_map_of_transient_address_8hxx.html#a0daf37db12466a60e3aecb519c92aa53">BOPCol_DataMapOfTransientAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a8edec3481f22fc0b6149f0b648eac9fc">myProjPTMap</a></td></tr>
+<tr class="separator:a8edec3481f22fc0b6149f0b648eac9fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a0c0dec92ea930e59f17cfeff171f79"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a0a0c0dec92ea930e59f17cfeff171f79">myHatcherMap</a></td></tr>
+<tr class="separator:a0a0c0dec92ea930e59f17cfeff171f79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcbf43294db0d8afda5a10262720bf46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#adcbf43294db0d8afda5a10262720bf46">myProjSDataMap</a></td></tr>
+<tr class="separator:adcbf43294db0d8afda5a10262720bf46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4348ced907a76d4ba0aaab2c05cba46e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a4348ced907a76d4ba0aaab2c05cba46e">myBndBoxDataMap</a></td></tr>
+<tr class="separator:a4348ced907a76d4ba0aaab2c05cba46e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1586475de29de08361033271e887cb0e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a1586475de29de08361033271e887cb0e">mySurfAdaptorMap</a></td></tr>
+<tr class="separator:a1586475de29de08361033271e887cb0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8f39fb9e74bcdfbd007f0c80b0698c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#af8f39fb9e74bcdfbd007f0c80b0698c2">myCreateFlag</a></td></tr>
 <tr class="separator:af8f39fb9e74bcdfbd007f0c80b0698c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2423ea0b9726278d7c0d47ce3e911bd8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_tools___context.html#a2423ea0b9726278d7c0d47ce3e911bd8">myPOnSTolerance</a></td></tr>
@@ -272,52 +259,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The intersection Context contains geometrical and topological toolkit (classifiers, projectors, etc). The intersection Context is for caching the tools to increase the performance. </p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a294a2be126c58028f36d84ac9c3bcf6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a294a2be126c58028f36d84ac9c3bcf6f">&#9670;&nbsp;</a></span>DataMapOfShapeAddress</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="class_n_collection___data_map.html">NCollection_DataMap</a>&lt;<a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a>, <a class="el" href="_standard___type_def_8hxx.html#af78960a4034c65ad98ee041d96dae5fb">Standard_Address</a>, <a class="el" href="class_top_tools___shape_map_hasher.html">TopTools_ShapeMapHasher</a>&gt; <a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">IntTools_Context::DataMapOfShapeAddress</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a35d8dbdb873ac143d1861216b2e8159d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a35d8dbdb873ac143d1861216b2e8159d">&#9670;&nbsp;</a></span>DataMapOfTransientAddress</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="class_n_collection___data_map.html">NCollection_DataMap</a>&lt;<a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_standard___transient.html">Standard_Transient</a> &gt;, <a class="el" href="_standard___type_def_8hxx.html#af78960a4034c65ad98ee041d96dae5fb">Standard_Address</a>, <a class="el" href="_t_col_std___map_transient_hasher_8hxx.html#a10088ceaabefb9d16eb23a8d6c5cf29c">TColStd_MapTransientHasher</a>&gt; <a class="el" href="class_int_tools___context.html#a35d8dbdb873ac143d1861216b2e8159d">IntTools_Context::DataMapOfTransientAddress</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa028f933dd89a148ee54027739590eaa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa028f933dd89a148ee54027739590eaa">&#9670;&nbsp;</a></span>IntTools_Context() <span class="overload">[1/2]</span></h2>
 
@@ -360,8 +302,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a2bb2188538922d93c956d4c6fa87810f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2bb2188538922d93c956d4c6fa87810f">&#9670;&nbsp;</a></span>IntTools_Context() <span class="overload">[2/2]</span></h2>
+<a id="a0fed8f6d02eef1b19cb1f38119385044"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fed8f6d02eef1b19cb1f38119385044">&#9670;&nbsp;</a></span>IntTools_Context() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -369,7 +311,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">IntTools_Context::IntTools_Context </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_n_collection___base_allocator.html">NCollection_BaseAllocator</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="_b_o_p_col___base_allocator_8hxx.html#ac8e7d56bf5bcc63be08e775c91f3fb36">BOPCol_BaseAllocator</a> &amp;&#160;</td>
           <td class="paramname"><em>theAllocator</em></td><td>)</td>
           <td></td>
         </tr>
@@ -994,36 +936,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a42ce0e70f33998df6f2babf74256c968"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a42ce0e70f33998df6f2babf74256c968">&#9670;&nbsp;</a></span>OBB()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_bnd___o_b_b.html">Bnd_OBB</a>&amp; IntTools_Context::OBB </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a> &amp;&#160;</td>
-          <td class="paramname"><em>theShape</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td>
-          <td class="paramname"><em>theFuzzyValue</em> = <code><a class="el" href="class_precision.html#a94f8d5777a3e8e1c61bd7bbfa8dfc0eb">Precision::Confusion</a>()</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Builds and stores an Oriented Bounding Box for the shape. Returns a reference to OBB. </p>
-
-</div>
-</div>
 <a id="a64d0dfad33868103ea0c8f416ef2b7f6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a64d0dfad33868103ea0c8f416ef2b7f6">&#9670;&nbsp;</a></span>ProjectPointOnEdge()</h2>
 
@@ -1279,8 +1191,8 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Field Documentation</h2>
-<a id="ae0c01295635bca0361a4822f757cfecb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0c01295635bca0361a4822f757cfecb">&#9670;&nbsp;</a></span>myAllocator</h2>
+<a id="afb44297afb78df9f8a2dbd12aa94fdbe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb44297afb78df9f8a2dbd12aa94fdbe">&#9670;&nbsp;</a></span>myAllocator</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1289,7 +1201,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_n_collection___base_allocator.html">NCollection_BaseAllocator</a> &gt; IntTools_Context::myAllocator</td>
+          <td class="memname"><a class="el" href="_b_o_p_col___base_allocator_8hxx.html#ac8e7d56bf5bcc63be08e775c91f3fb36">BOPCol_BaseAllocator</a> IntTools_Context::myAllocator</td>
         </tr>
       </table>
   </td>
@@ -1301,8 +1213,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a3c97f91273fbb218f7c2812a2c98d25a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c97f91273fbb218f7c2812a2c98d25a">&#9670;&nbsp;</a></span>myBndBoxDataMap</h2>
+<a id="a4348ced907a76d4ba0aaab2c05cba46e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4348ced907a76d4ba0aaab2c05cba46e">&#9670;&nbsp;</a></span>myBndBoxDataMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1311,7 +1223,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a> IntTools_Context::myBndBoxDataMap</td>
+          <td class="memname"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a> IntTools_Context::myBndBoxDataMap</td>
         </tr>
       </table>
   </td>
@@ -1345,8 +1257,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ae22d22929533d742f7aa0a3187ecc370"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae22d22929533d742f7aa0a3187ecc370">&#9670;&nbsp;</a></span>myFClass2dMap</h2>
+<a id="ab96fb9217b5705775906e2afa9bf0198"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab96fb9217b5705775906e2afa9bf0198">&#9670;&nbsp;</a></span>myFClass2dMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1355,7 +1267,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a> IntTools_Context::myFClass2dMap</td>
+          <td class="memname"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a> IntTools_Context::myFClass2dMap</td>
         </tr>
       </table>
   </td>
@@ -1367,8 +1279,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ac621b445abfcdb9cdd904048b754d027"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac621b445abfcdb9cdd904048b754d027">&#9670;&nbsp;</a></span>myHatcherMap</h2>
+<a id="a0a0c0dec92ea930e59f17cfeff171f79"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a0c0dec92ea930e59f17cfeff171f79">&#9670;&nbsp;</a></span>myHatcherMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1377,29 +1289,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a> IntTools_Context::myHatcherMap</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a9467761b45546232fd21f92289e5869a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9467761b45546232fd21f92289e5869a">&#9670;&nbsp;</a></span>myOBBMap</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a> IntTools_Context::myOBBMap</td>
+          <td class="memname"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a> IntTools_Context::myHatcherMap</td>
         </tr>
       </table>
   </td>
@@ -1433,8 +1323,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a74114fe452e098b63c91c88f41473f67"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74114fe452e098b63c91c88f41473f67">&#9670;&nbsp;</a></span>myProjPCMap</h2>
+<a id="a929dbdf41b12b5887ef8b1d852d7a554"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a929dbdf41b12b5887ef8b1d852d7a554">&#9670;&nbsp;</a></span>myProjPCMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1443,7 +1333,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a> IntTools_Context::myProjPCMap</td>
+          <td class="memname"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a> IntTools_Context::myProjPCMap</td>
         </tr>
       </table>
   </td>
@@ -1455,8 +1345,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a496a980c32441749a5359d31759fd038"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a496a980c32441749a5359d31759fd038">&#9670;&nbsp;</a></span>myProjPSMap</h2>
+<a id="a9a7ed01ea3f901706afde08c635480ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a7ed01ea3f901706afde08c635480ba">&#9670;&nbsp;</a></span>myProjPSMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1465,7 +1355,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a> IntTools_Context::myProjPSMap</td>
+          <td class="memname"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a> IntTools_Context::myProjPSMap</td>
         </tr>
       </table>
   </td>
@@ -1477,8 +1367,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ad00174977cbbb6b4252f58f1cb086159"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad00174977cbbb6b4252f58f1cb086159">&#9670;&nbsp;</a></span>myProjPTMap</h2>
+<a id="a8edec3481f22fc0b6149f0b648eac9fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8edec3481f22fc0b6149f0b648eac9fc">&#9670;&nbsp;</a></span>myProjPTMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1487,7 +1377,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_int_tools___context.html#a35d8dbdb873ac143d1861216b2e8159d">DataMapOfTransientAddress</a> IntTools_Context::myProjPTMap</td>
+          <td class="memname"><a class="el" href="_b_o_p_col___data_map_of_transient_address_8hxx.html#a0daf37db12466a60e3aecb519c92aa53">BOPCol_DataMapOfTransientAddress</a> IntTools_Context::myProjPTMap</td>
         </tr>
       </table>
   </td>
@@ -1499,8 +1389,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="abc685ec18362dee4d4323ebd4df4a17f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc685ec18362dee4d4323ebd4df4a17f">&#9670;&nbsp;</a></span>myProjSDataMap</h2>
+<a id="adcbf43294db0d8afda5a10262720bf46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcbf43294db0d8afda5a10262720bf46">&#9670;&nbsp;</a></span>myProjSDataMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1509,7 +1399,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a> IntTools_Context::myProjSDataMap</td>
+          <td class="memname"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a> IntTools_Context::myProjSDataMap</td>
         </tr>
       </table>
   </td>
@@ -1521,8 +1411,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ad4b8829fa2076795e6328c7fdba12c2b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4b8829fa2076795e6328c7fdba12c2b">&#9670;&nbsp;</a></span>mySClassMap</h2>
+<a id="a587e10859aa1a42d6c1c43cb77a96dd4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a587e10859aa1a42d6c1c43cb77a96dd4">&#9670;&nbsp;</a></span>mySClassMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1531,7 +1421,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a> IntTools_Context::mySClassMap</td>
+          <td class="memname"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a> IntTools_Context::mySClassMap</td>
         </tr>
       </table>
   </td>
@@ -1543,8 +1433,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="aa7529b92b180b5c73ace54c1797d2da9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa7529b92b180b5c73ace54c1797d2da9">&#9670;&nbsp;</a></span>mySurfAdaptorMap</h2>
+<a id="a1586475de29de08361033271e887cb0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1586475de29de08361033271e887cb0e">&#9670;&nbsp;</a></span>mySurfAdaptorMap</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1553,7 +1443,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f">DataMapOfShapeAddress</a> IntTools_Context::mySurfAdaptorMap</td>
+          <td class="memname"><a class="el" href="_b_o_p_col___data_map_of_shape_address_8hxx.html#a3dd4afee39b588b39474bebd19e1db13">BOPCol_DataMapOfShapeAddress</a> IntTools_Context::mySurfAdaptorMap</td>
         </tr>
       </table>
   </td>

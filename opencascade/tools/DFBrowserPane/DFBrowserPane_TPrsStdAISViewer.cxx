@@ -19,9 +19,7 @@
 #include <AIS_InteractiveContext.hxx>
 #include <TPrsStd_AISViewer.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QVariant>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : 

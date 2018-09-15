@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <XmlMDF_ADriverTable.hxx>
 #include <XmlMDocStd.hxx>
 #include <XmlMDocStd_XLinkDriver.hxx>
@@ -24,7 +24,7 @@
 //purpose  : 
 //=======================================================================
 void XmlMDocStd::AddDrivers (const Handle(XmlMDF_ADriverTable)& aDriverTable,
-                             const Handle(Message_Messenger)&   aMessageDriver)
+                             const Handle(CDM_MessageDriver)&   aMessageDriver)
 {
   aDriverTable->AddDriver (new XmlMDocStd_XLinkDriver(aMessageDriver)); 
 }

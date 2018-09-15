@@ -115,9 +115,8 @@ void BRepBndLib::Add(const TopoDS_Shape& S, Bnd_Box& B, Standard_Boolean useTria
           }
           else {
             for (;ex2.More();ex2.Next()) {
-              const TopoDS_Edge& anEdge = TopoDS::Edge(ex2.Current());
-              BC.Initialize(anEdge);
-              BndLib_Add3dCurve::Add(BC, BRep_Tool::Tolerance(anEdge), B);
+              BC.Initialize(TopoDS::Edge(ex2.Current()));
+              BndLib_Add3dCurve::Add(BC, BRep_Tool::Tolerance(F), B);
             }
             B.Enlarge(BRep_Tool::Tolerance(F));
           }

@@ -17,6 +17,15 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__Geom_DLL" />
+					<Add option="-D__TColGeom_DLL" />
+					<Add option="-D__GeomAdaptor_DLL" />
+					<Add option="-D__AdvApprox_DLL" />
+					<Add option="-D__GeomLProp_DLL" />
+					<Add option="-D__Adaptor3d_DLL" />
+					<Add option="-D__LProp3d_DLL" />
+					<Add option="-D__TopAbs_DLL" />
+					<Add option="-D__GeomEvaluator_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKG3d_obj.link" />
@@ -35,6 +44,15 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__Geom_DLL" />
+					<Add option="-D__TColGeom_DLL" />
+					<Add option="-D__GeomAdaptor_DLL" />
+					<Add option="-D__AdvApprox_DLL" />
+					<Add option="-D__GeomLProp_DLL" />
+					<Add option="-D__Adaptor3d_DLL" />
+					<Add option="-D__LProp3d_DLL" />
+					<Add option="-D__TopAbs_DLL" />
+					<Add option="-D__GeomEvaluator_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKG3d_objd.link" />
@@ -306,30 +324,6 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/GeomEvaluator/GeomEvaluator_SurfaceOfRevolution.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/GProp/GProp.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/GProp/GProp_CelGProps.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/GProp/GProp_GProps.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/GProp/GProp_PEquation.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/GProp/GProp_PGProps.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/GProp/GProp_PrincipalProps.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/GProp/GProp_SelGProps.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/GProp/GProp_VelGProps.cxx">
 			<Option link="0" />
 		</Unit>
 	</Project>

@@ -27,11 +27,12 @@
 #include <TopoDS_Compound.hxx>
 #include <BRep_Builder.hxx>
 
+#include <BOPCol_IndexedMapOfShape.hxx>
+
 #include <BOPDS_ShapeInfo.hxx>
 #include <BOPDS_DS.hxx>
 
 #include <BOPTools_AlgoTools.hxx>
-#include <TopTools_IndexedMapOfShape.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
 
@@ -49,10 +50,10 @@ BOPAlgo_Builder::BOPAlgo_Builder()
   myEntryPoint(0),
   myImages(100, myAllocator),
   myShapesSD(100, myAllocator),
+  mySplits(100, myAllocator),
   myOrigins(100, myAllocator),
   myNonDestructive(Standard_False),
-  myGlue(BOPAlgo_GlueOff),
-  myCheckInverted(Standard_True)
+  myGlue(BOPAlgo_GlueOff)
 {
 }
 //=======================================================================
@@ -70,10 +71,10 @@ BOPAlgo_Builder::BOPAlgo_Builder
   myEntryPoint(0),
   myImages(100, myAllocator), 
   myShapesSD(100, myAllocator),
+  mySplits(100, myAllocator),
   myOrigins(100, myAllocator),
   myNonDestructive(Standard_False),
-  myGlue(BOPAlgo_GlueOff),
-  myCheckInverted(Standard_True)
+  myGlue(BOPAlgo_GlueOff)
 {
 }
 //=======================================================================
@@ -100,6 +101,7 @@ void BOPAlgo_Builder::Clear()
   myMapFence.Clear();
   myImages.Clear();
   myShapesSD.Clear();
+  mySplits.Clear();
   myOrigins.Clear();
 }
 //=======================================================================
@@ -116,9 +118,9 @@ void BOPAlgo_Builder::AddArgument(const TopoDS_Shape& theShape)
 //function : SetArguments
 //purpose  : 
 //=======================================================================
-void BOPAlgo_Builder::SetArguments(const TopTools_ListOfShape& theShapes)
+void BOPAlgo_Builder::SetArguments(const BOPCol_ListOfShape& theShapes)
 {
-  TopTools_ListIteratorOfListOfShape aIt;
+  BOPCol_ListIteratorOfListOfShape aIt;
   //
   myArguments.Clear();
   //
@@ -127,6 +129,95 @@ void BOPAlgo_Builder::SetArguments(const TopTools_ListOfShape& theShapes)
     const TopoDS_Shape& aS = aIt.Value();
     AddArgument(aS);
   }
+}
+//=======================================================================
+//function : Arguments
+//purpose  : 
+//=======================================================================
+const BOPCol_ListOfShape& BOPAlgo_Builder::Arguments()const
+{
+  return myArguments;
+}
+//=======================================================================
+//function : Images
+//purpose  : 
+//=======================================================================
+const BOPCol_DataMapOfShapeListOfShape& BOPAlgo_Builder::Images()const
+{
+  return myImages;
+}
+//=======================================================================
+//function : Origins
+//purpose  : 
+//=======================================================================
+const BOPCol_DataMapOfShapeListOfShape& BOPAlgo_Builder::Origins()const
+{
+  return myOrigins;
+}
+
+//=======================================================================
+//function : ShapesSd
+//purpose  : 
+//=======================================================================
+const BOPCol_DataMapOfShapeShape& BOPAlgo_Builder::ShapesSD()const
+{
+  return myShapesSD;
+}
+//=======================================================================
+//function : Splits
+//purpose  : 
+//=======================================================================
+const BOPCol_DataMapOfShapeListOfShape& BOPAlgo_Builder::Splits()const
+{
+  return mySplits;
+}
+//=======================================================================
+//function : PPaveFiller
+//purpose  : 
+//=======================================================================
+BOPAlgo_PPaveFiller BOPAlgo_Builder::PPaveFiller()
+{
+  return myPaveFiller;
+}
+//=======================================================================
+//function : PDS
+//purpose  : 
+//=======================================================================
+BOPDS_PDS BOPAlgo_Builder::PDS()
+{
+  return myDS;
+}
+//=======================================================================
+//function : SetNonDestructive
+//purpose  : 
+//=======================================================================
+void BOPAlgo_Builder::SetNonDestructive(const Standard_Boolean theFlag)
+{
+  myNonDestructive = theFlag;
+}
+//=======================================================================
+//function : NonDestructive
+//purpose  : 
+//=======================================================================
+Standard_Boolean BOPAlgo_Builder::NonDestructive() const
+{
+  return myNonDestructive;
+}
+//=======================================================================
+//function : SetGlue
+//purpose  : 
+//=======================================================================
+void BOPAlgo_Builder::SetGlue(const BOPAlgo_GlueEnum theGlue)
+{
+  myGlue=theGlue;
+}
+//=======================================================================
+//function : Glue
+//purpose  : 
+//=======================================================================
+BOPAlgo_GlueEnum BOPAlgo_Builder::Glue() const 
+{
+  return myGlue;
 }
 //=======================================================================
 // function: CheckData
@@ -195,7 +286,6 @@ void BOPAlgo_Builder::Perform()
   pPF->SetFuzzyValue(myFuzzyValue);
   pPF->SetNonDestructive(myNonDestructive);
   pPF->SetGlue(myGlue);
-  pPF->SetUseOBB(myUseOBB);
   //
   pPF->Perform();
   //
@@ -213,7 +303,6 @@ void BOPAlgo_Builder::PerformWithFiller(const BOPAlgo_PaveFiller& theFiller)
   myNonDestructive = theFiller.NonDestructive();
   myFuzzyValue = theFiller.FuzzyValue();
   myGlue = theFiller.Glue();
-  myUseOBB = theFiller.UseOBB();
   PerformInternal(theFiller);
 }
 //=======================================================================
@@ -358,7 +447,7 @@ void BOPAlgo_Builder::PostTreat()
 {
   Standard_Integer i, aNbS;
   TopAbs_ShapeEnum aType;
-  TopTools_IndexedMapOfShape aMA;
+  BOPCol_IndexedMapOfShape aMA;
   if (myPaveFiller->NonDestructive()) {
     // MapToAvoid
     aNbS=myDS->NbSourceShapes();

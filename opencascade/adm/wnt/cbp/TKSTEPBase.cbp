@@ -17,6 +17,14 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__StepBasic_DLL" />
+					<Add option="-D__RWStepBasic_DLL" />
+					<Add option="-D__StepRepr_DLL" />
+					<Add option="-D__RWStepRepr_DLL" />
+					<Add option="-D__StepGeom_DLL" />
+					<Add option="-D__RWStepGeom_DLL" />
+					<Add option="-D__StepShape_DLL" />
+					<Add option="-D__RWStepShape_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKSTEPBase_obj.link" />
@@ -35,6 +43,14 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__StepBasic_DLL" />
+					<Add option="-D__RWStepBasic_DLL" />
+					<Add option="-D__StepRepr_DLL" />
+					<Add option="-D__RWStepRepr_DLL" />
+					<Add option="-D__StepGeom_DLL" />
+					<Add option="-D__RWStepGeom_DLL" />
+					<Add option="-D__StepShape_DLL" />
+					<Add option="-D__RWStepShape_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKSTEPBase_objd.link" />

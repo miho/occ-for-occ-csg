@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -156,9 +156,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a016164517a7d4d9b4832b2b78d49d5cd"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a016164517a7d4d9b4832b2b78d49d5cd">Export</a> (const <a class="el" href="_standard___type_def_8hxx.html#aee98bfe6774a1f4d9570c388805de3cc">Standard_CString</a> theFileName, const <a class="el" href="_graphic3d___export_format_8hxx.html#aa12258da95bb12312fd1f2d3b6d69754">Graphic3d_ExportFormat</a> theFormat, const <a class="el" href="_graphic3d___sort_type_8hxx.html#a71af52e4e8d4ca113c9cbd6ba4371987">Graphic3d_SortType</a> theSortType=<a class="el" href="_graphic3d___sort_type_8hxx.html#a71af52e4e8d4ca113c9cbd6ba4371987acacd58ebb1ea49e8debb59ce5b9b5033">Graphic3d_ST_BSP_Tree</a>) override</td></tr>
 <tr class="memdesc:a016164517a7d4d9b4832b2b78d49d5cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Export scene into the one of the Vector graphics formats (SVG, PS, PDF...). In contrast to Bitmaps, Vector graphics is scalable (so you may got quality benefits on printing to laser printer). Notice however that results may differ a lot and do not contain some elements.  <a href="#a016164517a7d4d9b4832b2b78d49d5cd">More...</a><br /></td></tr>
 <tr class="separator:a016164517a7d4d9b4832b2b78d49d5cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e4bf5f3000b9286bd531977ad47162d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a3e4bf5f3000b9286bd531977ad47162d">InvalidateBVHData</a> (const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a> theLayerId) override</td></tr>
-<tr class="memdesc:a3e4bf5f3000b9286bd531977ad47162d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Marks <a class="el" href="namespace_b_v_h.html">BVH</a> tree and the set of <a class="el" href="namespace_b_v_h.html">BVH</a> primitives of correspondent priority list with id theLayerId as outdated.  <a href="#a3e4bf5f3000b9286bd531977ad47162d">More...</a><br /></td></tr>
-<tr class="separator:a3e4bf5f3000b9286bd531977ad47162d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa13c732a7420bb05ed0da0cd3166817c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#aa13c732a7420bb05ed0da0cd3166817c">InvalidateBVHData</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theLayerId) override</td></tr>
+<tr class="memdesc:aa13c732a7420bb05ed0da0cd3166817c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Marks <a class="el" href="namespace_b_v_h.html">BVH</a> tree and the set of <a class="el" href="namespace_b_v_h.html">BVH</a> primitives of correspondent priority list with id theLayerId as outdated.  <a href="#aa13c732a7420bb05ed0da0cd3166817c">More...</a><br /></td></tr>
+<tr class="separator:aa13c732a7420bb05ed0da0cd3166817c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29759f1d50ed6abc67dc642947482d77"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a29759f1d50ed6abc67dc642947482d77">AddZLayer</a> (const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a> theLayerId) override</td></tr>
 <tr class="memdesc:a29759f1d50ed6abc67dc642947482d77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a new top-level z layer with the given ID.  <a href="#a29759f1d50ed6abc67dc642947482d77">More...</a><br /></td></tr>
 <tr class="separator:a29759f1d50ed6abc67dc642947482d77"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -231,6 +231,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a99b894f5c167bf5fc97ca18774730b70"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a99b894f5c167bf5fc97ca18774730b70">SetCullingEnabled</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theIsEnabled) override</td></tr>
 <tr class="memdesc:a99b894f5c167bf5fc97ca18774730b70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enables or disables frustum culling optimization.  <a href="#a99b894f5c167bf5fc97ca18774730b70">More...</a><br /></td></tr>
 <tr class="separator:a99b894f5c167bf5fc97ca18774730b70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68e5e64a0e6ca76158566ec8b29a83d9"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a68e5e64a0e6ca76158566ec8b29a83d9">ShadingModel</a> () const override</td></tr>
+<tr class="memdesc:a68e5e64a0e6ca76158566ec8b29a83d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns shading model of the view.  <a href="#a68e5e64a0e6ca76158566ec8b29a83d9">More...</a><br /></td></tr>
+<tr class="separator:a68e5e64a0e6ca76158566ec8b29a83d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd47afc16732b18fe1998e61c5729057"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#abd47afc16732b18fe1998e61c5729057">SetShadingModel</a> (const <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> theModel) override</td></tr>
+<tr class="memdesc:abd47afc16732b18fe1998e61c5729057"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets shading model of the view.  <a href="#abd47afc16732b18fe1998e61c5729057">More...</a><br /></td></tr>
+<tr class="separator:abd47afc16732b18fe1998e61c5729057"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c14cb1ff33bd0f9697bf9a42fc1b145"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_graphic3d___type_of_backfacing_model_8hxx.html#ac6b20ac0f4dce6a4cb02f146cf101628">Graphic3d_TypeOfBackfacingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a0c14cb1ff33bd0f9697bf9a42fc1b145">BackfacingModel</a> () const override</td></tr>
 <tr class="memdesc:a0c14cb1ff33bd0f9697bf9a42fc1b145"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return backfacing model used for the view.  <a href="#a0c14cb1ff33bd0f9697bf9a42fc1b145">More...</a><br /></td></tr>
 <tr class="separator:a0c14cb1ff33bd0f9697bf9a42fc1b145"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -249,12 +255,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6ca06c48e369d60f5333bce4e5057d0e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a6ca06c48e369d60f5333bce4e5057d0e">SetCamera</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___camera.html">Graphic3d_Camera</a> &gt; &amp;theCamera) override</td></tr>
 <tr class="memdesc:a6ca06c48e369d60f5333bce4e5057d0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets camera used by the view.  <a href="#a6ca06c48e369d60f5333bce4e5057d0e">More...</a><br /></td></tr>
 <tr class="separator:a6ca06c48e369d60f5333bce4e5057d0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4061523958ed6f7e4f4a9255b5f892fb"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a4061523958ed6f7e4f4a9255b5f892fb">Lights</a> () const override</td></tr>
-<tr class="memdesc:a4061523958ed6f7e4f4a9255b5f892fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns list of lights of the view.  <a href="#a4061523958ed6f7e4f4a9255b5f892fb">More...</a><br /></td></tr>
-<tr class="separator:a4061523958ed6f7e4f4a9255b5f892fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a1dc43f42b418addfff390a82117c80"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a1a1dc43f42b418addfff390a82117c80">SetLights</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; &amp;theLights) override</td></tr>
-<tr class="memdesc:a1a1dc43f42b418addfff390a82117c80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets list of lights for the view.  <a href="#a1a1dc43f42b418addfff390a82117c80">More...</a><br /></td></tr>
-<tr class="separator:a1a1dc43f42b418addfff390a82117c80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1a24c1c5b4ce2d7a1c480a90d833c9f"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="_graphic3d___c_light_8hxx.html#abe4316813ad795869a8bcef07acefbde">Graphic3d_ListOfCLight</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#ae1a24c1c5b4ce2d7a1c480a90d833c9f">Lights</a> () const override</td></tr>
+<tr class="memdesc:ae1a24c1c5b4ce2d7a1c480a90d833c9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns list of lights of the view.  <a href="#ae1a24c1c5b4ce2d7a1c480a90d833c9f">More...</a><br /></td></tr>
+<tr class="separator:ae1a24c1c5b4ce2d7a1c480a90d833c9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86db226c662ebfafc01f5c6b57ff87e8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a86db226c662ebfafc01f5c6b57ff87e8">SetLights</a> (const <a class="el" href="_graphic3d___c_light_8hxx.html#abe4316813ad795869a8bcef07acefbde">Graphic3d_ListOfCLight</a> &amp;theLights) override</td></tr>
+<tr class="memdesc:a86db226c662ebfafc01f5c6b57ff87e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets list of lights for the view.  <a href="#a86db226c662ebfafc01f5c6b57ff87e8">More...</a><br /></td></tr>
+<tr class="separator:a86db226c662ebfafc01f5c6b57ff87e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58e9e85d99872d9d7015a87344239bf2"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___sequence_of_h_clip_plane.html">Graphic3d_SequenceOfHClipPlane</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a58e9e85d99872d9d7015a87344239bf2">ClipPlanes</a> () const override</td></tr>
 <tr class="memdesc:a58e9e85d99872d9d7015a87344239bf2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns list of clip planes set for the view.  <a href="#a58e9e85d99872d9d7015a87344239bf2">More...</a><br /></td></tr>
 <tr class="separator:a58e9e85d99872d9d7015a87344239bf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -281,15 +287,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8344a8ac848035e8dcbecf852651be21"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_open_gl___layer_list.html">OpenGl_LayerList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a8344a8ac848035e8dcbecf852651be21">LayerList</a> () const</td></tr>
 <tr class="memdesc:a8344a8ac848035e8dcbecf852651be21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns list of OpenGL Z-layers.  <a href="#a8344a8ac848035e8dcbecf852651be21">More...</a><br /></td></tr>
 <tr class="separator:a8344a8ac848035e8dcbecf852651be21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f118e56ca7fd2d3744ce41fbf0f854d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_open_gl___light_8hxx.html#a7c0473974997f9a92cf6758482eb364c">OpenGl_ListOfLight</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a7f118e56ca7fd2d3744ce41fbf0f854d">LightList</a> () const</td></tr>
+<tr class="memdesc:a7f118e56ca7fd2d3744ce41fbf0f854d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns list of openGL light sources.  <a href="#a7f118e56ca7fd2d3744ce41fbf0f854d">More...</a><br /></td></tr>
+<tr class="separator:a7f118e56ca7fd2d3744ce41fbf0f854d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19018428a284c0aa09a329ad3df2683f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_open_gl___window.html">OpenGl_Window</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a19018428a284c0aa09a329ad3df2683f">GlWindow</a> () const</td></tr>
 <tr class="memdesc:a19018428a284c0aa09a329ad3df2683f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns OpenGL window implementation.  <a href="#a19018428a284c0aa09a329ad3df2683f">More...</a><br /></td></tr>
 <tr class="separator:a19018428a284c0aa09a329ad3df2683f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbe86bdd862dbaf08e442198c19aae7b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_open_gl___texture_set.html">OpenGl_TextureSet</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#abbe86bdd862dbaf08e442198c19aae7b">GlTextureEnv</a> () const</td></tr>
 <tr class="memdesc:abbe86bdd862dbaf08e442198c19aae7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns OpenGL environment map.  <a href="#abbe86bdd862dbaf08e442198c19aae7b">More...</a><br /></td></tr>
 <tr class="separator:abbe86bdd862dbaf08e442198c19aae7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c6b9cd1f40d43a3030c06dc60c77519"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_open_gl___b_v_h_tree_selector.html">OpenGl_BVHTreeSelector</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a5c6b9cd1f40d43a3030c06dc60c77519">BVHTreeSelector</a> () const</td></tr>
-<tr class="memdesc:a5c6b9cd1f40d43a3030c06dc60c77519"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns selector for <a class="el" href="namespace_b_v_h.html">BVH</a> tree, providing a possibility to store information about current view volume and to detect which objects are overlapping it.  <a href="#a5c6b9cd1f40d43a3030c06dc60c77519">More...</a><br /></td></tr>
-<tr class="separator:a5c6b9cd1f40d43a3030c06dc60c77519"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab089ee8b7526ebd2a8a0e333da61fb9a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_open_gl___b_v_h_tree_selector.html">OpenGl_BVHTreeSelector</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#ab089ee8b7526ebd2a8a0e333da61fb9a">BVHTreeSelector</a> ()</td></tr>
+<tr class="memdesc:ab089ee8b7526ebd2a8a0e333da61fb9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns selector for <a class="el" href="namespace_b_v_h.html">BVH</a> tree, providing a possibility to store information about current view volume and to detect which objects are overlapping it.  <a href="#ab089ee8b7526ebd2a8a0e333da61fb9a">More...</a><br /></td></tr>
+<tr class="separator:ab089ee8b7526ebd2a8a0e333da61fb9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fe8eca35ad0e934c77307be5d8d1db2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a8fe8eca35ad0e934c77307be5d8d1db2">HasImmediateStructures</a> () const</td></tr>
 <tr class="memdesc:a8fe8eca35ad0e934c77307be5d8d1db2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if there are immediate structures to display.  <a href="#a8fe8eca35ad0e934c77307be5d8d1db2">More...</a><br /></td></tr>
 <tr class="separator:a8fe8eca35ad0e934c77307be5d8d1db2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -315,12 +324,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2f9f7113059ca0c2534ae585f5d61d4b inherit pub_methods_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a2f9f7113059ca0c2534ae585f5d61d4b">IsRemoved</a> () const</td></tr>
 <tr class="memdesc:a2f9f7113059ca0c2534ae585f5d61d4b inherit pub_methods_class_graphic3d___c_view"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the view was removed.  <a href="class_graphic3d___c_view.html#a2f9f7113059ca0c2534ae585f5d61d4b">More...</a><br /></td></tr>
 <tr class="separator:a2f9f7113059ca0c2534ae585f5d61d4b inherit pub_methods_class_graphic3d___c_view"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11a4433feadfa1817505756d83d4aae0 inherit pub_methods_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a11a4433feadfa1817505756d83d4aae0">ShadingModel</a> () const</td></tr>
-<tr class="memdesc:a11a4433feadfa1817505756d83d4aae0 inherit pub_methods_class_graphic3d___c_view"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns default Shading Model of the view; Graphic3d_TOSM_FRAGMENT by default.  <a href="class_graphic3d___c_view.html#a11a4433feadfa1817505756d83d4aae0">More...</a><br /></td></tr>
-<tr class="separator:a11a4433feadfa1817505756d83d4aae0 inherit pub_methods_class_graphic3d___c_view"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a330c32d92d5d938f9263bfd4cdd718af inherit pub_methods_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a330c32d92d5d938f9263bfd4cdd718af">SetShadingModel</a> (<a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> theModel)</td></tr>
-<tr class="memdesc:a330c32d92d5d938f9263bfd4cdd718af inherit pub_methods_class_graphic3d___c_view"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets default Shading Model of the view. Will throw an exception on attempt to set Graphic3d_TOSM_DEFAULT.  <a href="class_graphic3d___c_view.html#a330c32d92d5d938f9263bfd4cdd718af">More...</a><br /></td></tr>
-<tr class="separator:a330c32d92d5d938f9263bfd4cdd718af inherit pub_methods_class_graphic3d___c_view"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e71cda116fef0abf0104c85495203a4 inherit pub_methods_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_visualization_8hxx.html#a34e18a8ee0f907cce2c120179d588c9e">Graphic3d_TypeOfVisualization</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a9e71cda116fef0abf0104c85495203a4">VisualizationType</a> () const</td></tr>
 <tr class="memdesc:a9e71cda116fef0abf0104c85495203a4 inherit pub_methods_class_graphic3d___c_view"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns visualization type of the view.  <a href="class_graphic3d___c_view.html#a9e71cda116fef0abf0104c85495203a4">More...</a><br /></td></tr>
 <tr class="separator:a9e71cda116fef0abf0104c85495203a4 inherit pub_methods_class_graphic3d___c_view"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -336,7 +339,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a42821c4ee071011bc3ba3a52e7c8150c inherit pub_methods_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a42821c4ee071011bc3ba3a52e7c8150c">ReCompute</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___structure.html">Graphic3d_Structure</a> &gt; &amp;theStructure)</td></tr>
 <tr class="memdesc:a42821c4ee071011bc3ba3a52e7c8150c inherit pub_methods_class_graphic3d___c_view"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the new presentation of the structure displayed in this view with the type Graphic3d_TOS_COMPUTED.  <a href="class_graphic3d___c_view.html#a42821c4ee071011bc3ba3a52e7c8150c">More...</a><br /></td></tr>
 <tr class="separator:a42821c4ee071011bc3ba3a52e7c8150c inherit pub_methods_class_graphic3d___c_view"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7bda5ca8037366a522ca7e3d0857c80b inherit pub_methods_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a7bda5ca8037366a522ca7e3d0857c80b">Update</a> (const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a> theLayerId=<a class="el" href="_graphic3d___z_layer_id_8hxx.html#a05589fbab0657f08285ebdfe93f5ec9eae04f0dff1da76dd13e2bb60fd647c5ff">Graphic3d_ZLayerId_UNKNOWN</a>)</td></tr>
+<tr class="memitem:a7bda5ca8037366a522ca7e3d0857c80b inherit pub_methods_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a7bda5ca8037366a522ca7e3d0857c80b">Update</a> (const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a> theLayerId=<a class="el" href="_graphic3d___z_layer_id_8hxx.html#abc5c98fcc1211af2b80116dd6e0a035dae04f0dff1da76dd13e2bb60fd647c5ff">Graphic3d_ZLayerId_UNKNOWN</a>)</td></tr>
 <tr class="memdesc:a7bda5ca8037366a522ca7e3d0857c80b inherit pub_methods_class_graphic3d___c_view"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invalidates bounding box of specified ZLayerId.  <a href="class_graphic3d___c_view.html#a7bda5ca8037366a522ca7e3d0857c80b">More...</a><br /></td></tr>
 <tr class="separator:a7bda5ca8037366a522ca7e3d0857c80b inherit pub_methods_class_graphic3d___c_view"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46c61f22c3559877a1f405bcec328416 inherit pub_methods_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a46c61f22c3559877a1f405bcec328416">Compute</a> ()</td></tr>
@@ -634,8 +637,6 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:adfaf6ef225374c942698e8dde6e77687 inherit pro_attribs_class_graphic3d___c_view"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9533cfc8c7769364ce6078b2d0d2a1de inherit pro_attribs_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a9533cfc8c7769364ce6078b2d0d2a1de">myIsRemoved</a></td></tr>
 <tr class="separator:a9533cfc8c7769364ce6078b2d0d2a1de inherit pro_attribs_class_graphic3d___c_view"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4055e5124817696fcc33f7a586a71e35 inherit pro_attribs_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a4055e5124817696fcc33f7a586a71e35">myShadingModel</a></td></tr>
-<tr class="separator:a4055e5124817696fcc33f7a586a71e35 inherit pro_attribs_class_graphic3d___c_view"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4771d87bd99a4b9576ba109e4514677c inherit pro_attribs_class_graphic3d___c_view"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_visualization_8hxx.html#a34e18a8ee0f907cce2c120179d588c9e">Graphic3d_TypeOfVisualization</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a4771d87bd99a4b9576ba109e4514677c">myVisualization</a></td></tr>
 <tr class="separator:a4771d87bd99a4b9576ba109e4514677c inherit pro_attribs_class_graphic3d___c_view"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -662,6 +663,9 @@ Rendering of GL graphics (with prepared drawing buffer).</h2></td></tr>
 <tr class="memitem:afe566f921bad62e7b8213a0a5fce9f9a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#afe566f921bad62e7b8213a0a5fce9f9a">myCulling</a></td></tr>
 <tr class="memdesc:afe566f921bad62e7b8213a0a5fce9f9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#afe566f921bad62e7b8213a0a5fce9f9a">More...</a><br /></td></tr>
 <tr class="separator:afe566f921bad62e7b8213a0a5fce9f9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9ea06361a9407167f98698f8974f168"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#ab9ea06361a9407167f98698f8974f168">myShadingModel</a></td></tr>
+<tr class="memdesc:ab9ea06361a9407167f98698f8974f168"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#ab9ea06361a9407167f98698f8974f168">More...</a><br /></td></tr>
+<tr class="separator:ab9ea06361a9407167f98698f8974f168"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9df1231ed6fc9e4aa886eaf913aa4dc7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_backfacing_model_8hxx.html#ac6b20ac0f4dce6a4cb02f146cf101628">Graphic3d_TypeOfBackfacingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a9df1231ed6fc9e4aa886eaf913aa4dc7">myBackfacing</a></td></tr>
 <tr class="memdesc:a9df1231ed6fc9e4aa886eaf913aa4dc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#a9df1231ed6fc9e4aa886eaf913aa4dc7">More...</a><br /></td></tr>
 <tr class="separator:a9df1231ed6fc9e4aa886eaf913aa4dc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -692,12 +696,12 @@ Rendering of GL graphics (with prepared drawing buffer).</h2></td></tr>
 <tr class="memitem:a283259f8963bee954d355801da44bf10"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_graphic3d___graduated_trihedron.html">Graphic3d_GraduatedTrihedron</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a283259f8963bee954d355801da44bf10">myGTrihedronData</a></td></tr>
 <tr class="memdesc:a283259f8963bee954d355801da44bf10"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#a283259f8963bee954d355801da44bf10">More...</a><br /></td></tr>
 <tr class="separator:a283259f8963bee954d355801da44bf10"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f3dba5b2c1d498f2f2c819577e04f3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a0f3dba5b2c1d498f2f2c819577e04f3c">myNoShadingLight</a></td></tr>
-<tr class="memdesc:a0f3dba5b2c1d498f2f2c819577e04f3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#a0f3dba5b2c1d498f2f2c819577e04f3c">More...</a><br /></td></tr>
-<tr class="separator:a0f3dba5b2c1d498f2f2c819577e04f3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc78a0d653debdb26f97742f4d14f6b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#afc78a0d653debdb26f97742f4d14f6b4">myLights</a></td></tr>
-<tr class="memdesc:afc78a0d653debdb26f97742f4d14f6b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#afc78a0d653debdb26f97742f4d14f6b4">More...</a><br /></td></tr>
-<tr class="separator:afc78a0d653debdb26f97742f4d14f6b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d1ae82dca0f3923cd9106cfc4c5388c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_open_gl___light_8hxx.html#a7c0473974997f9a92cf6758482eb364c">OpenGl_ListOfLight</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a2d1ae82dca0f3923cd9106cfc4c5388c">myNoShadingLight</a></td></tr>
+<tr class="memdesc:a2d1ae82dca0f3923cd9106cfc4c5388c"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#a2d1ae82dca0f3923cd9106cfc4c5388c">More...</a><br /></td></tr>
+<tr class="separator:a2d1ae82dca0f3923cd9106cfc4c5388c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7574f5e93f6a964bb4e16f27d05e825"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_open_gl___light_8hxx.html#a7c0473974997f9a92cf6758482eb364c">OpenGl_ListOfLight</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#ab7574f5e93f6a964bb4e16f27d05e825">myLights</a></td></tr>
+<tr class="memdesc:ab7574f5e93f6a964bb4e16f27d05e825"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#ab7574f5e93f6a964bb4e16f27d05e825">More...</a><br /></td></tr>
+<tr class="separator:ab7574f5e93f6a964bb4e16f27d05e825"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae320738677f6f63087ea9d898576de67"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_open_gl___layer_list.html">OpenGl_LayerList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#ae320738677f6f63087ea9d898576de67">myZLayers</a></td></tr>
 <tr class="memdesc:ae320738677f6f63087ea9d898576de67"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#ae320738677f6f63087ea9d898576de67">More...</a><br /></td></tr>
 <tr class="separator:ae320738677f6f63087ea9d898576de67"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -710,9 +714,6 @@ Rendering of GL graphics (with prepared drawing buffer).</h2></td></tr>
 <tr class="memitem:a79d0c31eb83880d0b0615ea93a6841df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#aafd0aa27030c44cea49764e622cedd68">Standard_Size</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a79d0c31eb83880d0b0615ea93a6841df">myCurrLightSourceState</a></td></tr>
 <tr class="memdesc:a79d0c31eb83880d0b0615ea93a6841df"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#a79d0c31eb83880d0b0615ea93a6841df">More...</a><br /></td></tr>
 <tr class="separator:a79d0c31eb83880d0b0615ea93a6841df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa72168720e9bb9281dc5650f5003b6d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#aafd0aa27030c44cea49764e622cedd68">Standard_Size</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#aa72168720e9bb9281dc5650f5003b6d5">myLightsRevision</a></td></tr>
-<tr class="memdesc:aa72168720e9bb9281dc5650f5003b6d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#aa72168720e9bb9281dc5650f5003b6d5">More...</a><br /></td></tr>
-<tr class="separator:aa72168720e9bb9281dc5650f5003b6d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a18b771827fb186bdeb790e7e8151b07c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_open_gl___view.html#af7e3ac3b32eaf768eaba7a18ee1eec10">StateInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a18b771827fb186bdeb790e7e8151b07c">myLastOrientationState</a></td></tr>
 <tr class="memdesc:a18b771827fb186bdeb790e7e8151b07c"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#a18b771827fb186bdeb790e7e8151b07c">More...</a><br /></td></tr>
 <tr class="separator:a18b771827fb186bdeb790e7e8151b07c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -728,9 +729,6 @@ Rendering of GL graphics (with prepared drawing buffer).</h2></td></tr>
 <tr class="memitem:a07c62272e773139fdced77bfa006bc26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_open_gl___graduated_trihedron.html">OpenGl_GraduatedTrihedron</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a07c62272e773139fdced77bfa006bc26">myGraduatedTrihedron</a></td></tr>
 <tr class="memdesc:a07c62272e773139fdced77bfa006bc26"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#a07c62272e773139fdced77bfa006bc26">More...</a><br /></td></tr>
 <tr class="separator:a07c62272e773139fdced77bfa006bc26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc75e486e7117aadd6151aa970249c86"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_open_gl___frame_stats_prs.html">OpenGl_FrameStatsPrs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#abc75e486e7117aadd6151aa970249c86">myFrameStatsPrs</a></td></tr>
-<tr class="memdesc:abc75e486e7117aadd6151aa970249c86"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#abc75e486e7117aadd6151aa970249c86">More...</a><br /></td></tr>
-<tr class="separator:abc75e486e7117aadd6151aa970249c86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0e40bc8a4d5605fb5730ec745e13712"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_open_gl___texture_set.html">OpenGl_TextureSet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#ab0e40bc8a4d5605fb5730ec745e13712">myTextureEnv</a></td></tr>
 <tr class="memdesc:ab0e40bc8a4d5605fb5730ec745e13712"><td class="mdescLeft">&#160;</td><td class="mdescRight">main list of displayed structure, sorted by layers  <a href="#ab0e40bc8a4d5605fb5730ec745e13712">More...</a><br /></td></tr>
 <tr class="separator:ab0e40bc8a4d5605fb5730ec745e13712"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -755,9 +753,6 @@ Rendering of GL graphics (with prepared drawing buffer).</h2></td></tr>
 <tr class="memitem:a41d00c1fb499de801708269cf43e87c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a41d00c1fb499de801708269cf43e87c9">renderTrihedron</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_open_gl___workspace.html">OpenGl_Workspace</a> &gt; &amp;theWorkspace)</td></tr>
 <tr class="memdesc:a41d00c1fb499de801708269cf43e87c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Renders trihedron.  <a href="#a41d00c1fb499de801708269cf43e87c9">More...</a><br /></td></tr>
 <tr class="separator:a41d00c1fb499de801708269cf43e87c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4126d7d38229ecdd112d7ec8ea0d5c35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___view.html#a4126d7d38229ecdd112d7ec8ea0d5c35">renderFrameStats</a> ()</td></tr>
-<tr class="memdesc:a4126d7d38229ecdd112d7ec8ea0d5c35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Renders frame statistics.  <a href="#a4126d7d38229ecdd112d7ec8ea0d5c35">More...</a><br /></td></tr>
-<tr class="separator:a4126d7d38229ecdd112d7ec8ea0d5c35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
 data types related to ray-tracing</h2></td></tr>
@@ -2101,8 +2096,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a5c6b9cd1f40d43a3030c06dc60c77519"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c6b9cd1f40d43a3030c06dc60c77519">&#9670;&nbsp;</a></span>BVHTreeSelector()</h2>
+<a id="ab089ee8b7526ebd2a8a0e333da61fb9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab089ee8b7526ebd2a8a0e333da61fb9a">&#9670;&nbsp;</a></span>BVHTreeSelector()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2111,10 +2106,10 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="class_open_gl___b_v_h_tree_selector.html">OpenGl_BVHTreeSelector</a>&amp; OpenGl_View::BVHTreeSelector </td>
+          <td class="memname"><a class="el" href="class_open_gl___b_v_h_tree_selector.html">OpenGl_BVHTreeSelector</a>&amp; OpenGl_View::BVHTreeSelector </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -3045,8 +3040,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a3e4bf5f3000b9286bd531977ad47162d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3e4bf5f3000b9286bd531977ad47162d">&#9670;&nbsp;</a></span>InvalidateBVHData()</h2>
+<a id="aa13c732a7420bb05ed0da0cd3166817c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa13c732a7420bb05ed0da0cd3166817c">&#9670;&nbsp;</a></span>InvalidateBVHData()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3057,7 +3052,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">virtual void OpenGl_View::InvalidateBVHData </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
           <td class="paramname"><em>theLayerId</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3071,7 +3066,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Marks <a class="el" href="namespace_b_v_h.html">BVH</a> tree and the set of <a class="el" href="namespace_b_v_h.html">BVH</a> primitives of correspondent priority list with id theLayerId as outdated. </p>
 
-<p>Implements <a class="el" href="class_graphic3d___c_view.html#a45ae74c207a36fb44153789c9feff4b3">Graphic3d_CView</a>.</p>
+<p>Implements <a class="el" href="class_graphic3d___c_view.html#ad0c670bd9ae85d1b1a68b3de1016aad5">Graphic3d_CView</a>.</p>
 
 </div>
 </div>
@@ -3219,8 +3214,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a4061523958ed6f7e4f4a9255b5f892fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4061523958ed6f7e4f4a9255b5f892fb">&#9670;&nbsp;</a></span>Lights()</h2>
+<a id="a7f118e56ca7fd2d3744ce41fbf0f854d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f118e56ca7fd2d3744ce41fbf0f854d">&#9670;&nbsp;</a></span>LightList()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3229,7 +3224,34 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt;&amp; OpenGl_View::Lights </td>
+          <td class="memname">const <a class="el" href="_open_gl___light_8hxx.html#a7c0473974997f9a92cf6758482eb364c">OpenGl_ListOfLight</a>&amp; OpenGl_View::LightList </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns list of openGL light sources. </p>
+
+</div>
+</div>
+<a id="ae1a24c1c5b4ce2d7a1c480a90d833c9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1a24c1c5b4ce2d7a1c480a90d833c9f">&#9670;&nbsp;</a></span>Lights()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const <a class="el" href="_graphic3d___c_light_8hxx.html#abe4316813ad795869a8bcef07acefbde">Graphic3d_ListOfCLight</a>&amp; OpenGl_View::Lights </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -3244,7 +3266,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Returns list of lights of the view. </p>
 
-<p>Implements <a class="el" href="class_graphic3d___c_view.html#a06dc75332bb771272cfdf68f871e57ca">Graphic3d_CView</a>.</p>
+<p>Implements <a class="el" href="class_graphic3d___c_view.html#a9662c60a4ede4ce108e77a3d99d408b4">Graphic3d_CView</a>.</p>
 
 </div>
 </div>
@@ -3663,33 +3685,6 @@ Additional Inherited Members</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="a4126d7d38229ecdd112d7ec8ea0d5c35"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4126d7d38229ecdd112d7ec8ea0d5c35">&#9670;&nbsp;</a></span>renderFrameStats()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void OpenGl_View::renderFrameStats </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Renders frame statistics. </p>
 
 </div>
 </div>
@@ -4453,8 +4448,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a1a1dc43f42b418addfff390a82117c80"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a1dc43f42b418addfff390a82117c80">&#9670;&nbsp;</a></span>SetLights()</h2>
+<a id="a86db226c662ebfafc01f5c6b57ff87e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86db226c662ebfafc01f5c6b57ff87e8">&#9670;&nbsp;</a></span>SetLights()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4465,7 +4460,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">virtual void OpenGl_View::SetLights </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="_graphic3d___c_light_8hxx.html#abe4316813ad795869a8bcef07acefbde">Graphic3d_ListOfCLight</a> &amp;&#160;</td>
           <td class="paramname"><em>theLights</em></td><td>)</td>
           <td></td>
         </tr>
@@ -4479,7 +4474,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Sets list of lights for the view. </p>
 
-<p>Implements <a class="el" href="class_graphic3d___c_view.html#a862e0cc413a900220a30c13b80921bca">Graphic3d_CView</a>.</p>
+<p>Implements <a class="el" href="class_graphic3d___c_view.html#ae80e4a15c65dcc42f430e5ac0d2690ae">Graphic3d_CView</a>.</p>
 
 </div>
 </div>
@@ -4500,6 +4495,36 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Setup local camera origin currently set for rendering. </p>
+
+</div>
+</div>
+<a id="abd47afc16732b18fe1998e61c5729057"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abd47afc16732b18fe1998e61c5729057">&#9670;&nbsp;</a></span>SetShadingModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void OpenGl_View::SetShadingModel </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td>
+          <td class="paramname"><em>theModel</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets shading model of the view. </p>
+
+<p>Implements <a class="el" href="class_graphic3d___c_view.html#a529fe520f3be7bd5b2652238ecdea18f">Graphic3d_CView</a>.</p>
 
 </div>
 </div>
@@ -4701,6 +4726,35 @@ Additional Inherited Members</h2></td></tr>
 <p>Sets the settings for a single Z layer of specified view. </p>
 
 <p>Implements <a class="el" href="class_graphic3d___c_view.html#a7077725c63cea56e3fef29dab0d12657">Graphic3d_CView</a>.</p>
+
+</div>
+</div>
+<a id="a68e5e64a0e6ca76158566ec8b29a83d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68e5e64a0e6ca76158566ec8b29a83d9">&#9670;&nbsp;</a></span>ShadingModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> OpenGl_View::ShadingModel </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns shading model of the view. </p>
+
+<p>Implements <a class="el" href="class_graphic3d___c_view.html#a9aac15f77838efbef5f995a7d1c690f4">Graphic3d_CView</a>.</p>
 
 </div>
 </div>
@@ -5803,30 +5857,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="abc75e486e7117aadd6151aa970249c86"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc75e486e7117aadd6151aa970249c86">&#9670;&nbsp;</a></span>myFrameStatsPrs</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_open_gl___frame_stats_prs.html">OpenGl_FrameStatsPrs</a> OpenGl_View::myFrameStatsPrs</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>main list of displayed structure, sorted by layers </p>
-
-</div>
-</div>
 <a id="a5912cfbaee4060ea7b453d96769244ed"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5912cfbaee4060ea7b453d96769244ed">&#9670;&nbsp;</a></span>myFullScreenQuad</h2>
 
@@ -6236,8 +6266,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="afc78a0d653debdb26f97742f4d14f6b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc78a0d653debdb26f97742f4d14f6b4">&#9670;&nbsp;</a></span>myLights</h2>
+<a id="ab7574f5e93f6a964bb4e16f27d05e825"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7574f5e93f6a964bb4e16f27d05e825">&#9670;&nbsp;</a></span>myLights</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6246,31 +6276,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; OpenGl_View::myLights</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>main list of displayed structure, sorted by layers </p>
-
-</div>
-</div>
-<a id="aa72168720e9bb9281dc5650f5003b6d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa72168720e9bb9281dc5650f5003b6d5">&#9670;&nbsp;</a></span>myLightsRevision</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#aafd0aa27030c44cea49764e622cedd68">Standard_Size</a> OpenGl_View::myLightsRevision</td>
+          <td class="memname"><a class="el" href="_open_gl___light_8hxx.html#a7c0473974997f9a92cf6758482eb364c">OpenGl_ListOfLight</a> OpenGl_View::myLights</td>
         </tr>
       </table>
   </td>
@@ -6381,8 +6387,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a0f3dba5b2c1d498f2f2c819577e04f3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f3dba5b2c1d498f2f2c819577e04f3c">&#9670;&nbsp;</a></span>myNoShadingLight</h2>
+<a id="a2d1ae82dca0f3923cd9106cfc4c5388c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d1ae82dca0f3923cd9106cfc4c5388c">&#9670;&nbsp;</a></span>myNoShadingLight</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6391,7 +6397,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; OpenGl_View::myNoShadingLight</td>
+          <td class="memname"><a class="el" href="_open_gl___light_8hxx.html#a7c0473974997f9a92cf6758482eb364c">OpenGl_ListOfLight</a> OpenGl_View::myNoShadingLight</td>
         </tr>
       </table>
   </td>
@@ -7242,6 +7248,30 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Texture buffer of transformations of high-level <a class="el" href="namespace_b_v_h.html">BVH</a> nodes. </p>
+
+</div>
+</div>
+<a id="ab9ea06361a9407167f98698f8974f168"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9ea06361a9407167f98698f8974f168">&#9670;&nbsp;</a></span>myShadingModel</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> OpenGl_View::myShadingModel</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>main list of displayed structure, sorted by layers </p>
 
 </div>
 </div>

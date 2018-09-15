@@ -1644,7 +1644,7 @@ void OpenGl_AspectMarker::Resources::BuildSprites (const Handle(OpenGl_Context)&
       }
       else
       {
-        const TCollection_AsciiString anOldKey = mySpriteA->First()->ResourceId();
+        const TCollection_AsciiString anOldKey = mySprite->First()->ResourceId();
         mySpriteA.Nullify(); // we need nullify all handles before ReleaseResource() call
         theCtx->ReleaseResource (anOldKey, Standard_True);
       }
@@ -1737,7 +1737,6 @@ void OpenGl_AspectMarker::Resources::BuildSprites (const Handle(OpenGl_Context)&
           Handle(TColStd_HArray1OfByte) aBitMap = fillPointBitmap (aSize);
           aMarkerImage2 = new Graphic3d_MarkerImage (aBitMap, aSize, aSize);
         }
-        Standard_FALLTHROUGH
         case Aspect_TOM_O_PLUS:
         case Aspect_TOM_O_STAR:
         case Aspect_TOM_O_X:
@@ -1755,10 +1754,8 @@ void OpenGl_AspectMarker::Resources::BuildSprites (const Handle(OpenGl_Context)&
         }
         case Aspect_TOM_RING1:
           if (aLimit == 0.0f) aLimit = aScale * 0.2f;
-          Standard_FALLTHROUGH
         case Aspect_TOM_RING2:
           if (aLimit == 0.0f) aLimit = aScale * 0.5f;
-          Standard_FALLTHROUGH
         case Aspect_TOM_RING3:
         {
           if (aLimit == 0.0f) aLimit = aScale * 0.8f;
@@ -1899,7 +1896,6 @@ void OpenGl_AspectMarker::Resources::BuildSprites (const Handle(OpenGl_Context)&
           glBitmap (aSize, aSize, (GLfloat )(0.5f * aSize), (GLfloat )(0.5f * aSize),
                     0.0f, 0.0f, &aBitMap->Array1().Value (aBitMap->Lower()));
         }
-        Standard_FALLTHROUGH
         case Aspect_TOM_O_PLUS:
         case Aspect_TOM_O_STAR:
         case Aspect_TOM_O_X:
@@ -1944,10 +1940,8 @@ void OpenGl_AspectMarker::Resources::BuildSprites (const Handle(OpenGl_Context)&
         }
         case Aspect_TOM_RING1:
           if (aLimit == 0.0f) aLimit = aScale * 0.2f;
-          Standard_FALLTHROUGH
         case Aspect_TOM_RING2:
           if (aLimit == 0.0f) aLimit = aScale * 0.5f;
-          Standard_FALLTHROUGH
         case Aspect_TOM_RING3:
         {
           if (aLimit == 0.0f) aLimit = aScale * 0.8f;

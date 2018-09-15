@@ -30,16 +30,16 @@ protected:
   {
   public:
     //! Read persistent data from a file.
-    virtual void Read (StdObjMgt_ReadData&) {}
+    Standard_EXPORT virtual void Read (StdObjMgt_ReadData&) {}
     //! Write persistent data to a file.
-    virtual void Write (StdObjMgt_WriteData&) const {}
+    Standard_EXPORT virtual void Write (StdObjMgt_WriteData&) const {}
     //! Gets persistent child objects
     inline void PChildren(StdObjMgt_Persistent::SequenceOfPersistent&) const {}
     //! Returns persistent type name
     Standard_CString PName() const;
 
     //! Import transient attribuite from the persistent data
-    virtual void ImportAttribute() {}
+    Standard_EXPORT virtual void ImportAttribute() {}
   };
 
 public:

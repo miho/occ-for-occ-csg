@@ -1,4 +1,6 @@
-// Copyright (c) 2017-2018 OPEN CASCADE SAS
+// Created on: 2017-02-10
+// Created by: Sergey NIKONOV
+// Copyright (c) 2000-2017 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -20,10 +22,12 @@
 #include <OSD_File.hxx>
 #include <TDF_Attribute.hxx>
 #include <TDF_LabelSequence.hxx>
-#include <XCAFNoteObjects_NoteObject.hxx>
 
 class Standard_GUID;
 class TDF_RelocationTable;
+
+class XCAFDoc_Note;
+DEFINE_STANDARD_HANDLE(XCAFDoc_Note, TDF_Attribute)
 
 //! A base note attribute.
 //! Any note contains the name of the user created the note
@@ -45,22 +49,16 @@ public:
   //! \param [in] theTimeStamp - timestamp of the note.
   //! \return A handle to the attribute instance.
   Standard_EXPORT void Set(const TCollection_ExtendedString& theUserName,
-                           const TCollection_ExtendedString& theTimeStamp);
+    const TCollection_ExtendedString& theTimeStamp);
 
   //! Returns the user name, who created the note.
-  const TCollection_ExtendedString& UserName() const { return myUserName; }
+  Standard_EXPORT const TCollection_ExtendedString& UserName() const;
 
   //! Returns the timestamp of the note.
-  const TCollection_ExtendedString& TimeStamp() const { return myTimeStamp; }
+  Standard_EXPORT const TCollection_ExtendedString& TimeStamp() const;
 
   //! Checks if the note isn't linked to annotated items.
   Standard_EXPORT Standard_Boolean IsOrphan() const;
-
-  //! Returns auxiliary data object
-  Standard_EXPORT Handle(XCAFNoteObjects_NoteObject) GetObject() const;
-
-  //! Updates auxiliary data
-  Standard_EXPORT void SetObject(const Handle(XCAFNoteObjects_NoteObject)& theObject);
 
 public:
 
@@ -80,7 +78,5 @@ private:
   TCollection_ExtendedString myUserName;  ///< Name of the user, who created the note.
   TCollection_ExtendedString myTimeStamp; ///< Timestamp, when the note was created.
 };
-
-DEFINE_STANDARD_HANDLE(XCAFDoc_Note, TDF_Attribute)
 
 #endif // _XCAFDoc_Note_HeaderFile

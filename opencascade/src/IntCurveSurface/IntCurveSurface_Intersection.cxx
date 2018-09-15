@@ -25,18 +25,10 @@
 #define PARAMEQUAL(a,b) (Abs((a)-(b))< (1e-8))
 
 //================================================================================
-IntCurveSurface_Intersection::IntCurveSurface_Intersection(): 
-done(Standard_False),
-myIsParallel(Standard_False)
-{ 
+IntCurveSurface_Intersection::IntCurveSurface_Intersection(): done(Standard_False) { 
 }
 //================================================================================
 Standard_Boolean IntCurveSurface_Intersection::IsDone() const { return(done); } 
-//================================================================================
-Standard_Boolean IntCurveSurface_Intersection::IsParallel() const 
-{ 
-  return(myIsParallel); 
-}
 //================================================================================
 Standard_Integer IntCurveSurface_Intersection::NbPoints() const { 
   if (!done) {throw StdFail_NotDone();}
@@ -124,7 +116,6 @@ void IntCurveSurface_Intersection::ResetFields() {
     lseg.Clear();
     lpnt.Clear();
     done=Standard_False;
-    myIsParallel = Standard_False;
   }
 }
 //================================================================================

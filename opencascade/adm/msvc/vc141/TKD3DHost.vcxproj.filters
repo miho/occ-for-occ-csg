@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{ED86059F-0A36-156F-0D78-E51563DF178D}</UniqueIdentifier>
+      <UniqueIdentifier>{D02C035F-14FC-004D-0170-7DF01B1EA97D}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\D3DHost">
-      <UniqueIdentifier>{835EBE8C-0B88-0EC4-1775-2CC798E40196}</UniqueIdentifier>
+      <UniqueIdentifier>{095445B7-0370-097C-106F-164498F15940}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

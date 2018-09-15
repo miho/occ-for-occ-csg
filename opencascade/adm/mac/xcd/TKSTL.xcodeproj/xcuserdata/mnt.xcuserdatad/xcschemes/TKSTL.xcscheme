@@ -13,7 +13,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "001C037D0431186F1173132D"
+               BlueprintIdentifier = "029B15E207390598111518D4"
                BuildableName = "libTKSTL.dylib"
                BlueprintName = "TKSTL"
                ReferencedContainer = "container:TKSTL.xcodeproj">

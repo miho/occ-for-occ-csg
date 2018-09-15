@@ -1,5 +1,3 @@
-puts "REQUIRED All: Projection Failed"
-
 puts "==========="
 puts " OCC308 "
 puts "==========="

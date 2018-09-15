@@ -60,27 +60,25 @@ endmacro()
 # COMPILER variable
 macro (OCCT_MAKE_COMPILER_SHORT_NAME)
   if (MSVC)
-    if ((MSVC_VERSION EQUAL 1300) OR (MSVC_VERSION EQUAL 1310))
+    if (MSVC70)
       set (COMPILER vc7)
-    elseif (MSVC_VERSION EQUAL 1400)
+    elseif (MSVC80)
       set (COMPILER vc8)
-    elseif (MSVC_VERSION EQUAL 1500)
+    elseif (MSVC90)
       set (COMPILER vc9)
-    elseif (MSVC_VERSION EQUAL 1600)
+    elseif (MSVC10)
       set (COMPILER vc10)
-    elseif (MSVC_VERSION EQUAL 1700)
+    elseif (MSVC11)
       set (COMPILER vc11)
-    elseif (MSVC_VERSION EQUAL 1800)
+    elseif (MSVC12)
       set (COMPILER vc12)
-    elseif (MSVC_VERSION EQUAL 1900)
+    elseif (MSVC14)
       set (COMPILER vc14)
-    elseif ((MSVC_VERSION GREATER 1900) AND (MSVC_VERSION LESS 2000))
+    elseif (MSVC15)
       # Since Visual Studio 15 (2017), its version diverged from version of
       # compiler which is 14.1; as that compiler uses the same run-time as 14.0,
       # we keep its id as "vc14" to be compatibille
       set (COMPILER vc14)
-    else()
-      message (FATAL_ERROR "Unrecognized MSVC_VERSION")
     endif()
   elseif (DEFINED CMAKE_COMPILER_IS_GNUCC)
     set (COMPILER gcc)
@@ -502,11 +500,11 @@ function (OCCT_TOOLKIT_FULL_DEP TOOLKIT_NAME TOOLKIT_FULL_DEPS)
   set (${TOOLKIT_FULL_DEPS} ${LOCAL_TOOLKIT_FULL_DEPS} PARENT_SCOPE)
 endfunction()
 
-# Function to get list of modules/toolkits/samples from file adm/${FILE_NAME}.
+# Function to get list of modules and toolkits from file adm/MODULES.
 # Creates list <$MODULE_LIST> to store list of MODULES and
-# <NAME_OF_MODULE>_TOOLKITS foreach module to store its toolkits, where "TOOLKITS" is defined by TOOLKITS_NAME_SUFFIX.
-function (OCCT_MODULES_AND_TOOLKITS FILE_NAME TOOLKITS_NAME_SUFFIX MODULE_LIST)
-  FILE_TO_LIST ("adm/${FILE_NAME}" FILE_CONTENT)
+# <NAME_OF_MODULE>_TOOLKITS foreach module to store its toolkits.
+function (OCCT_MODULES_AND_TOOLKITS MODULE_LIST)
+  FILE_TO_LIST ("adm/MODULES" FILE_CONTENT)
 
   foreach (CONTENT_LINE ${FILE_CONTENT})
     string (REPLACE " " ";" CONTENT_LINE ${CONTENT_LINE})
@@ -514,10 +512,28 @@ function (OCCT_MODULES_AND_TOOLKITS FILE_NAME TOOLKITS_NAME_SUFFIX MODULE_LIST)
     list (REMOVE_AT CONTENT_LINE 0)
     list (APPEND ${MODULE_LIST} ${MODULE_NAME})
     # (!) REMOVE THE LINE BELOW (implicit variables)
-    set (${MODULE_NAME}_${TOOLKITS_NAME_SUFFIX} ${CONTENT_LINE} PARENT_SCOPE)
+    set (${MODULE_NAME}_TOOLKITS ${CONTENT_LINE} PARENT_SCOPE)
   endforeach()
 
   set (${MODULE_LIST} ${${MODULE_LIST}} PARENT_SCOPE)
+endfunction()
+
+# Function to get list of tools and toolkits from file adm/TOOLS.
+# Creates list <$TOOL_LIST> to store list of TOOLS and
+# <NAME_OF_TOOL>_TOOLKITS foreach tool to store its toolkits.
+function (OCCT_TOOLS_AND_TOOLKITS TOOL_LIST)
+  FILE_TO_LIST ("adm/TOOLS" FILE_CONTENT)
+
+  foreach (CONTENT_LINE ${FILE_CONTENT})
+    string (REPLACE " " ";" CONTENT_LINE ${CONTENT_LINE})
+    list (GET CONTENT_LINE 0 TOOL_NAME)
+    list (REMOVE_AT CONTENT_LINE 0)
+    list (APPEND ${TOOL_LIST} ${TOOL_NAME})
+    # (!) REMOVE THE LINE BELOW (implicit variables)
+    set (${TOOL_NAME}_TOOL_TOOLKITS ${CONTENT_LINE} PARENT_SCOPE)
+  endforeach()
+
+  set (${TOOL_LIST} ${${TOOL_LIST}} PARENT_SCOPE)
 endfunction()
 
 # Returns OCC version string from file Standard_Version.hxx (if available)
@@ -585,7 +601,7 @@ endmacro()
 # prior to version 3.3 not supporting per-configuration install paths
 # for install target files (see https://cmake.org/Bug/view.php?id=14317)
 macro (OCCT_UPDATE_TARGET_FILE)
-  if (MSVC)
+  if (NOT SINGLE_GENERATOR)
     OCCT_INSERT_CODE_FOR_TARGET ()
   endif()
 

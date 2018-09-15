@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -65,14 +65,13 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#pub-methods">Public Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">NCollection_UtfIterator&lt; Type &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Template class for Unicode strings support.  
+<p>Template class for Unicode strings support. It defines an iterator and provide correct way to read multi-byte text (UTF-8 and UTF-16) and convert it from one to another. The current value of iterator returned as UTF-32 Unicode code.  
  <a href="class_n_collection___utf_iterator.html#details">More...</a></p>
 
 <p><code>#include &lt;NCollection_UtfIterator.hxx&gt;</code></p>
@@ -86,7 +85,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:af657ce79dab31b2681735b5a04b896c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize iterator within specified NULL-terminated string.  <a href="#af657ce79dab31b2681735b5a04b896c7">More...</a><br /></td></tr>
 <tr class="separator:af657ce79dab31b2681735b5a04b896c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad15450d295e136c5df4eb3471939aec0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_n_collection___utf_iterator.html">NCollection_UtfIterator</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_collection___utf_iterator.html#ad15450d295e136c5df4eb3471939aec0">operator++</a> ()</td></tr>
-<tr class="memdesc:ad15450d295e136c5df4eb3471939aec0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pre-increment operator. Reads the next unicode symbol. Notice - no protection against overrun!  <a href="#ad15450d295e136c5df4eb3471939aec0">More...</a><br /></td></tr>
+<tr class="memdesc:ad15450d295e136c5df4eb3471939aec0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pre-increment operator. Reads the next unicode character. Notice - no protection against overrun!  <a href="#ad15450d295e136c5df4eb3471939aec0">More...</a><br /></td></tr>
 <tr class="separator:ad15450d295e136c5df4eb3471939aec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3488aee151818a18b226777205e6146"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_n_collection___utf_iterator.html">NCollection_UtfIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_collection___utf_iterator.html#ac3488aee151818a18b226777205e6146">operator++</a> (int)</td></tr>
 <tr class="memdesc:ac3488aee151818a18b226777205e6146"><td class="mdescLeft">&#160;</td><td class="mdescRight">Post-increment operator. Notice - no protection against overrun!  <a href="#ac3488aee151818a18b226777205e6146">More...</a><br /></td></tr>
@@ -142,9 +141,7 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename Type&gt;<br />
 class NCollection_UtfIterator&lt; Type &gt;</h3>
 
-<p>Template class for Unicode strings support. </p>
-<p>It defines an iterator and provide correct way to read multi-byte text (UTF-8 and UTF-16) and convert it from one to another. The current value of iterator is returned as UTF-32 Unicode symbol.</p>
-<p>Here and below term "Unicode symbol" is used as synonym of "Unicode code point". </p>
+<p>Template class for Unicode strings support. It defines an iterator and provide correct way to read multi-byte text (UTF-8 and UTF-16) and convert it from one to another. The current value of iterator returned as UTF-32 Unicode code. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a74cdf40ac2506c51cfec8b6cd93f1264"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a74cdf40ac2506c51cfec8b6cd93f1264">&#9670;&nbsp;</a></span>NCollection_UtfIterator()</h2>
@@ -192,9 +189,6 @@ template&lt;typename Type &gt; </div>
 template&lt;typename Type &gt; </div>
 <div class="memtemplate">
 template&lt;typename TypeWrite &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> <a class="el" href="class_n_collection___utf_iterator.html">NCollection_UtfIterator</a>&lt; Type &gt;::AdvanceBytesUtf </td>
@@ -203,11 +197,6 @@ template&lt;typename TypeWrite &gt; </div>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the advance in TypeWrite chars needed to store current symbol </dd></dl>
 
@@ -397,9 +386,6 @@ template&lt;typename Type &gt; </div>
 template&lt;typename Type &gt; </div>
 <div class="memtemplate">
 template&lt;typename TypeWrite &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">TypeWrite* <a class="el" href="class_n_collection___utf_iterator.html">NCollection_UtfIterator</a>&lt; Type &gt;::GetUtf </td>
@@ -409,11 +395,6 @@ template&lt;typename TypeWrite &gt; </div>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Fill the UTF-** buffer within current Unicode symbol. Use method AdvanceUtf**() to allocate buffer with enough size. </p>
@@ -558,7 +539,7 @@ template&lt;typename Type &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>the index displacement from iterator intialization (first symbol has index 0) </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the index displacement from iterator intialization </dd></dl>
 
 </div>
 </div>
@@ -647,7 +628,7 @@ template&lt;typename Type &gt; </div>
 </div><div class="memdoc">
 
 <p>Dereference operator. </p>
-<dl class="section return"><dt>Returns</dt><dd>the UTF-32 codepoint of the symbol currently pointed by iterator. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the UTF-32 codepoint of the character currently pointed by iterator. </dd></dl>
 
 </div>
 </div>
@@ -676,7 +657,7 @@ template&lt;typename Type &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Pre-increment operator. Reads the next unicode symbol. Notice - no protection against overrun! </p>
+<p>Pre-increment operator. Reads the next unicode character. Notice - no protection against overrun! </p>
 
 </div>
 </div>

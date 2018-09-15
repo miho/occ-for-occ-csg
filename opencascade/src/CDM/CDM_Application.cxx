@@ -17,13 +17,13 @@
 
 #include <CDM_Application.hxx>
 #include <CDM_Document.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <CDM_MetaData.hxx>
+#include <CDM_NullMessageDriver.hxx>
 #include <CDM_Reference.hxx>
 #include <Resource_Manager.hxx>
 #include <Standard_Type.hxx>
 #include <TCollection_ExtendedString.hxx>
-#include <Message.hxx>
-#include <Message_Messenger.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(CDM_Application,Standard_Transient)
 
@@ -55,12 +55,11 @@ void CDM_Application::SetReferenceCounter
 //purpose  : 
 //=======================================================================
 
-Handle(Message_Messenger) CDM_Application::MessageDriver()
+Handle(CDM_MessageDriver) CDM_Application::MessageDriver()
 {
-  static Handle(Message_Messenger) theMessenger;
-  if(theMessenger.IsNull()) 
-    theMessenger = Message::DefaultMessenger();
-  return theMessenger;
+  static Handle(CDM_NullMessageDriver) theMessageDriver
+    =new CDM_NullMessageDriver;
+  return theMessageDriver;
 }
 
 //=======================================================================
@@ -70,7 +69,7 @@ Handle(Message_Messenger) CDM_Application::MessageDriver()
 
 void CDM_Application::Write(const Standard_ExtString aString)
 {
-  MessageDriver()->Send(aString);
+  MessageDriver()->Write(aString);
 }
 
 //=======================================================================
@@ -103,26 +102,4 @@ void CDM_Application::EndOfUpdate
       
   message+=aDocument->Presentation();
   Write(message.ToExtString());
-}
-
-//=======================================================================
-//function : Name
-//purpose  : returns the application name
-//=======================================================================
-
-TCollection_ExtendedString CDM_Application::Name() const
-{
-  // Default: empty
-  return TCollection_ExtendedString();
-}
-
-//=======================================================================
-//function : Version
-//purpose  : returns the application version
-//=======================================================================
-
-TCollection_AsciiString CDM_Application::Version() const
-{
-  // Default: empty
-  return TCollection_AsciiString();
 }

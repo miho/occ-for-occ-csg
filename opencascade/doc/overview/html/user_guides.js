@@ -117,17 +117,6 @@ var user_guides =
           [ "Wire Explorer", "occt_user_guides__modeling_data.html#occt_modat_5_5_1", null ]
         ] ],
         [ "Storage of shapes", "occt_user_guides__modeling_data.html#occt_modat_5_6", null ]
-      ] ],
-      [ "Bounding boxes", "occt_user_guides__modeling_data.html#occt_modat_6", [
-        [ "Brief description of some algorithms working with OBB", "occt_user_guides__modeling_data.html#occt_modat_6_1", [
-          [ "Creation of OBB from set of points", "occt_user_guides__modeling_data.html#occt_modat_6_1_1", null ],
-          [ "Creation of OBB based on Axes of inertia", "occt_user_guides__modeling_data.html#occt_modat_6_1_2", null ],
-          [ "Method IsOut for a point", "occt_user_guides__modeling_data.html#occt_modat_6_1_3", null ],
-          [ "Method IsOut for another OBB", "occt_user_guides__modeling_data.html#occt_modat_6_1_4", null ],
-          [ "Method Add for point or another bounding box", "occt_user_guides__modeling_data.html#occt_modat_6_1_5", null ]
-        ] ],
-        [ "Add a shape", "occt_user_guides__modeling_data.html#occt_modat_6_2", null ],
-        [ "Limitations of algorithm for OBB creation.", "occt_user_guides__modeling_data.html#occt_modat_6_3", null ]
       ] ]
     ] ],
     [ "BRep Format", "occt_user_guides__brep_wp.html", [
@@ -225,14 +214,7 @@ var user_guides =
         [ "Getting normal for the face", "occt_user_guides__modeling_algos.html#occt_modalg_2_topo_tools_8", null ]
       ] ],
       [ "The Topology API", "occt_user_guides__modeling_algos.html#occt_modalg_3a", [
-        [ "Error Handling in the Topology API", "occt_user_guides__modeling_algos.html#occt_modalg_3a_1", null ],
-        [ "History support", "occt_user_guides__modeling_algos.html#occt_modalg_hist", [
-          [ "Deleted shapes", "occt_user_guides__modeling_algos.html#occt_modalg_hist_del", null ],
-          [ "Modified shapes", "occt_user_guides__modeling_algos.html#occt_modalg_hist_mod", null ],
-          [ "Generated shapes", "occt_user_guides__modeling_algos.html#occt_modalg_hist_gen", null ],
-          [ "BRepTools_History", "occt_user_guides__modeling_algos.html#occt_modalg_hist_tool", null ],
-          [ "DRAW history support", "occt_user_guides__modeling_algos.html#occt_modalg_hist_draw", null ]
-        ] ]
+        [ "Error Handling in the Topology API", "occt_user_guides__modeling_algos.html#occt_modalg_3a_1", null ]
       ] ],
       [ "Standard  Topological Objects", "occt_user_guides__modeling_algos.html#occt_modalg_3", [
         [ "Vertex", "occt_user_guides__modeling_algos.html#occt_modalg_3_1", null ],
@@ -316,10 +298,6 @@ var user_guides =
       [ "Meshing", "occt_user_guides__modeling_algos.html#occt_modalg_11", [
         [ "Mesh presentations", "occt_user_guides__modeling_algos.html#occt_modalg_11_1", null ],
         [ "Meshing algorithm", "occt_user_guides__modeling_algos.html#occt_modalg_11_2", null ]
-      ] ],
-      [ "3D Model Defeaturing", "occt_user_guides__modeling_algos.html#occt_modalg_defeaturing", [
-        [ "Usage", "occt_user_guides__modeling_algos.html#occt_modalg_defeaturing_usage", null ],
-        [ "Examples", "occt_user_guides__modeling_algos.html#occt_modalg_defeaturing_examples", null ]
       ] ]
     ] ],
     [ "Boolean Operations", "occt_user_guides__boolean_operations.html", [
@@ -384,8 +362,6 @@ var user_guides =
       [ "General Fuse Algorithm", "occt_user_guides__boolean_operations.html#occt_algorithms_7", [
         [ "Arguments", "occt_user_guides__boolean_operations.html#occt_algorithms_7_1", null ],
         [ "Results", "occt_user_guides__boolean_operations.html#occt_algorithms_7_2", null ],
-        [ "Options", "occt_user_guides__boolean_operations.html#occt_algorithms_7_3a", null ],
-        [ "Usage", "occt_user_guides__boolean_operations.html#occt_algorithms_7_3b", null ],
         [ "Examples", "occt_user_guides__boolean_operations.html#occt_algorithms_7_3", [
           [ "Case 1: Three edges intersecting at a point", "occt_user_guides__boolean_operations.html#occt_algorithms_7_3_1", null ],
           [ "Case 2: Two wires and an edge", "occt_user_guides__boolean_operations.html#occt_algorithms_7_3_2", null ],
@@ -528,22 +504,9 @@ var user_guides =
         ] ],
         [ "Safe processing mode", "occt_user_guides__boolean_operations.html#occt_algorithms_11a_3", [
           [ "Usage", "occt_user_guides__boolean_operations.html#occt_algorithms_11a_3_1", null ]
-        ] ],
-        [ "How to disable check of input solids for inverted status", "occt_user_guides__boolean_operations.html#occt_algorithms_11a_4", [
-          [ "Usage", "occt_user_guides__boolean_operations.html#occt_algorithms_11a_4_1", null ]
-        ] ],
-        [ "Usage of Oriented Bounding Boxes", "occt_user_guides__boolean_operations.html#occt_algorithms_11a_5_obb", [
-          [ "Usage", "occt_user_guides__boolean_operations.html#occt_algorithms_11a_5_obb_1", null ]
         ] ]
       ] ],
       [ "Errors and warnings reporting system", "occt_user_guides__boolean_operations.html#occt_algorithms_ers", null ],
-      [ "History Information", "occt_user_guides__boolean_operations.html#occt_algorithms_history", [
-        [ "Examples", "occt_user_guides__boolean_operations.html#occt_algorithms_history_ex", [
-          [ "Deleted shapes", "occt_user_guides__boolean_operations.html#occt_algorithms_history_ex_del", null ],
-          [ "Modified shapes", "occt_user_guides__boolean_operations.html#occt_algorithms_history_ex_modif", null ],
-          [ "Generated shapes", "occt_user_guides__boolean_operations.html#occt_algorithms_history_gen", null ]
-        ] ]
-      ] ],
       [ "Usage", "occt_user_guides__boolean_operations.html#occt_algorithms_11b", [
         [ "Package BRepAlgoAPI", "occt_user_guides__boolean_operations.html#occt_algorithms_11b_1", null ],
         [ "Package BOPTest", "occt_user_guides__boolean_operations.html#occt_algorithms_11b_2", [
@@ -934,10 +897,7 @@ var user_guides =
         [ "Validation Properties", "occt_user_guides__xde.html#occt_xde_1_4", null ],
         [ "Names", "occt_user_guides__xde.html#occt_xde_1_5", null ],
         [ "Colors and Layers", "occt_user_guides__xde.html#occt_xde_1_6", null ],
-        [ "Geometric Dimensions & Tolerances (GD&T)", "occt_user_guides__xde.html#occt_xde_1_7", null ],
-        [ "Clipping planes", "occt_user_guides__xde.html#occt_xde_1_8", null ],
-        [ "Saved views", "occt_user_guides__xde.html#occt_xde_1_9", null ],
-        [ "Custom notes", "occt_user_guides__xde.html#occt_xde_1_10", null ]
+        [ "Custom notes", "occt_user_guides__xde.html#occt_xde_1_7", null ]
       ] ],
       [ "Working with XDE", "occt_user_guides__xde.html#occt_xde_2", [
         [ "Getting started", "occt_user_guides__xde.html#occt_xde_2_1", [
@@ -970,33 +930,23 @@ var user_guides =
           [ "Queries on Colors", "occt_user_guides__xde.html#occt_xde_2_6_3", null ],
           [ "Editing Colors", "occt_user_guides__xde.html#occt_xde_2_6_4", null ]
         ] ],
-        [ "Geometric Dimensions & Tolerances (GD&T)", "occt_user_guides__xde.html#occt_xde_2_7", [
+        [ "Custom notes", "occt_user_guides__xde.html#occt_xde_2_7", [
           [ "Initialization", "occt_user_guides__xde.html#occt_xde_2_7_1", null ],
-          [ "Adding a GD&T", "occt_user_guides__xde.html#occt_xde_2_7_2", null ],
-          [ "Editing a GD&T", "occt_user_guides__xde.html#occt_xde_2_7_3", null ],
-          [ "Linking GD&Ts", "occt_user_guides__xde.html#occt_xde_2_7_4", null ],
-          [ "Finding GD&Ts and reference shapes", "occt_user_guides__xde.html#occt_xde_2_7_5", null ],
-          [ "Storing custom data", "occt_user_guides__xde.html#occt_xde_2_7_6", null ]
+          [ "Creating Notes", "occt_user_guides__xde.html#occt_xde_2_7_2", null ],
+          [ "Editing a Note", "occt_user_guides__xde.html#occt_xde_2_7_3", null ],
+          [ "Adding Notes", "occt_user_guides__xde.html#occt_xde_2_7_4", null ],
+          [ "Finding Notes", "occt_user_guides__xde.html#occt_xde_2_7_5", null ],
+          [ "Removing Notes", "occt_user_guides__xde.html#occt_xde_2_7_6", null ],
+          [ "Deleting Notes", "occt_user_guides__xde.html#occt_xde_2_7_7", null ]
         ] ],
-        [ "Clipping planes", "occt_user_guides__xde.html#occt_xde_2_8", null ],
-        [ "Saved views", "occt_user_guides__xde.html#occt_xde_2_9", null ],
-        [ "Custom notes", "occt_user_guides__xde.html#occt_xde_2_10", [
-          [ "Initialization", "occt_user_guides__xde.html#occt_xde_2_10_1", null ],
-          [ "Creating Notes", "occt_user_guides__xde.html#occt_xde_2_10_2", null ],
-          [ "Editing a Note", "occt_user_guides__xde.html#occt_xde_2_10_3", null ],
-          [ "Adding Notes", "occt_user_guides__xde.html#occt_xde_2_10_4", null ],
-          [ "Finding Notes", "occt_user_guides__xde.html#occt_xde_2_10_5", null ],
-          [ "Removing Notes", "occt_user_guides__xde.html#occt_xde_2_10_6", null ],
-          [ "Deleting Notes", "occt_user_guides__xde.html#occt_xde_2_10_7", null ]
+        [ "Reading and Writing STEP or IGES", "occt_user_guides__xde.html#occt_xde_2_8", [
+          [ "Reading a STEP file", "occt_user_guides__xde.html#occt_xde_2_8_1", null ],
+          [ "Writing a STEP file", "occt_user_guides__xde.html#occt_xde_2_8_2", null ],
+          [ "Reading an IGES File", "occt_user_guides__xde.html#occt_xde_2_8_3", null ],
+          [ "Writing an IGES File", "occt_user_guides__xde.html#occt_xde_2_8_4", null ]
         ] ],
-        [ "Reading and Writing STEP or IGES", "occt_user_guides__xde.html#occt_xde_2_11", [
-          [ "Reading a STEP file", "occt_user_guides__xde.html#occt_xde_2_11_1", null ],
-          [ "Writing a STEP file", "occt_user_guides__xde.html#occt_xde_2_11_2", null ],
-          [ "Reading an IGES File", "occt_user_guides__xde.html#occt_xde_2_11_3", null ],
-          [ "Writing an IGES File", "occt_user_guides__xde.html#occt_xde_2_11_4", null ]
-        ] ],
-        [ "Using an XDE Document", "occt_user_guides__xde.html#occt_xde_2_12", [
-          [ "XDE Data inside an Application Document", "occt_user_guides__xde.html#occt_xde_2_12_1", null ]
+        [ "Using an XDE Document", "occt_user_guides__xde.html#occt_xde_2_9", [
+          [ "XDE Data inside an Application Document", "occt_user_guides__xde.html#occt_xde_2_91", null ]
         ] ]
       ] ]
     ] ],
@@ -1077,9 +1027,7 @@ var user_guides =
         [ "The choice between standard and custom attributes", "occt_user_guides__ocaf.html#occt_ocaf_6_3", [
           [ "Comparison  and analysis of approaches", "occt_user_guides__ocaf.html#occt_ocaf_6_2_3", null ],
           [ "Conclusion", "occt_user_guides__ocaf.html#occt_ocaf_6_2_4", null ]
-        ] ],
-        [ "Standard Attributes with User Defined GUID", "occt_user_guides__ocaf.html#occt_ocaf_6_4", null ],
-        [ "Creation Attributes with User Defined GUID.", "occt_user_guides__ocaf.html#occt_ocaf_6_4_1", null ]
+        ] ]
       ] ],
       [ "Visualization Attributes", "occt_user_guides__ocaf.html#occt_ocaf_7", [
         [ "Overview", "occt_user_guides__ocaf.html#occt_ocaf_7_1", null ],
@@ -1496,8 +1444,7 @@ var user_guides =
         ] ],
         [ "Intersections", "occt_user_guides__test_harness.html#occt_draw_6_7", [
           [ "intersect", "occt_user_guides__test_harness.html#occt_draw_6_7_1", null ],
-          [ "2dintersect", "occt_user_guides__test_harness.html#occt_draw_6_7_2", null ],
-          [ "intconcon", "occt_user_guides__test_harness.html#occt_draw_6_7_3", null ]
+          [ "dintersect", "occt_user_guides__test_harness.html#occt_draw_6_7_2", null ]
         ] ],
         [ "Approximations", "occt_user_guides__test_harness.html#occt_draw_6_8", [
           [ "appro, dapprox", "occt_user_guides__test_harness.html#occt_draw_6_8_1", null ],
@@ -1577,11 +1524,9 @@ var user_guides =
           [ "bcutblend", "occt_user_guides__test_harness.html#occt_draw_7_8_4a", null ],
           [ "mkevol, updatevol, buildevol", "occt_user_guides__test_harness.html#occt_draw_7_8_5", null ]
         ] ],
-        [ "Defeaturing", "occt_user_guides__test_harness.html#occt_draw_defeaturing", null ],
         [ "Analysis of topology and geometry", "occt_user_guides__test_harness.html#occt_draw_7_9", [
           [ "lprops, sprops, vprops", "occt_user_guides__test_harness.html#occt_draw_7_9_1", null ],
           [ "bounding", "occt_user_guides__test_harness.html#occt_draw_7_9_2", null ],
-          [ "isbbinterf", "occt_user_guides__test_harness.html#occt_draw_7_9_2a", null ],
           [ "distmini", "occt_user_guides__test_harness.html#occt_draw_7_9_3", null ],
           [ "xdistef, xdistcs, xdistcc, xdistc2dc2dss, xdistcc2ds", "occt_user_guides__test_harness.html#occt_draw_7_9_4", null ],
           [ "checkshape", "occt_user_guides__test_harness.html#occt_draw_7_9_5", null ],
@@ -1599,13 +1544,6 @@ var user_guides =
           [ "deform", "occt_user_guides__test_harness.html#occt_draw_7_11_4", null ],
           [ "nurbsconvert", "occt_user_guides__test_harness.html#occt_draw_7_11_5", null ],
           [ "edgestofaces", "occt_user_guides__test_harness.html#occt_draw_7_11_6", null ]
-        ] ],
-        [ "History commands", "occt_user_guides__test_harness.html#occt_draw_hist", [
-          [ "savehistory", "occt_user_guides__test_harness.html#occt_draw_hist_save", null ],
-          [ "isdeleted", "occt_user_guides__test_harness.html#occt_draw_hist_isdel", null ],
-          [ "modified", "occt_user_guides__test_harness.html#occt_draw_hist_mod", null ],
-          [ "generated", "occt_user_guides__test_harness.html#occt_draw_hist_gen", null ],
-          [ "Enabling Draw history support for the algorithms", "occt_user_guides__test_harness.html#occt_draw_hist_extension", null ]
         ] ],
         [ "Texture Mapping to a Shape", "occt_user_guides__test_harness.html#occt_draw_7_12", [
           [ "vtexture", "occt_user_guides__test_harness.html#occt_draw_7_12_1", null ],
@@ -1833,7 +1771,7 @@ var user_guides =
         [ "Overview", "occt_user_guides__inspector.html#occt_inspector_1_1", null ],
         [ "Getting started", "occt_user_guides__inspector.html#occt_inspector_1_3", null ]
       ] ],
-      [ "Inspector Plugins", "occt_user_guides__inspector.html#occt_inspector_2", [
+      [ "Inspector", "occt_user_guides__inspector.html#occt_inspector_2", [
         [ "Overview", "occt_user_guides__inspector.html#occt_inspector_2_1", null ],
         [ "DFBrowser Plugin", "occt_user_guides__inspector.html#occt_inspector_2_2", [
           [ "Overview", "occt_user_guides__inspector.html#occt_inspector_2_2_1", null ],
@@ -1844,38 +1782,30 @@ var user_guides =
         [ "VInspector Plugin", "occt_user_guides__inspector.html#occt_inspector_2_3", [
           [ "Overview", "occt_user_guides__inspector.html#occt_inspector_2_3_1", null ],
           [ "Elements", "occt_user_guides__inspector.html#occt_inspector_2_3_2", null ],
-          [ "Elements cooperation", "occt_user_guides__inspector.html#occt_inspector_2_3_3", null ],
-          [ "VInspector tree view columns", "occt_user_guides__inspector.html#occt_inspector_2_3_4", null ]
+          [ "Elements cooperation", "occt_user_guides__inspector.html#occt_inspector_2_3_3", null ]
         ] ],
         [ "ShapeView Plugin", "occt_user_guides__inspector.html#occt_inspector_2_4", [
           [ "Overview", "occt_user_guides__inspector.html#occt_inspector_2_4_1", null ],
           [ "Elements", "occt_user_guides__inspector.html#occt_inspector_2_4_2", null ],
-          [ "Elements cooperation", "occt_user_guides__inspector.html#occt_inspector_2_4_3", null ],
-          [ "ShapeView tree view columns", "occt_user_guides__inspector.html#occt_inspector_2_4_4", null ]
+          [ "Elements cooperation", "occt_user_guides__inspector.html#occt_inspector_2_4_3", null ]
         ] ]
       ] ],
       [ "Common controls", "occt_user_guides__inspector.html#occt_inspector_3", [
-        [ "Tree View", "occt_user_guides__inspector.html#occt_inspector_3_1", [
-          [ "Tree View preferences", "occt_user_guides__inspector.html#occt_inspector_3_1_1", null ]
-        ] ],
-        [ "3D View", "occt_user_guides__inspector.html#occt_inspector_3_2", [
-          [ "Overview", "occt_user_guides__inspector.html#occt_inspector_3_2_1", null ],
-          [ "Elements", "occt_user_guides__inspector.html#occt_inspector_3_2_2", null ],
-          [ "3D View preferences.", "occt_user_guides__inspector.html#occt_inspector_3_2_3", null ]
-        ] ],
-        [ "Preferences context menu", "occt_user_guides__inspector.html#occt_inspector_3_3", null ]
+        [ "3D View", "occt_user_guides__inspector.html#occt_inspector_3_1", [
+          [ "Overview", "occt_user_guides__inspector.html#occt_inspector_3_1_1", null ],
+          [ "Elements", "occt_user_guides__inspector.html#occt_inspector_3_1_2", null ]
+        ] ]
       ] ],
-      [ "Getting Started", "occt_user_guides__inspector.html#occt_inspector_4", [
-        [ "TInspectorEXE sample", "occt_user_guides__inspector.html#occt_inspector_4_1", [
-          [ "TInspectorEXE preferences", "occt_user_guides__inspector.html#occt_inspector_4_1_1", null ]
-        ] ],
-        [ "How to launch the Inspector in DRAW Test Harness", "occt_user_guides__inspector.html#occt_inspector_4_2", null ],
-        [ "How to use the Inspector in a custom application", "occt_user_guides__inspector.html#occt_inspector_4_3", null ]
-      ] ],
-      [ "Build procedure", "occt_user_guides__inspector.html#occt_inspector_5", [
-        [ "Building with CMake within OCCT", "occt_user_guides__inspector.html#occt_inspector_5_1", null ]
-      ] ],
-      [ "Sources and packaging", "occt_user_guides__inspector.html#occt_inspector_6", null ],
-      [ "Glossary", "occt_user_guides__inspector.html#occt_inspector_7", null ]
+      [ "TInspectorEXE sample", "occt_user_guides__inspector.html#occt_inspector_6", null ],
+      [ "Launch in DRAW Test Harness", "occt_user_guides__inspector.html#occt_inspector_7", null ],
+      [ "Using in a custom application", "occt_user_guides__inspector.html#occt_inspector_8", null ],
+      [ "Build procedure", "occt_user_guides__inspector.html#occt_inspector_4", null ],
+      [ "Sources and packaging", "occt_user_guides__inspector.html#occt_inspector_5", null ],
+      [ "Glossary", "occt_user_guides__inspector.html#occt_inspector_9", [
+        [ "TDF_Attribute Simple types", "occt_user_guides__inspector.html#occt_attribute_simple_types", null ],
+        [ "TDF_Attribute List types", "occt_user_guides__inspector.html#occt_attribute_list_types", null ],
+        [ "TDF_Attribute Array types", "occt_user_guides__inspector.html#occt_attribute_array_types", null ],
+        [ "XDE tree node ID description", "occt_user_guides__inspector.html#occt_attribute_xde_tree_node_id", null ]
+      ] ]
     ] ]
 ];

@@ -17,6 +17,21 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__StepAP214_DLL" />
+					<Add option="-D__RWStepAP214_DLL" />
+					<Add option="-D__StepAP203_DLL" />
+					<Add option="-D__RWStepAP203_DLL" />
+					<Add option="-D__STEPConstruct_DLL" />
+					<Add option="-D__STEPEdit_DLL" />
+					<Add option="-D__GeomToStep_DLL" />
+					<Add option="-D__StepToGeom_DLL" />
+					<Add option="-D__StepToTopoDS_DLL" />
+					<Add option="-D__TopoDSToStep_DLL" />
+					<Add option="-D__STEPControl_DLL" />
+					<Add option="-D__STEPSelections_DLL" />
+					<Add option="-D__StepAP209_DLL" />
+					<Add option="-D__RWStepAP242_DLL" />
+					<Add option="-D__StepAP242_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKSTEP_obj.link" />
@@ -35,6 +50,21 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__StepAP214_DLL" />
+					<Add option="-D__RWStepAP214_DLL" />
+					<Add option="-D__StepAP203_DLL" />
+					<Add option="-D__RWStepAP203_DLL" />
+					<Add option="-D__STEPConstruct_DLL" />
+					<Add option="-D__STEPEdit_DLL" />
+					<Add option="-D__GeomToStep_DLL" />
+					<Add option="-D__StepToGeom_DLL" />
+					<Add option="-D__StepToTopoDS_DLL" />
+					<Add option="-D__TopoDSToStep_DLL" />
+					<Add option="-D__STEPControl_DLL" />
+					<Add option="-D__STEPSelections_DLL" />
+					<Add option="-D__StepAP209_DLL" />
+					<Add option="-D__RWStepAP242_DLL" />
+					<Add option="-D__StepAP242_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKSTEP_objd.link" />

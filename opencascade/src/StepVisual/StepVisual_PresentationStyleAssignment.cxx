@@ -45,5 +45,5 @@ StepVisual_PresentationStyleSelect StepVisual_PresentationStyleAssignment::Style
 
 Standard_Integer StepVisual_PresentationStyleAssignment::NbStyles () const
 {
-  return (styles.IsNull()) ?  0 : styles->Length();
+	return styles->Length();
 }

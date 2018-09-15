@@ -54,7 +54,6 @@
 #include <XmlDrivers_DocumentRetrievalDriver.hxx>
 #include <XmlDrivers_DocumentStorageDriver.hxx>
 #include <TDataStd_Real.hxx>
-#include <Standard_Atomic.hxx>
 
 #include <cstdio>
 #include <cmath>
@@ -2337,8 +2336,8 @@ static Standard_Integer OCC25043 (Draw_Interpretor& theDI,
     for (; anCheckIter.More(); anCheckIter.Next())
     {
       const BOPAlgo_CheckResult& aCurCheckRes = anCheckIter.Value();
-      const TopTools_ListOfShape& aCurFaultyShapes = aCurCheckRes.GetFaultyShapes1();
-      TopTools_ListIteratorOfListOfShape aFaultyIter(aCurFaultyShapes);
+      const BOPCol_ListOfShape& aCurFaultyShapes = aCurCheckRes.GetFaultyShapes1();
+      BOPCol_ListIteratorOfListOfShape aFaultyIter(aCurFaultyShapes);
       for (; aFaultyIter.More(); aFaultyIter.Next())
       {
         const TopoDS_Shape& aFaultyShape = aFaultyIter.Value();
@@ -2716,8 +2715,10 @@ static Standard_Integer OCC25413 (Draw_Interpretor& di, Standard_Integer narg , 
 #include <BRepAlgoAPI_Cut.hxx>
 #include <BRepAlgoAPI_Section.hxx>
 //
-#include <TopExp.hxx>
-#include <TopTools_MapOfShape.hxx>
+#include <BOPTools.hxx>
+//
+#include <BOPCol_MapOfShape.hxx>
+#include <BOPCol_ListOfShape.hxx>
 //=======================================================================
 //function : OCC25446
 //purpose  :
@@ -2754,7 +2755,7 @@ static Standard_Integer OCC25446 (Draw_Interpretor& theDI,
   aOp = (BOPAlgo_Operation)iOp;
   //
   Standard_Integer iErr;
-  TopTools_ListOfShape aLS;
+  BOPCol_ListOfShape aLS;
   BOPAlgo_PaveFiller aPF;
   //
   aLS.Append(aS1);
@@ -2799,14 +2800,14 @@ static Standard_Integer OCC25446 (Draw_Interpretor& theDI,
   const TopoDS_Shape& aRes = pBuilder->Shape();
   DBRep::Set(argv[1], aRes);
   //
-  TopTools_MapOfShape aMapArgs, aMapShape;
-  TopTools_MapIteratorOfMapOfShape aIt;
+  BOPCol_MapOfShape aMapArgs, aMapShape;
+  BOPCol_MapIteratorOfMapOfShape aIt;
   Standard_Boolean bIsDeletedHist, bIsDeletedMap;
   TopAbs_ShapeEnum aType;
   //
-  TopExp::MapShapes(aS1, aMapArgs);
-  TopExp::MapShapes(aS2, aMapArgs);
-  TopExp::MapShapes(aRes, aMapShape);
+  BOPTools::MapShapes(aS1, aMapArgs);
+  BOPTools::MapShapes(aS2, aMapArgs);
+  BOPTools::MapShapes(aRes, aMapShape);
   //
   aIt.Initialize(aMapArgs);
   for (; aIt.More(); aIt.Next()) {
@@ -2863,19 +2864,19 @@ struct OCC25545_Functor
 //function : OCC25545
 //purpose  : Tests data race when concurrently accessing TopLoc_Location::Transformation()
 //=======================================================================
-
+#ifdef HAVE_TBB
 static Standard_Integer OCC25545 (Draw_Interpretor& di, 
                                   Standard_Integer, 
                                   const char **)
 {
   // Place vertices in a vector, giving the i-th vertex the
   // transformation that translates it on the vector (i,0,0) from the origin.
-  Standard_Integer n = 1000;
+  size_t n = 1000;
   std::vector<TopoDS_Shape> aShapeVec (n);
   std::vector<TopLoc_Location> aLocVec (n);
   TopoDS_Shape aShape = BRepBuilderAPI_MakeVertex (gp::Origin ());
   aShapeVec[0] = aShape;
-  for (Standard_Integer i = 1; i < n; ++i) {
+  for (size_t i = 1; i < n; ++i) {
     gp_Trsf aT;
     aT.SetTranslation (gp_Vec (1, 0, 0));
     aLocVec[i] = aLocVec[i - 1] * aT;
@@ -2886,12 +2887,20 @@ static Standard_Integer OCC25545 (Draw_Interpretor& di,
   // concurrently
   OCC25545_Functor aFunc(aShapeVec);
 
-  // concurrently process
-  OSD_Parallel::For (0, n, aFunc);
-
+  //concurrently process
+  tbb::parallel_for (size_t (0), n, aFunc, tbb::simple_partitioner ());
   QVERIFY (!aFunc.myIsRaceDetected);
   return 0;
 }
+#else
+static Standard_Integer OCC25545 (Draw_Interpretor&, 
+                                  Standard_Integer, 
+                                  const char **argv)
+{
+  cout << "Test skipped: command " << argv[0] << " requires TBB library" << endl;
+  return 0;
+}
+#endif
 
 //=======================================================================
 //function : OCC25547
@@ -3480,7 +3489,7 @@ static Standard_Integer OCC24923(
   const Standard_Real aDeviation = 
     1. - (Standard_Real)(aPointsNb - aFailedNb) / (Standard_Real)aPointsNb;
 
-  theDI << "Number of incorrect cases: " << aFailedNb << " (Total " << aPointsNb << ")\n";
+  theDI << "Number of failed cases: " << aFailedNb << " (Total " << aPointsNb << ")\n";
   if (aDeviation > aMaxDeviation)
   {
     theDI << "Failed. Number of incorrect results is too huge: " << 
@@ -5333,52 +5342,6 @@ static Standard_Integer OCC28310 (Draw_Interpretor& /*theDI*/, Standard_Integer 
   return 0;
 }
 
-// repetitive display and removal of multiple small objects in the viewer for 
-// test of memory leak in visualization (OCCT 6.9.0 - 7.0.0)
-static Standard_Integer OCC29412 (Draw_Interpretor& /*theDI*/, Standard_Integer theArgNb, const char** theArgVec)
-{
-  Handle(AIS_InteractiveContext) aCtx = ViewerTest::GetAISContext();
-  if (aCtx.IsNull())
-  {
-    std::cout << "Error: no active view.\n";
-    return 1;
-  }
-
-  const int aNbIters = (theArgNb <= 1 ? 10000 : Draw::Atoi (theArgVec[1]));
-  int aProgressPrev = -1;
-  for (int m_loopIndex = 0; m_loopIndex < aNbIters; m_loopIndex++)
-  {
-    gp_Pnt pos;
-    gp_Vec dir(0, 0,1);
-
-    gp_Ax2 center (pos, dir);
-    gp_Circ circle (center, 1);
-    Handle(AIS_Shape) feature;
-
-    BRepBuilderAPI_MakeEdge builder( circle );
-
-    if( builder.Error() == BRepBuilderAPI_EdgeDone )
-    {
-      TopoDS_Edge E1 = builder.Edge();
-      TopoDS_Shape W2 = BRepBuilderAPI_MakeWire(E1).Wire();
-      feature = new AIS_Shape(W2);
-      aCtx->Display (feature, true);
-    }
-
-    aCtx->CurrentViewer()->Update();
-    ViewerTest::CurrentView()->FitAll();
-    aCtx->Remove (feature, true);
-
-    const int aProgress = (m_loopIndex * 100) / aNbIters;
-    if (aProgress != aProgressPrev)
-    {
-      std::cerr << aProgress << "%\r";
-      aProgressPrev = aProgress;
-    }
-  }
-  return 0;
-}
-
 //========================================================================
 //function : Commands_19
 //purpose  :
@@ -5517,6 +5480,5 @@ void QABugs::Commands_19(Draw_Interpretor& theCommands) {
   theCommands.Add("OCC28310",
                   "OCC28310: Tests validness of iterator in AIS_InteractiveContext after an removing object from it",
                   __FILE__, OCC28310, group);
-  theCommands.Add("OCC29412", "OCC29412 [nb cycles]: test display / remove of many small objects", __FILE__, OCC29412, group);
   return;
 }

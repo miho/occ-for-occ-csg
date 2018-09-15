@@ -17,6 +17,22 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__IntCurvesFace_DLL" />
+					<Add option="-D__MAT_DLL" />
+					<Add option="-D__MAT2d_DLL" />
+					<Add option="-D__Bisector_DLL" />
+					<Add option="-D__BRepMAT2d_DLL" />
+					<Add option="-D__BRepCheck_DLL" />
+					<Add option="-D__BRepBndLib_DLL" />
+					<Add option="-D__BRepExtrema_DLL" />
+					<Add option="-D__BRepClass_DLL" />
+					<Add option="-D__BRepClass3d_DLL" />
+					<Add option="-D__BRepLib_DLL" />
+					<Add option="-D__BRepGProp_DLL" />
+					<Add option="-D__BRepIntCurveSurface_DLL" />
+					<Add option="-D__BRepTopAdaptor_DLL" />
+					<Add option="-D__BRepBuilderAPI_DLL" />
+					<Add option="-D__BRepApprox_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKTopAlgo_obj.link" />
@@ -35,6 +51,22 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__IntCurvesFace_DLL" />
+					<Add option="-D__MAT_DLL" />
+					<Add option="-D__MAT2d_DLL" />
+					<Add option="-D__Bisector_DLL" />
+					<Add option="-D__BRepMAT2d_DLL" />
+					<Add option="-D__BRepCheck_DLL" />
+					<Add option="-D__BRepBndLib_DLL" />
+					<Add option="-D__BRepExtrema_DLL" />
+					<Add option="-D__BRepClass_DLL" />
+					<Add option="-D__BRepClass3d_DLL" />
+					<Add option="-D__BRepLib_DLL" />
+					<Add option="-D__BRepGProp_DLL" />
+					<Add option="-D__BRepIntCurveSurface_DLL" />
+					<Add option="-D__BRepTopAdaptor_DLL" />
+					<Add option="-D__BRepBuilderAPI_DLL" />
+					<Add option="-D__BRepApprox_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKTopAlgo_objd.link" />
@@ -120,6 +152,9 @@
 		<Unit filename="../../../src/MAT2d/MAT2d_MiniPath.cxx">
 			<Option link="0" />
 		</Unit>
+		<Unit filename="../../../src/MAT2d/MAT2d_SketchExplorer.cxx">
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../../src/MAT2d/MAT2d_Tool2d.cxx">
 			<Option link="0" />
 		</Unit>
@@ -193,9 +228,6 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BRepBndLib/BRepBndLib.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/BRepBndLib/BRepBndLib_1.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BRepExtrema/BRepExtrema_DistShapeShape.cxx">
@@ -499,6 +531,9 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BRepApprox/BRepApprox_TheMultiLineOfApprox_0.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/BRepApprox/BRepApprox_TheMultiLineToolOfApprox_0.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BRepApprox/BRepApprox_ThePrmPrmSvSurfacesOfApprox_0.cxx">

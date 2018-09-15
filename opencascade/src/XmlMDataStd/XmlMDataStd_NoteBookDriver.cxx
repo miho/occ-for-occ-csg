@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_NoteBook.hxx>
 #include <TDF_Attribute.hxx>
@@ -28,7 +28,7 @@ IMPLEMENT_STANDARD_RTTIEXT(XmlMDataStd_NoteBookDriver,XmlMDF_ADriver)
 //purpose  : Constructor
 //=======================================================================
 XmlMDataStd_NoteBookDriver::XmlMDataStd_NoteBookDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 

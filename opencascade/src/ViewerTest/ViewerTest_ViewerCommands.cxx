@@ -26,7 +26,6 @@
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
-#include <Aspect_Grid.hxx>
 #include <DBRep.hxx>
 #include <Draw_ProgressIndicator.hxx>
 #include <Graphic3d_ArrayOfPolylines.hxx>
@@ -170,59 +169,6 @@ Aspect_Handle GetWindowHandle(const Handle(Aspect_Window)& theWindow)
 }
 #endif
 
-//! Setting additional flag to store 2D mode of the View to avoid scene rotation by mouse/key events
-class ViewerTest_V3dView : public V3d_View
-{
-  DEFINE_STANDARD_RTTI_INLINE(ViewerTest_V3dView, V3d_View)
-public:
-  //! Initializes the view.
-  ViewerTest_V3dView (const Handle(V3d_Viewer)& theViewer, const V3d_TypeOfView theType = V3d_ORTHOGRAPHIC,
-                      bool theIs2dMode = false)
-  : V3d_View (theViewer, theType), myIs2dMode (theIs2dMode) {}
-
-  //! Initializes the view by copying.
-  ViewerTest_V3dView (const Handle(V3d_Viewer)& theViewer, const Handle(V3d_View)& theView)
-  : V3d_View (theViewer, theView), myIs2dMode (false)
-  {
-    if (Handle(ViewerTest_V3dView) aV3dView = Handle(ViewerTest_V3dView)::DownCast (theView))
-    {
-      myIs2dMode = aV3dView->IsViewIn2DMode();
-    }
-  }
-
-  //! Returns true if 2D mode is set for the view
-  bool IsViewIn2DMode() const { return myIs2dMode; }
-
-  //! Sets 2D mode for the view
-  void SetView2DMode (bool the2dMode) { myIs2dMode = the2dMode; }
-
-public:
-
-  //! Returns true if active view in 2D mode.
-  static bool IsCurrentViewIn2DMode()
-  {
-    if (Handle(ViewerTest_V3dView) aV3dView = Handle(ViewerTest_V3dView)::DownCast (ViewerTest::CurrentView()))
-    {
-      return aV3dView->IsViewIn2DMode();
-    }
-    return false;
-  }
-
-  //! Set if active view in 2D mode.
-  static void SetCurrentView2DMode (bool theIs2d)
-  {
-    if (Handle(ViewerTest_V3dView) aV3dView = Handle(ViewerTest_V3dView)::DownCast (ViewerTest::CurrentView()))
-    {
-      aV3dView->SetView2DMode (theIs2d);
-    }
-  }
-
-private:
-
-  Standard_Boolean myIs2dMode; //!< 2D mode flag
-
-};
-
 NCollection_DoubleMap <TCollection_AsciiString, Handle(V3d_View)> ViewerTest_myViews;
 static NCollection_DoubleMap <TCollection_AsciiString, Handle(AIS_InteractiveContext)>  ViewerTest_myContexts;
 static NCollection_DoubleMap <TCollection_AsciiString, Handle(Graphic3d_GraphicDriver)> ViewerTest_myDrivers;
@@ -316,7 +262,7 @@ const Handle(Standard_Transient)& ViewerTest::WClass()
   {
     theWClass = new WNT_WClass ("GW3D_Class", (Standard_Address )AdvViewerWindowProc,
                                 CS_VREDRAW | CS_HREDRAW, 0, 0,
-                                ::LoadCursor (NULL, IDC_ARROW));
+                                ::LoadCursorW (NULL, IDC_ARROW));
   }
 #endif
   return theWClass;
@@ -583,9 +529,8 @@ TCollection_AsciiString ViewerTest::ViewerInit (const Standard_Integer thePxLeft
                                                 const Standard_Integer thePxTop,
                                                 const Standard_Integer thePxWidth,
                                                 const Standard_Integer thePxHeight,
-                                                const TCollection_AsciiString& theViewName,
-                                                const TCollection_AsciiString& theDisplayName,
-                                                const Handle(V3d_View)& theViewToClone)
+                                                Standard_CString theViewName,
+                                                Standard_CString theDisplayName)
 {
   // Default position and dimension of the viewer window.
   // Note that left top corner is set to be sufficiently small to have
@@ -597,10 +542,6 @@ TCollection_AsciiString ViewerTest::ViewerInit (const Standard_Integer thePxLeft
   Standard_Integer aPxWidth  = 409;
   Standard_Integer aPxHeight = 409;
   Standard_Boolean toCreateViewer = Standard_False;
-  if (!theViewToClone.IsNull())
-  {
-    theViewToClone->Window()->Size (aPxWidth, aPxHeight);
-  }
 
   Handle(OpenGl_GraphicDriver) aGraphicDriver;
   ViewerTest_Names aViewNames(theViewName);
@@ -770,16 +711,7 @@ TCollection_AsciiString ViewerTest::ViewerInit (const Standard_Integer thePxLeft
   VT_GetWindow()->SetVirtual (Draw_VirtualWindows);
 
   // View setup
-  Handle(V3d_View) aView;
-  if (!theViewToClone.IsNull())
-  {
-    aView = new ViewerTest_V3dView (a3DViewer, theViewToClone);
-  }
-  else
-  {
-    aView = new ViewerTest_V3dView (a3DViewer, a3DViewer->DefaultTypeOfView());
-  }
-
+  Handle(V3d_View) aView = a3DViewer->CreateView();
   aView->SetWindow (VT_GetWindow());
   ViewerTest::GetAISContext()->RedrawImmediate (a3DViewer);
 
@@ -847,9 +779,7 @@ static int VInit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const cha
 {
   TCollection_AsciiString aViewName, aDisplayName;
   Standard_Integer aPxLeft = 0, aPxTop = 0, aPxWidth = 0, aPxHeight = 0;
-  Handle(V3d_View) aCopyFrom;
   TCollection_AsciiString aName, aValue;
-  int is2dMode = -1;
   for (Standard_Integer anArgIt = 1; anArgIt < theArgsNb; ++anArgIt)
   {
     const TCollection_AsciiString anArg = theArgVec[anArgIt];
@@ -903,32 +833,11 @@ static int VInit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const cha
         ++anArgIt;
       }
     }
-    else if (anArgCase == "-2d_mode"
-          || anArgCase == "-2dmode"
-          || anArgCase == "-2d")
-    {
-      bool toEnable = true;
-      if (anArgIt + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIt + 1], toEnable))
-      {
-        ++anArgIt;
-      }
-      is2dMode = toEnable ? 1 : 0;
-    }
     else if (anArgIt + 1 < theArgsNb
           && (anArgCase == "-disp"
            || anArgCase == "-display"))
     {
       aDisplayName = theArgVec[++anArgIt];
-    }
-    else if (!ViewerTest::CurrentView().IsNull()
-          &&  aCopyFrom.IsNull()
-          && (anArgCase == "-copy"
-           || anArgCase == "-clone"
-           || anArgCase == "-cloneactive"
-           || anArgCase == "-cloneactiveview"))
-    {
-      aCopyFrom = ViewerTest::CurrentView();
     }
     // old syntax
     else if (ViewerTest::SplitParameter (anArg, aName, aValue))
@@ -993,19 +902,12 @@ static int VInit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const cha
   {
     TCollection_AsciiString aCommand = TCollection_AsciiString ("vactivate ") + aViewNames.GetViewName();
     theDi.Eval (aCommand.ToCString());
-    if (is2dMode != -1)
-    {
-      ViewerTest_V3dView::SetCurrentView2DMode (is2dMode == 1);
-    }
     return 0;
   }
 
   TCollection_AsciiString aViewId = ViewerTest::ViewerInit (aPxLeft, aPxTop, aPxWidth, aPxHeight,
-                                                            aViewName, aDisplayName, aCopyFrom);
-  if (is2dMode != -1)
-  {
-    ViewerTest_V3dView::SetCurrentView2DMode (is2dMode == 1);
-  }
+                                                            aViewName.ToCString(),
+                                                            aDisplayName.ToCString());
   theDi << aViewId;
   return 0;
 }
@@ -1620,14 +1522,12 @@ void VT_ProcessKeyPress (const char* buf_ret)
   const Handle(V3d_View) aView = ViewerTest::CurrentView();
   // Letter in alphabetic order
 
-  if (!strcasecmp (buf_ret, "A")
-   && !ViewerTest_V3dView::IsCurrentViewIn2DMode())
+  if (!strcasecmp (buf_ret, "A"))
   {
     // AXO
     aView->SetProj(V3d_XposYnegZpos);
   }
-  else if (!strcasecmp (buf_ret, "D")
-        && !ViewerTest_V3dView::IsCurrentViewIn2DMode())
+  else if (!strcasecmp (buf_ret, "D"))
   {
     // Reset
     aView->Reset();
@@ -1722,26 +1622,22 @@ void VT_ProcessKeyPress (const char* buf_ret)
     }
 
   }
-  else if (!strcasecmp (buf_ret, "T")
-        && !ViewerTest_V3dView::IsCurrentViewIn2DMode())
+  else if (!strcasecmp (buf_ret, "T"))
   {
     // Top
     aView->SetProj(V3d_Zpos);
   }
-  else if (!strcasecmp (buf_ret, "B")
-        && !ViewerTest_V3dView::IsCurrentViewIn2DMode())
+  else if (!strcasecmp (buf_ret, "B"))
   {
     // Bottom
     aView->SetProj(V3d_Zneg);
   }
-  else if (!strcasecmp (buf_ret, "L")
-        && !ViewerTest_V3dView::IsCurrentViewIn2DMode())
+  else if (!strcasecmp (buf_ret, "L"))
   {
     // Left
     aView->SetProj(V3d_Xneg);
   }
-  else if (!strcasecmp (buf_ret, "R")
-        && !ViewerTest_V3dView::IsCurrentViewIn2DMode())
+  else if (!strcasecmp (buf_ret, "R"))
   {
     // Right
     aView->SetProj(V3d_Xpos);
@@ -1805,30 +1701,9 @@ void VT_ProcessKeyPress (const char* buf_ret)
   else
   {
     // Number
-    const Standard_Integer aSelMode = Draw::Atoi(buf_ret);
-    if (aSelMode >= 0 && aSelMode <= 7)
-    {
-      bool toEnable = true;
-      if (const Handle(AIS_InteractiveContext) aCtx = ViewerTest::GetAISContext())
-      {
-        AIS_ListOfInteractive aPrsList;
-        aCtx->DisplayedObjects (aPrsList);
-        for (AIS_ListOfInteractive::Iterator aPrsIter (aPrsList); aPrsIter.More() && toEnable; aPrsIter.Next())
-        {
-          TColStd_ListOfInteger aModes;
-          aCtx->ActivatedModes (aPrsIter.Value(), aModes);
-          for (TColStd_ListOfInteger::Iterator aModeIter (aModes); aModeIter.More() && toEnable; aModeIter.Next())
-          {
-            if (aModeIter.Value() == aSelMode)
-            {
-              toEnable = false;
-            }
-          }
-        }
-      }
-      TCollection_AsciiString aCmd = TCollection_AsciiString ("vselmode ") + aSelMode + (toEnable ? " 1" : " 0");
-      Draw_Interprete (aCmd.ToCString());
-    }
+    Standard_Integer Num = Draw::Atoi(buf_ret);
+    if(Num>=0 && Num<=7)
+      ViewerTest::StandardModeActivation(Num);
   }
 }
 
@@ -1928,11 +1803,6 @@ void VT_ProcessButton1Release (Standard_Boolean theIsShift)
 //==============================================================================
 void VT_ProcessButton3Press()
 {
-  if (ViewerTest_V3dView::IsCurrentViewIn2DMode())
-  {
-    return;
-  }
-
   Start_Rot = 1;
   HasHlrOnBeforeRotation = ViewerTest::CurrentView()->ComputedMode();
   if (HasHlrOnBeforeRotation)
@@ -4785,8 +4655,6 @@ inline void printZLayerInfo (Draw_Interpretor& theDI,
     theDI << "  Immediate: TRUE\n";
   }
   theDI << "  Origin: " << theLayer.Origin().X() << " " << theLayer.Origin().Y() << " " << theLayer.Origin().Z() << "\n";
-  theDI << "  Culling distance: "      << theLayer.CullingDistance() << "\n";
-  theDI << "  Culling size: "          << theLayer.CullingSize() << "\n";
   theDI << "  Depth test:   "          << (theLayer.ToEnableDepthTest() ? "enabled" : "disabled") << "\n";
   theDI << "  Depth write:  "          << (theLayer.ToEnableDepthWrite() ? "enabled" : "disabled") << "\n";
   theDI << "  Depth buffer clearing: " << (theLayer.ToClearDepth() ? "enabled" : "disabled") << "\n";
@@ -5015,33 +4883,6 @@ static int VZLayer (Draw_Interpretor& theDI,
         anArgIter += 2;
       }
       aSettings.SetOrigin (anOrigin);
-      aViewer->SetZLayerSettings (aLayerId, aSettings);
-    }
-    else if (aLayerId != Graphic3d_ZLayerId_UNKNOWN
-          && anArgIter + 1 < theArgNb
-          && (anArg == "-cullingdistance"
-           || anArg == "-cullingdist"
-           || anArg == "-culldistance"
-           || anArg == "-culldist"
-           || anArg == "-distcull"
-           || anArg == "-distculling"
-           || anArg == "-distanceculling"))
-    {
-      Graphic3d_ZLayerSettings aSettings = aViewer->ZLayerSettings (aLayerId);
-      const Standard_Real aDist = Draw::Atof (theArgVec[++anArgIter]);
-      aSettings.SetCullingDistance (aDist);
-      aViewer->SetZLayerSettings (aLayerId, aSettings);
-    }
-    else if (aLayerId != Graphic3d_ZLayerId_UNKNOWN
-          && anArgIter + 1 < theArgNb
-          && (anArg == "-cullingsize"
-           || anArg == "-cullsize"
-           || anArg == "-sizecull"
-           || anArg == "-sizeculling"))
-    {
-      Graphic3d_ZLayerSettings aSettings = aViewer->ZLayerSettings (aLayerId);
-      const Standard_Real aSize = Draw::Atof (theArgVec[++anArgIter]);
-      aSettings.SetCullingSize (aSize);
       aViewer->SetZLayerSettings (aLayerId, aSettings);
     }
     else if (anArg == "-settings"
@@ -6181,16 +6022,6 @@ static int VReadPixel (Draw_Interpretor& theDI,
     return 1;
   }
 
-  // redirect possible warning messages that could have been added by ToPixMap
-  // into the Tcl interpretor (via DefaultMessenger) to cout, so that they do not
-  // contaminate result of the command
-  Standard_CString aWarnLog = theDI.Result();
-  if (aWarnLog != NULL && aWarnLog[0] != '\0')
-  {
-    std::cout << aWarnLog << std::endl;
-  }
-  theDI.Reset();
-
   Quantity_ColorRGBA aColor = anImage.PixelColor (anX, anY);
   if (toShowName)
   {
@@ -6534,8 +6365,10 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
                               ? int(anImgRef->SizeY() * 2)
                               : int(anImgRef->SizeY());
   TCollection_AsciiString aDisplayName;
-  TCollection_AsciiString aViewId = ViewerTest::ViewerInit (aPxLeft, aPxTop, aWinSizeX, aWinSizeY,
-                                                            aViewName, aDisplayName);
+  TCollection_AsciiString aViewId = ViewerTest::ViewerInit (aPxLeft, aPxTop,
+                                                            aWinSizeX, aWinSizeY,
+                                                            aViewName.ToCString(),
+                                                            aDisplayName.ToCString());
 
   Standard_Real aRatio = anImgRef->Ratio();
   Standard_Real aSizeX = 1.0;
@@ -6668,69 +6501,23 @@ static Standard_Integer VSelect (Draw_Interpretor& di,
 //function : VMoveTo
 //purpose  : Emulates cursor movement to defined pixel position
 //=======================================================================
-static Standard_Integer VMoveTo (Draw_Interpretor& ,
-                                Standard_Integer theNbArgs,
-                                const char**     theArgVec)
+static Standard_Integer VMoveTo (Draw_Interpretor& di,
+                                Standard_Integer argc,
+                                const char ** argv)
 {
-  const Handle(AIS_InteractiveContext)& aContext = ViewerTest::GetAISContext();
-  const Handle(V3d_View)&               aView    = ViewerTest::CurrentView();
-  if (aContext.IsNull())
+  if(argc != 3)
   {
-    std::cout << "Error: no active View\n";
+    di << "Usage : " << argv[0] << " x y\n";
     return 1;
   }
 
-  Graphic3d_Vec2i aMousePos (IntegerLast(), IntegerLast());
-  for (Standard_Integer anArgIter = 1; anArgIter < theNbArgs; ++anArgIter)
+  Handle(AIS_InteractiveContext) aContext = ViewerTest::GetAISContext();
+  if(aContext.IsNull())
   {
-    TCollection_AsciiString anArgStr (theArgVec[anArgIter]);
-    anArgStr.LowerCase();
-    if (anArgStr == "-reset"
-     || anArgStr == "-clear")
-    {
-      if (anArgIter + 1 < theNbArgs)
-      {
-        std::cout << "Syntax error at '" << theArgVec[anArgIter + 1] << "'\n";
-        return 1;
-      }
-
-      const Standard_Boolean toEchoGrid = aContext->CurrentViewer()->Grid()->IsActive()
-                                       && aContext->CurrentViewer()->GridEcho();
-      if (toEchoGrid)
-      {
-        aContext->CurrentViewer()->HideGridEcho (aView);
-      }
-      if (aContext->ClearDetected() || toEchoGrid)
-      {
-        aContext->CurrentViewer()->RedrawImmediate();
-      }
-      return 0;
-    }
-    else if (aMousePos.x() == IntegerLast()
-          && anArgStr.IsIntegerValue())
-    {
-      aMousePos.x() = anArgStr.IntegerValue();
-    }
-    else if (aMousePos.y() == IntegerLast()
-          && anArgStr.IsIntegerValue())
-    {
-      aMousePos.y() = anArgStr.IntegerValue();
-    }
-    else
-    {
-      std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
-      return 1;
-    }
-  }
-
-  if (aMousePos.x() == IntegerLast()
-   || aMousePos.y() == IntegerLast())
-  {
-    std::cout << "Syntax error: wrong number of arguments\n";
+    di << "use 'vinit' command before " << argv[0] << "\n";
     return 1;
   }
-
-  ViewerTest::CurrentEventManager()->MoveTo (aMousePos.x(), aMousePos.y());
+  ViewerTest::CurrentEventManager()->MoveTo(atoi(argv[1]),atoi(argv[2]));
   return 0;
 }
 
@@ -7110,59 +6897,6 @@ static int VViewParams (Draw_Interpretor& theDi, Standard_Integer theArgsNb, con
     aView->SetCenter (aCenter2d.x(), aCenter2d.y());
   }
 
-  return 0;
-}
-
-//==============================================================================
-//function : V2DMode
-//purpose  :
-//==============================================================================
-static Standard_Integer V2DMode (Draw_Interpretor&, Standard_Integer theArgsNb, const char** theArgVec)
-{
-  bool is2dMode = true;
-  Handle(ViewerTest_V3dView) aV3dView = Handle(ViewerTest_V3dView)::DownCast (ViewerTest::CurrentView());
-  if (aV3dView.IsNull())
-  {
-    std::cout << "Error: no active view.\n";
-    return 1;
-  }
-  for (Standard_Integer anArgIt = 1; anArgIt < theArgsNb; ++anArgIt)
-  {
-    const TCollection_AsciiString anArg = theArgVec[anArgIt];
-    TCollection_AsciiString anArgCase = anArg;
-    anArgCase.LowerCase();
-    if (anArgIt + 1 < theArgsNb
-     && anArgCase == "-name")
-    {
-      ViewerTest_Names aViewNames (theArgVec[++anArgIt]);
-      TCollection_AsciiString aViewName = aViewNames.GetViewName();
-      if (!ViewerTest_myViews.IsBound1 (aViewName))
-      {
-        std::cout << "Syntax error: unknown view '" << theArgVec[anArgIt - 1] << "'.\n";
-        return 1;
-      }
-      aV3dView = Handle(ViewerTest_V3dView)::DownCast (ViewerTest_myViews.Find1 (aViewName));
-    }
-    else if (anArgCase == "-mode")
-    {
-      if (anArgIt + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIt + 1], is2dMode))
-      {
-        ++anArgIt;
-      }
-    }
-    else if (ViewerTest::ParseOnOff (theArgVec[anArgIt], is2dMode))
-    {
-      //
-    }
-    else
-    {
-      std::cout << "Syntax error: unknown argument " << anArg << ".\n";
-      return 1;
-    }
-  }
-
-  aV3dView->SetView2DMode (is2dMode);
   return 0;
 }
 
@@ -8681,12 +8415,10 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
       return 0;
     }
     else if (aChangeArg == "-set"
-          || aChangeArg == "-unset"
-          || aChangeArg == "-setoverrideglobal")
+          || aChangeArg == "-unset")
     {
       // set / unset plane command
-      const Standard_Boolean toSet            = aChangeArg.StartsWith ("-set");
-      const Standard_Boolean toOverrideGlobal = aChangeArg == "-setoverrideglobal";
+      Standard_Boolean toSet = aChangeArg == "-set";
       Standard_Integer anIt = 1;
       for (; anIt < aNbChangeArgs; ++anIt)
       {
@@ -8696,8 +8428,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
         {
           break;
         }
-        else if (!toOverrideGlobal
-               && ViewerTest_myViews.IsBound1 (anEntityName))
+        else if (ViewerTest_myViews.IsBound1 (anEntityName))
         {
           Handle(V3d_View) aView = ViewerTest_myViews.Find1 (anEntityName);
           if (toSet)
@@ -8720,10 +8451,6 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
           else
           {
             aIObj->RemoveClipPlane (aClipPlane);
-          }
-          if (!aIObj->ClipPlanes().IsNull())
-          {
-            aIObj->ClipPlanes()->SetOverrideGlobal (toOverrideGlobal);
           }
         }
         else
@@ -9447,7 +9174,6 @@ static int VDefaults (Draw_Interpretor& theDi,
 
 //! Auxiliary method
 inline void addLight (const Handle(V3d_Light)& theLightNew,
-                      const Graphic3d_ZLayerId theLayer,
                       const Standard_Boolean   theIsGlobal)
 {
   if (theLightNew.IsNull())
@@ -9455,28 +9181,13 @@ inline void addLight (const Handle(V3d_Light)& theLightNew,
     return;
   }
 
-  Handle(V3d_Viewer) aViewer = ViewerTest::GetViewerFromContext();
-  if (theLayer == Graphic3d_ZLayerId_UNKNOWN)
+  if (theIsGlobal)
   {
-    aViewer->AddLight (theLightNew);
-    if (theIsGlobal)
-    {
-      aViewer->SetLightOn (theLightNew);
-    }
-    else
-    {
-      ViewerTest::CurrentView()->SetLightOn (theLightNew);
-    }
+    ViewerTest::GetViewerFromContext()->SetLightOn (theLightNew);
   }
   else
   {
-    Graphic3d_ZLayerSettings aSettings = aViewer->ZLayerSettings (theLayer);
-    if (aSettings.Lights().IsNull())
-    {
-      aSettings.SetLights (new Graphic3d_LightSet());
-    }
-    aSettings.Lights()->Add (theLightNew);
-    aViewer->SetZLayerSettings (theLayer, aSettings);
+    ViewerTest::CurrentView()->SetLightOn (theLightNew);
   }
 }
 
@@ -9523,9 +9234,7 @@ static int VLight (Draw_Interpretor& theDi,
     {
       Handle(V3d_Light) aLight = aLightIter.Value();
       const Quantity_Color aColor = aLight->Color();
-      theDi << "Light #" << aLightId
-            << (!aLight->Name().IsEmpty() ? (TCollection_AsciiString(" ") + aLight->Name()) : "")
-            << " [" << aLight->GetId() << "]" << "\n";
+      theDi << "Light" << aLightId << "\n";
       switch (aLight->Type())
       {
         case V3d_AMBIENT:
@@ -9536,39 +9245,53 @@ static int VLight (Draw_Interpretor& theDi,
         }
         case V3d_DIRECTIONAL:
         {
+          Handle(V3d_DirectionalLight) aLightDir = Handle(V3d_DirectionalLight)::DownCast (aLight);
           theDi << "  Type:       Directional\n";
           theDi << "  Intensity:  " << aLight->Intensity() << "\n";
           theDi << "  Headlight:  " << (aLight->Headlight() ? "TRUE" : "FALSE") << "\n";
           theDi << "  Smoothness: " << aLight->Smoothness() << "\n";
-          aLight->Direction (anXYZ[0], anXYZ[1], anXYZ[2]);
-          theDi << "  Direction:  " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
+          if (!aLightDir.IsNull())
+          {
+            aLightDir->Position  (anXYZ[0], anXYZ[1], anXYZ[2]);
+            theDi << "  Position:   " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
+            aLightDir->Direction (anXYZ[0], anXYZ[1], anXYZ[2]);
+            theDi << "  Direction:  " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
+          }
           break;
         }
         case V3d_POSITIONAL:
         {
+          Handle(V3d_PositionalLight) aLightPos = Handle(V3d_PositionalLight)::DownCast (aLight);
           theDi << "  Type:       Positional\n";
           theDi << "  Intensity:  " << aLight->Intensity() << "\n";
           theDi << "  Headlight:  " << (aLight->Headlight() ? "TRUE" : "FALSE") << "\n";
           theDi << "  Smoothness: " << aLight->Smoothness() << "\n";
-          aLight->Position  (anXYZ[0], anXYZ[1], anXYZ[2]);
-          theDi << "  Position:   " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
-          aLight->Attenuation (anAtten[0], anAtten[1]);
-          theDi << "  Atten.:     " << anAtten[0] << " " << anAtten[1] << "\n";
+          if (!aLightPos.IsNull())
+          {
+            aLightPos->Position  (anXYZ[0], anXYZ[1], anXYZ[2]);
+            theDi << "  Position:   " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
+            aLightPos->Attenuation (anAtten[0], anAtten[1]);
+            theDi << "  Atten.:     " << anAtten[0] << " " << anAtten[1] << "\n";
+          }
           break;
         }
         case V3d_SPOT:
         {
+          Handle(V3d_SpotLight) aLightSpot = Handle(V3d_SpotLight)::DownCast (aLight);
           theDi << "  Type:       Spot\n";
           theDi << "  Intensity:  " << aLight->Intensity() << "\n";
           theDi << "  Headlight:  " << (aLight->Headlight() ? "TRUE" : "FALSE") << "\n";
-          aLight->Position  (anXYZ[0], anXYZ[1], anXYZ[2]);
-          theDi << "  Position:   " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
-          aLight->Direction (anXYZ[0], anXYZ[1], anXYZ[2]);
-          theDi << "  Direction:  " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
-          aLight->Attenuation (anAtten[0], anAtten[1]);
-          theDi << "  Atten.:     " << anAtten[0] << " " << anAtten[1] << "\n";
-          theDi << "  Angle:      " << (aLight->Angle() * 180.0 / M_PI) << "\n";
-          theDi << "  Exponent:   " << aLight->Concentration() << "\n";
+          if (!aLightSpot.IsNull())
+          {
+            aLightSpot->Position  (anXYZ[0], anXYZ[1], anXYZ[2]);
+            theDi << "  Position:   " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
+            aLightSpot->Direction (anXYZ[0], anXYZ[1], anXYZ[2]);
+            theDi << "  Direction:  " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
+            aLightSpot->Attenuation (anAtten[0], anAtten[1]);
+            theDi << "  Atten.:     " << anAtten[0] << " " << anAtten[1] << "\n";
+            theDi << "  Angle:      " << (aLightSpot->Angle() * 180.0 / M_PI) << "\n";
+            theDi << "  Exponent:   " << aLightSpot->Concentration() << "\n";
+          }
           break;
         }
         default:
@@ -9577,202 +9300,118 @@ static int VLight (Draw_Interpretor& theDi,
           break;
         }
       }
-      theDi << "  Color:      " << aColor.Red() << ", " << aColor.Green() << ", " << aColor.Blue() << " [" << Quantity_Color::StringName (aColor.Name()) << "]\n";
+      theDi << "  Color:     " << aColor.Red() << ", " << aColor.Green() << ", " << aColor.Blue() << "\n";
     }
   }
 
   Handle(V3d_Light) aLightNew;
   Handle(V3d_Light) aLightOld;
-  Graphic3d_ZLayerId aLayer = Graphic3d_ZLayerId_UNKNOWN;
   Standard_Boolean  isGlobal = Standard_True;
   Standard_Boolean  toCreate = Standard_False;
-  ViewerTest_AutoUpdater anUpdateTool (ViewerTest::GetAISContext(), aView);
   for (Standard_Integer anArgIt = 1; anArgIt < theArgsNb; ++anArgIt)
   {
-    Handle(V3d_Light) aLightCurr = aLightNew.IsNull() ? aLightOld : aLightNew;
+    Handle(V3d_Light)            aLightCurr = aLightNew.IsNull() ? aLightOld : aLightNew;
+    Handle(V3d_AmbientLight)     aLightAmb  = Handle(V3d_AmbientLight)    ::DownCast (aLightCurr);
+    Handle(V3d_DirectionalLight) aLightDir  = Handle(V3d_DirectionalLight)::DownCast (aLightCurr);
+    Handle(V3d_PositionalLight)  aLightPos  = Handle(V3d_PositionalLight) ::DownCast (aLightCurr);
+    Handle(V3d_SpotLight)        aLightSpot = Handle(V3d_SpotLight)       ::DownCast (aLightCurr);
 
     TCollection_AsciiString aName, aValue;
     const TCollection_AsciiString anArg (theArgVec[anArgIt]);
     TCollection_AsciiString anArgCase (anArg);
     anArgCase.UpperCase();
-    if (anUpdateTool.parseRedrawMode (anArg))
-    {
-      continue;
-    }
-
     if (anArgCase.IsEqual ("NEW")
      || anArgCase.IsEqual ("ADD")
-     || anArgCase.IsEqual ("CREATE")
-     || anArgCase.IsEqual ("-NEW")
-     || anArgCase.IsEqual ("-ADD")
-     || anArgCase.IsEqual ("-CREATE"))
+     || anArgCase.IsEqual ("CREATE"))
     {
       toCreate = Standard_True;
     }
-    else if (anArgCase.IsEqual ("-LAYER")
-          || anArgCase.IsEqual ("-ZLAYER"))
-    {
-      if (++anArgIt >= theArgsNb)
-      {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
-        return 1;
-      }
-
-      TCollection_AsciiString aValStr (theArgVec[anArgIt]);
-      aValStr.LowerCase();
-      if (aValStr == "default"
-       || aValStr == "def")
-      {
-        aLayer = Graphic3d_ZLayerId_Default;
-      }
-      else if (aValStr == "top")
-      {
-        aLayer = Graphic3d_ZLayerId_Top;
-      }
-      else if (aValStr == "topmost")
-      {
-        aLayer = Graphic3d_ZLayerId_Topmost;
-      }
-      else if (aValStr == "toposd"
-            || aValStr == "osd")
-      {
-        aLayer = Graphic3d_ZLayerId_TopOSD;
-      }
-      else if (aValStr == "botosd"
-            || aValStr == "bottom")
-      {
-        aLayer = Graphic3d_ZLayerId_BotOSD;
-      }
-      else if (aValStr.IsIntegerValue())
-      {
-        aLayer = Draw::Atoi (theArgVec[anArgIt]);
-      }
-      else
-      {
-        std::cout << "Wrong syntax at argument '" << anArg << "'!\n";
-        return 1;
-      }
-    }
     else if (anArgCase.IsEqual ("GLOB")
-          || anArgCase.IsEqual ("GLOBAL")
-          || anArgCase.IsEqual ("-GLOB")
-          || anArgCase.IsEqual ("-GLOBAL"))
+          || anArgCase.IsEqual ("GLOBAL"))
     {
       isGlobal = Standard_True;
     }
     else if (anArgCase.IsEqual ("LOC")
-          || anArgCase.IsEqual ("LOCAL")
-          || anArgCase.IsEqual ("-LOC")
-          || anArgCase.IsEqual ("-LOCAL"))
+          || anArgCase.IsEqual ("LOCAL"))
     {
       isGlobal = Standard_False;
     }
     else if (anArgCase.IsEqual ("DEF")
-          || anArgCase.IsEqual ("DEFAULTS")
-          || anArgCase.IsEqual ("-DEF")
-          || anArgCase.IsEqual ("-DEFAULTS"))
+          || anArgCase.IsEqual ("DEFAULTS"))
     {
       toCreate = Standard_False;
       aViewer->SetDefaultLights();
     }
     else if (anArgCase.IsEqual ("CLR")
-          || anArgCase.IsEqual ("CLEAR")
-          || anArgCase.IsEqual ("-CLR")
-          || anArgCase.IsEqual ("-CLEAR"))
+          || anArgCase.IsEqual ("CLEAR"))
     {
       toCreate = Standard_False;
-
-      TColStd_SequenceOfInteger aLayers;
-      aViewer->GetAllZLayers (aLayers);
-      for (TColStd_SequenceOfInteger::Iterator aLayeriter (aLayers); aLayeriter.More(); aLayeriter.Next())
+      for (V3d_ListOfLightIterator aLightIter (aView->ActiveLightIterator()); aLightIter.More();)
       {
-        if (aLayeriter.Value() == aLayer
-         || aLayer == Graphic3d_ZLayerId_UNKNOWN)
-        {
-          Graphic3d_ZLayerSettings aSettings = aViewer->ZLayerSettings (aLayeriter.Value());
-          aSettings.SetLights (Handle(Graphic3d_LightSet)());
-          aViewer->SetZLayerSettings (aLayeriter.Value(), aSettings);
-          if (aLayer != Graphic3d_ZLayerId_UNKNOWN)
-          {
-            break;
-          }
-        }
-      }
-
-      if (aLayer == Graphic3d_ZLayerId_UNKNOWN)
-      {
-        for (V3d_ListOfLightIterator aLightIter (aView->ActiveLightIterator()); aLightIter.More();)
-        {
-          Handle(V3d_Light) aLight = aLightIter.Value();
-          aViewer->DelLight (aLight);
-          aLightIter = aView->ActiveLightIterator();
-        }
+        Handle(V3d_Light) aLight = aLightIter.Value();
+        aViewer->DelLight (aLight);
+        aLightIter = aView->ActiveLightIterator();
       }
     }
     else if (anArgCase.IsEqual ("AMB")
           || anArgCase.IsEqual ("AMBIENT")
           || anArgCase.IsEqual ("AMBLIGHT"))
     {
+      addLight (aLightNew, isGlobal);
       if (!toCreate)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
-
-      addLight (aLightNew, aLayer, isGlobal);
       toCreate  = Standard_False;
-      aLightNew = new V3d_AmbientLight();
+      aLightNew = new V3d_AmbientLight (aViewer);
     }
     else if (anArgCase.IsEqual ("DIRECTIONAL")
           || anArgCase.IsEqual ("DIRLIGHT"))
     {
+      addLight (aLightNew, isGlobal);
       if (!toCreate)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
-
-      addLight (aLightNew, aLayer, isGlobal);
       toCreate  = Standard_False;
-      aLightNew = new V3d_DirectionalLight();
+      aLightNew = new V3d_DirectionalLight (aViewer);
     }
     else if (anArgCase.IsEqual ("SPOT")
           || anArgCase.IsEqual ("SPOTLIGHT"))
     {
+      addLight (aLightNew, isGlobal);
       if (!toCreate)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
-
-      addLight (aLightNew, aLayer, isGlobal);
       toCreate  = Standard_False;
-      aLightNew = new V3d_SpotLight (gp_Pnt (0.0, 0.0, 0.0));
+      aLightNew = new V3d_SpotLight (aViewer, 0.0, 0.0, 0.0);
     }
     else if (anArgCase.IsEqual ("POSLIGHT")
           || anArgCase.IsEqual ("POSITIONAL"))
     {
+      addLight (aLightNew, isGlobal);
       if (!toCreate)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
-
-      addLight (aLightNew, aLayer, isGlobal);
       toCreate  = Standard_False;
-      aLightNew = new V3d_PositionalLight (gp_Pnt (0.0, 0.0, 0.0));
+      aLightNew = new V3d_PositionalLight (aViewer, 0.0, 0.0, 0.0);
     }
-    else if (anArgCase.IsEqual ("CHANGE")
-          || anArgCase.IsEqual ("-CHANGE"))
+    else if (anArgCase.IsEqual ("CHANGE"))
     {
+      addLight (aLightNew, isGlobal);
+      aLightNew.Nullify();
       if (++anArgIt >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
 
-      addLight (aLightNew, aLayer, isGlobal);
-      aLightNew.Nullify();
       const Standard_Integer aLightId = getLightId (theArgVec[anArgIt]);
       Standard_Integer aLightIt = 0;
       for (V3d_ListOfLightIterator aLightIter (aView->ActiveLightIterator()); aLightIter.More(); aLightIter.Next(), ++aLightIt)
@@ -9791,9 +9430,7 @@ static int VLight (Draw_Interpretor& theDi,
       }
     }
     else if (anArgCase.IsEqual ("DEL")
-          || anArgCase.IsEqual ("DELETE")
-          || anArgCase.IsEqual ("-DEL")
-          || anArgCase.IsEqual ("-DELETE"))
+          || anArgCase.IsEqual ("DELETE"))
     {
       Handle(V3d_Light) aLightDel;
       if (++anArgIt >= theArgsNb)
@@ -9813,47 +9450,15 @@ static int VLight (Draw_Interpretor& theDi,
           break;
         }
       }
-      if (aLightDel.IsNull())
-      {
-        continue;
-      }
-
-      TColStd_SequenceOfInteger aLayers;
-      aViewer->GetAllZLayers (aLayers);
-      for (TColStd_SequenceOfInteger::Iterator aLayeriter (aLayers); aLayeriter.More(); aLayeriter.Next())
-      {
-        if (aLayeriter.Value() == aLayer
-         || aLayer == Graphic3d_ZLayerId_UNKNOWN)
-        {
-          Graphic3d_ZLayerSettings aSettings = aViewer->ZLayerSettings (aLayeriter.Value());
-          if (!aSettings.Lights().IsNull())
-          {
-            aSettings.Lights()->Remove (aLightDel);
-            if (aSettings.Lights()->IsEmpty())
-            {
-              aSettings.SetLights (Handle(Graphic3d_LightSet)());
-            }
-          }
-          aViewer->SetZLayerSettings (aLayeriter.Value(), aSettings);
-          if (aLayer != Graphic3d_ZLayerId_UNKNOWN)
-          {
-            break;
-          }
-        }
-      }
-
-      if (aLayer == Graphic3d_ZLayerId_UNKNOWN)
+      if (!aLightDel.IsNull())
       {
         aViewer->DelLight (aLightDel);
       }
     }
     else if (anArgCase.IsEqual ("COLOR")
-          || anArgCase.IsEqual ("COLOUR")
-          || anArgCase.IsEqual ("-COLOR")
-          || anArgCase.IsEqual ("-COLOUR"))
+          || anArgCase.IsEqual ("COLOUR"))
     {
-      if (++anArgIt >= theArgsNb
-       || aLightCurr.IsNull())
+      if (++anArgIt >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
@@ -9862,17 +9467,15 @@ static int VLight (Draw_Interpretor& theDi,
       TCollection_AsciiString anArgNext (theArgVec[anArgIt]);
       anArgNext.UpperCase();
       const Quantity_Color aColor = ViewerTest::GetColorFromName (anArgNext.ToCString());
-      aLightCurr->SetColor (aColor);
+      if (!aLightCurr.IsNull())
+      {
+        aLightCurr->SetColor (aColor);
+      }
     }
     else if (anArgCase.IsEqual ("POS")
-          || anArgCase.IsEqual ("POSITION")
-          || anArgCase.IsEqual ("-POS")
-          || anArgCase.IsEqual ("-POSITION"))
+          || anArgCase.IsEqual ("POSITION"))
     {
-      if ((anArgIt + 3) >= theArgsNb
-       || aLightCurr.IsNull()
-       || (aLightCurr->Type() != Graphic3d_TOLS_POSITIONAL
-        && aLightCurr->Type() != Graphic3d_TOLS_SPOT))
+      if ((anArgIt + 3) >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
@@ -9881,17 +9484,28 @@ static int VLight (Draw_Interpretor& theDi,
       anXYZ[0] = Atof (theArgVec[++anArgIt]);
       anXYZ[1] = Atof (theArgVec[++anArgIt]);
       anXYZ[2] = Atof (theArgVec[++anArgIt]);
-      aLightCurr->SetPosition (anXYZ[0], anXYZ[1], anXYZ[2]);
+      if (!aLightDir.IsNull())
+      {
+        aLightDir->SetPosition (anXYZ[0], anXYZ[1], anXYZ[2]);
+      }
+      else if (!aLightPos.IsNull())
+      {
+        aLightPos->SetPosition (anXYZ[0], anXYZ[1], anXYZ[2]);
+      }
+      else if (!aLightSpot.IsNull())
+      {
+        aLightSpot->SetPosition (anXYZ[0], anXYZ[1], anXYZ[2]);
+      }
+      else
+      {
+        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        return 1;
+      }
     }
     else if (anArgCase.IsEqual ("DIR")
-          || anArgCase.IsEqual ("DIRECTION")
-          || anArgCase.IsEqual ("-DIR")
-          || anArgCase.IsEqual ("-DIRECTION"))
+          || anArgCase.IsEqual ("DIRECTION"))
     {
-      if ((anArgIt + 3) >= theArgsNb
-       || aLightCurr.IsNull()
-       || (aLightCurr->Type() != Graphic3d_TOLS_DIRECTIONAL
-        && aLightCurr->Type() != Graphic3d_TOLS_SPOT))
+      if ((anArgIt + 3) >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
@@ -9900,26 +9514,36 @@ static int VLight (Draw_Interpretor& theDi,
       anXYZ[0] = Atof (theArgVec[++anArgIt]);
       anXYZ[1] = Atof (theArgVec[++anArgIt]);
       anXYZ[2] = Atof (theArgVec[++anArgIt]);
-      aLightCurr->SetDirection (anXYZ[0], anXYZ[1], anXYZ[2]);
+      if (!aLightDir.IsNull())
+      {
+        aLightDir->SetDirection (anXYZ[0], anXYZ[1], anXYZ[2]);
+      }
+      else if (!aLightSpot.IsNull())
+      {
+        aLightSpot->SetDirection (anXYZ[0], anXYZ[1], anXYZ[2]);
+      }
+      else
+      {
+        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        return 1;
+      }
     }
     else if (anArgCase.IsEqual ("SM")
-          || anArgCase.IsEqual ("SMOOTHNESS")
-          || anArgCase.IsEqual ("-SM")
-          || anArgCase.IsEqual ("-SMOOTHNESS"))
+          || anArgCase.IsEqual ("SMOOTHNESS"))
     {
-      if (++anArgIt >= theArgsNb
-       || aLightCurr.IsNull())
+      if (++anArgIt >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
 
-      Standard_ShortReal aSmoothness = (Standard_ShortReal )Atof (theArgVec[anArgIt]);
-      if (Abs (aSmoothness) <= ShortRealEpsilon())
+      Standard_Real aSmoothness = Atof (theArgVec[anArgIt]);
+
+      if (fabs (aSmoothness) < Precision::Confusion())
       {
         aLightCurr->SetIntensity (1.f);
       }
-      else if (Abs (aLightCurr->Smoothness()) <= ShortRealEpsilon())
+      else if (fabs (aLightCurr->Smoothness()) < Precision::Confusion())
       {
         aLightCurr->SetIntensity ((aSmoothness * aSmoothness) / 3.f);
       }
@@ -9929,122 +9553,142 @@ static int VLight (Draw_Interpretor& theDi,
         aLightCurr->SetIntensity (aLightCurr->Intensity() / (aSmoothnessRatio * aSmoothnessRatio));
       }
 
-      if (aLightCurr->Type() == Graphic3d_TOLS_POSITIONAL)
+      if (!aLightPos.IsNull())
       {
-        aLightCurr->SetSmoothRadius (aSmoothness);
+        aLightPos->SetSmoothRadius (aSmoothness);
       }
-      else if (aLightCurr->Type() == Graphic3d_TOLS_DIRECTIONAL)
+      else if (!aLightDir.IsNull())
       {
-        aLightCurr->SetSmoothAngle (aSmoothness);
+        aLightDir->SetSmoothAngle (aSmoothness);
       }
     }
     else if (anArgCase.IsEqual ("INT")
-          || anArgCase.IsEqual ("INTENSITY")
-          || anArgCase.IsEqual ("-INT")
-          || anArgCase.IsEqual ("-INTENSITY"))
+          || anArgCase.IsEqual ("INTENSITY"))
     {
-      if (++anArgIt >= theArgsNb
-       || aLightCurr.IsNull())
+      if (++anArgIt >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
 
-      Standard_ShortReal aIntensity = (Standard_ShortReal )Atof (theArgVec[anArgIt]);
-      aLightCurr->SetIntensity (aIntensity);
+      Standard_Real aIntensity = Atof (theArgVec[anArgIt]);
+
+      if (!aLightCurr.IsNull())
+      {
+        aLightCurr->SetIntensity (aIntensity);
+      }
     }
     else if (anArgCase.IsEqual ("ANG")
-          || anArgCase.IsEqual ("ANGLE")
-          || anArgCase.IsEqual ("-ANG")
-          || anArgCase.IsEqual ("-ANGLE"))
+          || anArgCase.IsEqual ("ANGLE"))
     {
-      if (++anArgIt >= theArgsNb
-       || aLightCurr.IsNull()
-       || aLightCurr->Type() != Graphic3d_TOLS_SPOT)
+      if (++anArgIt >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
 
-      Standard_ShortReal anAngle = (Standard_ShortReal )Atof (theArgVec[anArgIt]);
-      aLightCurr->SetAngle (Standard_ShortReal (anAngle / 180.0 * M_PI));
+      Standard_Real anAngle = Atof (theArgVec[anArgIt]);
+
+      if (!aLightSpot.IsNull())
+      {
+        aLightSpot->SetAngle (anAngle / 180.0 * M_PI);
+      }
     }
     else if (anArgCase.IsEqual ("CONSTATTEN")
-          || anArgCase.IsEqual ("CONSTATTENUATION")
-          || anArgCase.IsEqual ("-CONSTATTEN")
-          || anArgCase.IsEqual ("-CONSTATTENUATION"))
+          || anArgCase.IsEqual ("CONSTATTENUATION"))
     {
-      if (++anArgIt >= theArgsNb
-       || aLightCurr.IsNull()
-       || (aLightCurr->Type() != Graphic3d_TOLS_POSITIONAL
-        && aLightCurr->Type() != Graphic3d_TOLS_SPOT))
+      if (++anArgIt >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
 
-      aLightCurr->Attenuation (anAtten[0], anAtten[1]);
-      anAtten[0] = Atof (theArgVec[anArgIt]);
-      aLightCurr->SetAttenuation ((Standard_ShortReal )anAtten[0], (Standard_ShortReal )anAtten[1]);
+      if (!aLightPos.IsNull())
+      {
+        aLightPos->Attenuation (anAtten[0], anAtten[1]);
+        anAtten[0] = Atof (theArgVec[anArgIt]);
+        aLightPos->SetAttenuation (anAtten[0], anAtten[1]);
+      }
+      else if (!aLightSpot.IsNull())
+      {
+        aLightSpot->Attenuation (anAtten[0], anAtten[1]);
+        anAtten[0] = Atof (theArgVec[anArgIt]);
+        aLightSpot->SetAttenuation (anAtten[0], anAtten[1]);
+      }
+      else
+      {
+        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        return 1;
+      }
     }
     else if (anArgCase.IsEqual ("LINATTEN")
           || anArgCase.IsEqual ("LINEARATTEN")
-          || anArgCase.IsEqual ("LINEARATTENUATION")
-          || anArgCase.IsEqual ("-LINATTEN")
-          || anArgCase.IsEqual ("-LINEARATTEN")
-          || anArgCase.IsEqual ("-LINEARATTENUATION"))
+          || anArgCase.IsEqual ("LINEARATTENUATION"))
     {
-      if (++anArgIt >= theArgsNb
-       || aLightCurr.IsNull()
-       || (aLightCurr->Type() != Graphic3d_TOLS_POSITIONAL
-        && aLightCurr->Type() != Graphic3d_TOLS_SPOT))
+      if (++anArgIt >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
 
-      aLightCurr->Attenuation (anAtten[0], anAtten[1]);
-      anAtten[1] = Atof (theArgVec[anArgIt]);
-      aLightCurr->SetAttenuation ((Standard_ShortReal )anAtten[0], (Standard_ShortReal )anAtten[1]);
+      if (!aLightPos.IsNull())
+      {
+        aLightPos->Attenuation (anAtten[0], anAtten[1]);
+        anAtten[1] = Atof (theArgVec[anArgIt]);
+        aLightPos->SetAttenuation (anAtten[0], anAtten[1]);
+      }
+      else if (!aLightSpot.IsNull())
+      {
+        aLightSpot->Attenuation (anAtten[0], anAtten[1]);
+        anAtten[1] = Atof (theArgVec[anArgIt]);
+        aLightSpot->SetAttenuation (anAtten[0], anAtten[1]);
+      }
+      else
+      {
+        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        return 1;
+      }
     }
     else if (anArgCase.IsEqual ("EXP")
           || anArgCase.IsEqual ("EXPONENT")
           || anArgCase.IsEqual ("SPOTEXP")
-          || anArgCase.IsEqual ("SPOTEXPONENT")
-          || anArgCase.IsEqual ("-EXP")
-          || anArgCase.IsEqual ("-EXPONENT")
-          || anArgCase.IsEqual ("-SPOTEXP")
-          || anArgCase.IsEqual ("-SPOTEXPONENT"))
+          || anArgCase.IsEqual ("SPOTEXPONENT"))
     {
-      if (++anArgIt >= theArgsNb
-       || aLightCurr.IsNull()
-       || aLightCurr->Type() != Graphic3d_TOLS_SPOT)
+      if (++anArgIt >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
 
-      aLightCurr->SetConcentration ((Standard_ShortReal )Atof (theArgVec[anArgIt]));
+      if (!aLightSpot.IsNull())
+      {
+        aLightSpot->SetConcentration (Atof (theArgVec[anArgIt]));
+      }
+      else
+      {
+        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        return 1;
+      }
     }
     else if (anArgCase.IsEqual ("HEAD")
-          || anArgCase.IsEqual ("HEADLIGHT")
-          || anArgCase.IsEqual ("-HEAD")
-          || anArgCase.IsEqual ("-HEADLIGHT"))
+          || anArgCase.IsEqual ("HEADLIGHT"))
     {
-      if (aLightCurr.IsNull()
-       || aLightCurr->Type() == Graphic3d_TOLS_AMBIENT)
+      if (++anArgIt >= theArgsNb)
       {
         std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
         return 1;
       }
 
-      Standard_Boolean isHeadLight = Standard_True;
-      if (anArgIt + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIt + 1], isHeadLight))
+      if (aLightAmb.IsNull()
+       && !aLightCurr.IsNull())
       {
-        ++anArgIt;
+        aLightCurr->SetHeadlight (Draw::Atoi (theArgVec[anArgIt]) != 0);
       }
-      aLightCurr->SetHeadlight (isHeadLight);
+      else
+      {
+        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        return 1;
+      }
     }
     else
     {
@@ -10052,115 +9696,10 @@ static int VLight (Draw_Interpretor& theDi,
     }
   }
 
-  addLight (aLightNew, aLayer, isGlobal);
+  addLight (aLightNew, isGlobal);
+  aViewer->UpdateLights();
+
   return 0;
-}
-
-//! Read Graphic3d_RenderingParams::PerfCounters flag.
-static Standard_Boolean parsePerfStatsFlag (const TCollection_AsciiString& theValue,
-                                            Standard_Boolean& theToReset,
-                                            Graphic3d_RenderingParams::PerfCounters& theFlagsRem,
-                                            Graphic3d_RenderingParams::PerfCounters& theFlagsAdd)
-{
-  Graphic3d_RenderingParams::PerfCounters aFlag = Graphic3d_RenderingParams::PerfCounters_NONE;
-  TCollection_AsciiString aVal = theValue;
-  Standard_Boolean toReverse = Standard_False;
-  if (aVal == "none")
-  {
-    theToReset = Standard_True;
-    return Standard_True;
-  }
-  else if (aVal.StartsWith ("-"))
-  {
-    toReverse = Standard_True;
-    aVal = aVal.SubString (2, aVal.Length());
-  }
-  else if (aVal.StartsWith ("no"))
-  {
-    toReverse = Standard_True;
-    aVal = aVal.SubString (3, aVal.Length());
-  }
-  else if (aVal.StartsWith ("+"))
-  {
-    aVal = aVal.SubString (2, aVal.Length());
-  }
-  else
-  {
-    theToReset = Standard_True;
-  }
-
-  if (     aVal == "fps"
-        || aVal == "framerate")  aFlag = Graphic3d_RenderingParams::PerfCounters_FrameRate;
-  else if (aVal == "cpu")        aFlag = Graphic3d_RenderingParams::PerfCounters_CPU;
-  else if (aVal == "layers")     aFlag = Graphic3d_RenderingParams::PerfCounters_Layers;
-  else if (aVal == "structs"
-        || aVal == "structures"
-        || aVal == "objects")    aFlag = Graphic3d_RenderingParams::PerfCounters_Structures;
-  else if (aVal == "groups")     aFlag = Graphic3d_RenderingParams::PerfCounters_Groups;
-  else if (aVal == "arrays")     aFlag = Graphic3d_RenderingParams::PerfCounters_GroupArrays;
-  else if (aVal == "tris"
-        || aVal == "triangles")  aFlag = Graphic3d_RenderingParams::PerfCounters_Triangles;
-  else if (aVal == "pnts"
-        || aVal == "points")     aFlag = Graphic3d_RenderingParams::PerfCounters_Points;
-  else if (aVal == "mem"
-        || aVal == "gpumem"
-        || aVal == "estimmem")   aFlag = Graphic3d_RenderingParams::PerfCounters_EstimMem;
-  else if (aVal == "basic")      aFlag = Graphic3d_RenderingParams::PerfCounters_Basic;
-  else if (aVal == "extended"
-        || aVal == "verbose"
-        || aVal == "extra")      aFlag = Graphic3d_RenderingParams::PerfCounters_Extended;
-  else
-  {
-    return Standard_False;
-  }
-
-  if (toReverse)
-  {
-    theFlagsRem = Graphic3d_RenderingParams::PerfCounters(theFlagsRem | aFlag);
-  }
-  else
-  {
-    theFlagsAdd = Graphic3d_RenderingParams::PerfCounters(theFlagsAdd | aFlag);
-  }
-  return Standard_True;
-}
-
-//! Read Graphic3d_RenderingParams::PerfCounters flags.
-static Standard_Boolean convertToPerfStatsFlags (const TCollection_AsciiString& theValue,
-                                                 Graphic3d_RenderingParams::PerfCounters& theFlags)
-{
-  TCollection_AsciiString aValue = theValue;
-  Graphic3d_RenderingParams::PerfCounters aFlagsRem = Graphic3d_RenderingParams::PerfCounters_NONE;
-  Graphic3d_RenderingParams::PerfCounters aFlagsAdd = Graphic3d_RenderingParams::PerfCounters_NONE;
-  Standard_Boolean toReset = Standard_False;
-  for (;;)
-  {
-    Standard_Integer aSplitPos = aValue.Search ("|");
-    if (aSplitPos <= 0)
-    {
-      if (!parsePerfStatsFlag (aValue, toReset, aFlagsRem, aFlagsAdd))
-      {
-        return Standard_False;
-      }
-      if (toReset)
-      {
-        theFlags = Graphic3d_RenderingParams::PerfCounters_NONE;
-      }
-      theFlags = Graphic3d_RenderingParams::PerfCounters(theFlags |  aFlagsAdd);
-      theFlags = Graphic3d_RenderingParams::PerfCounters(theFlags & ~aFlagsRem);
-      return Standard_True;
-    }
-
-    if (aSplitPos > 1)
-    {
-      TCollection_AsciiString aSubValue = aValue.SubString (1, aSplitPos - 1);
-      if (!parsePerfStatsFlag (aSubValue, toReset, aFlagsRem, aFlagsAdd))
-      {
-        return Standard_False;
-      }
-    }
-    aValue = aValue.SubString (aSplitPos + 1, aValue.Length());
-  }
 }
 
 //=======================================================================
@@ -10254,54 +9793,11 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     theDI << "shadingModel: ";
     switch (aView->ShadingModel())
     {
-      case Graphic3d_TOSM_DEFAULT:  theDI << "default"; break;
-      case Graphic3d_TOSM_UNLIT:    theDI << "unlit";   break;
-      case Graphic3d_TOSM_FACET:    theDI << "flat";    break;
-      case Graphic3d_TOSM_VERTEX:   theDI << "gouraud"; break;
-      case Graphic3d_TOSM_FRAGMENT: theDI << "phong";   break;
+      case V3d_COLOR:   theDI << "color";   break;
+      case V3d_FLAT:    theDI << "flat";    break;
+      case V3d_GOURAUD: theDI << "gouraud"; break;
+      case V3d_PHONG:   theDI << "phong";   break;
     }
-    {
-      theDI << "perfCounters:";
-      if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_FrameRate) != 0)
-      {
-        theDI << " fps";
-      }
-      if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_CPU) != 0)
-      {
-        theDI << " cpu";
-      }
-      if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_Structures) != 0)
-      {
-        theDI << " structs";
-      }
-      if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_Groups) != 0)
-      {
-        theDI << " groups";
-      }
-      if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_GroupArrays) != 0)
-      {
-        theDI << " arrays";
-      }
-      if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_Triangles) != 0)
-      {
-        theDI << " tris";
-      }
-      if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_Points) != 0)
-      {
-        theDI << " pnts";
-      }
-      if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_EstimMem) != 0)
-      {
-        theDI << " gpumem";
-      }
-      if (aParams.CollectedStats == Graphic3d_RenderingParams::PerfCounters_NONE)
-      {
-        theDI << " none";
-      }
-      theDI << "\n";
-    }
-    theDI << "depth pre-pass: " << (aParams.ToEnableDepthPrepass        ? "on" : "off") << "\n";
-    theDI << "alpha to coverage: " << (aParams.ToEnableAlphaToCoverage  ? "on" : "off") << "\n";
     theDI << "\n";
     return 0;
   }
@@ -10431,35 +9927,6 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       {
         std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
         return 1;
-      }
-    }
-    else if (aFlag == "-depthprepass")
-    {
-      if (toPrint)
-      {
-        theDI << (aParams.ToEnableDepthPrepass ? "on " : "off ");
-        continue;
-      }
-      aParams.ToEnableDepthPrepass = Standard_True;
-      if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], aParams.ToEnableDepthPrepass))
-      {
-        ++anArgIter;
-      }
-    }
-    else if (aFlag == "-samplealphatocoverage"
-          || aFlag == "-alphatocoverage")
-    {
-      if (toPrint)
-      {
-        theDI << (aParams.ToEnableAlphaToCoverage ? "on " : "off ");
-        continue;
-      }
-      aParams.ToEnableAlphaToCoverage = Standard_True;
-      if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], aParams.ToEnableAlphaToCoverage))
-      {
-        ++anArgIter;
       }
     }
     else if (aFlag == "-rendscale"
@@ -10747,11 +10214,10 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       {
         switch (aView->ShadingModel())
         {
-          case Graphic3d_TOSM_DEFAULT:  theDI << "default";  break;
-          case Graphic3d_TOSM_UNLIT:    theDI << "unlit ";   break;
-          case Graphic3d_TOSM_FACET:    theDI << "flat ";    break;
-          case Graphic3d_TOSM_VERTEX:   theDI << "gouraud "; break;
-          case Graphic3d_TOSM_FRAGMENT: theDI << "phong ";   break;
+          case V3d_COLOR:   theDI << "color ";   break;
+          case V3d_FLAT:    theDI << "flat ";    break;
+          case V3d_GOURAUD: theDI << "gouraud "; break;
+          case V3d_PHONG:   theDI << "phong ";   break;
         }
         continue;
       }
@@ -10761,15 +10227,34 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
         std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
       }
 
-      Graphic3d_TypeOfShadingModel aModel = Graphic3d_TOSM_DEFAULT;
-      if (ViewerTest::ParseShadingModel (theArgVec[anArgIter], aModel)
-       && aModel != Graphic3d_TOSM_DEFAULT)
+      TCollection_AsciiString aMode (theArgVec[anArgIter]);
+      aMode.LowerCase();
+      if (aMode == "color"
+       || aMode == "none")
       {
-        aView->SetShadingModel (aModel);
+        aView->SetShadingModel (V3d_COLOR);
+      }
+      else if (aMode == "flat"
+            || aMode == "facet")
+      {
+        aView->SetShadingModel (V3d_FLAT);
+      }
+      else if (aMode == "gouraud"
+            || aMode == "vertex"
+            || aMode == "vert")
+      {
+        aView->SetShadingModel (V3d_GOURAUD);
+      }
+      else if (aMode == "phong"
+            || aMode == "fragment"
+            || aMode == "frag"
+            || aMode == "pixel")
+      {
+        aView->SetShadingModel (V3d_PHONG);
       }
       else
       {
-        std::cout << "Error: unknown shading model '" << theArgVec[anArgIter] << "'\n";
+        std::cout << "Error: unknown shading model '" << aMode << "'\n";
         return 1;
       }
     }
@@ -10921,39 +10406,6 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
         std::cout << "Error: wrong syntax at argument'" << anArg << "'.\n";
         return 1;
       }
-    }
-    else if (aFlag == "-performancestats"
-          || aFlag == "-performancecounters"
-          || aFlag == "-perfstats"
-          || aFlag == "-perfcounters"
-          || aFlag == "-stats")
-    {
-      if (++anArgIter >= theArgNb)
-      {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
-        return 1;
-      }
-
-      TCollection_AsciiString aFlagsStr (theArgVec[anArgIter]);
-      aFlagsStr.LowerCase();
-      Graphic3d_RenderingParams::PerfCounters aFlags = aView->ChangeRenderingParams().CollectedStats;
-      if (!convertToPerfStatsFlags (aFlagsStr, aFlags))
-      {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
-        return 1;
-      }
-      aView->ChangeRenderingParams().CollectedStats = aFlags;
-      aView->ChangeRenderingParams().ToShowStats = aFlags != Graphic3d_RenderingParams::PerfCounters_NONE;
-    }
-    else if (aFlag == "-perfupdateinterval"
-          || aFlag == "-statsupdateinterval")
-    {
-      if (++anArgIter >= theArgNb)
-      {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
-        return 1;
-      }
-      aView->ChangeRenderingParams().StatsUpdateInterval = (Standard_ShortReal )Draw::Atof (theArgVec[anArgIter]);
     }
     else
     {
@@ -11880,7 +11332,7 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
   const char *group = "ZeViewer";
   theCommands.Add("vinit",
           "vinit [-name viewName] [-left leftPx] [-top topPx] [-width widthPx] [-height heightPx]"
-    "\n\t\t:     [-exitOnClose] [-closeOnEscape] [-cloneActive] [-2d_mode {on|off}=off]"
+    "\n\t\t:     [-exitOnClose] [-closeOnEscape]"
   #if !defined(_WIN32) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX))
     "\n\t\t:     [-display displayName]"
   #endif
@@ -11896,10 +11348,8 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
 #endif
     "\n\t\t:  -left,  -top    pixel position of left top corner of the window."
     "\n\t\t:  -width, -height width and heigth of window respectively."
-    "\n\t\t:  -cloneActive floag to copy camera and dimensions of active view."
     "\n\t\t:  -exitOnClose when specified, closing the view will exit application."
     "\n\t\t:  -closeOnEscape when specified, view will be closed on pressing Escape."
-    "\n\t\t:  -2d_mode when on, view will not react on rotate scene events"
     "\n\t\t: Additional commands for operations with views: vclose, vactivate, vviewlist.",
     __FILE__,VInit,group);
   theCommands.Add("vclose" ,
@@ -12082,7 +11532,6 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
   theCommands.Add("vzlayer",
               "vzlayer [layerId]"
       "\n\t\t:         [-add|-delete|-get|-settings]"
-      "\n\t\t:         [-origin X Y Z] [-cullDist Distance] [-cullSize Size]"
       "\n\t\t:         [-enable|-disable {depthTest|depthWrite|depthClear|depthoffset}]"
       "\n\t\t:         [-enable|-disable {positiveOffset|negativeOffset|textureenv}]"
       "\n\t\t: ZLayer list management:"
@@ -12215,9 +11664,8 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "- 5) any of these selections with shift button pressed",
     __FILE__, VSelect, group);
   theCommands.Add ("vmoveto",
-    "vmoveto [x y] [-reset]"
-    "\n\t\t: Emulates cursor movement to pixel position (x,y)."
-    "\n\t\t:   -reset resets current highlighting",
+    "vmoveto x y"
+    "- emulates cursor movement to pixel postion (x,y)",
     __FILE__, VMoveTo, group);
   theCommands.Add ("vviewparams",
               "vviewparams [-args] [-scale [s]]"
@@ -12235,16 +11683,6 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
       "\n\t\t:                 or changes the size of its maximum dimension"
       "\n\t\t:   -args         prints vviewparams arguments for restoring current view",
     __FILE__, VViewParams, group);
-
-  theCommands.Add("v2dmode",
-    "v2dmode [-name viewName] [-mode {-on|-off}=-on]"
-    "\n\t\t:   name   - name of existing view, if not defined, the active view is changed"
-    "\n\t\t:   mode   - switches On/Off rotation mode"
-    "\n\t\t: Set 2D mode of the active viewer manipulating. The following mouse and key actions are disabled:"
-    "\n\t\t:   - rotation of the view by 3rd mouse button with Ctrl active"
-    "\n\t\t:   - set view projection using key buttons: A/D/T/B/L/R for AXO, Reset, Top, Bottom, Left, Right"
-    "\n\t\t: View camera position might be changed only by commands.",
-    __FILE__, V2DMode, group);
 
   theCommands.Add("vanimation", "Alias for vanim",
     __FILE__, VAnimation, group);
@@ -12394,7 +11832,7 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
   theCommands.Add("vclipplane",
               "vclipplane planeName [{0|1}]"
       "\n\t\t:   [-equation A B C D]"
-      "\n\t\t:   [-set|-unset|-setOverrideGlobal [objects|views]]"
+      "\n\t\t:   [-set|-unset [objects|views]]"
       "\n\t\t:   [-maxPlanes]"
       "\n\t\t:   [-capping {0|1}]"
       "\n\t\t:     [-color R G B] [-hatch {on|off|ID}]"
@@ -12431,26 +11869,25 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
   theCommands.Add("vlight",
     "tool to manage light sources, without arguments shows list of lights."
     "\n    Main commands: "
-    "\n      '-clear' to clear lights"
-    "\n      '-{def}aults' to load deafault lights"
-    "\n      '-add' <type> to add any light source"
+    "\n      'clear' to clear lights"
+    "\n      '{def}aults' to load deafault lights"
+    "\n      'add' (or 'new') <type> to add any light source"
     "\n          where <type> is one of {amb}ient|directional|{spot}light|positional"
     "\n      'change' <lightId> to edit light source with specified lightId"
     "\n\n      In addition to 'add' and 'change' commands you can use light parameters:"
-    "\n        -layer Id"
-    "\n        -{pos}ition X Y Z"
-    "\n        -{dir}ection X Y Z (for directional light or for spotlight)"
-    "\n        -color colorName"
-    "\n        -{head}light 0|1"
-    "\n        -{sm}oothness value"
-    "\n        -{int}ensity value"
-    "\n        -{constAtten}uation value"
-    "\n        -{linearAtten}uation value"
-    "\n        -angle angleDeg"
-    "\n        -{spotexp}onent value"
-    "\n        -local|-global"
-    "\n\n        example: vlight -add positional -head 1 -pos 0 1 1 -color red"
-    "\n        example: vlight -change 0 -direction 0 -1 0 -linearAttenuation 0.2",
+    "\n        {pos}ition X Y Z"
+    "\n        {dir}ection X Y Z (for directional light or for spotlight)"
+    "\n        color colorName"
+    "\n        {head}light 0|1"
+    "\n        {sm}oothness value"
+    "\n        {int}ensity value"
+    "\n        {constAtten}uation value"
+    "\n        {linearAtten}uation value"
+    "\n        angle angleDeg"
+    "\n        {spotexp}onent value"
+    "\n        local|global"
+    "\n\n        example: vlight add positional head 1 pos 0 1 1 color red"
+    "\n        example: vlight change 0 direction 0 -1 0 linearAttenuation 0.2",
     __FILE__, VLight, group);
   theCommands.Add("vraytrace",
             "vraytrace [0|1]"
@@ -12463,8 +11900,6 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "\n      '-raster'                   Disables GPU ray-tracing"
     "\n      '-msaa         0..4'        Specifies number of samples for MSAA"
     "\n      '-oit          off|0.0-1.0' Enables/disables OIT and sets depth weight factor"
-    "\n      '-depthPrePass on|off'      Enables/disables depth pre-pass"
-    "\n      '-alphatocoverage on|off'   Enables/disables alpha to coverage (needs MSAA)"
     "\n      '-rendScale    value        Rendering resolution scale factor"
     "\n      '-rayTrace'                 Enables  GPU ray-tracing"
     "\n      '-rayDepth     0..10'       Defines maximum ray-tracing depth"
@@ -12489,9 +11924,6 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "\n      '-exposure     value'       Exposure value for tone mapping (0.0 value disables the effect)"
     "\n      '-whitepoint   value'       White point value for filmic tone mapping"
     "\n      '-tonemapping  mode'        Tone mapping mode (disabled, filmic)"
-    "\n      '-perfCounters none|fps|cpu|layers|structures|groups|arrays|triagles|points|gpuMem|basic|extended|nofps'"
-    "\n                                  Show/hide performance counters (flags can be combined)"
-    "\n      '-perfUpdateInterval nbSeconds' Performance counters update interval"
     "\n    Unlike vcaps, these parameters dramatically change visual properties."
     "\n    Command is intended to control presentation quality depending on"
     "\n    hardware capabilities and performance.",

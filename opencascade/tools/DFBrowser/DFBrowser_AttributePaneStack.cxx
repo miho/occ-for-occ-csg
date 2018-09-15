@@ -25,15 +25,11 @@
 #include <inspector/DFBrowser_SearchView.hxx>
 #include <inspector/DFBrowser_Window.hxx>
 
-#include <inspector/ViewControl_Tools.hxx>
-
 #include <TDF_Attribute.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QItemSelectionModel>
 #include <QMap>
 #include <QStackedWidget>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : Constructor
@@ -53,9 +49,9 @@ DFBrowser_AttributePaneStack::DFBrowser_AttributePaneStack (QObject* theParent)
 void DFBrowser_AttributePaneStack::CreateWidget (QWidget* theParent)
 {
   myAttributesStack = new QStackedWidget (theParent);
-  ViewControl_Tools::SetWhiteBackground (myAttributesStack);
+  DFBrowser_Window::SetWhiteBackground (myAttributesStack);
   myEmptyWidget = new QWidget (theParent);
-  ViewControl_Tools::SetWhiteBackground (myEmptyWidget);
+  DFBrowser_Window::SetWhiteBackground (myEmptyWidget);
 
   myAttributesStack->addWidget (myEmptyWidget);
 
@@ -89,7 +85,7 @@ void DFBrowser_AttributePaneStack::SetPaneMode (const DFBrowser_AttributePaneTyp
   else
   {
     QItemSelectionModel* aSelectionModel = myModule->GetOCAFViewSelectionModel();
-    QModelIndex anIndex = TreeModel_ModelBase::SingleSelected (aSelectionModel->selectedIndexes(), 0);
+    QModelIndex anIndex = DFBrowser_Window::SingleSelected (aSelectionModel->selectedIndexes(), 0);
     SetCurrentItem (anIndex);
   }
 }

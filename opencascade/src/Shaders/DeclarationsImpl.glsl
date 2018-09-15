@@ -15,24 +15,6 @@
 
 // This file includes implementation of common functions and properties accessors
 
-#if defined(FRAGMENT_SHADER)
-//! Output color (and coverage for accumulation by OIT algorithm).
-void occSetFragColor (in vec4 theColor)
-{
-#if defined(OCC_ALPHA_TEST)
-  if (theColor.a < occAlphaCutoff) discard;
-#endif
-#if defined(OCC_WRITE_WEIGHT_OIT_COVERAGE)
-  float aWeight     = theColor.a * clamp (1e+2 * pow (1.0 - gl_FragCoord.z * occOitDepthFactor, 3.0), 1e-2, 1e+2);
-  occFragCoverage.r = theColor.a * aWeight;
-  occFragColor      = vec4 (theColor.rgb * theColor.a * aWeight, theColor.a);
-#else
-  occFragColor = theColor;
-#endif
-}
-#endif
-
-#if defined(THE_MAX_LIGHTS) && (THE_MAX_LIGHTS > 0)
 // arrays of light sources
 uniform THE_PREC_ENUM ivec2 occLightSourcesTypes[THE_MAX_LIGHTS]; //!< packed light sources types
 uniform               vec4  occLightSources[THE_MAX_LIGHTS * 4];  //!< packed light sources parameters
@@ -48,7 +30,6 @@ float occLight_ConstAttenuation  (in int theId) { return occLightSources[theId *
 float occLight_LinearAttenuation (in int theId) { return occLightSources[theId * 4 + 3].y; }
 float occLight_SpotCutOff        (in int theId) { return occLightSources[theId * 4 + 3].z; }
 float occLight_SpotExponent      (in int theId) { return occLightSources[theId * 4 + 3].w; }
-#endif
 
 // material state
 uniform vec4 occFrontMaterial[5];

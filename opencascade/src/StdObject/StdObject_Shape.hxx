@@ -48,25 +48,23 @@ protected:
   Standard_Integer                     myOrient;
 
   friend StdObjMgt_ReadData& operator >>
-    (StdObjMgt_ReadData&, StdObject_Shape&);
+    (StdObjMgt_ReadData::Object, StdObject_Shape&);
   friend StdObjMgt_WriteData& operator <<
-    (StdObjMgt_WriteData&, const StdObject_Shape&);
+    (StdObjMgt_WriteData::Object, const StdObject_Shape&);
 };
 
 //! Read persistent data from a file.
 inline StdObjMgt_ReadData& operator >>
-  (StdObjMgt_ReadData& theReadData, StdObject_Shape& theShape)
+  (StdObjMgt_ReadData::Object theReadData, StdObject_Shape& theShape)
 {
-  StdObjMgt_ReadData::ObjectSentry aSentry (theReadData);
   theShape.read (theReadData);
   return theReadData;
 }
 
 //! Write persistent data to a file.
 inline StdObjMgt_WriteData& operator <<
-  (StdObjMgt_WriteData& theWriteData, const StdObject_Shape& theShape)
+  (StdObjMgt_WriteData::Object theWriteData, const StdObject_Shape& theShape)
 {
-  StdObjMgt_WriteData::ObjectSentry aSentry (theWriteData);
   theShape.write (theWriteData);
   return theWriteData;
 }

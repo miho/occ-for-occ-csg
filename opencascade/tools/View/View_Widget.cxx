@@ -19,16 +19,11 @@
 
 #include <inspector/View_Widget.hxx>
 
-#include <AIS_Trihedron.hxx>
-#include <Geom_Axis2Placement.hxx>
 #include <Graphic3d_GraphicDriver.hxx>
 #include <Standard_Version.hxx>
-
-#include <inspector/View_ToolButton.hxx>
 #include <inspector/View_ViewActionType.hxx>
 #include <inspector/View_Viewer.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QColorDialog>
 #include <QCursor>
 #include <QFileInfo>
@@ -40,7 +35,6 @@
 #include <QRubberBand>
 #include <QStatusBar>
 #include <QStyleFactory>
-#include <Standard_WarningsRestore.hxx>
 
 #include <stdio.h>
 
@@ -63,16 +57,13 @@
 // function :  Constructor
 // purpose :
 // =======================================================================
-View_Widget::View_Widget (QWidget* theParent, const bool isFitAllActive)
+View_Widget::View_Widget (QWidget* theParent)
 : QWidget (theParent), myCurrentMode (View_CurrentAction3d_Nothing), myFirst (true), myDefaultWidth (-1),
   myDefaultHeight (-1), myViewIsEnabled (true), myXmin (0), myYmin (0), myXmax (0), myYmax (0), myDragButtonDownX (0),
-  myDragButtonDownY (0), myDragMultiButtonDownX (0), myDragMultiButtonDownY (0), myIsRectVisible (false), myRectBand (0),
-  myHasInitProj (Standard_False), myInitVx (0), myInitVy (0), myInitVz (0)
+  myDragButtonDownY (0), myDragMultiButtonDownX (0), myDragMultiButtonDownY (0), myIsRectVisible (false), myRectBand (0)
 {
   myViewer = new View_Viewer (View_Viewer::DefaultColor());
   myViewer->InitStandardViewer();
-
-  myViewer->GetContext()->Display(new AIS_Trihedron (new Geom_Axis2Placement (gp::XOY())), Standard_True);
 
   setAttribute (Qt::WA_PaintOnScreen);
   setAttribute (Qt::WA_NoSystemBackground);
@@ -83,7 +74,6 @@ View_Widget::View_Widget (QWidget* theParent, const bool isFitAllActive)
   setFocusPolicy (Qt::StrongFocus);
 
   initViewActions();
-  ((View_ToolButton*)myFitAllAction)->SetButtonChecked (isFitAllActive);
   initCursors();
 }
 
@@ -124,9 +114,6 @@ void View_Widget::Init()
 
   myViewer->GetView()->SetBackgroundColor (View_Viewer::DefaultColor());
   myViewer->GetView()->MustBeResized();
-
-  if (myHasInitProj)
-    myViewer->GetView()->SetProj (myInitVx, myInitVy, myInitVz);
 }
 
 // =======================================================================
@@ -144,14 +131,13 @@ int View_Widget::GetDisplayMode() const
 // =======================================================================
 void View_Widget::paintEvent (QPaintEvent* /*theEvent*/)
 {
-#if (QT_VERSION < 0x050000 || QT_VERSION >= 0x050700)
+#if QT_VERSION < 0x050000
   if (myFirst)
   {
     Init();
     myFirst = false;
   }
 #endif
-
   if (myViewer->GetView())
     myViewer->GetView()->Redraw();
 }
@@ -162,7 +148,7 @@ void View_Widget::paintEvent (QPaintEvent* /*theEvent*/)
 // =======================================================================
 void View_Widget::resizeEvent (QResizeEvent* /*theEvent*/)
 {
-#if (QT_VERSION > 0x050000 && QT_VERSION < 0x050700)
+#if QT_VERSION > 0x050000
   if (myFirst)
   {
     Init();
@@ -196,20 +182,8 @@ void View_Widget::SetEnabledView (const bool theIsEnabled)
   if (myViewer->GetView())
     myViewer->GetView()->SetBackgroundColor (theIsEnabled ? View_Viewer::DefaultColor()
                                                           : View_Viewer::DisabledColor());
-  for (int anActionId = View_ViewActionType_FitAreaId; anActionId <= View_ViewActionType_DisplayModeId; anActionId++)
+  for (int anActionId = View_ViewActionType_FitAllId; anActionId <= View_ViewActionType_DisplayModeId; anActionId++)
     GetViewAction ((View_ViewActionType)anActionId)->setEnabled (theIsEnabled);
-}
-
-// =======================================================================
-// function : onCheckedStateChanged
-// purpose :
-// =======================================================================
-void View_Widget::onCheckedStateChanged (bool isOn)
-{
-  QWidget* aSentByAction = (QWidget*)sender();
-
-  if (aSentByAction == myFitAllAction)
-    emit checkedStateChanged(View_ViewActionType_FitAllId, isOn);
 }
 
 // =======================================================================
@@ -218,11 +192,11 @@ void View_Widget::onCheckedStateChanged (bool isOn)
 // =======================================================================
 void View_Widget::OnUpdateToggled (bool isOn)
 {
-  QAction* aSentByAction = (QAction*)sender();
+  QAction* sentBy = (QAction*)sender();
 
-  if (aSentByAction == myViewActions[View_ViewActionType_DisplayModeId])
+  if (sentBy == myViewActions[View_ViewActionType_DisplayModeId])
   {
-    aSentByAction->setIcon (isOn ? QIcon (":/icons/view_dm_wireframe.png")
+    sentBy->setIcon (isOn ? QIcon (":/icons/view_dm_wireframe.png")
                           : QIcon (":/icons/view_dm_shading.png"));
     return;
   }
@@ -230,7 +204,7 @@ void View_Widget::OnUpdateToggled (bool isOn)
   if (!isOn)
     return;
 
-  for (int anActionId = View_ViewActionType_FitAreaId; anActionId <= View_ViewActionType_RotationId; anActionId++)
+  for (int anActionId = View_ViewActionType_FitAllId; anActionId <= View_ViewActionType_RotationId; anActionId++)
   {
     QAction* anAction = myViewActions[(View_ViewActionType)anActionId];
     if ((anAction == myViewActions[View_ViewActionType_FitAreaId]) ||
@@ -238,19 +212,19 @@ void View_Widget::OnUpdateToggled (bool isOn)
         (anAction == myViewActions[View_ViewActionType_PanId]) ||
         (anAction == myViewActions[View_ViewActionType_RotationId]))
     {
-      if (anAction && (anAction != aSentByAction))
+      if (anAction && (anAction != sentBy))
       {
         anAction->setChecked (false);
       }
       else
       {
-        if (aSentByAction == myViewActions[View_ViewActionType_FitAreaId])
+        if (sentBy == myViewActions[View_ViewActionType_FitAreaId])
           setActiveCursor (View_CursorMode_HandCursor);
-        else if (aSentByAction == myViewActions[View_ViewActionType_ZoomId])
+        else if (sentBy == myViewActions[View_ViewActionType_ZoomId])
           setActiveCursor (View_CursorMode_ZoomCursor);
-        else if (aSentByAction == myViewActions[View_ViewActionType_PanId])
+        else if (sentBy == myViewActions[View_ViewActionType_PanId])
           setActiveCursor (View_CursorMode_PanCursor);
-        else if (aSentByAction == myViewActions[View_ViewActionType_RotationId])
+        else if (sentBy == myViewActions[View_ViewActionType_RotationId])
           setActiveCursor (View_CursorMode_RotationCursor);
         else
           setActiveCursor (View_CursorMode_DefaultCursor);
@@ -268,11 +242,7 @@ void View_Widget::initViewActions()
   if (!myViewActions.empty())
     return;
 
-  myFitAllAction = new View_ToolButton (this); //!< action for automatic fit all
-  connect (myFitAllAction, SIGNAL (checkedStateChanged(bool)), this, SLOT (onCheckedStateChanged(bool)));
   createAction (View_ViewActionType_FitAllId, ":/icons/view_fitall.png", tr ("Fit All"), SLOT (OnFitAll()));
-  myFitAllAction->setDefaultAction (GetViewAction (View_ViewActionType_FitAllId));
-
   createAction (View_ViewActionType_FitAreaId, ":/icons/view_fitarea.png", tr ("Fit Area"), SLOT (OnFitArea()), true);
   createAction (View_ViewActionType_ZoomId, ":/icons/view_zoom.png", tr ("Zoom"), SLOT (OnZoom()), true);
   createAction (View_ViewActionType_PanId, ":/icons/view_pan.png", tr ("Pan"), SLOT (OnPan()), true);
@@ -656,8 +626,7 @@ void View_Widget::processInputEvent (const Standard_Integer/* theX*/, const Stan
 // =======================================================================
 void View_Widget::processMoveEvent (const Standard_Integer theX, const Standard_Integer theY)
 {
-  if (myViewer->GetView())
-    myViewer->GetContext()->MoveTo (theX, theY, myViewer->GetView(), Standard_True);
+  myViewer->GetContext()->MoveTo (theX, theY, myViewer->GetView(), Standard_True);
 }
 
 // =======================================================================

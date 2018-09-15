@@ -306,6 +306,7 @@
 		<Unit filename="../../../src/GeomAPI/GeomAPI_ExtremaCurveSurface.cxx" />
 		<Unit filename="../../../src/GeomAPI/GeomAPI_ExtremaSurfaceSurface.cxx" />
 		<Unit filename="../../../src/GeomAPI/GeomAPI_IntCS.cxx" />
+		<Unit filename="../../../src/GeomAPI/GeomAPI_IntSS.cxx" />
 		<Unit filename="../../../src/GeomAPI/GeomAPI_Interpolate.cxx" />
 		<Unit filename="../../../src/GeomAPI/GeomAPI_PointsToBSpline.cxx" />
 		<Unit filename="../../../src/GeomAPI/GeomAPI_PointsToBSplineSurface.cxx" />
@@ -419,13 +420,14 @@
 		<Unit filename="../../../src/IntPolyh/IntPolyh_Couple.cxx" />
 		<Unit filename="../../../src/IntPolyh/IntPolyh_Edge.cxx" />
 		<Unit filename="../../../src/IntPolyh/IntPolyh_Intersection.cxx" />
+		<Unit filename="../../../src/IntPolyh/IntPolyh_Intersection_1.cxx" />
 		<Unit filename="../../../src/IntPolyh/IntPolyh_MaillageAffinage.cxx" />
 		<Unit filename="../../../src/IntPolyh/IntPolyh_Point.cxx" />
 		<Unit filename="../../../src/IntPolyh/IntPolyh_SectionLine.cxx" />
 		<Unit filename="../../../src/IntPolyh/IntPolyh_StartPoint.cxx" />
-		<Unit filename="../../../src/IntPolyh/IntPolyh_Tools.cxx" />
 		<Unit filename="../../../src/IntPolyh/IntPolyh_Triangle.cxx" />
 		<Unit filename="../../../src/TopClass/TopClass.cxx" />
+		<Unit filename="../../../src/TopClass/TopClass_Intersection3d.cxx" />
 		<Unit filename="../../../src/TopClass/TopClass_SolidExplorer.cxx" />
 	</Project>
 </CodeBlocks_project_file>

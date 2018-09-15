@@ -29,19 +29,21 @@ vdump $imagedir/${casename}_h_pres.png
 
 # Activate the local selection by edges and hilight small circle edge.
 # It's discretization should coincide with discretization of whole shape hiligting.
-vselmode p -set EDGE 1
+vsetam 2
 vmoveto 130 80
 vdump $imagedir/${casename}_local_h_pres.png
+
+vunsetam
 
 # Explode object on faces
 explode p F
 # Create colored shape: set another color to one face
 vaspects p -subshapes p_3 -setcolor RED
 
-vselmode p -set 0 1
+vsetam 0
 vmoveto 100 100
 vdump $imagedir/${casename}_h_sub_pres.png
 
-vselmode p -set EDGE 1
+vsetam 2
 vmoveto 130 80
 vdump $imagedir/${casename}_local_h_sub_pres.png

@@ -17,9 +17,7 @@
 
 #include <TFunction_Scope.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QVariant>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : GetValues

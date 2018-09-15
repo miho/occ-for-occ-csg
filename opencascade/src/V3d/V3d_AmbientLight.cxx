@@ -13,21 +13,11 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+// Modified     30-03-98 : ZOV ; PRO6774 (reconstruction of the class hierarchy and suppressing useless methods)
+
 #include <V3d_AmbientLight.hxx>
 
-#include <V3d_Viewer.hxx>
-
-IMPLEMENT_STANDARD_RTTIEXT(V3d_AmbientLight, Graphic3d_CLight)
-
-// =======================================================================
-// function : V3d_AmbientLight
-// purpose  :
-// =======================================================================
-V3d_AmbientLight::V3d_AmbientLight (const Quantity_Color& theColor)
-: Graphic3d_CLight (Graphic3d_TOLS_AMBIENT)
-{
-  SetColor (theColor);
-}
+IMPLEMENT_STANDARD_RTTIEXT(V3d_AmbientLight,V3d_Light)
 
 // =======================================================================
 // function : V3d_AmbientLight
@@ -35,11 +25,8 @@ V3d_AmbientLight::V3d_AmbientLight (const Quantity_Color& theColor)
 // =======================================================================
 V3d_AmbientLight::V3d_AmbientLight (const Handle(V3d_Viewer)& theViewer,
                                     const Quantity_Color& theColor)
-: Graphic3d_CLight (Graphic3d_TOLS_AMBIENT)
+: V3d_Light (theViewer)
 {
+  SetType  (V3d_AMBIENT);
   SetColor (theColor);
-  if (!theViewer.IsNull())
-  {
-    theViewer->AddLight (this);
-  }
 }

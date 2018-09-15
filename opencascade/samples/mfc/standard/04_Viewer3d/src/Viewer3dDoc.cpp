@@ -196,7 +196,7 @@ void CViewer3dDoc::OnSphere()
     myAISContext->SetMaterial (mySphere, Graphic3d_NOM_BRONZE, Standard_False);
     myAISContext->SetDisplayMode (mySphere, 1, Standard_False);
 
-    myAISContext->Display (mySphere, Standard_True);
+    myAISContext->Display (mySphere, Standard_False);
     TCollection_AsciiString Message("\
 BRepPrimAPI_MakeSphere S(gp_Pnt(0,300,0), 100.);\n\
     ");
@@ -681,55 +681,55 @@ void  CViewer3dDoc::Popup (const Standard_Integer  x,
 //Set faces selection mode
 void CViewer3dDoc::OnFaces() 
 {
-  myAISContext->Deactivate();
   myAISContext->Activate (AIS_Shape::SelectionMode (TopAbs_FACE));
 
   myCResultDialog.SetTitle("Standard mode: TopAbs_FACE");
-  myCResultDialog.SetText("  myAISContext->Deactivate();\n"
-                          "  myAISContext->Activate (AIS_Shape::SelectionMode (TopAbs_FACE));\n\n");
+  myCResultDialog.SetText("  myAISContext->OpenLocalContext(); \n"
+                                    "  \n"
+                                    "  myAISContext->ActivateStandardMode(TopAbs_FACE); \n"
+                                    "  \n");
   SetTitle (L"Standard mode: TopAbs_FACE");
 }
 
 //Set edges selection mode
 void CViewer3dDoc::OnEdges() 
 {
-  myAISContext->Deactivate();
   myAISContext->Activate (AIS_Shape::SelectionMode (TopAbs_EDGE));
 
   myCResultDialog.SetTitle("Standard mode: TopAbs_EDGE");
-  myCResultDialog.SetText("  myAISContext->Deactivate();\n"
-                          "  myAISContext->Activate (AIS_Shape::SelectionMode (TopAbs_EDGE));\n\n");
+  myCResultDialog.SetText("  myAISContext->OpenLocalContext(); \n"
+                                    "  \n"
+                                    "  myAISContext->ActivateStandardMode(TopAbs_EDGE); \n"
+                                    "  \n");
   SetTitle (L"Standard mode: TopAbs_EDGE");
 }
 
 // Set vertices selection mode
 void CViewer3dDoc::OnVertices() 
 {
-  myAISContext->Deactivate();
   myAISContext->Activate (AIS_Shape::SelectionMode (TopAbs_VERTEX));
 
   myCResultDialog.SetTitle("Standard mode: TopAbs_VERTEX");
-  myCResultDialog.SetText("  myAISContext->Deactivate();\n"
-                          "  myAISContext->Activate (AIS_Shape::SelectionMode (TopAbs_VERTEX));\n\n");
+  myCResultDialog.SetText("  myAISContext->OpenLocalContext(); \n"
+                                    "  \n"
+                                    "  myAISContext->ActivateStandardMode(TopAbs_VERTEX); \n"
+                                    "  \n");
   SetTitle (L"Standard mode: TopAbs_VERTEX");
 }
 
 //Neutral selection mode
 void CViewer3dDoc::OnNeutral() 
 {
-  myAISContext->Deactivate();
-  myAISContext->Activate (0);
-
   myCResultDialog.SetTitle("Standard mode: Neutral");
-  myCResultDialog.SetText("  myAISContext->Deactivate();\n"
-                          "  myAISContext->Activate (0);\n\n");
+  myCResultDialog.SetText("  myAISContext->CloseAllContexts(); \n"
+                                    "  \n");
   SetTitle (L"Standard mode: Neutral");
 }
 
 // Change the color of faces on a user cylinder
 void CViewer3dDoc::OnUsercylinderChangefacecolor() 
 {
-  myAISContext->Activate (myAISContext->SelectedInteractive(), AIS_Shape::SelectionMode (TopAbs_FACE));
+  myAISContext->Activate(myAISContext->SelectedInteractive(), 4);
   myState = FACE_COLOR;
   // see the following of treatment in inputevent
 }

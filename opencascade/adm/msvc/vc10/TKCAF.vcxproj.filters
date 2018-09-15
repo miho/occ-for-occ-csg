@@ -2,16 +2,16 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{386379A0-15A5-1385-025C-C5AD9E0998E2}</UniqueIdentifier>
+      <UniqueIdentifier>{E4F46B06-12ED-18BA-1986-025CFA264EBD}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\TDataXtd">
-      <UniqueIdentifier>{1458F24D-0235-1329-061E-6434CAC5D7B9}</UniqueIdentifier>
+      <UniqueIdentifier>{FB6FE977-085F-17E9-0974-A318B8ABE5B1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\TNaming">
-      <UniqueIdentifier>{D5B72EEE-0D2D-0A15-1360-85D1FD9D49B9}</UniqueIdentifier>
+      <UniqueIdentifier>{74ED4068-05CF-170B-0FAB-2BB8815E3D0A}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\AppStd">
-      <UniqueIdentifier>{532A219F-0F27-14DD-0A9F-DC32D58D590F}</UniqueIdentifier>
+      <UniqueIdentifier>{F9703A83-0DDE-172A-1739-ACFA94773807}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +82,9 @@
       <Filter>Source files\TNaming</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\TNaming\TNaming_NamingTool.cxx">
+      <Filter>Source files\TNaming</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TNaming\TNaming_SameShapeIterator.cxx">
       <Filter>Source files\TNaming</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\TNaming\TNaming_Scope.cxx">

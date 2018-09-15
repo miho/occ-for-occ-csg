@@ -26,16 +26,16 @@ template <class StringClass, typename CharType>
 void StdLPersistent_HString::instance<StringClass, CharType>::Read
   (StdObjMgt_ReadData& theReadData)
 {
-  StdObjMgt_ReadData::ObjectSentry aSentry (theReadData);
+  StdObjMgt_ReadData::Object anObjectData (theReadData);
 
   Standard_Integer aSize;
-  theReadData >> aSize;
+  anObjectData >> aSize;
   myValue = new StringClass (aSize, 0);
 
   for (Standard_Integer i = 1; i <= aSize; i++)
   {
     CharType aChar;
-    theReadData >> aChar;
+    anObjectData >> aChar;
     myValue->SetValue (i, aChar);
   }
 }
@@ -48,15 +48,15 @@ template <class StringClass, typename CharType>
 void StdLPersistent_HString::instance<StringClass, CharType>::Write
   (StdObjMgt_WriteData& theWriteData) const
 {
-  StdObjMgt_WriteData::ObjectSentry aSentry (theWriteData);
+  StdObjMgt_WriteData::Object anObjectData(theWriteData);
 
   Standard_Integer aSize = myValue->Length();
-  theWriteData << aSize;
+  anObjectData << aSize;
 
   for (Standard_Integer i = 1; i <= aSize; i++)
   {
     CharType aChar (0);
-    theWriteData << aChar;
+    anObjectData << aChar;
   }
 }
 

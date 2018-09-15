@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="occ_logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -152,15 +152,13 @@ ccmake d:/occt
 <tr>
 <td>BUILD_MODULE_&lt;MODULE&gt;</td><td>Boolean flag </td><td>Indicates whether the corresponding OCCT module should be built or not. It should be noted that some toolkits of a module can be built even if this module is not checked (this happens if some other modules depend on these toolkits). The main modules and their descriptions can be found in <a class="el" href="user_guides.html">User Guides</a> </td></tr>
 <tr>
-<td>BUILD_LIBRARY_TYPE </td><td>String </td><td>Specifies the type of library to be created. "Shared" libraries are linked dynamically and loaded at runtime. "Static" libraries are archives of object files used when linking other targets. Note that <a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_draw.html">Draw</a> Harness plugin system is incompatible with "Static" builds, and therefore it is disabled for these builds. </td></tr>
+<td>BUILD_LIBRARY_TYPE </td><td>String </td><td>Specifies the type of library to be created. "Shared" libraries are linked dynamically and loaded at runtime. "Static" libraries are archives of object files used when linking other targets </td></tr>
 <tr>
 <td>BUILD_ADDITIONAL_TOOLKITS </td><td>String </td><td>Semicolon-separated individual toolkits to include into build process. If you want to build some particular libraries (toolkits) only, then you may uncheck all modules in the corresponding <em>BUILD_MODUE_&lt;MODULE&gt;</em> options and provide the list of necessary libraries here. Of course, all dependencies will be resolved automatically </td></tr>
 <tr>
-<td>BUILD_YACCLEX </td><td>Boolean flag </td><td>Enables Flex/Bison lexical analyzers. OCCT source files relating to STEP reader and <a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_expr_intrp.html">ExprIntrp</a> functionality are generated automatically with Flex/Bison. Checking this option leads to automatic search of Flex/Bison binaries and regeneration of the mentioned files </td></tr>
+<td>BUILD_YACCLEX </td><td>Boolean flag </td><td>Enables Flex/Bison lexical analyzers. OCCT source files relating to STEP reader and <a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_expr_intrp.html">ExprIntrp</a> functionality are generated automatically with Flex/Bison. Checking this option leads to automatic search of Flex/Bison binaries and regeneration of the mentioned files </td></tr>
 <tr>
-<td>BUILD_SAMPLES_MFC </td><td>Boolean flag </td><td>Indicates whether MFC samples should be built together with OCCT. This option is only relevant to Windows platforms </td></tr>
-<tr>
-<td>BUILD_SAMPLES_QT </td><td>Boolean flag </td><td>Indicates whether QT samples should be built together with OCCT. </td></tr>
+<td>BUILD_MODULE_MfcSamples </td><td>Boolean flag </td><td>Indicates whether MFC samples should be built together with OCCT. This option is only relevant to Windows platforms </td></tr>
 <tr>
 <td>BUILD_Inspector </td><td>Boolean flag </td><td>Indicates whether Inspector should be built together with OCCT. </td></tr>
 <tr>
@@ -281,7 +279,7 @@ win32\vc10\bind -- binary files (installed 3rdparties and occt)
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sat May 26 2018 14:12:06 for Open CASCADE Technology by
+    <li class="footer">Generated on Wed Aug 30 2017 17:08:51 for Open CASCADE Technology by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

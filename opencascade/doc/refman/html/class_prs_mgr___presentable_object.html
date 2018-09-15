@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -141,10 +141,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a0f5b7cb15c272d6a2170597c8f479f9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns information on whether the object accepts display in HLR mode or not.  <a href="#a0f5b7cb15c272d6a2170597c8f479f9b">More...</a><br /></td></tr>
 <tr class="separator:a0f5b7cb15c272d6a2170597c8f479f9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a783ad7386dc7ade1656efd74414d3eba"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___transform_pers.html">Graphic3d_TransformPers</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#a783ad7386dc7ade1656efd74414d3eba">TransformPersistence</a> () const</td></tr>
-<tr class="memdesc:a783ad7386dc7ade1656efd74414d3eba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns Transformation Persistence defining a special Local Coordinate system where this presentable object is located or NULL handle if not defined. Position of the object having Transformation Persistence is mutable and depends on camera position. The same applies to a bounding box of the object.  <a href="#a783ad7386dc7ade1656efd74414d3eba">More...</a><br /></td></tr>
 <tr class="separator:a783ad7386dc7ade1656efd74414d3eba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71c6c328f746e23b5c8abf931bdcf244"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#a71c6c328f746e23b5c8abf931bdcf244">SetTransformPersistence</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___transform_pers.html">Graphic3d_TransformPers</a> &gt; &amp;theTrsfPers)</td></tr>
-<tr class="memdesc:a71c6c328f746e23b5c8abf931bdcf244"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up Transform Persistence defining a special Local Coordinate system where this object should be located. Note that management of Transform Persistence object is more expensive than of the normal one, because it requires its position being recomputed basing on camera position within each draw call / traverse.  <a href="#a71c6c328f746e23b5c8abf931bdcf244">More...</a><br /></td></tr>
+<tr class="memdesc:a71c6c328f746e23b5c8abf931bdcf244"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up Transform Persistence for this object.  <a href="#a71c6c328f746e23b5c8abf931bdcf244">More...</a><br /></td></tr>
 <tr class="separator:a71c6c328f746e23b5c8abf931bdcf244"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a105c4a12e3bd9fc73fe53d23fca3117b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#a105c4a12e3bd9fc73fe53d23fca3117b">Standard_DEPRECATED</a> (&quot;This method is deprecated - <a class="el" href="class_prs_mgr___presentable_object.html#a71c6c328f746e23b5c8abf931bdcf244">SetTransformPersistence</a>() taking <a class="el" href="class_graphic3d___transform_pers.html">Graphic3d_TransformPers</a> should be called instead&quot;) void <a class="el" href="class_prs_mgr___presentable_object.html#a71c6c328f746e23b5c8abf931bdcf244">SetTransformPersistence</a>(const <a class="el" href="_graphic3d___trans_mode_flags_8hxx.html#a6e379524d93a3030779b307e967cb17e">Graphic3d_TransModeFlags</a> theMode</td></tr>
 <tr class="memdesc:a105c4a12e3bd9fc73fe53d23fca3117b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up Transform Persistence Mode for this object. This function used to lock in object position, rotation and / or zooming relative to camera position. Object will be drawn in the origin setted by thePoint parameter (except Graphic3d_TMF_TriedronPers flag.  <a href="#a105c4a12e3bd9fc73fe53d23fca3117b">More...</a><br /></td></tr>
@@ -161,25 +160,25 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a16f1f0e7da4c26c3435c0970263e5489"><td class="mdescLeft">&#160;</td><td class="mdescRight">gives the list of modes which are flagged "to be updated".  <a href="#a16f1f0e7da4c26c3435c0970263e5489">More...</a><br /></td></tr>
 <tr class="separator:a16f1f0e7da4c26c3435c0970263e5489"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a199eeeb9f44ddad6241d20290ecb7af0"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom___transformation.html">Geom_Transformation</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#a199eeeb9f44ddad6241d20290ecb7af0">LocalTransformationGeom</a> () const</td></tr>
-<tr class="memdesc:a199eeeb9f44ddad6241d20290ecb7af0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the local transformation. Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence.  <a href="#a199eeeb9f44ddad6241d20290ecb7af0">More...</a><br /></td></tr>
+<tr class="memdesc:a199eeeb9f44ddad6241d20290ecb7af0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the local transformation.  <a href="#a199eeeb9f44ddad6241d20290ecb7af0">More...</a><br /></td></tr>
 <tr class="separator:a199eeeb9f44ddad6241d20290ecb7af0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16ae4b9891b5ee8aae1907d5784e0411"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#a16ae4b9891b5ee8aae1907d5784e0411">SetLocalTransformation</a> (const <a class="el" href="classgp___trsf.html">gp_Trsf</a> &amp;theTrsf)</td></tr>
-<tr class="memdesc:a16ae4b9891b5ee8aae1907d5784e0411"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets local transformation to theTransformation. Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence.  <a href="#a16ae4b9891b5ee8aae1907d5784e0411">More...</a><br /></td></tr>
+<tr class="memdesc:a16ae4b9891b5ee8aae1907d5784e0411"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets local transformation to theTransformation.  <a href="#a16ae4b9891b5ee8aae1907d5784e0411">More...</a><br /></td></tr>
 <tr class="separator:a16ae4b9891b5ee8aae1907d5784e0411"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21fca73fb09ac8d8912ce999c9ab6ddb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#a21fca73fb09ac8d8912ce999c9ab6ddb">SetLocalTransformation</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom___transformation.html">Geom_Transformation</a> &gt; &amp;theTrsf)</td></tr>
-<tr class="memdesc:a21fca73fb09ac8d8912ce999c9ab6ddb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets local transformation to theTransformation. Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence.  <a href="#a21fca73fb09ac8d8912ce999c9ab6ddb">More...</a><br /></td></tr>
+<tr class="memdesc:a21fca73fb09ac8d8912ce999c9ab6ddb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets local transformation to theTransformation.  <a href="#a21fca73fb09ac8d8912ce999c9ab6ddb">More...</a><br /></td></tr>
 <tr class="separator:a21fca73fb09ac8d8912ce999c9ab6ddb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2f0e9c681fea7545cfe379d7d15bea0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#ab2f0e9c681fea7545cfe379d7d15bea0">HasTransformation</a> () const</td></tr>
 <tr class="memdesc:ab2f0e9c681fea7545cfe379d7d15bea0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if object has a transformation that is different from the identity.  <a href="#ab2f0e9c681fea7545cfe379d7d15bea0">More...</a><br /></td></tr>
 <tr class="separator:ab2f0e9c681fea7545cfe379d7d15bea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14cdb1d795e4ff991f0deff86d74bf89"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom___transformation.html">Geom_Transformation</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#a14cdb1d795e4ff991f0deff86d74bf89">TransformationGeom</a> () const</td></tr>
-<tr class="memdesc:a14cdb1d795e4ff991f0deff86d74bf89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the transformation taking into account transformation of parent object(s). Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence.  <a href="#a14cdb1d795e4ff991f0deff86d74bf89">More...</a><br /></td></tr>
+<tr class="memdesc:a14cdb1d795e4ff991f0deff86d74bf89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the transformation taking into account transformation of parent object(s).  <a href="#a14cdb1d795e4ff991f0deff86d74bf89">More...</a><br /></td></tr>
 <tr class="separator:a14cdb1d795e4ff991f0deff86d74bf89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae069b4b81373c67277dc05760d6e40cd"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classgp___trsf.html">gp_Trsf</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#ae069b4b81373c67277dc05760d6e40cd">LocalTransformation</a> () const</td></tr>
-<tr class="memdesc:ae069b4b81373c67277dc05760d6e40cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the local transformation. Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence.  <a href="#ae069b4b81373c67277dc05760d6e40cd">More...</a><br /></td></tr>
+<tr class="memdesc:ae069b4b81373c67277dc05760d6e40cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the local transformation.  <a href="#ae069b4b81373c67277dc05760d6e40cd">More...</a><br /></td></tr>
 <tr class="separator:ae069b4b81373c67277dc05760d6e40cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f7db1c46558ac19e5444cf4805436d1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classgp___trsf.html">gp_Trsf</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#a8f7db1c46558ac19e5444cf4805436d1">Transformation</a> () const</td></tr>
-<tr class="memdesc:a8f7db1c46558ac19e5444cf4805436d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the transformation taking into account transformation of parent object(s). Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence.  <a href="#a8f7db1c46558ac19e5444cf4805436d1">More...</a><br /></td></tr>
+<tr class="memdesc:a8f7db1c46558ac19e5444cf4805436d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the transformation taking into account transformation of parent object(s).  <a href="#a8f7db1c46558ac19e5444cf4805436d1">More...</a><br /></td></tr>
 <tr class="separator:a8f7db1c46558ac19e5444cf4805436d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acda8b438789ce9cfe5078684730ba797"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classgp___g_trsf.html">gp_GTrsf</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_prs_mgr___presentable_object.html#acda8b438789ce9cfe5078684730ba797">InversedTransformation</a> () const</td></tr>
 <tr class="separator:acda8b438789ce9cfe5078684730ba797"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -618,7 +617,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Calculates the 3D view aPresentation and its updates. The latter are managed by aPresentationManager. aPresentableObject has the display mode aMode; this has the default value of 0, that is, the wireframe display mode. </p>
 
-<p>Reimplemented in <a class="el" href="class_a_i_s___color_scale.html#a9816684bdf1ed3eca8879bffcf1ae137">AIS_ColorScale</a>, <a class="el" href="class_a_i_s___angle_dimension.html#afca9d0da004549ac87c20a67101176b5">AIS_AngleDimension</a>, <a class="el" href="class_a_i_s___manipulator.html#aa4fc3dd283e42b55e467dd6d9cce058c">AIS_Manipulator</a>, <a class="el" href="class_a_i_s___shape.html#afb80823a950643803cbbfef963576777">AIS_Shape</a>, <a class="el" href="class_a_i_s___length_dimension.html#a11d0b1f758175e8fce7a415fe3fe3010">AIS_LengthDimension</a>, <a class="el" href="class_a_i_s___trihedron.html#a7b350d3b659a466770833856b9fde80e">AIS_Trihedron</a>, <a class="el" href="class_a_i_s___textured_shape.html#ae93dadd939dc83bb9bac8772c154ccb3">AIS_TexturedShape</a>, <a class="el" href="class_a_i_s___diameter_dimension.html#a1481499e6a0e61b3e767b5bd85369cce">AIS_DiameterDimension</a>, <a class="el" href="class_a_i_s___radius_dimension.html#a4344716c6979d2dd15bbf02703339903">AIS_RadiusDimension</a>, <a class="el" href="class_a_i_s___rubber_band.html#ab86c297c75c1011c00423cddd053a2d2">AIS_RubberBand</a>, <a class="el" href="class_a_i_s___multiple_connected_interactive.html#af6283635b1bc544fad484d20a13479f9">AIS_MultipleConnectedInteractive</a>, <a class="el" href="class_a_i_s___point_cloud.html#ad5b03b1975f52a58329a1e2f8715edaa">AIS_PointCloud</a>, <a class="el" href="class_a_i_s___connected_interactive.html#ac4904fd27ec6becd95a17ca6b9417ae9">AIS_ConnectedInteractive</a>, <a class="el" href="class_a_i_s___plane_trihedron.html#a91c613997bc49290af29b9fd0b806395">AIS_PlaneTrihedron</a>, <a class="el" href="class_a_i_s___colored_shape.html#a59eea77409159839b0c290b84de391a6">AIS_ColoredShape</a>, <a class="el" href="class_a_i_s___point.html#aad05ca7bbb19eeb6165836a6c40df45d">AIS_Point</a>, <a class="el" href="class_mesh_v_s___mesh.html#afb20423302f24383945ffdf1add47511">MeshVS_Mesh</a>, <a class="el" href="class_x_c_a_f_prs___a_i_s_object.html#a6f50e3c5cdbc14440e7e24260dab764e">XCAFPrs_AISObject</a>, <a class="el" href="class_q_a_bugs___presentable_object.html#a16274dc7a3efacbbc239c3ede7aebb1b">QABugs_PresentableObject</a>, and <a class="el" href="class_std_select___shape.html#ae3a7b507982853a4d7642ac7c7e7f59f">StdSelect_Shape</a>.</p>
+<p>Reimplemented in <a class="el" href="class_a_i_s___color_scale.html#a9816684bdf1ed3eca8879bffcf1ae137">AIS_ColorScale</a>, <a class="el" href="class_a_i_s___angle_dimension.html#afca9d0da004549ac87c20a67101176b5">AIS_AngleDimension</a>, <a class="el" href="class_a_i_s___manipulator.html#aa4fc3dd283e42b55e467dd6d9cce058c">AIS_Manipulator</a>, <a class="el" href="class_a_i_s___shape.html#af12128ad612d2ba1162b7d90244a1c60">AIS_Shape</a>, <a class="el" href="class_a_i_s___length_dimension.html#a11d0b1f758175e8fce7a415fe3fe3010">AIS_LengthDimension</a>, <a class="el" href="class_a_i_s___trihedron.html#a7b350d3b659a466770833856b9fde80e">AIS_Trihedron</a>, <a class="el" href="class_a_i_s___textured_shape.html#ae93dadd939dc83bb9bac8772c154ccb3">AIS_TexturedShape</a>, <a class="el" href="class_a_i_s___diameter_dimension.html#a1481499e6a0e61b3e767b5bd85369cce">AIS_DiameterDimension</a>, <a class="el" href="class_a_i_s___radius_dimension.html#a4344716c6979d2dd15bbf02703339903">AIS_RadiusDimension</a>, <a class="el" href="class_a_i_s___rubber_band.html#ab86c297c75c1011c00423cddd053a2d2">AIS_RubberBand</a>, <a class="el" href="class_a_i_s___multiple_connected_interactive.html#af6283635b1bc544fad484d20a13479f9">AIS_MultipleConnectedInteractive</a>, <a class="el" href="class_a_i_s___point_cloud.html#ad5b03b1975f52a58329a1e2f8715edaa">AIS_PointCloud</a>, <a class="el" href="class_a_i_s___connected_interactive.html#ac4904fd27ec6becd95a17ca6b9417ae9">AIS_ConnectedInteractive</a>, <a class="el" href="class_a_i_s___plane_trihedron.html#a91c613997bc49290af29b9fd0b806395">AIS_PlaneTrihedron</a>, <a class="el" href="class_a_i_s___colored_shape.html#a59eea77409159839b0c290b84de391a6">AIS_ColoredShape</a>, <a class="el" href="class_a_i_s___point.html#aad05ca7bbb19eeb6165836a6c40df45d">AIS_Point</a>, <a class="el" href="class_mesh_v_s___mesh.html#afb20423302f24383945ffdf1add47511">MeshVS_Mesh</a>, <a class="el" href="class_x_c_a_f_prs___a_i_s_object.html#a6f50e3c5cdbc14440e7e24260dab764e">XCAFPrs_AISObject</a>, <a class="el" href="class_q_a_bugs___presentable_object.html#a16274dc7a3efacbbc239c3ede7aebb1b">QABugs_PresentableObject</a>, and <a class="el" href="class_std_select___shape.html#ae3a7b507982853a4d7642ac7c7e7f59f">StdSelect_Shape</a>.</p>
 
 </div>
 </div>
@@ -658,7 +657,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Calculates the 3D view aPresentation and its updates. The latter are managed by aPresentationManager. Each of the views in the viewer and every modification such as rotation, for example, entails recalculation. It must be redefined to implement hidden line removal for the object. The user never calls this method himself. This is done via the InteractiveContext object and is dependent on the point of view from which the object is displayed. </p>
 
-<p>Reimplemented in <a class="el" href="class_a_i_s___shape.html#ac59a7d0ad772bf7d70bc2e42a0c08f64">AIS_Shape</a>, <a class="el" href="class_a_i_s___trihedron.html#a45b65184e4ad7bd05bf6011f702ee040">AIS_Trihedron</a>, <a class="el" href="class_a_i_s___connected_interactive.html#adb3e7bde845469691f80300fa16d1bb2">AIS_ConnectedInteractive</a>, and <a class="el" href="class_a_i_s___multiple_connected_interactive.html#a9b33e1ed75546865fff3f79798f9eb76">AIS_MultipleConnectedInteractive</a>.</p>
+<p>Reimplemented in <a class="el" href="class_a_i_s___shape.html#a493a4fb10245f5828711b02e5f898089">AIS_Shape</a>, <a class="el" href="class_a_i_s___trihedron.html#a45b65184e4ad7bd05bf6011f702ee040">AIS_Trihedron</a>, <a class="el" href="class_a_i_s___connected_interactive.html#adb3e7bde845469691f80300fa16d1bb2">AIS_ConnectedInteractive</a>, and <a class="el" href="class_a_i_s___multiple_connected_interactive.html#a9b33e1ed75546865fff3f79798f9eb76">AIS_MultipleConnectedInteractive</a>.</p>
 
 </div>
 </div>
@@ -704,7 +703,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Calculates the 3D view aPresentation and its updates. The latter are managed by aPresentationManager. A point of view is provided by the projector aProjector, and the geometric transformation which has transformed associated presentable objects is specified by aTrsf. This function is to be used in case where a hidden line removal display cannot be calculated automatically. This occurs when associated presentable objects have been transformed geometrically, but not translated. Warning The transformation aTrsf must be applied to the object before computation. </p>
 
-<p>Reimplemented in <a class="el" href="class_a_i_s___shape.html#acb90fe92274c01eba49c02a48bd9964d">AIS_Shape</a>, <a class="el" href="class_a_i_s___trihedron.html#aaee21053cabc72023aa4a6695669f2cd">AIS_Trihedron</a>, <a class="el" href="class_a_i_s___plane.html#ad4bd685635f59ad224e0cae78cf2b1a4">AIS_Plane</a>, <a class="el" href="class_a_i_s___connected_interactive.html#a9b4065e67974ec72f794db31c832d8ad">AIS_ConnectedInteractive</a>, <a class="el" href="class_a_i_s___fix_relation.html#a1d36190f38e7ae48d36874cfaaee790b">AIS_FixRelation</a>, <a class="el" href="class_a_i_s___axis.html#abbac7d5fd8f5742c4da2b42a390793dd">AIS_Axis</a>, <a class="el" href="class_a_i_s___equal_distance_relation.html#ad64a7936e0a6a4377a0178f58b7b3d62">AIS_EqualDistanceRelation</a>, <a class="el" href="class_a_i_s___plane_trihedron.html#a76baf296c2d000a8f2982a2b33e6acbf">AIS_PlaneTrihedron</a>, <a class="el" href="class_a_i_s___chamf2d_dimension.html#a3db433498f4d7be7205b100553f6be94">AIS_Chamf2dDimension</a>, <a class="el" href="class_a_i_s___symmetric_relation.html#ac53f768d770f1fa86e58d851d1303372">AIS_SymmetricRelation</a>, <a class="el" href="class_a_i_s___tangent_relation.html#a572b7159c3905f1b2c0c65907a61fd48">AIS_TangentRelation</a>, <a class="el" href="class_a_i_s___chamf3d_dimension.html#a1868a0a3ed5537eeb6e0b43e05e7b97e">AIS_Chamf3dDimension</a>, <a class="el" href="class_a_i_s___identic_relation.html#a089db92e7f915418d03e2febf625a603">AIS_IdenticRelation</a>, <a class="el" href="class_a_i_s___parallel_relation.html#a28d0f76521de5cadf055c474a8d89997">AIS_ParallelRelation</a>, <a class="el" href="class_a_i_s___perpendicular_relation.html#a040026acd371bbad0cd008b5ff8a4416">AIS_PerpendicularRelation</a>, <a class="el" href="class_a_i_s___max_radius_dimension.html#a405d2c70689d801a0c345b3cfb7f3b05">AIS_MaxRadiusDimension</a>, <a class="el" href="class_a_i_s___multiple_connected_interactive.html#ac12798ae11d6f06e3f758f8235f2a0ec">AIS_MultipleConnectedInteractive</a>, <a class="el" href="class_a_i_s___offset_dimension.html#a4cf0b37a3478308da4850875b2739bfe">AIS_OffsetDimension</a>, <a class="el" href="class_a_i_s___concentric_relation.html#a113eaf3eb8085abf87c88bc9d693c5cb">AIS_ConcentricRelation</a>, <a class="el" href="class_a_i_s___min_radius_dimension.html#aae1fd737965a9388254961fcf6288cb1">AIS_MinRadiusDimension</a>, <a class="el" href="class_a_i_s___mid_point_relation.html#ae6db50a37c69ac5666807ee15b660895">AIS_MidPointRelation</a>, <a class="el" href="class_a_i_s___point.html#a620f6c63f2e5a2b7f745495c2c5f5d09">AIS_Point</a>, <a class="el" href="class_a_i_s___equal_radius_relation.html#aaa5844a92181c2a797c5a1dcb2cd215c">AIS_EqualRadiusRelation</a>, <a class="el" href="class_std_select___shape.html#afd0f0c2670ecbeb35124d1edf6caa3e7">StdSelect_Shape</a>, <a class="el" href="class_a_i_s___circle.html#a1e1baf15bfe08b268fd19ca01fc27570">AIS_Circle</a>, and <a class="el" href="class_a_i_s___line.html#a76cded065641526c20debf70ab3a4681">AIS_Line</a>.</p>
+<p>Reimplemented in <a class="el" href="class_a_i_s___shape.html#a7d28b33338b1630165fa49f61d84636e">AIS_Shape</a>, <a class="el" href="class_a_i_s___trihedron.html#aaee21053cabc72023aa4a6695669f2cd">AIS_Trihedron</a>, <a class="el" href="class_a_i_s___plane.html#ad4bd685635f59ad224e0cae78cf2b1a4">AIS_Plane</a>, <a class="el" href="class_a_i_s___connected_interactive.html#a9b4065e67974ec72f794db31c832d8ad">AIS_ConnectedInteractive</a>, <a class="el" href="class_a_i_s___fix_relation.html#a1d36190f38e7ae48d36874cfaaee790b">AIS_FixRelation</a>, <a class="el" href="class_a_i_s___axis.html#abbac7d5fd8f5742c4da2b42a390793dd">AIS_Axis</a>, <a class="el" href="class_a_i_s___equal_distance_relation.html#ad64a7936e0a6a4377a0178f58b7b3d62">AIS_EqualDistanceRelation</a>, <a class="el" href="class_a_i_s___plane_trihedron.html#a76baf296c2d000a8f2982a2b33e6acbf">AIS_PlaneTrihedron</a>, <a class="el" href="class_a_i_s___chamf2d_dimension.html#a3db433498f4d7be7205b100553f6be94">AIS_Chamf2dDimension</a>, <a class="el" href="class_a_i_s___symmetric_relation.html#ac53f768d770f1fa86e58d851d1303372">AIS_SymmetricRelation</a>, <a class="el" href="class_a_i_s___tangent_relation.html#a572b7159c3905f1b2c0c65907a61fd48">AIS_TangentRelation</a>, <a class="el" href="class_a_i_s___chamf3d_dimension.html#a1868a0a3ed5537eeb6e0b43e05e7b97e">AIS_Chamf3dDimension</a>, <a class="el" href="class_a_i_s___identic_relation.html#a089db92e7f915418d03e2febf625a603">AIS_IdenticRelation</a>, <a class="el" href="class_a_i_s___parallel_relation.html#a28d0f76521de5cadf055c474a8d89997">AIS_ParallelRelation</a>, <a class="el" href="class_a_i_s___perpendicular_relation.html#a040026acd371bbad0cd008b5ff8a4416">AIS_PerpendicularRelation</a>, <a class="el" href="class_a_i_s___max_radius_dimension.html#a405d2c70689d801a0c345b3cfb7f3b05">AIS_MaxRadiusDimension</a>, <a class="el" href="class_a_i_s___multiple_connected_interactive.html#ac12798ae11d6f06e3f758f8235f2a0ec">AIS_MultipleConnectedInteractive</a>, <a class="el" href="class_a_i_s___offset_dimension.html#a4cf0b37a3478308da4850875b2739bfe">AIS_OffsetDimension</a>, <a class="el" href="class_a_i_s___concentric_relation.html#a113eaf3eb8085abf87c88bc9d693c5cb">AIS_ConcentricRelation</a>, <a class="el" href="class_a_i_s___min_radius_dimension.html#aae1fd737965a9388254961fcf6288cb1">AIS_MinRadiusDimension</a>, <a class="el" href="class_a_i_s___mid_point_relation.html#ae6db50a37c69ac5666807ee15b660895">AIS_MidPointRelation</a>, <a class="el" href="class_a_i_s___point.html#a620f6c63f2e5a2b7f745495c2c5f5d09">AIS_Point</a>, <a class="el" href="class_a_i_s___equal_radius_relation.html#aaa5844a92181c2a797c5a1dcb2cd215c">AIS_EqualRadiusRelation</a>, <a class="el" href="class_std_select___shape.html#afd0f0c2670ecbeb35124d1edf6caa3e7">StdSelect_Shape</a>, <a class="el" href="class_a_i_s___circle.html#a1e1baf15bfe08b268fd19ca01fc27570">AIS_Circle</a>, and <a class="el" href="class_a_i_s___line.html#a76cded065641526c20debf70ab3a4681">AIS_Line</a>.</p>
 
 </div>
 </div>
@@ -935,7 +934,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Return the local transformation. Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence. </p>
+<p>Return the local transformation. </p>
 
 </div>
 </div>
@@ -962,7 +961,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Return the local transformation. Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence. </p>
+<p>Return the local transformation. </p>
 
 </div>
 </div>
@@ -1273,7 +1272,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Sets local transformation to theTransformation. Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence. </p>
+<p>Sets local transformation to theTransformation. </p>
 
 </div>
 </div>
@@ -1301,7 +1300,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Sets local transformation to theTransformation. Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence. </p>
+<p>Sets local transformation to theTransformation. </p>
 
 </div>
 </div>
@@ -1426,8 +1425,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Sets up Transform Persistence defining a special Local Coordinate system where this object should be located. Note that management of Transform Persistence object is more expensive than of the normal one, because it requires its position being recomputed basing on camera position within each draw call / traverse. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_graphic3d___transform_pers.html" title="Transformation Persistence definition. ">Graphic3d_TransformPers</a> class description </dd></dl>
+<p>Sets up Transform Persistence for this object. </p>
 
 <p>Reimplemented in <a class="el" href="class_a_i_s___manipulator.html#a58160cf1935f5ec26f567ce4f842a638">AIS_Manipulator</a>.</p>
 
@@ -1584,7 +1582,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Return the transformation taking into account transformation of parent object(s). Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence. </p>
+<p>Return the transformation taking into account transformation of parent object(s). </p>
 
 </div>
 </div>
@@ -1611,7 +1609,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Return the transformation taking into account transformation of parent object(s). Note that the local transformation of the object having Transformation Persistence is applied within Local Coordinate system defined by this Persistence. </p>
+<p>Return the transformation taking into account transformation of parent object(s). </p>
 
 </div>
 </div>
@@ -1637,9 +1635,7 @@ Additional Inherited Members</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns Transformation Persistence defining a special Local Coordinate system where this presentable object is located or NULL handle if not defined. Position of the object having Transformation Persistence is mutable and depends on camera position. The same applies to a bounding box of the object. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_graphic3d___transform_pers.html" title="Transformation Persistence definition. ">Graphic3d_TransformPers</a> class description </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>transform persistence of the presentable object. </dd></dl>
 
 </div>
 </div>

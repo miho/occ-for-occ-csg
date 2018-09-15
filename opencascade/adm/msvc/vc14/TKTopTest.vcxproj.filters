@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{148F3B0C-037B-16E5-1569-29DD096EA486}</UniqueIdentifier>
+      <UniqueIdentifier>{67CA6491-08A5-17CD-1264-C37701BA1F91}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BRepTest">
-      <UniqueIdentifier>{F38B6344-12C7-0780-08F8-041065D08FD3}</UniqueIdentifier>
+      <UniqueIdentifier>{6E764C61-150E-1441-01E3-8A4897A3F2EB}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\GeometryTest">
-      <UniqueIdentifier>{92A10C08-137A-06A9-14B5-B7DE0952322A}</UniqueIdentifier>
+      <UniqueIdentifier>{A14B2624-08E1-189D-0804-E4068A6974F2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\HLRTest">
-      <UniqueIdentifier>{5B7B282F-0A42-13D7-0818-0F6ACF2D7CB1}</UniqueIdentifier>
+      <UniqueIdentifier>{7CF0E87A-026A-0809-0E6B-4A0C57705731}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\MeshTest">
-      <UniqueIdentifier>{555C0BE0-121A-1892-0B8D-3A22F1CC2D92}</UniqueIdentifier>
+      <UniqueIdentifier>{6C6F6CF0-0608-0CF0-091A-BD7ECBCF81EB}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\GeomliteTest">
-      <UniqueIdentifier>{C3D0C12B-11FF-16DD-16C7-AB10A3D1631D}</UniqueIdentifier>
+      <UniqueIdentifier>{5A7DAB1F-05E3-1226-07CA-18ECF26C4070}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\DrawFairCurve">
-      <UniqueIdentifier>{C2457375-1672-0554-1376-36AB3421FDB3}</UniqueIdentifier>
+      <UniqueIdentifier>{FAA97E28-0BD2-0706-13D7-BE740FB5AB1F}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BOPTest">
-      <UniqueIdentifier>{972CCBDF-1210-1761-03DE-90204D38DA80}</UniqueIdentifier>
+      <UniqueIdentifier>{F58F7609-0EA3-0976-08AF-E16AF234626D}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\SWDRAW">
-      <UniqueIdentifier>{9148B3A3-0F6C-0EF3-0570-76BD13775FF9}</UniqueIdentifier>
+      <UniqueIdentifier>{2A1810D9-1820-0D71-164C-54CEF6DF8808}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -48,9 +48,6 @@
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_DraftAngleCommands.cxx">
       <Filter>Source files\BRepTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\BRepTest\BRepTest_DrawableHistory.cxx">
-      <Filter>Source files\BRepTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_ExtremaCommands.cxx">
       <Filter>Source files\BRepTest</Filter>
     </ClCompile>
@@ -69,13 +66,7 @@
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_GPropCommands.cxx">
       <Filter>Source files\BRepTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\BRepTest\BRepTest_HistoryCommands.cxx">
-      <Filter>Source files\BRepTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_MatCommands.cxx">
-      <Filter>Source files\BRepTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\BRepTest\BRepTest_Objects.cxx">
       <Filter>Source files\BRepTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_OtherCommands.cxx">
@@ -210,6 +201,9 @@
     <ClCompile Include="..\..\..\src\BOPTest\BOPTest_DrawableShape.cxx">
       <Filter>Source files\BOPTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\BOPTest\BOPTest_HistoryCommands.cxx">
+      <Filter>Source files\BOPTest</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\BOPTest\BOPTest_LowCommands.cxx">
       <Filter>Source files\BOPTest</Filter>
     </ClCompile>
@@ -223,9 +217,6 @@
       <Filter>Source files\BOPTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPTest\BOPTest_PartitionCommands.cxx">
-      <Filter>Source files\BOPTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\BOPTest\BOPTest_RemoveFeaturesCommands.cxx">
       <Filter>Source files\BOPTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPTest\BOPTest_TolerCommands.cxx">

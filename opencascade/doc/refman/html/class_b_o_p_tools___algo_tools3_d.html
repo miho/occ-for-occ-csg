@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -97,16 +97,16 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a53a590daa1fd7d7b7f5cd91577c8d069"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a53a590daa1fd7d7b7f5cd91577c8d069">GetNormalToSurface</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom___surface.html">Geom_Surface</a> &gt; &amp;aS, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> U, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> V, <a class="el" href="classgp___dir.html">gp_Dir</a> &amp;aD)</td></tr>
 <tr class="memdesc:a53a590daa1fd7d7b7f5cd91577c8d069"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute normal &lt;aD&gt; to surface &lt;aS&gt; in point (U,V) Returns TRUE if directions aD1U, aD1V coincide.  <a href="#a53a590daa1fd7d7b7f5cd91577c8d069">More...</a><br /></td></tr>
 <tr class="separator:a53a590daa1fd7d7b7f5cd91577c8d069"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7a17a56b15c669d02db76b916cf3474"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#ac7a17a56b15c669d02db76b916cf3474">GetApproxNormalToFaceOnEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aT, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aPx, <a class="el" href="classgp___dir.html">gp_Dir</a> &amp;aD, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
-<tr class="memdesc:ac7a17a56b15c669d02db76b916cf3474"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes normal to the face &lt;aF&gt; for the 3D-point that belongs to the edge &lt;aE&gt; at parameter &lt;aT&gt;.<br />
+<tr class="memitem:ad8af0927c4062b3e0301097d9c6ab57f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#ad8af0927c4062b3e0301097d9c6ab57f">GetApproxNormalToFaceOnEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aT, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aPx, <a class="el" href="classgp___dir.html">gp_Dir</a> &amp;aD, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
+<tr class="memdesc:ad8af0927c4062b3e0301097d9c6ab57f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes normal to the face &lt;aF&gt; for the 3D-point that belongs to the edge &lt;aE&gt; at parameter &lt;aT&gt;.<br />
  Output:<br />
  aPx - the 3D-point where the normal computed<br />
  aD - the normal;<br />
  Warning:<br />
  The normal is computed not exactly in the point on the edge, but in point that is near to the edge towards to the face material (so, we'll have approx. normal);<br />
  The point is computed using PointNearEdge function, with the shifting value <a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a0ce82b7a8bc0ee2c3e81d09f232e2e59" title="Returns simple step value that is used in 2D-computations = 1.e-5. ">BOPTools_AlgoTools3D::MinStepIn2d()</a>, from the edge, but if this value is too big, the point will be computed using Hatcher (PointInFace function).<br />
- Returns TRUE in case of success.  <a href="#ac7a17a56b15c669d02db76b916cf3474">More...</a><br /></td></tr>
-<tr class="separator:ac7a17a56b15c669d02db76b916cf3474"><td class="memSeparator" colspan="2">&#160;</td></tr>
+ Returns TRUE in case of success.  <a href="#ad8af0927c4062b3e0301097d9c6ab57f">More...</a><br /></td></tr>
+<tr class="separator:ad8af0927c4062b3e0301097d9c6ab57f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26e7f5e09392da28fcda2925b5ac691d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a26e7f5e09392da28fcda2925b5ac691d">GetApproxNormalToFaceOnEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aT, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aP, <a class="el" href="classgp___dir.html">gp_Dir</a> &amp;aDNF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aDt2D)</td></tr>
 <tr class="memdesc:a26e7f5e09392da28fcda2925b5ac691d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes normal to the face &lt;aF&gt; for the 3D-point that belongs to the edge &lt;aE&gt; at parameter &lt;aT&gt;.<br />
  Output:<br />
@@ -118,46 +118,46 @@ Static Public Member Functions</h2></td></tr>
  No checks on this value will be done.<br />
  Returns TRUE in case of success.  <a href="#a26e7f5e09392da28fcda2925b5ac691d">More...</a><br /></td></tr>
 <tr class="separator:a26e7f5e09392da28fcda2925b5ac691d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14032f686e543a0a51ae93d7c6f64518"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a14032f686e543a0a51ae93d7c6f64518">GetApproxNormalToFaceOnEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aT, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aDt2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aP, <a class="el" href="classgp___dir.html">gp_Dir</a> &amp;aDNF, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
-<tr class="memdesc:a14032f686e543a0a51ae93d7c6f64518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes normal to the face &lt;aF&gt; for the 3D-point that belongs to the edge &lt;aE&gt; at parameter &lt;aT&gt;.<br />
+<tr class="memitem:adfc1102282b132a1bf6478bda33acb51"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#adfc1102282b132a1bf6478bda33acb51">GetApproxNormalToFaceOnEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aT, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aDt2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aP, <a class="el" href="classgp___dir.html">gp_Dir</a> &amp;aDNF, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
+<tr class="memdesc:adfc1102282b132a1bf6478bda33acb51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes normal to the face &lt;aF&gt; for the 3D-point that belongs to the edge &lt;aE&gt; at parameter &lt;aT&gt;.<br />
  Output:<br />
  aPx - the 3D-point where the normal computed<br />
  aD - the normal;<br />
  Warning:<br />
  The normal is computed not exactly in the point on the edge, but in point that is near to the edge towards to the face material (so, we'll have approx. normal);<br />
  The point is computed using PointNearEdge function with the shifting value &lt;aDt2D&gt; from the edge, but if this value is too big the point will be computed using Hatcher (PointInFace function).<br />
- Returns TRUE in case of success.  <a href="#a14032f686e543a0a51ae93d7c6f64518">More...</a><br /></td></tr>
-<tr class="separator:a14032f686e543a0a51ae93d7c6f64518"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadfbba81cecf33d882795fbc574846a5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#aadfbba81cecf33d882795fbc574846a5">PointNearEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aT, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aDt2D, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;aP2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aPx, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
-<tr class="memdesc:aadfbba81cecf33d882795fbc574846a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the point &lt;aPx&gt;, (&lt;aP2D&gt;) that is near to the edge &lt;aE&gt; at parameter &lt;aT&gt; towards to the material of the face &lt;aF&gt;. The value of shifting in 2D is &lt;aDt2D&gt;<br />
+ Returns TRUE in case of success.  <a href="#adfc1102282b132a1bf6478bda33acb51">More...</a><br /></td></tr>
+<tr class="separator:adfc1102282b132a1bf6478bda33acb51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a689018b21e0aef378041087555329bbe"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a689018b21e0aef378041087555329bbe">PointNearEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aT, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aDt2D, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;aP2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aPx, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
+<tr class="memdesc:a689018b21e0aef378041087555329bbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the point &lt;aPx&gt;, (&lt;aP2D&gt;) that is near to the edge &lt;aE&gt; at parameter &lt;aT&gt; towards to the material of the face &lt;aF&gt;. The value of shifting in 2D is &lt;aDt2D&gt;<br />
  If the value of shifting is too big the point will be computed using Hatcher (PointInFace function).<br />
  Returns error status:<br />
  0 - in case of success;<br />
  1 - &lt;aE&gt; does not have 2d curve on the face &lt;aF&gt;;<br />
- 2 - the computed point is out of the face.  <a href="#aadfbba81cecf33d882795fbc574846a5">More...</a><br /></td></tr>
-<tr class="separator:aadfbba81cecf33d882795fbc574846a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+ 2 - the computed point is out of the face.  <a href="#a689018b21e0aef378041087555329bbe">More...</a><br /></td></tr>
+<tr class="separator:a689018b21e0aef378041087555329bbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f8252121599aac92fd8fba0cfe1f8b1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a5f8252121599aac92fd8fba0cfe1f8b1">PointNearEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aT, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aDt2D, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;aP2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aPx)</td></tr>
 <tr class="memdesc:a5f8252121599aac92fd8fba0cfe1f8b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the point &lt;aPx&gt;, (&lt;aP2D&gt;) that is near to the edge &lt;aE&gt; at parameter &lt;aT&gt; towards to the material of the face &lt;aF&gt;. The value of shifting in 2D is &lt;aDt2D&gt;. No checks on this value will be done.<br />
  Returns error status:<br />
  0 - in case of success;<br />
  1 - &lt;aE&gt; does not have 2d curve on the face &lt;aF&gt;.  <a href="#a5f8252121599aac92fd8fba0cfe1f8b1">More...</a><br /></td></tr>
 <tr class="separator:a5f8252121599aac92fd8fba0cfe1f8b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6292a41812a84550ce496a60e9ed191"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#ab6292a41812a84550ce496a60e9ed191">PointNearEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aT, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;aP2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aPx, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
-<tr class="memdesc:ab6292a41812a84550ce496a60e9ed191"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the point &lt;aPx&gt;, (&lt;aP2D&gt;) that is near to the edge &lt;aE&gt; at parameter &lt;aT&gt; towards to the material of the face &lt;aF&gt;. The value of shifting in 2D is dt2D=<a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a0ce82b7a8bc0ee2c3e81d09f232e2e59" title="Returns simple step value that is used in 2D-computations = 1.e-5. ">BOPTools_AlgoTools3D::MinStepIn2d()</a><br />
+<tr class="memitem:a2ed25bfc173a0bb3d5653decf5628efd"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a2ed25bfc173a0bb3d5653decf5628efd">PointNearEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> aT, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;aP2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aPx, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
+<tr class="memdesc:a2ed25bfc173a0bb3d5653decf5628efd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the point &lt;aPx&gt;, (&lt;aP2D&gt;) that is near to the edge &lt;aE&gt; at parameter &lt;aT&gt; towards to the material of the face &lt;aF&gt;. The value of shifting in 2D is dt2D=<a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a0ce82b7a8bc0ee2c3e81d09f232e2e59" title="Returns simple step value that is used in 2D-computations = 1.e-5. ">BOPTools_AlgoTools3D::MinStepIn2d()</a><br />
  If the value of shifting is too big the point will be computed using Hatcher (PointInFace function).<br />
  Returns error status:<br />
  0 - in case of success;<br />
  1 - &lt;aE&gt; does not have 2d curve on the face &lt;aF&gt;;<br />
- 2 - the computed point is out of the face.  <a href="#ab6292a41812a84550ce496a60e9ed191">More...</a><br /></td></tr>
-<tr class="separator:ab6292a41812a84550ce496a60e9ed191"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae98ac98921c3f030be5c4831809bb74f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#ae98ac98921c3f030be5c4831809bb74f">PointNearEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;aP2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aPx, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
-<tr class="memdesc:ae98ac98921c3f030be5c4831809bb74f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the point &lt;aPx&gt;, (&lt;aP2D&gt;) that is near to the edge &lt;aE&gt; at arbitrary parameter towards to the material of the face &lt;aF&gt;. The value of shifting in 2D is dt2D=<a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a0ce82b7a8bc0ee2c3e81d09f232e2e59" title="Returns simple step value that is used in 2D-computations = 1.e-5. ">BOPTools_AlgoTools3D::MinStepIn2d()</a>.<br />
+ 2 - the computed point is out of the face.  <a href="#a2ed25bfc173a0bb3d5653decf5628efd">More...</a><br /></td></tr>
+<tr class="separator:a2ed25bfc173a0bb3d5653decf5628efd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a058e98f9eb5612dcf2483f2417f2bdc1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a058e98f9eb5612dcf2483f2417f2bdc1">PointNearEdge</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;aP2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;aPx, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
+<tr class="memdesc:a058e98f9eb5612dcf2483f2417f2bdc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the point &lt;aPx&gt;, (&lt;aP2D&gt;) that is near to the edge &lt;aE&gt; at arbitrary parameter towards to the material of the face &lt;aF&gt;. The value of shifting in 2D is dt2D=<a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a0ce82b7a8bc0ee2c3e81d09f232e2e59" title="Returns simple step value that is used in 2D-computations = 1.e-5. ">BOPTools_AlgoTools3D::MinStepIn2d()</a>.<br />
  If the value of shifting is too big the point will be computed using Hatcher (PointInFace function).<br />
  Returns error status:<br />
  0 - in case of success;<br />
  1 - &lt;aE&gt; does not have 2d curve on the face &lt;aF&gt;;<br />
- 2 - the computed point is out of the face.  <a href="#ae98ac98921c3f030be5c4831809bb74f">More...</a><br /></td></tr>
-<tr class="separator:ae98ac98921c3f030be5c4831809bb74f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+ 2 - the computed point is out of the face.  <a href="#a058e98f9eb5612dcf2483f2417f2bdc1">More...</a><br /></td></tr>
+<tr class="separator:a058e98f9eb5612dcf2483f2417f2bdc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ce82b7a8bc0ee2c3e81d09f232e2e59"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a0ce82b7a8bc0ee2c3e81d09f232e2e59">MinStepIn2d</a> ()</td></tr>
 <tr class="memdesc:a0ce82b7a8bc0ee2c3e81d09f232e2e59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns simple step value that is used in 2D-computations = 1.e-5.  <a href="#a0ce82b7a8bc0ee2c3e81d09f232e2e59">More...</a><br /></td></tr>
 <tr class="separator:a0ce82b7a8bc0ee2c3e81d09f232e2e59"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -167,20 +167,20 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a4117a5cbb88881481423a9093145546a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a4117a5cbb88881481423a9093145546a">OrientEdgeOnFace</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aER)</td></tr>
 <tr class="memdesc:a4117a5cbb88881481423a9093145546a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the edge &lt;aER&gt; from the face &lt;aF&gt; that is the same as the edge &lt;aE&gt;  <a href="#a4117a5cbb88881481423a9093145546a">More...</a><br /></td></tr>
 <tr class="separator:a4117a5cbb88881481423a9093145546a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70d77ef256f521e6a33f9bb21dea87b6"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a70d77ef256f521e6a33f9bb21dea87b6">PointInFace</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;theP, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;theP2D, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
-<tr class="memdesc:a70d77ef256f521e6a33f9bb21dea87b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes arbitrary point &lt;theP&gt; inside the face &lt;theF&gt;.<br />
+<tr class="memitem:ab765c207bfc971090facfb7b4be8c1b8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#ab765c207bfc971090facfb7b4be8c1b8">PointInFace</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;theP, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;theP2D, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
+<tr class="memdesc:ab765c207bfc971090facfb7b4be8c1b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes arbitrary point &lt;theP&gt; inside the face &lt;theF&gt;.<br />
  &lt;theP2D&gt; - 2D representation of &lt;theP&gt; on the surface of &lt;theF&gt;<br />
- Returns 0 in case of success.  <a href="#a70d77ef256f521e6a33f9bb21dea87b6">More...</a><br /></td></tr>
-<tr class="separator:a70d77ef256f521e6a33f9bb21dea87b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b3a5ace07466fcefe4cc711e353573b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a4b3a5ace07466fcefe4cc711e353573b">PointInFace</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theE, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theT, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theDt2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;theP, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;theP2D, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
-<tr class="memdesc:a4b3a5ace07466fcefe4cc711e353573b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a point &lt;theP&gt; inside the face &lt;theF&gt; using starting point taken by the parameter &lt;theT&gt; from the 2d curve of the edge &lt;theE&gt; on the face &lt;theF&gt; in the direction perpendicular to the tangent vector of the 2d curve of the edge.<br />
+ Returns 0 in case of success.  <a href="#ab765c207bfc971090facfb7b4be8c1b8">More...</a><br /></td></tr>
+<tr class="separator:ab765c207bfc971090facfb7b4be8c1b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29fbf912408970af79ef81f664c3f67e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a29fbf912408970af79ef81f664c3f67e">PointInFace</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theE, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theT, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theDt2D, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;theP, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;theP2D, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext)</td></tr>
+<tr class="memdesc:a29fbf912408970af79ef81f664c3f67e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a point &lt;theP&gt; inside the face &lt;theF&gt; using starting point taken by the parameter &lt;theT&gt; from the 2d curve of the edge &lt;theE&gt; on the face &lt;theF&gt; in the direction perpendicular to the tangent vector of the 2d curve of the edge.<br />
  The point will be distanced on &lt;theDt2D&gt; from the 2d curve. &lt;theP2D&gt; - 2D representation of &lt;theP&gt; on the surface of &lt;theF&gt;<br />
- Returns 0 in case of success.  <a href="#a4b3a5ace07466fcefe4cc711e353573b">More...</a><br /></td></tr>
-<tr class="separator:a4b3a5ace07466fcefe4cc711e353573b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fac881ef8dc92c8c19f84288fe7c372"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#a5fac881ef8dc92c8c19f84288fe7c372">PointInFace</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt; &amp;theL, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;theP, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;theP2D, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theDt2D=0.0)</td></tr>
-<tr class="memdesc:a5fac881ef8dc92c8c19f84288fe7c372"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a point &lt;theP&gt; inside the face &lt;theF&gt; using the line &lt;theL&gt; so that 2D point &lt;theP2D&gt;, 2D representation of &lt;theP&gt; on the surface of &lt;theF&gt;, lies on that line.<br />
- Returns 0 in case of success.  <a href="#a5fac881ef8dc92c8c19f84288fe7c372">More...</a><br /></td></tr>
-<tr class="separator:a5fac881ef8dc92c8c19f84288fe7c372"><td class="memSeparator" colspan="2">&#160;</td></tr>
+ Returns 0 in case of success.  <a href="#a29fbf912408970af79ef81f664c3f67e">More...</a><br /></td></tr>
+<tr class="separator:a29fbf912408970af79ef81f664c3f67e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa381a7bc02ac67ee4a7bd11ae3122595"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools3_d.html#aa381a7bc02ac67ee4a7bd11ae3122595">PointInFace</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt; &amp;theL, <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;theP, <a class="el" href="classgp___pnt2d.html">gp_Pnt2d</a> &amp;theP2D, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theDt2D=0.0)</td></tr>
+<tr class="memdesc:aa381a7bc02ac67ee4a7bd11ae3122595"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a point &lt;theP&gt; inside the face &lt;theF&gt; using the line &lt;theL&gt; so that 2D point &lt;theP2D&gt;, 2D representation of &lt;theP&gt; on the surface of &lt;theF&gt;, lies on that line.<br />
+ Returns 0 in case of success.  <a href="#aa381a7bc02ac67ee4a7bd11ae3122595">More...</a><br /></td></tr>
+<tr class="separator:aa381a7bc02ac67ee4a7bd11ae3122595"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The class contains handy static functions dealing with the topology This is the copy of BOPTools_AlgoTools3D.cdl file. </p>
@@ -223,8 +223,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ac7a17a56b15c669d02db76b916cf3474"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7a17a56b15c669d02db76b916cf3474">&#9670;&nbsp;</a></span>GetApproxNormalToFaceOnEdge() <span class="overload">[1/3]</span></h2>
+<a id="ad8af0927c4062b3e0301097d9c6ab57f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8af0927c4062b3e0301097d9c6ab57f">&#9670;&nbsp;</a></span>GetApproxNormalToFaceOnEdge() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -265,7 +265,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theContext</em>&#160;</td>
         </tr>
         <tr>
@@ -362,8 +362,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a14032f686e543a0a51ae93d7c6f64518"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14032f686e543a0a51ae93d7c6f64518">&#9670;&nbsp;</a></span>GetApproxNormalToFaceOnEdge() <span class="overload">[3/3]</span></h2>
+<a id="adfc1102282b132a1bf6478bda33acb51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfc1102282b132a1bf6478bda33acb51">&#9670;&nbsp;</a></span>GetApproxNormalToFaceOnEdge() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -410,7 +410,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theContext</em>&#160;</td>
         </tr>
         <tr>
@@ -694,8 +694,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a70d77ef256f521e6a33f9bb21dea87b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a70d77ef256f521e6a33f9bb21dea87b6">&#9670;&nbsp;</a></span>PointInFace() <span class="overload">[1/3]</span></h2>
+<a id="ab765c207bfc971090facfb7b4be8c1b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab765c207bfc971090facfb7b4be8c1b8">&#9670;&nbsp;</a></span>PointInFace() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -724,7 +724,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theContext</em>&#160;</td>
         </tr>
         <tr>
@@ -746,8 +746,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a4b3a5ace07466fcefe4cc711e353573b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b3a5ace07466fcefe4cc711e353573b">&#9670;&nbsp;</a></span>PointInFace() <span class="overload">[2/3]</span></h2>
+<a id="a29fbf912408970af79ef81f664c3f67e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29fbf912408970af79ef81f664c3f67e">&#9670;&nbsp;</a></span>PointInFace() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -794,7 +794,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theContext</em>&#160;</td>
         </tr>
         <tr>
@@ -816,8 +816,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a5fac881ef8dc92c8c19f84288fe7c372"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fac881ef8dc92c8c19f84288fe7c372">&#9670;&nbsp;</a></span>PointInFace() <span class="overload">[3/3]</span></h2>
+<a id="aa381a7bc02ac67ee4a7bd11ae3122595"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa381a7bc02ac67ee4a7bd11ae3122595">&#9670;&nbsp;</a></span>PointInFace() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -852,7 +852,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theContext</em>, </td>
         </tr>
         <tr>
@@ -879,8 +879,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aadfbba81cecf33d882795fbc574846a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aadfbba81cecf33d882795fbc574846a5">&#9670;&nbsp;</a></span>PointNearEdge() <span class="overload">[1/4]</span></h2>
+<a id="a689018b21e0aef378041087555329bbe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a689018b21e0aef378041087555329bbe">&#9670;&nbsp;</a></span>PointNearEdge() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -927,7 +927,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theContext</em>&#160;</td>
         </tr>
         <tr>
@@ -1017,8 +1017,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ab6292a41812a84550ce496a60e9ed191"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab6292a41812a84550ce496a60e9ed191">&#9670;&nbsp;</a></span>PointNearEdge() <span class="overload">[3/4]</span></h2>
+<a id="a2ed25bfc173a0bb3d5653decf5628efd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ed25bfc173a0bb3d5653decf5628efd">&#9670;&nbsp;</a></span>PointNearEdge() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1059,7 +1059,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theContext</em>&#160;</td>
         </tr>
         <tr>
@@ -1084,8 +1084,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ae98ac98921c3f030be5c4831809bb74f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae98ac98921c3f030be5c4831809bb74f">&#9670;&nbsp;</a></span>PointNearEdge() <span class="overload">[4/4]</span></h2>
+<a id="a058e98f9eb5612dcf2483f2417f2bdc1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a058e98f9eb5612dcf2483f2417f2bdc1">&#9670;&nbsp;</a></span>PointNearEdge() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1120,7 +1120,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theContext</em>&#160;</td>
         </tr>
         <tr>

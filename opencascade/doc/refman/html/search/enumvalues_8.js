@@ -160,9 +160,5 @@ var searchData=
   ['intwalk_5fpointconfondu',['IntWalk_PointConfondu',['../_int_walk___status_deflection_8hxx.html#a8056b23dea3857fbb02a5ff185e497b8a06c0c167dbc2194ff024b7b96907cbd9',1,'IntWalk_StatusDeflection.hxx']]],
   ['intwalk_5fsteptoosmall',['IntWalk_StepTooSmall',['../_int_walk___status_deflection_8hxx.html#a8056b23dea3857fbb02a5ff185e497b8a7c0a98c18c38d8f187e731e82f9da5cb',1,'IntWalk_StatusDeflection.hxx']]],
   ['iodtype_5fabsolute',['IODType_Absolute',['../class_graphic3d___camera.html#a529ffced6a9679cd12b020b1edeead37a1eee9267534ff40d2365559019107f08',1,'Graphic3d_Camera']]],
-  ['iodtype_5frelative',['IODType_Relative',['../class_graphic3d___camera.html#a529ffced6a9679cd12b020b1edeead37a57a0e63dc6540195d0240c0eacc3cba5',1,'Graphic3d_Camera']]],
-  ['iterationfilter_5fexcludeambient',['IterationFilter_ExcludeAmbient',['../class_graphic3d___light_set.html#ada6828d0e84a25b20dca476d402bd757aa10fb43f46e42ae8bc21fabbfbf84551',1,'Graphic3d_LightSet']]],
-  ['iterationfilter_5fexcludedisabled',['IterationFilter_ExcludeDisabled',['../class_graphic3d___light_set.html#ada6828d0e84a25b20dca476d402bd757a9d80529198abaf0363ea0b2a99406f5d',1,'Graphic3d_LightSet']]],
-  ['iterationfilter_5fexcludedisabledandambient',['IterationFilter_ExcludeDisabledAndAmbient',['../class_graphic3d___light_set.html#ada6828d0e84a25b20dca476d402bd757a31a26dd7b0ed6811bb2278e2b554ee13',1,'Graphic3d_LightSet']]],
-  ['iterationfilter_5fnone',['IterationFilter_None',['../class_graphic3d___light_set.html#ada6828d0e84a25b20dca476d402bd757a7644ab04248f112172e402e93178c75c',1,'Graphic3d_LightSet']]]
+  ['iodtype_5frelative',['IODType_Relative',['../class_graphic3d___camera.html#a529ffced6a9679cd12b020b1edeead37a57a0e63dc6540195d0240c0eacc3cba5',1,'Graphic3d_Camera']]]
 ];

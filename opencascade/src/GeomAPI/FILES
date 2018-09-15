@@ -13,6 +13,7 @@ GeomAPI_IntCS.cxx
 GeomAPI_IntCS.hxx
 GeomAPI_Interpolate.cxx
 GeomAPI_Interpolate.hxx
+GeomAPI_IntSS.cxx
 GeomAPI_IntSS.hxx
 GeomAPI_IntSS.lxx
 GeomAPI_PointsToBSpline.cxx

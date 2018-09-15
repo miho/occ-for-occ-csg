@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>The Curve from BRepAdaptor allows to use a Wire of the BRep topology like a 3D curve. Warning: With this class of curve, C0 and C1 continuities are not assumed. So be careful with some algorithm! Please note that <a class="el" href="class_b_rep_adaptor___comp_curve.html" title="The Curve from BRepAdaptor allows to use a Wire of the BRep topology like a 3D curve. Warning: With this class of curve, C0 and C1 continuities are not assumed. So be careful with some algorithm! Please note that BRepAdaptor_CompCurve cannot be periodic curve at all (even if it contains single periodic edge). ">BRepAdaptor_CompCurve</a> cannot be periodic curve at all (even if it contains single periodic edge).  
+<p>The Curve from BRepAdaptor allows to use a Wire of the BRep topology like a 3D curve. Warning: With this class of curve, C0 and C1 continuities are not assumed. So be carful with some algorithm!  
  <a href="class_b_rep_adaptor___comp_curve.html#details">More...</a></p>
 
 <p><code>#include &lt;BRepAdaptor_CompCurve.hxx&gt;</code></p>
@@ -100,6 +100,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7d2d202558960c71a065e2c4ec4c52b4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_adaptor___comp_curve.html#a7d2d202558960c71a065e2c4ec4c52b4">Initialize</a> (const <a class="el" href="class_topo_d_s___wire.html">TopoDS_Wire</a> &amp;W, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> KnotByCurvilinearAbcissa, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> First, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Last, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Tol)</td></tr>
 <tr class="memdesc:a7d2d202558960c71a065e2c4ec4c52b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets wire &lt;W&gt; and trimmed parameter.  <a href="#a7d2d202558960c71a065e2c4ec4c52b4">More...</a><br /></td></tr>
 <tr class="separator:a7d2d202558960c71a065e2c4ec4c52b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2cec83dbcb5769481136063bdfb0a1c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_adaptor___comp_curve.html#ae2cec83dbcb5769481136063bdfb0a1c">SetPeriodic</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> Periodic)</td></tr>
+<tr class="memdesc:ae2cec83dbcb5769481136063bdfb0a1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the flag Periodic. Warning: This method has no effect if the wire is not closed.  <a href="#ae2cec83dbcb5769481136063bdfb0a1c">More...</a><br /></td></tr>
+<tr class="separator:ae2cec83dbcb5769481136063bdfb0a1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a944972fd762ca214ebdf291ce5bba903"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_topo_d_s___wire.html">TopoDS_Wire</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_adaptor___comp_curve.html#a944972fd762ca214ebdf291ce5bba903">Wire</a> () const</td></tr>
 <tr class="memdesc:a944972fd762ca214ebdf291ce5bba903"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the wire.  <a href="#a944972fd762ca214ebdf291ce5bba903">More...</a><br /></td></tr>
 <tr class="separator:a944972fd762ca214ebdf291ce5bba903"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -180,8 +183,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad6dfd297d79343db6974dbb1a85e2315 inherit pub_methods_class_adaptor3d___curve"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Curve from BRepAdaptor allows to use a Wire of the BRep topology like a 3D curve. Warning: With this class of curve, C0 and C1 continuities are not assumed. So be careful with some algorithm! Please note that <a class="el" href="class_b_rep_adaptor___comp_curve.html" title="The Curve from BRepAdaptor allows to use a Wire of the BRep topology like a 3D curve. Warning: With this class of curve, C0 and C1 continuities are not assumed. So be careful with some algorithm! Please note that BRepAdaptor_CompCurve cannot be periodic curve at all (even if it contains single periodic edge). ">BRepAdaptor_CompCurve</a> cannot be periodic curve at all (even if it contains single periodic edge). </p>
-<p><a class="el" href="class_b_rep_adaptor___comp_curve.html" title="The Curve from BRepAdaptor allows to use a Wire of the BRep topology like a 3D curve. Warning: With this class of curve, C0 and C1 continuities are not assumed. So be careful with some algorithm! Please note that BRepAdaptor_CompCurve cannot be periodic curve at all (even if it contains single periodic edge). ">BRepAdaptor_CompCurve</a> can only work on valid wires where all edges are connected to each other to make a chain. </p>
+<div class="textblock"><p>The Curve from BRepAdaptor allows to use a Wire of the BRep topology like a 3D curve. Warning: With this class of curve, C0 and C1 continuities are not assumed. So be carful with some algorithm! </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa5e646ca10ed869c7dfe2c645a811409"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa5e646ca10ed869c7dfe2c645a811409">&#9670;&nbsp;</a></span>BRepAdaptor_CompCurve() <span class="overload">[1/3]</span></h2>
@@ -1215,6 +1217,26 @@ Public Member Functions</h2></td></tr>
 <p>returns the parametric resolution </p>
 
 <p>Reimplemented from <a class="el" href="class_adaptor3d___curve.html#a47065af75c458840c4eddf50780d61a3">Adaptor3d_Curve</a>.</p>
+
+</div>
+</div>
+<a id="ae2cec83dbcb5769481136063bdfb0a1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2cec83dbcb5769481136063bdfb0a1c">&#9670;&nbsp;</a></span>SetPeriodic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void BRepAdaptor_CompCurve::SetPeriodic </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
+          <td class="paramname"><em>Periodic</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the flag Periodic. Warning: This method has no effect if the wire is not closed. </p>
 
 </div>
 </div>

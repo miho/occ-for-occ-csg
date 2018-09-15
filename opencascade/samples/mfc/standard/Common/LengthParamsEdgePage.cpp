@@ -7,6 +7,7 @@
 
 #include <Standard_Macro.hxx>
 #include <AIS_InteractiveContext.hxx>
+#include <AIS_LocalContext.hxx>
 #include <AIS_LengthDimension.hxx>
 #include <GC_MakePlane.hxx>
 #include <TopExp.hxx>

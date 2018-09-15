@@ -17,7 +17,7 @@
 
 #include <TDataXtd_Presentation.hxx>
 #include <BinObjMgt_Persistent.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(BinMDataXtd_PresentationDriver,BinMDF_ADriver)
 
@@ -26,7 +26,7 @@ IMPLEMENT_STANDARD_RTTIEXT(BinMDataXtd_PresentationDriver,BinMDF_ADriver)
 //purpose  : Constructor
 //=======================================================================
 BinMDataXtd_PresentationDriver::BinMDataXtd_PresentationDriver
-                          (const Handle(Message_Messenger)& theMsgDriver)
+                          (const Handle(CDM_MessageDriver)& theMsgDriver)
 : BinMDF_ADriver(theMsgDriver, STANDARD_TYPE(TDataXtd_Presentation)->Name())
 {
 }

@@ -180,7 +180,6 @@ Standard_Boolean LDOMParser::ParseDocument (istream& theIStream, const Standard_
         break;
       }
       isDoctype = Standard_True;
-      continue;
     case LDOM_XmlReader::XML_COMMENT:
       continue;
     case LDOM_XmlReader::XML_FULL_ELEMENT:
@@ -199,9 +198,6 @@ Standard_Boolean LDOMParser::ParseDocument (istream& theIStream, const Standard_
         }
         continue;
       }
-      isError = Standard_True;
-      myError = "Expected comment or end-of-file";
-      break;
     case LDOM_XmlReader::XML_START_ELEMENT:
       if (isElement == Standard_False) {
         isElement = Standard_True;
@@ -228,13 +224,11 @@ Standard_Boolean LDOMParser::ParseDocument (istream& theIStream, const Standard_
       }
       isError = Standard_True;
       myError = "Expected comment or end-of-file";
-      break;
     case LDOM_XmlReader::XML_END_ELEMENT:
       if (endElement()) {
         isError = Standard_True;
         myError = "User abort at endElement()";
       }
-      break;
     case LDOM_XmlReader::XML_EOF:
       break;
     case LDOM_XmlReader::XML_UNKNOWN:

@@ -1,39 +1,34 @@
-puts "TODO OCC82 ALL: Error : Incomplete section of shell by plane"
-
-puts "====="
+puts "============"
+puts "BUC60908"
 puts "OCC82"
-puts "====="
+puts "============"
 puts ""
-#################################################
-# BUC60908. Incomplete section of shell by plane.
-#################################################
+###############################
+## Incomplete section of shell by plane
+###############################
 
-restore [locate_data_file BUC60907_px1.rle] sh
-
+restore [locate_data_file BUC60907_px1.rle] sh 
 checkshape sh
-
-set length 113.703
-
-set nbshapes_expected "
-Number of shapes in shape
- VERTEX    : 44
- EDGE      : 41
-"
 
 plane f 0 14.8053 0 0 1 0
 mkface f f
+bsection result sh f
 
-section result sh f
+set nb_info [nbshapes result]
+regexp {VERTEX +: +([-0-9.+eE]+)} $nb_info full nb_verices
+regexp {EDGE +: +([-0-9.+eE]+)} $nb_info full nb_edges
 
-checkshape result
+set nnv [expr $nb_verices-1]
 
-checkprops result -l ${length}
+puts "VERTEX : $nb_verices, EDGE : $nb_edges"  
 
-checknbshapes result -ref ${nbshapes_expected} -t -m "Section"
-
-set info [bopcheck result]
-if { [regexp "This shape seems to be OK" ${info}] != 1 } {
-    puts "Error : Incomplete section of shell by plane"
+if { $nnv > $nb_edges } {                                         
+    puts "Surplus of vertices, Faulty section"
+} else {
+    puts "Number of vertices correspond edges: OK"
 }
+checkprops result -l 113.703 
+checkshape result 
+checksection result
+checkview -display result -2d -path ${imagedir}/${test_image}.png
 
-checkview -display result -with sh -2d -path ${imagedir}/${test_image}.png

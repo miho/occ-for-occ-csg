@@ -25,14 +25,12 @@
 #include <NCollection_Map.hxx>
 #include <MeshTest.hxx>
 #include <Message.hxx>
-#include <Message_Alert.hxx>
 #include <Message_Msg.hxx>
 #include <Message_Messenger.hxx>
-#include <Message_Report.hxx>
 #include <SWDRAW.hxx>
 #include <TopoDS_AlertWithShape.hxx>
 
-#include <BOPAlgo_Alerts.hxx>
+#include <BOPAlgo_Algo.hxx>
 #include <BOPTest_Objects.hxx>
 
 //=======================================================================
@@ -53,10 +51,10 @@ void  BOPTest::AllCommands(Draw_Interpretor& theCommands)
   BOPTest::PartitionCommands (theCommands);
   BOPTest::APICommands       (theCommands);
   BOPTest::OptionCommands    (theCommands);
+  BOPTest::HistoryCommands   (theCommands);
   BOPTest::DebugCommands     (theCommands);
   BOPTest::CellsCommands     (theCommands);
   BOPTest::UtilityCommands   (theCommands);
-  BOPTest::RemoveFeaturesCommands(theCommands);
 }
 //=======================================================================
 //function : Factory
@@ -86,7 +84,7 @@ DPLUGIN(BOPTest)
 //purpose  : 
 //=======================================================================
 
-void BOPTest::ReportAlerts(const Handle(Message_Report)& theReport)
+void BOPTest::ReportAlerts (const BOPAlgo_Algo& theAlgorithm)
 {
   // first report warnings, then errors
   Message_Gravity anAlertTypes[2] = { Message_Warning, Message_Fail };
@@ -94,12 +92,11 @@ void BOPTest::ReportAlerts(const Handle(Message_Report)& theReport)
   {
     // report shapes for the same type of alert together
     NCollection_Map<Handle(Standard_Transient)> aPassedTypes;
-    const Message_ListOfAlert& aList = theReport->GetAlerts (anAlertTypes[iGravity]);
+    const Message_ListOfAlert& aList = theAlgorithm.GetReport()->GetAlerts (anAlertTypes[iGravity]);
     for (Message_ListOfAlert::Iterator aIt (aList); aIt.More(); aIt.Next())
     {
       // check that this type of warnings has not yet been processed
-      const Handle(Standard_Type)& aType = aIt.Value()->DynamicType();
-      if (!aPassedTypes.Add(aType))
+      if (! aPassedTypes.Add (aIt.Value()->DynamicType()))
         continue;
 
       // get alert message
@@ -115,9 +112,7 @@ void BOPTest::ReportAlerts(const Handle(Message_Report)& theReport)
         {
           Handle(TopoDS_AlertWithShape) aShapeAlert = Handle(TopoDS_AlertWithShape)::DownCast (aIt2.Value());
 
-          if (!aShapeAlert.IsNull() &&
-              (aType == aShapeAlert->DynamicType()) &&
-              !aShapeAlert->GetShape().IsNull())
+          if (! aShapeAlert.IsNull() && ! aShapeAlert->GetShape().IsNull()) 
           {
             //
             char aName[80];

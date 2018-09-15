@@ -15,7 +15,7 @@
 
 // modified     20.04.2009 Sergey Zaritchny
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <XmlMDataXtd.hxx>
 #include <XmlMDataXtd_AxisDriver.hxx>
 #include <XmlMDataXtd_ConstraintDriver.hxx>
@@ -37,7 +37,7 @@ static Standard_Integer myDocumentVersion = -1;
 //purpose  : 
 //=======================================================================
 void XmlMDataXtd::AddDrivers (const Handle(XmlMDF_ADriverTable)& aDriverTable,
-                              const Handle(Message_Messenger)&   anMsgDrv)
+                              const Handle(CDM_MessageDriver)&   anMsgDrv)
 {
   aDriverTable->AddDriver(new XmlMDataXtd_ShapeDriver         (anMsgDrv));
   aDriverTable->AddDriver(new XmlMDataXtd_PointDriver         (anMsgDrv));

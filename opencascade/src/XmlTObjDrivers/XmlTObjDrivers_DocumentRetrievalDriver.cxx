@@ -37,7 +37,7 @@ XmlTObjDrivers_DocumentRetrievalDriver::XmlTObjDrivers_DocumentRetrievalDriver()
 
 Handle(XmlMDF_ADriverTable)
         XmlTObjDrivers_DocumentRetrievalDriver::AttributeDrivers
-                        (const Handle(Message_Messenger)& theMsgDrv) 
+                        (const Handle(CDM_MessageDriver)& theMsgDrv) 
 {
   // Standard drivers
   Handle(XmlMDF_ADriverTable) aTable = XmlLDrivers::AttributeDrivers (theMsgDrv);

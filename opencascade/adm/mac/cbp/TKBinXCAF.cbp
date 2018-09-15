@@ -72,7 +72,6 @@
 		<Unit filename="../../../src/BinXCAFDrivers/BinXCAFDrivers_DocumentStorageDriver.cxx" />
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc.cxx" />
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_AreaDriver.cxx" />
-		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_AssemblyItemRefDriver.cxx" />
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_CentroidDriver.cxx" />
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_ClippingPlaneToolDriver.cxx" />
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_ColorDriver.cxx" />
@@ -88,11 +87,6 @@
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_LocationDriver.cxx" />
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_MaterialDriver.cxx" />
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_MaterialToolDriver.cxx" />
-		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_NoteBalloonDriver.cxx" />
-		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_NoteBinDataDriver.cxx" />
-		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_NoteCommentDriver.cxx" />
-		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_NoteDriver.cxx" />
-		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_NotesToolDriver.cxx" />
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_ShapeToolDriver.cxx" />
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_ViewDriver.cxx" />
 		<Unit filename="../../../src/BinMXCAFDoc/BinMXCAFDoc_ViewToolDriver.cxx" />

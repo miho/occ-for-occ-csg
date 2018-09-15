@@ -51,7 +51,7 @@ public:
   //! Move to the next Item
     void Next();
   
-  const TopoDS_Shape& Value() const;
+  Standard_EXPORT const TopoDS_Shape& Value() const;
 
 
 

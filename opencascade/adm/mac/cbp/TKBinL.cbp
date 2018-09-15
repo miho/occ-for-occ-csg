@@ -98,7 +98,6 @@
 		<Unit filename="../../../src/BinMDocStd/BinMDocStd.cxx" />
 		<Unit filename="../../../src/BinMDocStd/BinMDocStd_XLinkDriver.cxx" />
 		<Unit filename="../../../src/BinObjMgt/BinObjMgt_Persistent.cxx" />
-		<Unit filename="../../../src/BinObjMgt/BinObjMgt_RRelocationTable.cxx" />
 		<Unit filename="../../../src/BinLDrivers/BinLDrivers.cxx" />
 		<Unit filename="../../../src/BinLDrivers/BinLDrivers_DocumentRetrievalDriver.cxx" />
 		<Unit filename="../../../src/BinLDrivers/BinLDrivers_DocumentSection.cxx" />

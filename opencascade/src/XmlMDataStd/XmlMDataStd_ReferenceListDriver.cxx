@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <LDOM_MemManager.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_ReferenceList.hxx>
@@ -36,7 +36,7 @@ IMPLEMENT_DOMSTRING (AttributeIDString, "reflistattguid")
 //function : XmlMDataStd_ReferenceListDriver
 //purpose  : Constructor
 //=======================================================================
-XmlMDataStd_ReferenceListDriver::XmlMDataStd_ReferenceListDriver(const Handle(Message_Messenger)& theMsgDriver)
+XmlMDataStd_ReferenceListDriver::XmlMDataStd_ReferenceListDriver(const Handle(CDM_MessageDriver)& theMsgDriver)
      : XmlMDF_ADriver (theMsgDriver, NULL)
 {
 
@@ -72,7 +72,7 @@ Standard_Boolean XmlMDataStd_ReferenceListDriver::Paste(const XmlObjMgt_Persiste
       TCollection_ExtendedString("Cannot retrieve the first index"
                                  " for ReferenceList attribute as \"")
         + aFirstIndex + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
 
@@ -83,26 +83,17 @@ Standard_Boolean XmlMDataStd_ReferenceListDriver::Paste(const XmlObjMgt_Persiste
       TCollection_ExtendedString("Cannot retrieve the last index"
                                  " for ReferenceList attribute as \"")
         + aFirstIndex + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
 
   const Handle(TDataStd_ReferenceList) aReferenceList = Handle(TDataStd_ReferenceList)::DownCast(theTarget);
-  // attribute id
-  Standard_GUID aGUID;
-  XmlObjMgt_DOMString aGUIDStr = anElement.getAttribute(::AttributeIDString());
-  if (aGUIDStr.Type() == XmlObjMgt_DOMString::LDOM_NULL)
-    aGUID = TDataStd_ReferenceList::GetID(); //default case
-  else
-    aGUID = Standard_GUID(Standard_CString(aGUIDStr.GetString())); // user defined case
-  aReferenceList->SetID(aGUID);
-
   if(aLastInd > 0) {
     if (!anElement.hasChildNodes())
     {
       TCollection_ExtendedString aMessageString = 
         TCollection_ExtendedString("Cannot retrieve a list of reference");
-      myMessageDriver->Send (aMessageString, Message_Fail);
+      WriteMessage (aMessageString);
       return Standard_False;
     }
 
@@ -114,7 +105,7 @@ Standard_Boolean XmlMDataStd_ReferenceListDriver::Paste(const XmlObjMgt_Persiste
       aValueStr = XmlObjMgt::GetStringValue( *aCurElement );
       if (aValueStr == NULL)
       {
-        myMessageDriver->Send ("Cannot retrieve reference string from element", Message_Fail);
+        WriteMessage ("Cannot retrieve reference string from element");
         return Standard_False;
       }
       TCollection_AsciiString anEntry;
@@ -123,7 +114,7 @@ Standard_Boolean XmlMDataStd_ReferenceListDriver::Paste(const XmlObjMgt_Persiste
         TCollection_ExtendedString aMessage =
         TCollection_ExtendedString ("Cannot retrieve reference from \"")
         + aValueStr + '\"';
-        myMessageDriver->Send (aMessage, Message_Fail);
+        WriteMessage (aMessage);
         return Standard_False;
       }
       // Find label by entry
@@ -140,7 +131,7 @@ Standard_Boolean XmlMDataStd_ReferenceListDriver::Paste(const XmlObjMgt_Persiste
   aValueStr = XmlObjMgt::GetStringValue( *aCurElement );
   if (aValueStr == NULL)
   {
-    myMessageDriver->Send ("Cannot retrieve reference string from element", Message_Fail);
+    WriteMessage ("Cannot retrieve reference string from element");
     return Standard_False;
   }
   TCollection_AsciiString anEntry;
@@ -149,7 +140,7 @@ Standard_Boolean XmlMDataStd_ReferenceListDriver::Paste(const XmlObjMgt_Persiste
     TCollection_ExtendedString aMessage =
     TCollection_ExtendedString ("Cannot retrieve reference from \"")
     + aValueStr + '\"';
-    myMessageDriver->Send (aMessage, Message_Fail);
+    WriteMessage (aMessage);
     return Standard_False;
   }
   // Find label by entry
@@ -160,6 +151,15 @@ Standard_Boolean XmlMDataStd_ReferenceListDriver::Paste(const XmlObjMgt_Persiste
   }
   aReferenceList->Append(tLab);
   }
+  // attribute id
+  Standard_GUID aGUID;
+  XmlObjMgt_DOMString aGUIDStr = anElement.getAttribute(::AttributeIDString());
+  if (aGUIDStr.Type() == XmlObjMgt_DOMString::LDOM_NULL)
+    aGUID = TDataStd_ReferenceList::GetID(); //default case
+  else
+    aGUID = Standard_GUID(Standard_CString(aGUIDStr.GetString())); // user defined case
+
+  aReferenceList->SetID(aGUID);
 
   return Standard_True;
 }
@@ -176,7 +176,7 @@ void XmlMDataStd_ReferenceListDriver::Paste(const Handle(TDF_Attribute)& theSour
   TDF_Label L = aReferenceList->Label();
   if (L.IsNull())
   {
-    myMessageDriver->Send ("Label of a ReferenceList is Null.", Message_Fail);
+    WriteMessage ("Label of a ReferenceList is Null.");
     return;
   }
 

@@ -19,12 +19,10 @@
 #include <TCollection_AsciiString.hxx>
 #include <inspector/TInspector_Window.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QApplication>
 #include <QDir>
 #include <QMainWindow>
 #include <QWidget>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : Constructor
@@ -58,13 +56,4 @@ void TInspector_Communicator::SetVisible (const bool theVisible)
   // window is not visualized on X11 patform under DRAW tool without the next row
   QApplication::processEvents();
 #endif
-}
-
-// =======================================================================
-// function : Move
-// purpose :
-// =======================================================================
-void TInspector_Communicator::Move (const int theXPosition, const int theYPosition)
-{
-  myWindow->GetMainWindow()->move (theXPosition, theYPosition);
 }

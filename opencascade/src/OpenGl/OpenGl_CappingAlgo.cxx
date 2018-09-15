@@ -73,7 +73,7 @@ namespace
       aContext->ShaderManager()->UpdateClippingState();
 
       glClear (GL_STENCIL_BUFFER_BIT);
-      const bool aColorMaskBack = aContext->SetColorMask (false);
+      glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
       // override aspects, disable culling
       theWorkspace->SetAspectFace (&theWorkspace->NoneCulling());
@@ -116,7 +116,7 @@ namespace
       aContext->ShaderManager()->UpdateClippingState();
 
       // render capping plane using the generated stencil mask
-      aContext->SetColorMask (aColorMaskBack);
+      glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
       if (theWorkspace->UseDepthWrite())
       {
         glDepthMask (GL_TRUE);
@@ -228,5 +228,8 @@ Standard_Boolean OpenGl_CappingAlgoFilter::ShouldRender (const Handle(OpenGl_Wor
     return Standard_False;
   }
 
-  return theGlElement->IsFillDrawMode();
+  const OpenGl_PrimitiveArray* aPArray = dynamic_cast<const OpenGl_PrimitiveArray*> (theGlElement);
+  return aPArray != NULL
+      && aPArray->DrawMode() >= OpenGl_PrimitiveArray::THE_FILLPRIM_FROM
+      && aPArray->DrawMode() <= OpenGl_PrimitiveArray::THE_FILLPRIM_TO;
 }

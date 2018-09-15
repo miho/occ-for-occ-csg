@@ -24,7 +24,7 @@
 #include <BinObjMgt_RRelocationTable.hxx>
 #include <BinObjMgt_SRelocationTable.hxx>
 
-class Message_Messenger;
+class CDM_MessageDriver;
 class TDF_Attribute;
 class BinObjMgt_Persistent;
 
@@ -47,7 +47,7 @@ public:
 
 protected:
 
-  BinMXCAFDoc_NoteDriver(const Handle(Message_Messenger)& theMsgDriver,
+  BinMXCAFDoc_NoteDriver(const Handle(CDM_MessageDriver)& theMsgDriver,
                          Standard_CString                 theName);
 
 };

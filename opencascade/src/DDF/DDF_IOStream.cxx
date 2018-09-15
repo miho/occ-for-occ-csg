@@ -281,7 +281,7 @@ void DDF_IOStream::ReadExtendedLine(TCollection_ExtendedString& buffer)
 
 void DDF_IOStream::ReadChar(TCollection_AsciiString& buffer, const Standard_Integer rsize)
 {
-  char c = '\0';
+  char             c;
   Standard_Integer ccount = 0;
 
   buffer.Clear();
@@ -1216,7 +1216,7 @@ Storage_Error DDF_IOStream::BeginReadDataSection()
 void DDF_IOStream::ReadPersistentObjectHeader(Standard_Integer& aRef,
 					  Standard_Integer& aType) 
 {
-  char c = '\0';
+  char c;
 
   myIStream->get(c);
 
@@ -1256,7 +1256,7 @@ void DDF_IOStream::ReadPersistentObjectHeader(Standard_Integer& aRef,
 
 void DDF_IOStream::BeginReadPersistentObjectData() 
 {
-  char c = '\0';
+  char c;
   myIStream->get(c);
   while (c != '(') {
     if (IsEnd() || (c != ' ') || (c == '\n')) {
@@ -1273,7 +1273,7 @@ void DDF_IOStream::BeginReadPersistentObjectData()
 
 void DDF_IOStream::BeginReadObjectData() 
 {
-  char c = '\0';
+  char c;
   myIStream->get(c);
   while (c != '(') {
     if (IsEnd() || (c != ' ') || (c == '\n')) {
@@ -1290,7 +1290,7 @@ void DDF_IOStream::BeginReadObjectData()
 
 void DDF_IOStream::EndReadObjectData() 
 {
-  char c = '\0';
+  char c;
   myIStream->get(c);
   while (c != ')') {
     if (IsEnd() || (c != ' ') || (c == '\n')) {
@@ -1307,7 +1307,7 @@ void DDF_IOStream::EndReadObjectData()
 
 void DDF_IOStream::EndReadPersistentObjectData() 
 {
-  char c = '\0';
+  char c;
 
   myIStream->get(c);
   while (c != ')') {

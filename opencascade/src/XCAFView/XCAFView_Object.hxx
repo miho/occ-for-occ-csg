@@ -30,7 +30,7 @@
 class XCAFView_Object;
 DEFINE_STANDARD_HANDLE(XCAFView_Object, Standard_Transient)
                             
-//! Access object for saved view
+//! object to store view
 class XCAFView_Object : public Standard_Transient
 {
 
@@ -40,167 +40,167 @@ public:
   
   Standard_EXPORT XCAFView_Object(const Handle(XCAFView_Object)& theObj);
 
-  void SetName(Handle(TCollection_HAsciiString) theName)
+  Standard_EXPORT void SetName(Handle(TCollection_HAsciiString) theName)
   {
     myName = theName;
   }
 
-  Handle(TCollection_HAsciiString) Name()
+  Standard_EXPORT Handle(TCollection_HAsciiString) Name()
   {
     return myName;
   }
 
-  void SetType(XCAFView_ProjectionType theType)
+  Standard_EXPORT void SetType(XCAFView_ProjectionType theType)
   {
     myType = theType;
   }
 
-  XCAFView_ProjectionType Type()
+  Standard_EXPORT XCAFView_ProjectionType Type()
   {
     return myType;
   }
 
-  void SetProjectionPoint(gp_Pnt thePoint)
+  Standard_EXPORT void SetProjectionPoint(gp_Pnt thePoint)
   {
     myProjectionPoint = thePoint;
   }
 
-  gp_Pnt ProjectionPoint()
+  Standard_EXPORT gp_Pnt ProjectionPoint()
   {
     return myProjectionPoint;
   }
 
-  void SetViewDirection(gp_Dir theDirection)
+  Standard_EXPORT void SetViewDirection(gp_Dir theDirection)
   {
     myViewDirection = theDirection;
   }
 
-  gp_Dir ViewDirection()
+  Standard_EXPORT gp_Dir ViewDirection()
   {
     return myViewDirection;
   }
 
-  void SetUpDirection(gp_Dir theDirection)
+  Standard_EXPORT void SetUpDirection(gp_Dir theDirection)
   {
     myUpDirection = theDirection;
   }
 
-  gp_Dir UpDirection()
+  Standard_EXPORT gp_Dir UpDirection()
   {
     return myUpDirection;
   }
 
-  void SetZoomFactor(Standard_Real theZoomFactor)
+  Standard_EXPORT void SetZoomFactor(Standard_Real theZoomFactor)
   {
     myZoomFactor = theZoomFactor;
   }
 
-  Standard_Real ZoomFactor()
+  Standard_EXPORT Standard_Real ZoomFactor()
   {
     return myZoomFactor;
   }
 
-  void SetWindowHorizontalSize(Standard_Real theSize)
+  Standard_EXPORT void SetWindowHorizontalSize(Standard_Real theSize)
   {
     myWindowHorizontalSize = theSize;
   }
 
-  Standard_Real WindowHorizontalSize()
+  Standard_EXPORT Standard_Real WindowHorizontalSize()
   {
     return myWindowHorizontalSize;
   }
 
-  void SetWindowVerticalSize(Standard_Real theSize)
+  Standard_EXPORT void SetWindowVerticalSize(Standard_Real theSize)
   {
     myWindowVerticalSize = theSize;
   }
 
-  Standard_Real WindowVerticalSize()
+  Standard_EXPORT Standard_Real WindowVerticalSize()
   {
     return myWindowVerticalSize;
   }
 
-  void SetClippingExpression(Handle(TCollection_HAsciiString) theExpression)
+  Standard_EXPORT void SetClippingExpression(Handle(TCollection_HAsciiString) theExpression)
   {
     myClippingExpression = theExpression;
   }
 
-  Handle(TCollection_HAsciiString) ClippingExpression()
+  Standard_EXPORT Handle(TCollection_HAsciiString) ClippingExpression()
   {
     return myClippingExpression;
   }
 
-  void UnsetFrontPlaneClipping()
+  Standard_EXPORT void UnsetFrontPlaneClipping()
   {
     myFrontPlaneClipping = Standard_False;
   }
 
-  Standard_Boolean HasFrontPlaneClipping()
+  Standard_EXPORT Standard_Boolean HasFrontPlaneClipping()
   {
     return myFrontPlaneClipping;
   }
 
-  void SetFrontPlaneDistance(Standard_Real theDistance)
+  Standard_EXPORT void SetFrontPlaneDistance(Standard_Real theDistance)
   {
     myFrontPlaneDistance = theDistance;
     myFrontPlaneClipping = Standard_True;
   }
 
-  Standard_Real FrontPlaneDistance()
+  Standard_EXPORT Standard_Real FrontPlaneDistance()
   {
     return myFrontPlaneDistance;
   }
 
-  void UnsetBackPlaneClipping()
+  Standard_EXPORT void UnsetBackPlaneClipping()
   {
     myBackPlaneClipping = Standard_False;
   }
 
-  Standard_Boolean HasBackPlaneClipping()
+  Standard_EXPORT Standard_Boolean HasBackPlaneClipping()
   {
     return myBackPlaneClipping;
   }
 
-  void SetBackPlaneDistance(Standard_Real theDistance)
+  Standard_EXPORT void SetBackPlaneDistance(Standard_Real theDistance)
   {
     myBackPlaneDistance = theDistance;
     myBackPlaneClipping = Standard_True;
   }
 
-  Standard_Real BackPlaneDistance()
+  Standard_EXPORT Standard_Real BackPlaneDistance()
   {
     return myBackPlaneDistance;
   }
 
-  void SetViewVolumeSidesClipping(Standard_Boolean theViewVolumeSidesClipping)
+  Standard_EXPORT void SetViewVolumeSidesClipping(Standard_Boolean theViewVolumeSidesClipping)
   {
     myViewVolumeSidesClipping = theViewVolumeSidesClipping;
   }
 
-  Standard_Boolean HasViewVolumeSidesClipping()
+  Standard_EXPORT Standard_Boolean HasViewVolumeSidesClipping()
   {
     return myViewVolumeSidesClipping;
   }
 
-  void CreateGDTPoints(const Standard_Integer theLenght)
+  Standard_EXPORT void CreateGDTPoints(const Standard_Integer theLenght)
   {
     if (theLenght > 0)
       myGDTPoints = new TColgp_HArray1OfPnt(1, theLenght);
   }
 
-  Standard_Boolean HasGDTPoints()
+  Standard_EXPORT Standard_Boolean HasGDTPoints()
   {
     return (!myGDTPoints.IsNull());
   }
 
-  Standard_Integer NbGDTPoints()
+  Standard_EXPORT Standard_Integer NbGDTPoints()
   {
     if (myGDTPoints.IsNull())
       return 0;
     return myGDTPoints->Length();
   }
 
-  void SetGDTPoint(const Standard_Integer theIndex, const gp_Pnt thePoint)
+  Standard_EXPORT void SetGDTPoint(const Standard_Integer theIndex, const gp_Pnt thePoint)
   {
     if (myGDTPoints.IsNull())
       return;
@@ -208,7 +208,7 @@ public:
       myGDTPoints->SetValue(theIndex, thePoint);
   }
 
-  gp_Pnt GDTPoint(const Standard_Integer theIndex)
+  Standard_EXPORT gp_Pnt GDTPoint(const Standard_Integer theIndex)
   {
     if (myGDTPoints.IsNull())
       return gp_Pnt();

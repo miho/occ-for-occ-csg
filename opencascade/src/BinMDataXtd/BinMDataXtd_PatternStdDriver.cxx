@@ -17,7 +17,7 @@
 
 #include <BinMDataXtd_PatternStdDriver.hxx>
 #include <BinObjMgt_Persistent.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Real.hxx>
@@ -32,7 +32,7 @@ IMPLEMENT_STANDARD_RTTIEXT(BinMDataXtd_PatternStdDriver,BinMDF_ADriver)
 //purpose  : Constructor
 //=======================================================================
 BinMDataXtd_PatternStdDriver::BinMDataXtd_PatternStdDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : BinMDF_ADriver (theMsgDriver, NULL)
 {}
 

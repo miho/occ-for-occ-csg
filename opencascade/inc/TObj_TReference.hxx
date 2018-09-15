@@ -74,10 +74,10 @@ class TObj_TReference : public TDF_Attribute
   Standard_EXPORT Handle(TObj_Object) Get() const;
 
   //! Returns the Label of master object.
-  TDF_Label GetMasterLabel() const {return myMasterLabel;}
+  Standard_EXPORT TDF_Label GetMasterLabel() const {return myMasterLabel;}
 
   //! Returns the referred label.
-  TDF_Label GetLabel() const {return myLabel;}
+  Standard_EXPORT TDF_Label GetLabel() const {return myLabel;}
 
  public:
   //! Redefined OCAF abstract methods

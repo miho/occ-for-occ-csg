@@ -16,6 +16,7 @@
 
 
 #include <CDM_Document.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <PCDM.hxx>
 #include <PCDM_DOMHeaderParser.hxx>
 #include <PCDM_ReadWriter.hxx>

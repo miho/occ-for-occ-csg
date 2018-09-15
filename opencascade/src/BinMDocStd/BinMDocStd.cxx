@@ -17,14 +17,14 @@
 #include <BinMDF_ADriverTable.hxx>
 #include <BinMDocStd.hxx>
 #include <BinMDocStd_XLinkDriver.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 
 //=======================================================================
 //function : AddDrivers
 //purpose  : 
 //=======================================================================
 void BinMDocStd::AddDrivers (const Handle(BinMDF_ADriverTable)& theDriverTable,
-                              const Handle(Message_Messenger)&   theMsgDriver)
+                              const Handle(CDM_MessageDriver)&   theMsgDriver)
 {
   theDriverTable->AddDriver (new BinMDocStd_XLinkDriver  (theMsgDriver) );
   

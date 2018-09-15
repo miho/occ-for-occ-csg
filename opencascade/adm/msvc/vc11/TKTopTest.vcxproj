@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DB08517F-0A4F-1637-0350-7FF558C47C41}</ProjectGuid>
+    <ProjectGuid>{B3B3044A-0783-0BAF-1740-23A6D89EB291}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -89,7 +89,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__BRepTest_DLL;__GeometryTest_DLL;__HLRTest_DLL;__MeshTest_DLL;__GeomliteTest_DLL;__DrawFairCurve_DLL;__BOPTest_DLL;__SWDRAW_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -105,7 +105,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);__BRepTest_DLL;__GeometryTest_DLL;__HLRTest_DLL;__MeshTest_DLL;__GeomliteTest_DLL;__DrawFairCurve_DLL;__BOPTest_DLL;__SWDRAW_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKGeomAlgo.lib;TKTopAlgo.lib;TKernel.lib;TKMath.lib;TKBO.lib;TKG2d.lib;TKG3d.lib;TKDraw.lib;TKHLR.lib;TKGeomBase.lib;TKMesh.lib;TKService.lib;TKV3d.lib;TKFillet.lib;TKPrim.lib;TKBool.lib;TKOffset.lib;TKFeat.lib;TKShHealing.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -134,7 +134,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__BRepTest_DLL;__GeometryTest_DLL;__HLRTest_DLL;__MeshTest_DLL;__GeomliteTest_DLL;__DrawFairCurve_DLL;__BOPTest_DLL;__SWDRAW_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\..\..\..\win32\vc11\objd\TKTopTest/</AssemblerListingLocation>
@@ -151,7 +151,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);__BRepTest_DLL;__GeometryTest_DLL;__HLRTest_DLL;__MeshTest_DLL;__GeomliteTest_DLL;__DrawFairCurve_DLL;__BOPTest_DLL;__SWDRAW_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKGeomAlgo.lib;TKTopAlgo.lib;TKernel.lib;TKMath.lib;TKBO.lib;TKG2d.lib;TKG3d.lib;TKDraw.lib;TKHLR.lib;TKGeomBase.lib;TKMesh.lib;TKService.lib;TKV3d.lib;TKFillet.lib;TKPrim.lib;TKBool.lib;TKOffset.lib;TKFeat.lib;TKShHealing.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -180,7 +180,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__BRepTest_DLL;__GeometryTest_DLL;__HLRTest_DLL;__MeshTest_DLL;__GeomliteTest_DLL;__DrawFairCurve_DLL;__BOPTest_DLL;__SWDRAW_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -196,7 +196,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);__BRepTest_DLL;__GeometryTest_DLL;__HLRTest_DLL;__MeshTest_DLL;__GeomliteTest_DLL;__DrawFairCurve_DLL;__BOPTest_DLL;__SWDRAW_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKGeomAlgo.lib;TKTopAlgo.lib;TKernel.lib;TKMath.lib;TKBO.lib;TKG2d.lib;TKG3d.lib;TKDraw.lib;TKHLR.lib;TKGeomBase.lib;TKMesh.lib;TKService.lib;TKV3d.lib;TKFillet.lib;TKPrim.lib;TKBool.lib;TKOffset.lib;TKFeat.lib;TKShHealing.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -225,7 +225,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__BRepTest_DLL;__GeometryTest_DLL;__HLRTest_DLL;__MeshTest_DLL;__GeomliteTest_DLL;__DrawFairCurve_DLL;__BOPTest_DLL;__SWDRAW_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\..\..\..\win64\vc11\objd\TKTopTest/</AssemblerListingLocation>
@@ -242,7 +242,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);__BRepTest_DLL;__GeometryTest_DLL;__HLRTest_DLL;__MeshTest_DLL;__GeomliteTest_DLL;__DrawFairCurve_DLL;__BOPTest_DLL;__SWDRAW_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKGeomAlgo.lib;TKTopAlgo.lib;TKernel.lib;TKMath.lib;TKBO.lib;TKG2d.lib;TKG3d.lib;TKDraw.lib;TKHLR.lib;TKGeomBase.lib;TKMesh.lib;TKService.lib;TKV3d.lib;TKFillet.lib;TKPrim.lib;TKBool.lib;TKOffset.lib;TKFeat.lib;TKShHealing.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -268,8 +268,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_DraftAngleCommands.cxx">
     </ClCompile>
-    <ClCompile Include="..\..\..\src\BRepTest\BRepTest_DrawableHistory.cxx">
-    </ClCompile>
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_ExtremaCommands.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_FeatureCommands.cxx">
@@ -282,11 +280,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_GPropCommands.cxx">
     </ClCompile>
-    <ClCompile Include="..\..\..\src\BRepTest\BRepTest_HistoryCommands.cxx">
-    </ClCompile>
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_MatCommands.cxx">
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\BRepTest\BRepTest_Objects.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\BRepTest\BRepTest_OtherCommands.cxx">
     </ClCompile>
@@ -376,6 +370,8 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPTest\BOPTest_DrawableShape.cxx">
     </ClCompile>
+    <ClCompile Include="..\..\..\src\BOPTest\BOPTest_HistoryCommands.cxx">
+    </ClCompile>
     <ClCompile Include="..\..\..\src\BOPTest\BOPTest_LowCommands.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPTest\BOPTest_ObjCommands.cxx">
@@ -385,8 +381,6 @@
     <ClCompile Include="..\..\..\src\BOPTest\BOPTest_OptionCommands.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPTest\BOPTest_PartitionCommands.cxx">
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\BOPTest\BOPTest_RemoveFeaturesCommands.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPTest\BOPTest_TolerCommands.cxx">
     </ClCompile>

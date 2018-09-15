@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{31B8E996-02A6-0658-036C-064D86CBABEA}</ProjectGuid>
+    <ProjectGuid>{5575AC2A-1894-022E-15A6-DE2C061C5801}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -89,7 +89,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__StepAP214_DLL;__RWStepAP214_DLL;__StepAP203_DLL;__RWStepAP203_DLL;__STEPConstruct_DLL;__STEPEdit_DLL;__GeomToStep_DLL;__StepToGeom_DLL;__StepToTopoDS_DLL;__TopoDSToStep_DLL;__STEPControl_DLL;__STEPSelections_DLL;__StepAP209_DLL;__RWStepAP242_DLL;__StepAP242_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -105,7 +105,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);__StepAP214_DLL;__RWStepAP214_DLL;__StepAP203_DLL;__RWStepAP203_DLL;__STEPConstruct_DLL;__STEPEdit_DLL;__GeomToStep_DLL;__StepToGeom_DLL;__StepToTopoDS_DLL;__TopoDSToStep_DLL;__STEPControl_DLL;__STEPSelections_DLL;__StepAP209_DLL;__RWStepAP242_DLL;__StepAP242_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKernel.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKBRep.lib;TKMath.lib;TKG2d.lib;TKShHealing.lib;TKTopAlgo.lib;TKG3d.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKXSBase.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -134,7 +134,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__StepAP214_DLL;__RWStepAP214_DLL;__StepAP203_DLL;__RWStepAP203_DLL;__STEPConstruct_DLL;__STEPEdit_DLL;__GeomToStep_DLL;__StepToGeom_DLL;__StepToTopoDS_DLL;__TopoDSToStep_DLL;__STEPControl_DLL;__STEPSelections_DLL;__StepAP209_DLL;__RWStepAP242_DLL;__StepAP242_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\..\..\..\win32\vc11\objd\TKSTEP/</AssemblerListingLocation>
@@ -151,7 +151,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);__StepAP214_DLL;__RWStepAP214_DLL;__StepAP203_DLL;__RWStepAP203_DLL;__STEPConstruct_DLL;__STEPEdit_DLL;__GeomToStep_DLL;__StepToGeom_DLL;__StepToTopoDS_DLL;__TopoDSToStep_DLL;__STEPControl_DLL;__STEPSelections_DLL;__StepAP209_DLL;__RWStepAP242_DLL;__StepAP242_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKernel.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKBRep.lib;TKMath.lib;TKG2d.lib;TKShHealing.lib;TKTopAlgo.lib;TKG3d.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKXSBase.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -180,7 +180,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__StepAP214_DLL;__RWStepAP214_DLL;__StepAP203_DLL;__RWStepAP203_DLL;__STEPConstruct_DLL;__STEPEdit_DLL;__GeomToStep_DLL;__StepToGeom_DLL;__StepToTopoDS_DLL;__TopoDSToStep_DLL;__STEPControl_DLL;__STEPSelections_DLL;__StepAP209_DLL;__RWStepAP242_DLL;__StepAP242_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -196,7 +196,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);__StepAP214_DLL;__RWStepAP214_DLL;__StepAP203_DLL;__RWStepAP203_DLL;__STEPConstruct_DLL;__STEPEdit_DLL;__GeomToStep_DLL;__StepToGeom_DLL;__StepToTopoDS_DLL;__TopoDSToStep_DLL;__STEPControl_DLL;__STEPSelections_DLL;__StepAP209_DLL;__RWStepAP242_DLL;__StepAP242_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKernel.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKBRep.lib;TKMath.lib;TKG2d.lib;TKShHealing.lib;TKTopAlgo.lib;TKG3d.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKXSBase.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -225,7 +225,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__StepAP214_DLL;__RWStepAP214_DLL;__StepAP203_DLL;__RWStepAP203_DLL;__STEPConstruct_DLL;__STEPEdit_DLL;__GeomToStep_DLL;__StepToGeom_DLL;__StepToTopoDS_DLL;__TopoDSToStep_DLL;__STEPControl_DLL;__STEPSelections_DLL;__StepAP209_DLL;__RWStepAP242_DLL;__StepAP242_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\..\..\..\win64\vc11\objd\TKSTEP/</AssemblerListingLocation>
@@ -242,7 +242,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);__StepAP214_DLL;__RWStepAP214_DLL;__StepAP203_DLL;__RWStepAP203_DLL;__STEPConstruct_DLL;__STEPEdit_DLL;__GeomToStep_DLL;__StepToGeom_DLL;__StepToTopoDS_DLL;__TopoDSToStep_DLL;__STEPControl_DLL;__STEPSelections_DLL;__StepAP209_DLL;__RWStepAP242_DLL;__StepAP242_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKernel.lib;TKSTEPAttr.lib;TKSTEP209.lib;TKSTEPBase.lib;TKBRep.lib;TKMath.lib;TKG2d.lib;TKShHealing.lib;TKTopAlgo.lib;TKG3d.lib;TKGeomBase.lib;TKGeomAlgo.lib;TKXSBase.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>

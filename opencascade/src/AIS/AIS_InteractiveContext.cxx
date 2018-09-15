@@ -122,7 +122,6 @@ myCurHighlighted(0),
 myPickingStrategy (SelectMgr_PickingStrategy_FirstAcceptable),
 myIsAutoActivateSelMode(Standard_True)
 {
-  mgrSelector->Add (myMainSel);
   myStyles[Prs3d_TypeOfHighlight_None]          = myDefaultDrawer;
   myStyles[Prs3d_TypeOfHighlight_Selected]      = new Prs3d_Drawer();
   myStyles[Prs3d_TypeOfHighlight_Dynamic]       = new Prs3d_Drawer();
@@ -187,11 +186,11 @@ AIS_InteractiveContext::~AIS_InteractiveContext()
   Handle(AIS_InteractiveContext) aNullContext;
   for (AIS_DataMapIteratorOfDataMapOfIOStatus anObjIter (myObjects); anObjIter.More(); anObjIter.Next())
   {
-    const Handle(AIS_InteractiveObject)& anObj = anObjIter.Key();
+    Handle(AIS_InteractiveObject) anObj = anObjIter.Key();
     anObj->SetContext (aNullContext);
-    for (SelectMgr_SequenceOfSelection::Iterator aSelIter (anObj->Selections()); aSelIter.More(); aSelIter.Next())
+    for (anObj->Init(); anObj->More(); anObj->Next())
     {
-      aSelIter.Value()->UpdateBVHStatus (SelectMgr_TBU_Renew);
+      anObj->CurrentSelection()->UpdateBVHStatus (SelectMgr_TBU_Renew);
     }
   }
 }
@@ -458,10 +457,6 @@ void AIS_InteractiveContext::Display (const Handle(AIS_InteractiveObject)& theIO
   {
     Erase  (theIObj, theToUpdateViewer);
     Load (theIObj, theSelectionMode, theToAllowDecomposition);
-    if (Handle(AIS_GlobalStatus)* aStatusPtr = myObjects.ChangeSeek (theIObj))
-    {
-      (*aStatusPtr)->SetDisplayMode (theDispMode);
-    }
     return;
   }
 
@@ -489,7 +484,7 @@ void AIS_InteractiveContext::Display (const Handle(AIS_InteractiveObject)& theIO
   {
     Handle(AIS_GlobalStatus) aStatus = new AIS_GlobalStatus (AIS_DS_Displayed, theDispMode, theSelectionMode);
     myObjects.Bind   (theIObj, aStatus);
-    myMainVwr->StructureManager()->RegisterObject (theIObj);
+    Handle(Graphic3d_ViewAffinity) anAffinity = myMainVwr->StructureManager()->RegisterObject (theIObj);
     myMainPM->Display(theIObj, theDispMode);
     if (theSelectionMode != -1)
     {
@@ -572,20 +567,23 @@ void AIS_InteractiveContext::Load (const Handle(AIS_InteractiveObject)& theIObj,
     return;
   }
 
-  if (!myObjects.IsBound (theIObj))
+  if (theSelMode == -1
+  && !theToAllowDecomposition)
   {
-    Standard_Integer aDispMode, aHiMod, aSelModeDef;
-    GetDefModes (theIObj, aDispMode, aHiMod, aSelModeDef);
-    Handle(AIS_GlobalStatus) aStatus = new AIS_GlobalStatus (AIS_DS_Erased, aDispMode, theSelMode != -1 ? theSelMode : aSelModeDef);
-    myObjects.Bind (theIObj, aStatus);
-    myMainVwr->StructureManager()->RegisterObject (theIObj);
-  }
+    if (!myObjects.IsBound (theIObj))
+    {
+      Standard_Integer aDispMode, aHiMod, aSelModeDef;
+      GetDefModes (theIObj, aDispMode, aHiMod, aSelModeDef);
+      Handle(AIS_GlobalStatus) aStatus = new AIS_GlobalStatus (AIS_DS_Erased, aDispMode, aSelModeDef);
+      myObjects.Bind (theIObj, aStatus);
+    }
 
-  // Register theIObj in the selection manager to prepare further activation of selection
-  const Handle(SelectMgr_SelectableObject)& anObj = theIObj; // to avoid ambiguity
-  if (!mgrSelector->Contains (anObj))
-  {
-    mgrSelector->Load (theIObj);
+    // Register theIObj in the selection manager to prepare further activation of selection
+    const Handle(SelectMgr_SelectableObject)& anObj = theIObj; // to avoid ambiguity
+    if (!mgrSelector->Contains (anObj))
+    {
+      mgrSelector->Load (theIObj);
+    }
   }
 }
 
@@ -694,13 +692,15 @@ void AIS_InteractiveContext::DisplaySelected (const Standard_Boolean theToUpdate
     return;
   }
 
-  for (AIS_NListOfEntityOwner::Iterator aSelIter (mySelection->Objects()); aSelIter.More(); aSelIter.Next())
+  Standard_Boolean      isFound  = Standard_False;
+  for (mySelection->Init(); mySelection->More(); mySelection->Next())
   {
-    Handle(AIS_InteractiveObject) anObj = Handle(AIS_InteractiveObject)::DownCast (aSelIter.Value()->Selectable());
+    Handle(AIS_InteractiveObject) anObj = Handle(AIS_InteractiveObject)::DownCast (mySelection->Value()->Selectable());
     Display (anObj, Standard_False);
+    isFound = Standard_True;
   }
 
-  if (theToUpdateViewer && !mySelection->Objects().IsEmpty())
+  if (isFound && theToUpdateViewer)
   {
     myMainVwr->Update();
   }
@@ -717,12 +717,17 @@ void AIS_InteractiveContext::EraseSelected (const Standard_Boolean theToUpdateVi
     return;
   }
 
-  Standard_Boolean isFound = Standard_False;
-  for (AIS_NListOfEntityOwner::Iterator aSelIter (mySelection->Objects()); aSelIter.More(); aSelIter.Init (mySelection->Objects()))
+  Standard_Boolean      isFound  = Standard_False;
+  mySelection->Init();
+  while (mySelection->More())
   {
-    Handle(AIS_InteractiveObject) anObj = Handle(AIS_InteractiveObject)::DownCast (aSelIter.Value()->Selectable());
+    Handle(SelectMgr_EntityOwner) anOwner = mySelection->Value();
+    Handle(AIS_InteractiveObject) anObj   = Handle(AIS_InteractiveObject)::DownCast (anOwner->Selectable());
+
     Erase (anObj, Standard_False);
     isFound = Standard_True;
+
+    mySelection->Init();
   }
 
   if (isFound && theToUpdateViewer)
@@ -787,7 +792,6 @@ Standard_Boolean AIS_InteractiveContext::KeepTemporary(const Handle(AIS_Interact
                                                         Standard_False);
 //    GS->SubIntensityOn();
     myObjects.Bind(anIObj,GS);
-    myMainVwr->StructureManager()->RegisterObject (anIObj);
     mgrSelector->Load(anIObj);
     mgrSelector->Activate(anIObj,SM,myMainSel);
     
@@ -2492,33 +2496,6 @@ void AIS_InteractiveContext::ClearGlobalPrs (const Handle(AIS_InteractiveObject)
 }
 
 //=======================================================================
-//function : ClearDetected
-//purpose  :
-//=======================================================================
-Standard_Boolean AIS_InteractiveContext::ClearDetected (Standard_Boolean theToRedrawImmediate)
-{
-  myCurDetected = 0;
-  myCurHighlighted = 0;
-  myDetectedSeq.Clear();
-  myLastPicked  = myLastinMain;
-  myWasLastMain = Standard_True;
-  Standard_Boolean toUpdate = Standard_False;
-  if (!myLastPicked.IsNull() && myLastPicked->HasSelectable())
-  {
-    toUpdate = Standard_True;
-    clearDynamicHighlight();
-  }
-  myLastinMain.Nullify();
-  myLastPicked.Nullify();
-  myMainSel->ClearPicked();
-  if (toUpdate && theToRedrawImmediate)
-  {
-    myMainVwr->RedrawImmediate();
-  }
-  return toUpdate;
-}
-
-//=======================================================================
 //function : DrawHiddenLine
 //purpose  :
 //=======================================================================
@@ -2722,6 +2699,7 @@ Standard_Boolean AIS_InteractiveContext::IsInLocal (const Handle(AIS_Interactive
 //=======================================================================
 void AIS_InteractiveContext::InitAttributes()
 {
+  mgrSelector->Add (myMainSel);
 
   Graphic3d_MaterialAspect aMat (Graphic3d_NOM_BRASS);
   myDefaultDrawer->ShadingAspect()->SetMaterial (aMat);
@@ -2810,7 +2788,7 @@ Standard_Boolean AIS_InteractiveContext::PlaneSize (Standard_Real& theX,
 //purpose  :
 //=======================================================================
 void AIS_InteractiveContext::SetZLayer (const Handle(AIS_InteractiveObject)& theIObj,
-                                        const Graphic3d_ZLayerId theLayerId)
+                                        const Standard_Integer theLayerId)
 {
   if (theIObj.IsNull())
     return;
@@ -2822,7 +2800,7 @@ void AIS_InteractiveContext::SetZLayer (const Handle(AIS_InteractiveObject)& the
 //function : GetZLayer
 //purpose  :
 //=======================================================================
-Graphic3d_ZLayerId AIS_InteractiveContext::GetZLayer (const Handle(AIS_InteractiveObject)& theIObj) const
+Standard_Integer AIS_InteractiveContext::GetZLayer (const Handle(AIS_InteractiveObject)& theIObj) const
 {
   return !theIObj.IsNull()
        ?  theIObj->ZLayer()
@@ -2880,14 +2858,15 @@ void AIS_InteractiveContext::FitSelected (const Handle(V3d_View)& theView,
                                           const Standard_Real theMargin,
                                           const Standard_Boolean theToUpdate)
 {
-  const Handle(AIS_Selection)& aSelection = HasOpenedContext()
-                                          ? myLocalContexts(myCurLocalIndex)->Selection()
-                                          : mySelection;
+  const Handle(AIS_Selection)& aSelection = HasOpenedContext() ?
+      myLocalContexts(myCurLocalIndex)->Selection() : mySelection;
+
   Bnd_Box aBndSelected;
+
   AIS_MapOfObjectOwners anObjectOwnerMap;
-  for (AIS_NListOfEntityOwner::Iterator aSelIter (aSelection->Objects()); aSelIter.More(); aSelIter.Next())
+  for (aSelection->Init(); aSelection->More(); aSelection->Next())
   {
-    const Handle(SelectMgr_EntityOwner)& anOwner = aSelIter.Value();
+    const Handle(SelectMgr_EntityOwner)& anOwner = aSelection->Value();
     Handle(AIS_InteractiveObject) anObj = Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
     if (anObj->IsInfinite())
     {

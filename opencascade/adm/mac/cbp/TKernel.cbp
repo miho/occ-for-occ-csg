@@ -77,8 +77,6 @@
 		<Unit filename="../../../src/OSD/OSD_MemInfo.cxx" />
 		<Unit filename="../../../src/OSD/OSD_OpenFile.cxx" />
 		<Unit filename="../../../src/OSD/OSD_Parallel.cxx" />
-		<Unit filename="../../../src/OSD/OSD_Parallel_TBB.cxx" />
-		<Unit filename="../../../src/OSD/OSD_Parallel_Threads.cxx" />
 		<Unit filename="../../../src/OSD/OSD_Path.cxx" />
 		<Unit filename="../../../src/OSD/OSD_PerfMeter.cxx" />
 		<Unit filename="../../../src/OSD/OSD_Process.cxx" />
@@ -90,6 +88,7 @@
 		<Unit filename="../../../src/OSD/OSD_signal.cxx" />
 		<Unit filename="../../../src/Plugin/Plugin.cxx" />
 		<Unit filename="../../../src/Quantity/Quantity_Color.cxx" />
+		<Unit filename="../../../src/Quantity/Quantity_Convert.cxx" />
 		<Unit filename="../../../src/Quantity/Quantity_Date.cxx" />
 		<Unit filename="../../../src/Quantity/Quantity_Period.cxx" />
 		<Unit filename="../../../src/Resource/Resource_ConvertUnicode.c">
@@ -114,10 +113,11 @@
 		<Unit filename="../../../src/Standard/Standard_OutOfMemory.cxx" />
 		<Unit filename="../../../src/Standard/Standard_Persistent.cxx" />
 		<Unit filename="../../../src/Standard/Standard_Real.cxx" />
+		<Unit filename="../../../src/Standard/Standard_SStream.cxx" />
 		<Unit filename="../../../src/Standard/Standard_ShortReal.cxx" />
-		<Unit filename="../../../src/Standard/Standard_Strtod.cxx" />
 		<Unit filename="../../../src/Standard/Standard_Transient.cxx" />
 		<Unit filename="../../../src/Standard/Standard_Type.cxx" />
+		<Unit filename="../../../src/Standard/Standard_UUID.cxx" />
 		<Unit filename="../../../src/Standard/Standard_math.cxx" />
 		<Unit filename="../../../src/Storage/Storage.cxx" />
 		<Unit filename="../../../src/Storage/Storage_BaseDriver.cxx" />
@@ -131,7 +131,9 @@
 		<Unit filename="../../../src/Storage/Storage_Schema.cxx" />
 		<Unit filename="../../../src/Storage/Storage_TypeData.cxx" />
 		<Unit filename="../../../src/Storage/Storage_TypedCallBack.cxx" />
+		<Unit filename="../../../src/Storage/Storage_stCONSTclCOM.cxx" />
 		<Unit filename="../../../src/TColStd/TColStd_HPackedMapOfInteger.cxx" />
+		<Unit filename="../../../src/TColStd/TColStd_MapIteratorOfPackedMapOfInteger.cxx" />
 		<Unit filename="../../../src/TColStd/TColStd_PackedMapOfInteger.cxx" />
 		<Unit filename="../../../src/TCollection/TCollection.cxx" />
 		<Unit filename="../../../src/TCollection/TCollection_AsciiString.cxx" />

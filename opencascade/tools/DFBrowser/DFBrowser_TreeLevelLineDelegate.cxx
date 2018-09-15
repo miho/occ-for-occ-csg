@@ -16,9 +16,7 @@
 #include <inspector/DFBrowser_TreeLevelLineDelegate.hxx>
 #include <inspector/DFBrowserPane_Tools.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QPainter>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : Constructor

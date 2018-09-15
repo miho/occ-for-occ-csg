@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Compute the 2d-curve. Try to solve the particular case if possible. Otherwize, an approximation is done. For approximation some parameters are used, including required tolerance of approximation. Tolerance is maximal possible value of 3d deviation of 3d projection of projected curve from "exact" 3d projection. Since algorithm searches 2d curve on surface, required 2d tolerance is computed from 3d tolerance with help of U,V resolutions of surface. 3d and 2d tolerances have sence only for curves on surface, it defines precision of projecting and approximation and have nothing to do with distance between the projected curve and the surface.  
+<p>Compute the 2d-curve. Try to solve the particular case if possible. Otherwize, an approximation is done.  
  <a href="class_proj_lib___projected_curve.html#details">More...</a></p>
 
 <p><code>#include &lt;ProjLib_ProjectedCurve.hxx&gt;</code></p>
@@ -87,16 +87,12 @@ Inheritance diagram for ProjLib_ProjectedCurve:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a054d258896a643a73ef4a36480ea5032"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#a054d258896a643a73ef4a36480ea5032">ProjLib_ProjectedCurve</a> ()</td></tr>
-<tr class="memdesc:a054d258896a643a73ef4a36480ea5032"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty constructor, it only sets some initial values for class fields.  <a href="#a054d258896a643a73ef4a36480ea5032">More...</a><br /></td></tr>
 <tr class="separator:a054d258896a643a73ef4a36480ea5032"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b5f54c9029032a703682cfe3aff940a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#a4b5f54c9029032a703682cfe3aff940a">ProjLib_ProjectedCurve</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_surface.html">Adaptor3d_HSurface</a> &gt; &amp;S)</td></tr>
-<tr class="memdesc:a4b5f54c9029032a703682cfe3aff940a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor with initialisation field mySurface.  <a href="#a4b5f54c9029032a703682cfe3aff940a">More...</a><br /></td></tr>
 <tr class="separator:a4b5f54c9029032a703682cfe3aff940a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfecce5b7671ff5d262b4ce25a57b1aa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#abfecce5b7671ff5d262b4ce25a57b1aa">ProjLib_ProjectedCurve</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_surface.html">Adaptor3d_HSurface</a> &gt; &amp;S, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_curve.html">Adaptor3d_HCurve</a> &gt; &amp;C)</td></tr>
-<tr class="memdesc:abfecce5b7671ff5d262b4ce25a57b1aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor, which performs projecting. If projecting uses approximation, default parameters are used, in particular, 3d tolerance of approximation is <a class="el" href="class_precision.html#a94f8d5777a3e8e1c61bd7bbfa8dfc0eb" title="Returns the recommended precision value when checking coincidence of two points in real space...">Precision::Confusion()</a>  <a href="#abfecce5b7671ff5d262b4ce25a57b1aa">More...</a><br /></td></tr>
 <tr class="separator:abfecce5b7671ff5d262b4ce25a57b1aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22b5c37bfc0fa3ed3689a02029ca5d0e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#a22b5c37bfc0fa3ed3689a02029ca5d0e">ProjLib_ProjectedCurve</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_surface.html">Adaptor3d_HSurface</a> &gt; &amp;S, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_curve.html">Adaptor3d_HCurve</a> &gt; &amp;C, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Tol)</td></tr>
-<tr class="memdesc:a22b5c37bfc0fa3ed3689a02029ca5d0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor, which performs projecting. If projecting uses approximation, 3d tolerance is Tol, default parameters are used,.  <a href="#a22b5c37bfc0fa3ed3689a02029ca5d0e">More...</a><br /></td></tr>
 <tr class="separator:a22b5c37bfc0fa3ed3689a02029ca5d0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abce37a1706086cd021a2d80fd36a2506"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#abce37a1706086cd021a2d80fd36a2506">Load</a> (const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Tolerance)</td></tr>
 <tr class="memdesc:abce37a1706086cd021a2d80fd36a2506"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the tolerance used to project the curve on the surface.  <a href="#abce37a1706086cd021a2d80fd36a2506">More...</a><br /></td></tr>
@@ -104,21 +100,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac032ee98dea4e3009bff337d578ac162"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#ac032ee98dea4e3009bff337d578ac162">Load</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_surface.html">Adaptor3d_HSurface</a> &gt; &amp;S)</td></tr>
 <tr class="memdesc:ac032ee98dea4e3009bff337d578ac162"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the Surface.  <a href="#ac032ee98dea4e3009bff337d578ac162">More...</a><br /></td></tr>
 <tr class="separator:ac032ee98dea4e3009bff337d578ac162"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6e1508d530380d9b160d852a05d50aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#ae6e1508d530380d9b160d852a05d50aa">Perform</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_curve.html">Adaptor3d_HCurve</a> &gt; &amp;C)</td></tr>
-<tr class="memdesc:ae6e1508d530380d9b160d852a05d50aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs projecting for given curve. If projecting uses approximation, approximation parameters can be set before by corresponding methods SetDegree(...), SetMaxSegmets(...), SetBndPnt(...), SetMaxDist(...)  <a href="#ae6e1508d530380d9b160d852a05d50aa">More...</a><br /></td></tr>
-<tr class="separator:ae6e1508d530380d9b160d852a05d50aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89bac8d1c428f91773a5d5eb9c901f9f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#a89bac8d1c428f91773a5d5eb9c901f9f">SetDegree</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theDegMin, const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theDegMax)</td></tr>
-<tr class="memdesc:a89bac8d1c428f91773a5d5eb9c901f9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set min and max possible degree of result BSpline curve2d, which is got by approximation. If theDegMin/Max &lt; 0, algorithm uses values that are chosen depending of types curve 3d and surface.  <a href="#a89bac8d1c428f91773a5d5eb9c901f9f">More...</a><br /></td></tr>
-<tr class="separator:a89bac8d1c428f91773a5d5eb9c901f9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a361ce2ee7da25ad3ac08d6fee0afe527"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#a361ce2ee7da25ad3ac08d6fee0afe527">SetMaxSegments</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theMaxSegments)</td></tr>
-<tr class="memdesc:a361ce2ee7da25ad3ac08d6fee0afe527"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the parameter, which defines maximal value of parametric intervals the projected curve can be cut for approximation. If theMaxSegments &lt; 0, algorithm uses default value = 1000.  <a href="#a361ce2ee7da25ad3ac08d6fee0afe527">More...</a><br /></td></tr>
-<tr class="separator:a361ce2ee7da25ad3ac08d6fee0afe527"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89705dff5c104f984df830f7a9f2ea6e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#a89705dff5c104f984df830f7a9f2ea6e">SetBndPnt</a> (const <a class="el" href="_app_par_curves___constraint_8hxx.html#a305648bd8cc64e2dbf09b8420ca47e4c">AppParCurves_Constraint</a> theBndPnt)</td></tr>
-<tr class="memdesc:a89705dff5c104f984df830f7a9f2ea6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the parameter, which defines type of boundary condition between segments during approximation. It can be AppParCurves_PassPoint or AppParCurves_TangencyPoint. Default value is AppParCurves_TangencyPoint;.  <a href="#a89705dff5c104f984df830f7a9f2ea6e">More...</a><br /></td></tr>
-<tr class="separator:a89705dff5c104f984df830f7a9f2ea6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21df95a5a0ba9aa3077ef619b5178214"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#a21df95a5a0ba9aa3077ef619b5178214">SetMaxDist</a> (const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theMaxDist)</td></tr>
-<tr class="memdesc:a21df95a5a0ba9aa3077ef619b5178214"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the parameter, which degines maximal possible distance between projected curve and surface. It uses only for projecting on not analytical surfaces. If theMaxDist &lt; 0, algoritm uses default value 100.*Tolerance. If real distance between curve and surface more then theMaxDist, algorithm stops working.  <a href="#a21df95a5a0ba9aa3077ef619b5178214">More...</a><br /></td></tr>
-<tr class="separator:a21df95a5a0ba9aa3077ef619b5178214"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac2707b311e026d751a0e78f40a11c66"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#aac2707b311e026d751a0e78f40a11c66">Load</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_curve.html">Adaptor3d_HCurve</a> &gt; &amp;C)</td></tr>
+<tr class="memdesc:aac2707b311e026d751a0e78f40a11c66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the Curve.  <a href="#aac2707b311e026d751a0e78f40a11c66">More...</a><br /></td></tr>
+<tr class="separator:aac2707b311e026d751a0e78f40a11c66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a175fa7449e76d51d9b812253185b7364"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_surface.html">Adaptor3d_HSurface</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#a175fa7449e76d51d9b812253185b7364">GetSurface</a> () const</td></tr>
 <tr class="separator:a175fa7449e76d51d9b812253185b7364"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a638882566b99643b525eeebed0ab21f7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_curve.html">Adaptor3d_HCurve</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_proj_lib___projected_curve.html#a638882566b99643b525eeebed0ab21f7">GetCurve</a> () const</td></tr>
@@ -202,7 +186,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af4f72d523020c2d4e7124c67f420d3bd inherit pub_methods_class_adaptor2d___curve2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Compute the 2d-curve. Try to solve the particular case if possible. Otherwize, an approximation is done. For approximation some parameters are used, including required tolerance of approximation. Tolerance is maximal possible value of 3d deviation of 3d projection of projected curve from "exact" 3d projection. Since algorithm searches 2d curve on surface, required 2d tolerance is computed from 3d tolerance with help of U,V resolutions of surface. 3d and 2d tolerances have sence only for curves on surface, it defines precision of projecting and approximation and have nothing to do with distance between the projected curve and the surface. </p>
+<div class="textblock"><p>Compute the 2d-curve. Try to solve the particular case if possible. Otherwize, an approximation is done. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a054d258896a643a73ef4a36480ea5032"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a054d258896a643a73ef4a36480ea5032">&#9670;&nbsp;</a></span>ProjLib_ProjectedCurve() <span class="overload">[1/4]</span></h2>
@@ -218,8 +202,6 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Empty constructor, it only sets some initial values for class fields. </p>
 
 </div>
 </div>
@@ -238,8 +220,6 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Constructor with initialisation field mySurface. </p>
 
 </div>
 </div>
@@ -268,8 +248,6 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Constructor, which performs projecting. If projecting uses approximation, default parameters are used, in particular, 3d tolerance of approximation is <a class="el" href="class_precision.html#a94f8d5777a3e8e1c61bd7bbfa8dfc0eb" title="Returns the recommended precision value when checking coincidence of two points in real space...">Precision::Confusion()</a> </p>
 
 </div>
 </div>
@@ -304,8 +282,6 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Constructor, which performs projecting. If projecting uses approximation, 3d tolerance is Tol, default parameters are used,. </p>
 
 </div>
 </div>
@@ -1025,7 +1001,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="abce37a1706086cd021a2d80fd36a2506"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abce37a1706086cd021a2d80fd36a2506">&#9670;&nbsp;</a></span>Load() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abce37a1706086cd021a2d80fd36a2506">&#9670;&nbsp;</a></span>Load() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1045,7 +1021,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="ac032ee98dea4e3009bff337d578ac162"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac032ee98dea4e3009bff337d578ac162">&#9670;&nbsp;</a></span>Load() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac032ee98dea4e3009bff337d578ac162">&#9670;&nbsp;</a></span>Load() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1061,6 +1037,26 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Changes the Surface. </p>
+
+</div>
+</div>
+<a id="aac2707b311e026d751a0e78f40a11c66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac2707b311e026d751a0e78f40a11c66">&#9670;&nbsp;</a></span>Load() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ProjLib_ProjectedCurve::Load </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_curve.html">Adaptor3d_HCurve</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>C</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Changes the Curve. </p>
 
 </div>
 </div>
@@ -1175,26 +1171,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ae6e1508d530380d9b160d852a05d50aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae6e1508d530380d9b160d852a05d50aa">&#9670;&nbsp;</a></span>Perform()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ProjLib_ProjectedCurve::Perform </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_curve.html">Adaptor3d_HCurve</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>C</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Performs projecting for given curve. If projecting uses approximation, approximation parameters can be set before by corresponding methods SetDegree(...), SetMaxSegmets(...), SetBndPnt(...), SetMaxDist(...) </p>
-
-</div>
-</div>
 <a id="a18c55a23f8839eade93ec844b44c76b0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a18c55a23f8839eade93ec844b44c76b0">&#9670;&nbsp;</a></span>Period()</h2>
 
@@ -1249,96 +1225,6 @@ Public Member Functions</h2></td></tr>
 <p>Returns the parametric resolution corresponding to the real space resolution &lt;R3d&gt;. </p>
 
 <p>Reimplemented from <a class="el" href="class_adaptor2d___curve2d.html#adc8afac34b85ba42126c0eb0f80d2bb1">Adaptor2d_Curve2d</a>.</p>
-
-</div>
-</div>
-<a id="a89705dff5c104f984df830f7a9f2ea6e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89705dff5c104f984df830f7a9f2ea6e">&#9670;&nbsp;</a></span>SetBndPnt()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ProjLib_ProjectedCurve::SetBndPnt </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="_app_par_curves___constraint_8hxx.html#a305648bd8cc64e2dbf09b8420ca47e4c">AppParCurves_Constraint</a>&#160;</td>
-          <td class="paramname"><em>theBndPnt</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the parameter, which defines type of boundary condition between segments during approximation. It can be AppParCurves_PassPoint or AppParCurves_TangencyPoint. Default value is AppParCurves_TangencyPoint;. </p>
-
-</div>
-</div>
-<a id="a89bac8d1c428f91773a5d5eb9c901f9f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89bac8d1c428f91773a5d5eb9c901f9f">&#9670;&nbsp;</a></span>SetDegree()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ProjLib_ProjectedCurve::SetDegree </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>theDegMin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>theDegMax</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set min and max possible degree of result BSpline curve2d, which is got by approximation. If theDegMin/Max &lt; 0, algorithm uses values that are chosen depending of types curve 3d and surface. </p>
-
-</div>
-</div>
-<a id="a21df95a5a0ba9aa3077ef619b5178214"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21df95a5a0ba9aa3077ef619b5178214">&#9670;&nbsp;</a></span>SetMaxDist()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ProjLib_ProjectedCurve::SetMaxDist </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td>
-          <td class="paramname"><em>theMaxDist</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the parameter, which degines maximal possible distance between projected curve and surface. It uses only for projecting on not analytical surfaces. If theMaxDist &lt; 0, algoritm uses default value 100.*Tolerance. If real distance between curve and surface more then theMaxDist, algorithm stops working. </p>
-
-</div>
-</div>
-<a id="a361ce2ee7da25ad3ac08d6fee0afe527"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a361ce2ee7da25ad3ac08d6fee0afe527">&#9670;&nbsp;</a></span>SetMaxSegments()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ProjLib_ProjectedCurve::SetMaxSegments </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>theMaxSegments</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the parameter, which defines maximal value of parametric intervals the projected curve can be cut for approximation. If theMaxSegments &lt; 0, algorithm uses default value = 1000. </p>
 
 </div>
 </div>

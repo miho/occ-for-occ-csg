@@ -6,9 +6,8 @@ puts "========"
 box b 1 2 3
 
 # draw box
-vclear
-vclose ALL
 vinit View1
+vclear
 vsetdispmode 1
 vaxo
 vdisplay     b

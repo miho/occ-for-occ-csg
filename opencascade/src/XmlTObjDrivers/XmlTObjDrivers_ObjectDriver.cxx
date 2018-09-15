@@ -16,7 +16,7 @@
 // The original implementation Copyright: (C) RINA S.p.A
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include "XmlTObjDrivers_ObjectDriver.hxx"
 #include <TObj_TObject.hxx>
 #include <TObj_Persistence.hxx>
@@ -35,7 +35,7 @@ IMPLEMENT_STANDARD_RTTIEXT(XmlTObjDrivers_ObjectDriver,XmlMDF_ADriver)
 //=======================================================================
 
 XmlTObjDrivers_ObjectDriver::XmlTObjDrivers_ObjectDriver
-                         (const Handle(Message_Messenger)& theMessageDriver)
+                         (const Handle(CDM_MessageDriver)& theMessageDriver)
 : XmlMDF_ADriver( theMessageDriver, NULL)
 {
 }
@@ -71,7 +71,7 @@ Standard_Boolean XmlTObjDrivers_ObjectDriver::Paste
     Handle(TObj_TObject)::DownCast (Target) ->Set( anObject );
     return Standard_True;
   }
-  myMessageDriver->Send("error retrieving ExtendedString for type TObj_TModel", Message_Fail);
+  WriteMessage("error retrieving ExtendedString for type TObj_TModel");
   return Standard_False;
 }
 

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -116,7 +116,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a2f8d9c0026ed7073370c3003648ad0a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets status, display mode and selection mode for specified Object If theSelectionMode equals -1, theIObj will not be activated: it will be displayed but will not be selectable.  <a href="#a2f8d9c0026ed7073370c3003648ad0a7">More...</a><br /></td></tr>
 <tr class="separator:a2f8d9c0026ed7073370c3003648ad0a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a323e4c80099fd52d81e17a95db1d3f82"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a323e4c80099fd52d81e17a95db1d3f82">Load</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;aniobj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SelectionMode=-1, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> AllowDecomp=<a class="el" href="_standard___type_def_8hxx.html#a7b6e608c3535f709d07e1ad1c933ae20">Standard_False</a>)</td></tr>
-<tr class="memdesc:a323e4c80099fd52d81e17a95db1d3f82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allows you to load the Interactive Object with a given selection mode, and/or with the desired decomposition option, whether the object is visualized or not. If AllowDecomp = Standard_True and, if the interactive object is of the "Shape" type, these "standard" selection modes will be automatically activated as a function of the modes present in the Local Context. The loaded objects will be selectable but displayable in highlighting only when detected by the Selector.  <a href="#a323e4c80099fd52d81e17a95db1d3f82">More...</a><br /></td></tr>
+<tr class="memdesc:a323e4c80099fd52d81e17a95db1d3f82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allows you to load the Interactive Object with a given selection mode, and/or with the desired decomposition option, whether the object is visualized or not. If AllowDecomp = Standard_True and, if the interactive object is of the "Shape" type, these "standard" selection modes will be automatically activated as a function of the modes present in the Local Context. The loaded objects will be selectable but displayable in highlighting only when detected by the Selector. This method is available only when Local Contexts are open.  <a href="#a323e4c80099fd52d81e17a95db1d3f82">More...</a><br /></td></tr>
 <tr class="separator:a323e4c80099fd52d81e17a95db1d3f82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff5b73947ef64850ca7f81197d9fad94"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#aff5b73947ef64850ca7f81197d9fad94">Erase</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theIObj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>)</td></tr>
 <tr class="memdesc:aff5b73947ef64850ca7f81197d9fad94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hides the object. The object's presentations are simply flagged as invisible and therefore excluded from redrawing. To show hidden objects, use <a class="el" href="class_a_i_s___interactive_context.html#a37d5cb7992ecd126996d94ab07c05549" title="Displays the object in this Context using default Display Mode. This will be the object&#39;s default dis...">Display()</a>.  <a href="#aff5b73947ef64850ca7f81197d9fad94">More...</a><br /></td></tr>
@@ -140,7 +140,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aef4654ad6d6a618acb6e2d0f5187eeb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes Object from every viewer.  <a href="#aef4654ad6d6a618acb6e2d0f5187eeb4">More...</a><br /></td></tr>
 <tr class="separator:aef4654ad6d6a618acb6e2d0f5187eeb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a927182cc73e59a352f194cc539cad436"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a927182cc73e59a352f194cc539cad436">RemoveAll</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>)</td></tr>
-<tr class="memdesc:a927182cc73e59a352f194cc539cad436"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all the objects from Context.  <a href="#a927182cc73e59a352f194cc539cad436">More...</a><br /></td></tr>
+<tr class="memdesc:a927182cc73e59a352f194cc539cad436"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all the objects from all opened Local Contexts and from the Neutral Point.  <a href="#a927182cc73e59a352f194cc539cad436">More...</a><br /></td></tr>
 <tr class="separator:a927182cc73e59a352f194cc539cad436"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9c184258cf71560ac369a948f2212fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#ac9c184258cf71560ac369a948f2212fe">Redisplay</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theIObj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theAllModes=<a class="el" href="_standard___type_def_8hxx.html#a7b6e608c3535f709d07e1ad1c933ae20">Standard_False</a>)</td></tr>
 <tr class="memdesc:ac9c184258cf71560ac369a948f2212fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recomputes the seen parts presentation of the Object. If theAllModes equals true, all presentations are present in the object even if unseen.  <a href="#ac9c184258cf71560ac369a948f2212fe">More...</a><br /></td></tr>
@@ -164,12 +164,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2fbbd1bce01531112d5f3eb3dec14ed8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a2fbbd1bce01531112d5f3eb3dec14ed8">SetDisplayPriority</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theIObj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> thePriority)</td></tr>
 <tr class="memdesc:a2fbbd1bce01531112d5f3eb3dec14ed8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the display priority of the seen parts presentation of the Object.  <a href="#a2fbbd1bce01531112d5f3eb3dec14ed8">More...</a><br /></td></tr>
 <tr class="separator:a2fbbd1bce01531112d5f3eb3dec14ed8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f00fee096e9d5fa445a5eff74968df8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a2f00fee096e9d5fa445a5eff74968df8">GetZLayer</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theIObj) <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
-<tr class="memdesc:a2f00fee096e9d5fa445a5eff74968df8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get Z layer id set for displayed interactive object.  <a href="#a2f00fee096e9d5fa445a5eff74968df8">More...</a><br /></td></tr>
-<tr class="separator:a2f00fee096e9d5fa445a5eff74968df8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c0dc5a55362b6f43161a98c8971358a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a5c0dc5a55362b6f43161a98c8971358a">SetZLayer</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theIObj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a> theLayerId)</td></tr>
-<tr class="memdesc:a5c0dc5a55362b6f43161a98c8971358a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Z layer id for interactive object. The Z layers can be used to display temporarily presentations of some object in front of the other objects in the scene. The ids for Z layers are generated by <a class="el" href="class_v3d___viewer.html" title="Defines services on Viewer type objects. The methods of this class allow editing and interrogation of...">V3d_Viewer</a>.  <a href="#a5c0dc5a55362b6f43161a98c8971358a">More...</a><br /></td></tr>
-<tr class="separator:a5c0dc5a55362b6f43161a98c8971358a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bcd860f5e7a5eb96b44381c84972b00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a4bcd860f5e7a5eb96b44381c84972b00">GetZLayer</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theIObj) <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
+<tr class="memdesc:a4bcd860f5e7a5eb96b44381c84972b00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get Z layer id set for displayed interactive object.  <a href="#a4bcd860f5e7a5eb96b44381c84972b00">More...</a><br /></td></tr>
+<tr class="separator:a4bcd860f5e7a5eb96b44381c84972b00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f743c14e3beb6f692aed6861e3f150d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a9f743c14e3beb6f692aed6861e3f150d">SetZLayer</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theIObj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theLayerId)</td></tr>
+<tr class="memdesc:a9f743c14e3beb6f692aed6861e3f150d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Z layer id for interactive object. The Z layers can be used to display temporarily presentations of some object in front of the other objects in the scene. The ids for Z layers are generated by <a class="el" href="class_v3d___viewer.html" title="Defines services on Viewer type objects. The methods of this class allow editing and interrogation of...">V3d_Viewer</a>.  <a href="#a9f743c14e3beb6f692aed6861e3f150d">More...</a><br /></td></tr>
+<tr class="separator:a9f743c14e3beb6f692aed6861e3f150d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45cf213bf88623fd0e98d3dbafb1bb15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a45cf213bf88623fd0e98d3dbafb1bb15">SetViewAffinity</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theIObj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___view.html">V3d_View</a> &gt; &amp;theView, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theIsVisible)</td></tr>
 <tr class="memdesc:a45cf213bf88623fd0e98d3dbafb1bb15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup object visibility in specified view. Has no effect if object is not displayed in this context.  <a href="#a45cf213bf88623fd0e98d3dbafb1bb15">More...</a><br /></td></tr>
 <tr class="separator:a45cf213bf88623fd0e98d3dbafb1bb15"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -219,21 +219,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a7271a4f4660877cab946c7fe190abede"><td class="mdescLeft">&#160;</td><td class="mdescRight">Redraws immediate structures in all views of the viewer given taking into account its visibility.  <a href="#a7271a4f4660877cab946c7fe190abede">More...</a><br /></td></tr>
 <tr class="separator:a7271a4f4660877cab946c7fe190abede"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">management of active Selection Modes</div></td></tr>
-<tr class="memitem:a4798c98112a5889d4b4a04bab3ee0117"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a4798c98112a5889d4b4a04bab3ee0117">SetSelectionModeActive</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theObj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theMode, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theToActivate, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_a_i_s___selection_modes_concurrency_8hxx.html#aa92da4f10fd7d1e2ab2a2ccf44b67822">AIS_SelectionModesConcurrency</a> theConcurrency=<a class="el" href="_a_i_s___selection_modes_concurrency_8hxx.html#aa92da4f10fd7d1e2ab2a2ccf44b67822a23d9111b73db69dd3a7f7f17a4552f7d">AIS_SelectionModesConcurrency_Multiple</a>, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theIsForce=<a class="el" href="_standard___type_def_8hxx.html#a7b6e608c3535f709d07e1ad1c933ae20">Standard_False</a>)</td></tr>
-<tr class="memdesc:a4798c98112a5889d4b4a04bab3ee0117"><td class="mdescLeft">&#160;</td><td class="mdescRight">Activates or deactivates the selection mode for specified object. Has no effect if selection mode was already active/deactivated.  <a href="#a4798c98112a5889d4b4a04bab3ee0117">More...</a><br /></td></tr>
-<tr class="separator:a4798c98112a5889d4b4a04bab3ee0117"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f7101a745f88861df054ace1f2744b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a1f7101a745f88861df054ace1f2744b6">Activate</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theObj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theMode=0, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theIsForce=<a class="el" href="_standard___type_def_8hxx.html#a7b6e608c3535f709d07e1ad1c933ae20">Standard_False</a>)</td></tr>
-<tr class="memdesc:a1f7101a745f88861df054ace1f2744b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Activates the selection mode aMode whose index is given, for the given interactive entity anIobj.  <a href="#a1f7101a745f88861df054ace1f2744b6">More...</a><br /></td></tr>
-<tr class="separator:a1f7101a745f88861df054ace1f2744b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42c02317741462be956be3b7f3d3976e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a42c02317741462be956be3b7f3d3976e">Activate</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;anIobj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> aMode=0, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theIsForce=<a class="el" href="_standard___type_def_8hxx.html#a7b6e608c3535f709d07e1ad1c933ae20">Standard_False</a>)</td></tr>
+<tr class="memdesc:a42c02317741462be956be3b7f3d3976e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Activates the selection mode aMode whose index is given, for the given interactive entity anIobj.  <a href="#a42c02317741462be956be3b7f3d3976e">More...</a><br /></td></tr>
+<tr class="separator:a42c02317741462be956be3b7f3d3976e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38ff48c035b78e9f7df14fa44fe34e30"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a38ff48c035b78e9f7df14fa44fe34e30">Activate</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theMode, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theIsForce=<a class="el" href="_standard___type_def_8hxx.html#a7b6e608c3535f709d07e1ad1c933ae20">Standard_False</a>)</td></tr>
 <tr class="memdesc:a38ff48c035b78e9f7df14fa44fe34e30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Activates the given selection mode for the all displayed objects.  <a href="#a38ff48c035b78e9f7df14fa44fe34e30">More...</a><br /></td></tr>
 <tr class="separator:a38ff48c035b78e9f7df14fa44fe34e30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab52951c5a8a42ab76cbbe0f69c4e23f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#ab52951c5a8a42ab76cbbe0f69c4e23f2">Deactivate</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theObj)</td></tr>
-<tr class="memdesc:ab52951c5a8a42ab76cbbe0f69c4e23f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deactivates all the activated selection modes of an object.  <a href="#ab52951c5a8a42ab76cbbe0f69c4e23f2">More...</a><br /></td></tr>
-<tr class="separator:ab52951c5a8a42ab76cbbe0f69c4e23f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6cc8998846c87b08c405a37cb3f7521d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a6cc8998846c87b08c405a37cb3f7521d">Deactivate</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theObj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theMode)</td></tr>
-<tr class="memdesc:a6cc8998846c87b08c405a37cb3f7521d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deactivates all the activated selection modes of the interactive object anIobj with a given selection mode aMode.  <a href="#a6cc8998846c87b08c405a37cb3f7521d">More...</a><br /></td></tr>
-<tr class="separator:a6cc8998846c87b08c405a37cb3f7521d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a781c9ff6e3d3c1c0b43f80d99c5a73de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a781c9ff6e3d3c1c0b43f80d99c5a73de">Deactivate</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;anIObj)</td></tr>
+<tr class="memdesc:a781c9ff6e3d3c1c0b43f80d99c5a73de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deactivates all the activated selection modes of an object.  <a href="#a781c9ff6e3d3c1c0b43f80d99c5a73de">More...</a><br /></td></tr>
+<tr class="separator:a781c9ff6e3d3c1c0b43f80d99c5a73de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a177c25b9e805ead1485014929e27a382"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a177c25b9e805ead1485014929e27a382">Deactivate</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;anIobj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> aMode)</td></tr>
+<tr class="memdesc:a177c25b9e805ead1485014929e27a382"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deactivates all the activated selection modes of the interactive object anIobj with a given selection mode aMode.  <a href="#a177c25b9e805ead1485014929e27a382">More...</a><br /></td></tr>
+<tr class="separator:a177c25b9e805ead1485014929e27a382"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb66acac3ac8dee10e369acd7b46a5c1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#aeb66acac3ac8dee10e369acd7b46a5c1">Deactivate</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theMode)</td></tr>
 <tr class="memdesc:aeb66acac3ac8dee10e369acd7b46a5c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deactivates the given selection mode for all displayed objects.  <a href="#aeb66acac3ac8dee10e369acd7b46a5c1">More...</a><br /></td></tr>
 <tr class="separator:aeb66acac3ac8dee10e369acd7b46a5c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -241,7 +238,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a151b8f91174a31b950b1410aaa38dc98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deactivates all the activated selection mode at all displayed objects.  <a href="#a151b8f91174a31b950b1410aaa38dc98">More...</a><br /></td></tr>
 <tr class="separator:a151b8f91174a31b950b1410aaa38dc98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb12589e0af8c4f94ff7fa4daf8bcb7a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#abb12589e0af8c4f94ff7fa4daf8bcb7a">ActivatedModes</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;anIobj, <a class="el" href="_t_col_std___list_of_integer_8hxx.html#a1dad525c740b42a301bd3f7d44e62c3c">TColStd_ListOfInteger</a> &amp;theList) <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
-<tr class="memdesc:abb12589e0af8c4f94ff7fa4daf8bcb7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the list of activated selection modes.  <a href="#abb12589e0af8c4f94ff7fa4daf8bcb7a">More...</a><br /></td></tr>
+<tr class="memdesc:abb12589e0af8c4f94ff7fa4daf8bcb7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the list of activated selection modes in an open context.  <a href="#abb12589e0af8c4f94ff7fa4daf8bcb7a">More...</a><br /></td></tr>
 <tr class="separator:abb12589e0af8c4f94ff7fa4daf8bcb7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8cb62d753221eabc4b04f53585c1085f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a8cb62d753221eabc4b04f53585c1085f">EntityOwners</a> (<a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_select_mgr___indexed_map_of_owner_8hxx.html#a876693f57b4083b0db2e744396ca708f">SelectMgr_IndexedMapOfOwner</a> &gt; &amp;theOwners, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theIObj, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theMode=-1) <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
 <tr class="memdesc:a8cb62d753221eabc4b04f53585c1085f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a collection containing all entity owners created for the interactive object in specified selection mode (in all active modes if the Mode == -1)  <a href="#a8cb62d753221eabc4b04f53585c1085f">More...</a><br /></td></tr>
@@ -617,64 +614,64 @@ Protected Member Functions</h2></td></tr>
 Protected Attributes</h2></td></tr>
 <tr><td colspan="2"><div class="groupHeader">internal fields</div></td></tr>
 <tr class="memitem:a4a2623de4744d2c47ac1261872d11a4f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_a_i_s___data_map_of_i_o_status_8hxx.html#a310c30e002aeec3aa56953f7303946aa">AIS_DataMapOfIOStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a4a2623de4744d2c47ac1261872d11a4f">myObjects</a></td></tr>
-<tr class="memdesc:a4a2623de4744d2c47ac1261872d11a4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a4a2623de4744d2c47ac1261872d11a4f">More...</a><br /></td></tr>
+<tr class="memdesc:a4a2623de4744d2c47ac1261872d11a4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a4a2623de4744d2c47ac1261872d11a4f">More...</a><br /></td></tr>
 <tr class="separator:a4a2623de4744d2c47ac1261872d11a4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d8501332da4c34515138de764b7bba2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___selection_manager.html">SelectMgr_SelectionManager</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a7d8501332da4c34515138de764b7bba2">mgrSelector</a></td></tr>
-<tr class="memdesc:a7d8501332da4c34515138de764b7bba2"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a7d8501332da4c34515138de764b7bba2">More...</a><br /></td></tr>
+<tr class="memdesc:a7d8501332da4c34515138de764b7bba2"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a7d8501332da4c34515138de764b7bba2">More...</a><br /></td></tr>
 <tr class="separator:a7d8501332da4c34515138de764b7bba2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96caae711ee103b8b8661793f18e38e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_prs_mgr___presentation_manager3d_8hxx.html#abf0b70d35c36f63efe5029ef4b5bf3d3">PrsMgr_PresentationManager3d</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a96caae711ee103b8b8661793f18e38e4">myMainPM</a></td></tr>
-<tr class="memdesc:a96caae711ee103b8b8661793f18e38e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a96caae711ee103b8b8661793f18e38e4">More...</a><br /></td></tr>
+<tr class="memdesc:a96caae711ee103b8b8661793f18e38e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a96caae711ee103b8b8661793f18e38e4">More...</a><br /></td></tr>
 <tr class="separator:a96caae711ee103b8b8661793f18e38e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a9ae3d998e8f5034e2e34ee48ecf6dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___viewer.html">V3d_Viewer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a3a9ae3d998e8f5034e2e34ee48ecf6dd">myMainVwr</a></td></tr>
-<tr class="memdesc:a3a9ae3d998e8f5034e2e34ee48ecf6dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a3a9ae3d998e8f5034e2e34ee48ecf6dd">More...</a><br /></td></tr>
+<tr class="memdesc:a3a9ae3d998e8f5034e2e34ee48ecf6dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a3a9ae3d998e8f5034e2e34ee48ecf6dd">More...</a><br /></td></tr>
 <tr class="separator:a3a9ae3d998e8f5034e2e34ee48ecf6dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8742d0d2f0756dd1e18d8002e0d8a3c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_std_select___viewer_selector3d.html">StdSelect_ViewerSelector3d</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a8742d0d2f0756dd1e18d8002e0d8a3c6">myMainSel</a></td></tr>
-<tr class="memdesc:a8742d0d2f0756dd1e18d8002e0d8a3c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a8742d0d2f0756dd1e18d8002e0d8a3c6">More...</a><br /></td></tr>
+<tr class="memdesc:a8742d0d2f0756dd1e18d8002e0d8a3c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a8742d0d2f0756dd1e18d8002e0d8a3c6">More...</a><br /></td></tr>
 <tr class="separator:a8742d0d2f0756dd1e18d8002e0d8a3c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2cb3da856aa99f929494e0de038faf50"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___entity_owner.html">SelectMgr_EntityOwner</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a2cb3da856aa99f929494e0de038faf50">myLastPicked</a></td></tr>
-<tr class="memdesc:a2cb3da856aa99f929494e0de038faf50"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a2cb3da856aa99f929494e0de038faf50">More...</a><br /></td></tr>
+<tr class="memdesc:a2cb3da856aa99f929494e0de038faf50"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a2cb3da856aa99f929494e0de038faf50">More...</a><br /></td></tr>
 <tr class="separator:a2cb3da856aa99f929494e0de038faf50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b450dc7592deb21123000450ead738a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___entity_owner.html">SelectMgr_EntityOwner</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a2b450dc7592deb21123000450ead738a">myLastinMain</a></td></tr>
-<tr class="memdesc:a2b450dc7592deb21123000450ead738a"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a2b450dc7592deb21123000450ead738a">More...</a><br /></td></tr>
+<tr class="memdesc:a2b450dc7592deb21123000450ead738a"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a2b450dc7592deb21123000450ead738a">More...</a><br /></td></tr>
 <tr class="separator:a2b450dc7592deb21123000450ead738a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aacec4c4fe2a311e3b6a602dbf6086325"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#aacec4c4fe2a311e3b6a602dbf6086325">myWasLastMain</a></td></tr>
-<tr class="memdesc:aacec4c4fe2a311e3b6a602dbf6086325"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#aacec4c4fe2a311e3b6a602dbf6086325">More...</a><br /></td></tr>
+<tr class="memdesc:aacec4c4fe2a311e3b6a602dbf6086325"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#aacec4c4fe2a311e3b6a602dbf6086325">More...</a><br /></td></tr>
 <tr class="separator:aacec4c4fe2a311e3b6a602dbf6086325"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac20bc71ecf605cdd44217b1adcff9e95"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#ac20bc71ecf605cdd44217b1adcff9e95">myToHilightSelected</a></td></tr>
-<tr class="memdesc:ac20bc71ecf605cdd44217b1adcff9e95"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#ac20bc71ecf605cdd44217b1adcff9e95">More...</a><br /></td></tr>
+<tr class="memdesc:ac20bc71ecf605cdd44217b1adcff9e95"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#ac20bc71ecf605cdd44217b1adcff9e95">More...</a><br /></td></tr>
 <tr class="separator:ac20bc71ecf605cdd44217b1adcff9e95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adacc6d6a67bb456086ae031564e5f2b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___selection.html">AIS_Selection</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#adacc6d6a67bb456086ae031564e5f2b1">mySelection</a></td></tr>
-<tr class="memdesc:adacc6d6a67bb456086ae031564e5f2b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#adacc6d6a67bb456086ae031564e5f2b1">More...</a><br /></td></tr>
+<tr class="memdesc:adacc6d6a67bb456086ae031564e5f2b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#adacc6d6a67bb456086ae031564e5f2b1">More...</a><br /></td></tr>
 <tr class="separator:adacc6d6a67bb456086ae031564e5f2b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0f775734fc0c85c4c53a7528df7c673"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___or_filter.html">SelectMgr_OrFilter</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#ab0f775734fc0c85c4c53a7528df7c673">myFilters</a></td></tr>
-<tr class="memdesc:ab0f775734fc0c85c4c53a7528df7c673"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#ab0f775734fc0c85c4c53a7528df7c673">More...</a><br /></td></tr>
+<tr class="memdesc:ab0f775734fc0c85c4c53a7528df7c673"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#ab0f775734fc0c85c4c53a7528df7c673">More...</a><br /></td></tr>
 <tr class="separator:ab0f775734fc0c85c4c53a7528df7c673"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75852693825a119e5b258fdc782e1eef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_prs3d___drawer.html">Prs3d_Drawer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a75852693825a119e5b258fdc782e1eef">myDefaultDrawer</a></td></tr>
-<tr class="memdesc:a75852693825a119e5b258fdc782e1eef"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a75852693825a119e5b258fdc782e1eef">More...</a><br /></td></tr>
+<tr class="memdesc:a75852693825a119e5b258fdc782e1eef"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a75852693825a119e5b258fdc782e1eef">More...</a><br /></td></tr>
 <tr class="separator:a75852693825a119e5b258fdc782e1eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6eeb952f90387401161e80fd97c8561c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_prs3d___drawer.html">Prs3d_Drawer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a6eeb952f90387401161e80fd97c8561c">myStyles</a> [<a class="el" href="_prs3d___type_of_highlight_8hxx.html#a59acaf6212e3c436224754180aef0fd6abe48578b89c023ffba62678c0a638d93">Prs3d_TypeOfHighlight_NB</a>]</td></tr>
-<tr class="memdesc:a6eeb952f90387401161e80fd97c8561c"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a6eeb952f90387401161e80fd97c8561c">More...</a><br /></td></tr>
+<tr class="memdesc:a6eeb952f90387401161e80fd97c8561c"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a6eeb952f90387401161e80fd97c8561c">More...</a><br /></td></tr>
 <tr class="separator:a6eeb952f90387401161e80fd97c8561c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1962806f2a30893fcd511ea6733f812d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_a_i_s___data_map_of_i_l_c_8hxx.html#a2738ef15737c18a12a8578de3ef2a895">AIS_DataMapOfILC</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a1962806f2a30893fcd511ea6733f812d">myLocalContexts</a></td></tr>
-<tr class="memdesc:a1962806f2a30893fcd511ea6733f812d"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a1962806f2a30893fcd511ea6733f812d">More...</a><br /></td></tr>
+<tr class="memdesc:a1962806f2a30893fcd511ea6733f812d"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a1962806f2a30893fcd511ea6733f812d">More...</a><br /></td></tr>
 <tr class="separator:a1962806f2a30893fcd511ea6733f812d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a779e6c72acc5659a51e05530f9606bd8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a779e6c72acc5659a51e05530f9606bd8">myCurLocalIndex</a></td></tr>
-<tr class="memdesc:a779e6c72acc5659a51e05530f9606bd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a779e6c72acc5659a51e05530f9606bd8">More...</a><br /></td></tr>
+<tr class="memdesc:a779e6c72acc5659a51e05530f9606bd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a779e6c72acc5659a51e05530f9606bd8">More...</a><br /></td></tr>
 <tr class="separator:a779e6c72acc5659a51e05530f9606bd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae98335503ba1f36e9f49a71a46824461"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_t_col_std___sequence_of_integer_8hxx.html#a87785114fb76973a939c4c85036ecd12">TColStd_SequenceOfInteger</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#ae98335503ba1f36e9f49a71a46824461">myDetectedSeq</a></td></tr>
-<tr class="memdesc:ae98335503ba1f36e9f49a71a46824461"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#ae98335503ba1f36e9f49a71a46824461">More...</a><br /></td></tr>
+<tr class="memdesc:ae98335503ba1f36e9f49a71a46824461"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#ae98335503ba1f36e9f49a71a46824461">More...</a><br /></td></tr>
 <tr class="separator:ae98335503ba1f36e9f49a71a46824461"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c52f256dafaca0181532de95ec9a173"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a3c52f256dafaca0181532de95ec9a173">myCurDetected</a></td></tr>
-<tr class="memdesc:a3c52f256dafaca0181532de95ec9a173"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a3c52f256dafaca0181532de95ec9a173">More...</a><br /></td></tr>
+<tr class="memdesc:a3c52f256dafaca0181532de95ec9a173"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a3c52f256dafaca0181532de95ec9a173">More...</a><br /></td></tr>
 <tr class="separator:a3c52f256dafaca0181532de95ec9a173"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ae628e2474af1deecd41da44d5c52f8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a1ae628e2474af1deecd41da44d5c52f8">myCurHighlighted</a></td></tr>
-<tr class="memdesc:a1ae628e2474af1deecd41da44d5c52f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a1ae628e2474af1deecd41da44d5c52f8">More...</a><br /></td></tr>
+<tr class="memdesc:a1ae628e2474af1deecd41da44d5c52f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#a1ae628e2474af1deecd41da44d5c52f8">More...</a><br /></td></tr>
 <tr class="separator:a1ae628e2474af1deecd41da44d5c52f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeeec235f2050d570858a3a8e48e4cbdf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_select_mgr___picking_strategy_8hxx.html#aa06a764ad5c8c1302aa6abaa6d7c0ef0">SelectMgr_PickingStrategy</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#aeeec235f2050d570858a3a8e48e4cbdf">myPickingStrategy</a></td></tr>
-<tr class="memdesc:aeeec235f2050d570858a3a8e48e4cbdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#aeeec235f2050d570858a3a8e48e4cbdf">More...</a><br /></td></tr>
+<tr class="memdesc:aeeec235f2050d570858a3a8e48e4cbdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#aeeec235f2050d570858a3a8e48e4cbdf">More...</a><br /></td></tr>
 <tr class="separator:aeeec235f2050d570858a3a8e48e4cbdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af65dd84ee860f5078639eb5858524a2d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#af65dd84ee860f5078639eb5858524a2d">myIsAutoActivateSelMode</a></td></tr>
-<tr class="memdesc:af65dd84ee860f5078639eb5858524a2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#af65dd84ee860f5078639eb5858524a2d">More...</a><br /></td></tr>
+<tr class="memdesc:af65dd84ee860f5078639eb5858524a2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>  <a href="#af65dd84ee860f5078639eb5858524a2d">More...</a><br /></td></tr>
 <tr class="separator:af65dd84ee860f5078639eb5858524a2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="member-group"></a>
@@ -749,17 +746,14 @@ object local transformation management</h2></td></tr>
 <tr class="memdesc:a20c510623b28d2e88eba22417f73b7dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Puts the location on the initial graphic representation and the selection for the Object.  <a href="#a20c510623b28d2e88eba22417f73b7dd">More...</a><br /></td></tr>
 <tr class="separator:a20c510623b28d2e88eba22417f73b7dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2f4d764acdaab84173975f3eac05090"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#ab2f4d764acdaab84173975f3eac05090">PixelTolerance</a> () <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
-<tr class="memdesc:ab2f4d764acdaab84173975f3eac05090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the pixel tolerance, default is 2. Pixel Tolerance extends sensitivity within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> operation (picking by point) and can be adjusted by application based on user input precision (e.g. screen pixel density, input device precision, etc.).  <a href="#ab2f4d764acdaab84173975f3eac05090">More...</a><br /></td></tr>
+<tr class="memdesc:ab2f4d764acdaab84173975f3eac05090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the pixel tolerance, default is 2. Pixel Tolerance extends sensitivity within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> operation (picking by point) and can be adjusted by application based on user input precision (e.g. screen pixel density, input device precision, etc.).  <a href="#ab2f4d764acdaab84173975f3eac05090">More...</a><br /></td></tr>
 <tr class="separator:ab2f4d764acdaab84173975f3eac05090"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e5e046711bdeb494e39a885c29b366a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a5e5e046711bdeb494e39a885c29b366a">SetSelectionSensitivity</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theObject, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theMode, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theNewSensitivity)</td></tr>
 <tr class="memdesc:a5e5e046711bdeb494e39a885c29b366a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allows to manage sensitivity of a particular selection of interactive object theObject and changes previous sensitivity value of all sensitive entities in selection with theMode to the given theNewSensitivity.  <a href="#a5e5e046711bdeb494e39a885c29b366a">More...</a><br /></td></tr>
 <tr class="separator:a5e5e046711bdeb494e39a885c29b366a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6db432be49a4fd328e2f792dfe364f71"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_a_i_s___status_of_detection_8hxx.html#a2080b9fd0602f87fdd271f94bd8d7105">AIS_StatusOfDetection</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71">MoveTo</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theXPix, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theYPix, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___view.html">V3d_View</a> &gt; &amp;theView, <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theToRedrawOnUpdate)</td></tr>
-<tr class="memdesc:a6db432be49a4fd328e2f792dfe364f71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call <a class="el" href="class_a_i_s___interactive_context.html#a7271a4f4660877cab946c7fe190abede" title="Redraws immediate structures in all views of the viewer given taking into account its visibility...">RedrawImmediate()</a> to highlight detected object.  <a href="#a6db432be49a4fd328e2f792dfe364f71">More...</a><br /></td></tr>
+<tr class="memdesc:a6db432be49a4fd328e2f792dfe364f71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call <a class="el" href="class_a_i_s___interactive_context.html#a7271a4f4660877cab946c7fe190abede" title="Redraws immediate structures in all views of the viewer given taking into account its visibility...">RedrawImmediate()</a> to highlight detected object.  <a href="#a6db432be49a4fd328e2f792dfe364f71">More...</a><br /></td></tr>
 <tr class="separator:a6db432be49a4fd328e2f792dfe364f71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe2f5fc31d494173dfc995841364f33b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#abe2f5fc31d494173dfc995841364f33b">ClearDetected</a> (<a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theToRedrawImmediate=<a class="el" href="_standard___type_def_8hxx.html#a7b6e608c3535f709d07e1ad1c933ae20">Standard_False</a>)</td></tr>
-<tr class="memdesc:abe2f5fc31d494173dfc995841364f33b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the list of entities detected by <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> and resets dynamic highlighting.  <a href="#abe2f5fc31d494173dfc995841364f33b">More...</a><br /></td></tr>
-<tr class="separator:abe2f5fc31d494173dfc995841364f33b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4cec759933a05478e4cb7f5c22fb3802"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a4cec759933a05478e4cb7f5c22fb3802">HasDetected</a> () <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
 <tr class="memdesc:a4cec759933a05478e4cb7f5c22fb3802"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if there is a mouse-detected entity in context.  <a href="#a4cec759933a05478e4cb7f5c22fb3802">More...</a><br /></td></tr>
 <tr class="separator:a4cec759933a05478e4cb7f5c22fb3802"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -845,7 +839,7 @@ Selection management</h2></td></tr>
 <tr class="memdesc:a4b645469d8663d4b770116d8b6c6cae6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes highlighting from selected objects.  <a href="#a4b645469d8663d4b770116d8b6c6cae6">More...</a><br /></td></tr>
 <tr class="separator:a4b645469d8663d4b770116d8b6c6cae6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abca4e87f24c5813a3e641d5327757460"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#abca4e87f24c5813a3e641d5327757460">UpdateSelected</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>)</td></tr>
-<tr class="memdesc:abca4e87f24c5813a3e641d5327757460"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the list of selected objects: i.e. highlights the newly selected ones and unhighlights previously selected objects.  <a href="#abca4e87f24c5813a3e641d5327757460">More...</a><br /></td></tr>
+<tr class="memdesc:abca4e87f24c5813a3e641d5327757460"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the list of selected objects: i.e. highlights the newely selected ones and unhighlights previously selected objects.  <a href="#abca4e87f24c5813a3e641d5327757460">More...</a><br /></td></tr>
 <tr class="separator:abca4e87f24c5813a3e641d5327757460"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f0bc5b7062cd13854fa611eb10743fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a8f0bc5b7062cd13854fa611eb10743fe">ClearSelected</a> (<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>)</td></tr>
 <tr class="memdesc:a8f0bc5b7062cd13854fa611eb10743fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empties previous selected objects in order to get the selected objects detected by the selector using UpdateSelected.  <a href="#a8f0bc5b7062cd13854fa611eb10743fe">More...</a><br /></td></tr>
@@ -964,15 +958,15 @@ Local Context management (deprecated)</h2></td></tr>
 <tr class="memitem:a316366891fb27cc173f3073f20e25b7d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a316366891fb27cc173f3073f20e25b7d">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 void SetTemporaryAttributes(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theIObj</td></tr>
 <tr class="memdesc:a316366891fb27cc173f3073f20e25b7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the temporary graphic attributes of the entity anObj. These are provided by the attribute manager aDrawer and are valid for a particular local context only. If a local context is open and if updateviewer equals Standard_False, the presentation of the Interactive Object activates the selection mode; the object is displayed but no viewer will be updated.  <a href="#a316366891fb27cc173f3073f20e25b7d">More...</a><br /></td></tr>
 <tr class="separator:a316366891fb27cc173f3073f20e25b7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabba03b9ed6fcaf4bb63f85d23507b84"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#aabba03b9ed6fcaf4bb63f85d23507b84">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a1f7101a745f88861df054ace1f2744b6">Activate</a>() and <a class="el" href="class_a_i_s___shape.html#a20fd9d5e034faccd22843fd9a8e54a29">AIS_Shape::SelectionMode</a>() should be used instead&quot;) 1 void ActivateStandardMode(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_top_abs___shape_enum_8hxx.html#a67b8aa38656811eaee45f9df08499667">TopAbs_ShapeEnum</a> aStandardActivation)</td></tr>
-<tr class="memdesc:aabba03b9ed6fcaf4bb63f85d23507b84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides an alternative to the Display methods when activating specific selection modes. This has the effect of activating the corresponding selection mode aStandardActivation for all objects in Local Context which accept decomposition into sub-shapes. Every new Object which has been loaded into the interactive context and which answers these decomposition criteria is automatically activated according to these modes. Warning If you have opened a local context by loading an object with the default options (&lt;AllowShapeDecomposition&gt;= Standard_True), all objects of the "Shape" type are also activated with the same modes. You can act on the state of these "Standard" objects by using SetShapeDecomposition(Status).  <a href="#aabba03b9ed6fcaf4bb63f85d23507b84">More...</a><br /></td></tr>
-<tr class="separator:aabba03b9ed6fcaf4bb63f85d23507b84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acffc783fa40f71b295b83c9e68b9daea"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#acffc783fa40f71b295b83c9e68b9daea">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#ab52951c5a8a42ab76cbbe0f69c4e23f2">Deactivate</a>() should be used instead&quot;) 1 void DeactivateStandardMode(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_top_abs___shape_enum_8hxx.html#a67b8aa38656811eaee45f9df08499667">TopAbs_ShapeEnum</a> aStandardActivation)</td></tr>
-<tr class="memdesc:acffc783fa40f71b295b83c9e68b9daea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides an alternative to the Display methods when deactivating specific selection modes. This has the effect of deactivating the corresponding selection mode aStandardActivation for all objects in Local Context which accept decomposition into sub-shapes.  <a href="#acffc783fa40f71b295b83c9e68b9daea">More...</a><br /></td></tr>
-<tr class="separator:acffc783fa40f71b295b83c9e68b9daea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbf6c2d5bfc2e137c84d1f3bc86aae22"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#afbf6c2d5bfc2e137c84d1f3bc86aae22">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - list of activated Selection Modes should be tracked on application side; see also ::<a class="el" href="class_a_i_s___interactive_context.html#abb12589e0af8c4f94ff7fa4daf8bcb7a">ActivatedModes</a>()&quot;) 1 const <a class="el" href="_t_col_std___list_of_integer_8hxx.html#a1dad525c740b42a301bd3f7d44e62c3c">TColStd_ListOfInteger</a> &amp;ActivatedStandardModes() <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
-<tr class="memdesc:afbf6c2d5bfc2e137c84d1f3bc86aae22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the list of activated standard selection modes available in a local context.  <a href="#afbf6c2d5bfc2e137c84d1f3bc86aae22">More...</a><br /></td></tr>
-<tr class="separator:afbf6c2d5bfc2e137c84d1f3bc86aae22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae22d0760a7534ef20db93b8cdc1062e6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#ae22d0760a7534ef20db93b8cdc1062e6">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 void ActivateStandardMode(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_top_abs___shape_enum_8hxx.html#a67b8aa38656811eaee45f9df08499667">TopAbs_ShapeEnum</a> aStandardActivation)</td></tr>
+<tr class="memdesc:ae22d0760a7534ef20db93b8cdc1062e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides an alternative to the Display methods when activating specific selection modes. This has the effect of activating the corresponding selection mode aStandardActivation for all objects in Local Context which accept decomposition into sub-shapes. Every new Object which has been loaded into the interactive context and which answers these decomposition criteria is automatically activated according to these modes. Warning If you have opened a local context by loading an object with the default options (&lt;AllowShapeDecomposition&gt;= Standard_True), all objects of the "Shape" type are also activated with the same modes. You can act on the state of these "Standard" objects by using SetShapeDecomposition(Status).  <a href="#ae22d0760a7534ef20db93b8cdc1062e6">More...</a><br /></td></tr>
+<tr class="separator:ae22d0760a7534ef20db93b8cdc1062e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfc38e7affc452318b9f0151ea09ba1a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#adfc38e7affc452318b9f0151ea09ba1a">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 void DeactivateStandardMode(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_top_abs___shape_enum_8hxx.html#a67b8aa38656811eaee45f9df08499667">TopAbs_ShapeEnum</a> aStandardActivation)</td></tr>
+<tr class="memdesc:adfc38e7affc452318b9f0151ea09ba1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides an alternative to the Display methods when deactivating specific selection modes. This has the effect of deactivating the corresponding selection mode aStandardActivation for all objects in Local Context which accept decomposition into sub-shapes.  <a href="#adfc38e7affc452318b9f0151ea09ba1a">More...</a><br /></td></tr>
+<tr class="separator:adfc38e7affc452318b9f0151ea09ba1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b757e87ddc8e7d1af074d23e11b9268"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a0b757e87ddc8e7d1af074d23e11b9268">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 const <a class="el" href="_t_col_std___list_of_integer_8hxx.html#a1dad525c740b42a301bd3f7d44e62c3c">TColStd_ListOfInteger</a> &amp;ActivatedStandardModes() <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
+<tr class="memdesc:a0b757e87ddc8e7d1af074d23e11b9268"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the list of activated standard selection modes available in a local context.  <a href="#a0b757e87ddc8e7d1af074d23e11b9268">More...</a><br /></td></tr>
+<tr class="separator:a0b757e87ddc8e7d1af074d23e11b9268"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43c051a990b80320625d5e72f9668e5e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a43c051a990b80320625d5e72f9668e5e">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 Standard_Boolean IsInLocal(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;anObject</td></tr>
 <tr class="memdesc:a43c051a990b80320625d5e72f9668e5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns if possible, the first local context where the object is seen  <a href="#a43c051a990b80320625d5e72f9668e5e">More...</a><br /></td></tr>
 <tr class="separator:a43c051a990b80320625d5e72f9668e5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -997,34 +991,34 @@ Local Context management (deprecated)</h2></td></tr>
 <tr class="memitem:a007e0df4ea576613f7939fa1a3e3c862"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a007e0df4ea576613f7939fa1a3e3c862">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 Standard_Boolean IsCurrent(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;theObject) <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
 <tr class="memdesc:a007e0df4ea576613f7939fa1a3e3c862"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if there is a non-null interactive object in Neutral Point. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#a007e0df4ea576613f7939fa1a3e3c862">More...</a><br /></td></tr>
 <tr class="separator:a007e0df4ea576613f7939fa1a3e3c862"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa56e5268cf9f0c024dc1ae236da4b355"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#aa56e5268cf9f0c024dc1ae236da4b355">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#afffabfadddd46d2b00a8339d9835af1a">InitSelected</a>() should be called instead&quot;) 1 void InitCurrent()</td></tr>
-<tr class="memdesc:aa56e5268cf9f0c024dc1ae236da4b355"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a scan of the current selected objects in Neutral Point. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#aa56e5268cf9f0c024dc1ae236da4b355">More...</a><br /></td></tr>
-<tr class="separator:aa56e5268cf9f0c024dc1ae236da4b355"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a554569eea4c94842134113c816f89a7d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a554569eea4c94842134113c816f89a7d">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a94bb5be90685631957e5d4001f989066">MoreSelected</a>() should be called instead&quot;) 1 Standard_Boolean MoreCurrent() <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
-<tr class="memdesc:a554569eea4c94842134113c816f89a7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if there is another object found by the scan of the list of current objects. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#a554569eea4c94842134113c816f89a7d">More...</a><br /></td></tr>
-<tr class="separator:a554569eea4c94842134113c816f89a7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac36b6a9e78d8451c15b2fc3b832da69c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#ac36b6a9e78d8451c15b2fc3b832da69c">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a0de665cf47ace4d86b49012dc9126fb6">NextSelected</a>() should be called instead&quot;) 1 void NextCurrent()</td></tr>
-<tr class="memdesc:ac36b6a9e78d8451c15b2fc3b832da69c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Continues the scan to the next object in the list of current objects. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#ac36b6a9e78d8451c15b2fc3b832da69c">More...</a><br /></td></tr>
-<tr class="separator:ac36b6a9e78d8451c15b2fc3b832da69c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60debce42115560a211021efd1c1c9ab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a60debce42115560a211021efd1c1c9ab">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#adb264a8536f88e6bb4dcf8ce3eb31e27">SelectedInteractive</a>() should be called instead&quot;) 1 Handle&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; Current() <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
-<tr class="memdesc:a60debce42115560a211021efd1c1c9ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current interactive object. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#a60debce42115560a211021efd1c1c9ab">More...</a><br /></td></tr>
-<tr class="separator:a60debce42115560a211021efd1c1c9ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cb3aefb94a26318f0f7cbc671a439b8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a3cb3aefb94a26318f0f7cbc671a439b8">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a7cad6fea27e0a63bbe84fc41d6774bf6">NbSelected</a>() should be called instead&quot;) 1 Standard_Integer NbCurrents()</td></tr>
-<tr class="memdesc:a3cb3aefb94a26318f0f7cbc671a439b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if there is an open context.  <a href="#a3cb3aefb94a26318f0f7cbc671a439b8">More...</a><br /></td></tr>
-<tr class="separator:a3cb3aefb94a26318f0f7cbc671a439b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a117af6d5248c0922a1054666326ee637"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a117af6d5248c0922a1054666326ee637">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a3980a012b9aacf843d48758719b2ade2">HilightSelected</a>() should be called instead&quot;) 1 void HilightCurrents(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>)</td></tr>
-<tr class="memdesc:a117af6d5248c0922a1054666326ee637"><td class="mdescLeft">&#160;</td><td class="mdescRight">Highlights current objects. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#a117af6d5248c0922a1054666326ee637">More...</a><br /></td></tr>
-<tr class="separator:a117af6d5248c0922a1054666326ee637"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b533c816eca4309b3c4201322d63795"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a6b533c816eca4309b3c4201322d63795">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a4b645469d8663d4b770116d8b6c6cae6">UnhilightSelected</a>() should be called instead&quot;) 1 void UnhilightCurrents(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>)</td></tr>
-<tr class="memdesc:a6b533c816eca4309b3c4201322d63795"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes highlighting from current objects. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#a6b533c816eca4309b3c4201322d63795">More...</a><br /></td></tr>
-<tr class="separator:a6b533c816eca4309b3c4201322d63795"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade28b51285833537cdacc4020331b589"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#ade28b51285833537cdacc4020331b589">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a8f0bc5b7062cd13854fa611eb10743fe">ClearSelected</a>() should be called instead&quot;) 1 void ClearCurrents(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>)</td></tr>
-<tr class="memdesc:ade28b51285833537cdacc4020331b589"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empties previous current objects in order to get the current objects detected by the selector using UpdateCurrent. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#ade28b51285833537cdacc4020331b589">More...</a><br /></td></tr>
-<tr class="separator:ade28b51285833537cdacc4020331b589"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12afab23986482a3eee3c999f16ad5a6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a12afab23986482a3eee3c999f16ad5a6">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a1a6ef043cafec39731fd5f6fac9bbd11">DetectedCurrentOwner</a>() should be called instead&quot;) 1 const <a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a> &amp;DetectedCurrentShape() <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
-<tr class="separator:a12afab23986482a3eee3c999f16ad5a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b499e84bd40aae8652b97e8c97b2862"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a6b499e84bd40aae8652b97e8c97b2862">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a1a6ef043cafec39731fd5f6fac9bbd11">DetectedCurrentOwner</a>() should be called instead&quot;) 1 Handle&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; DetectedCurrentObject() <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
-<tr class="separator:a6b499e84bd40aae8652b97e8c97b2862"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a9bfbba52f0c10f6487f5614fa197e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a9a9bfbba52f0c10f6487f5614fa197e3">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 void InitCurrent()</td></tr>
+<tr class="memdesc:a9a9bfbba52f0c10f6487f5614fa197e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a scan of the current selected objects in Neutral Point. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#a9a9bfbba52f0c10f6487f5614fa197e3">More...</a><br /></td></tr>
+<tr class="separator:a9a9bfbba52f0c10f6487f5614fa197e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecbd2cb1ff6a210937cdaf80d4d860db"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#aecbd2cb1ff6a210937cdaf80d4d860db">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 Standard_Boolean MoreCurrent() <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
+<tr class="memdesc:aecbd2cb1ff6a210937cdaf80d4d860db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if there is another object found by the scan of the list of current objects. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#aecbd2cb1ff6a210937cdaf80d4d860db">More...</a><br /></td></tr>
+<tr class="separator:aecbd2cb1ff6a210937cdaf80d4d860db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f3365495b27481fbfd8087ccb46f360"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a3f3365495b27481fbfd8087ccb46f360">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 void NextCurrent()</td></tr>
+<tr class="memdesc:a3f3365495b27481fbfd8087ccb46f360"><td class="mdescLeft">&#160;</td><td class="mdescRight">Continues the scan to the next object in the list of current objects. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#a3f3365495b27481fbfd8087ccb46f360">More...</a><br /></td></tr>
+<tr class="separator:a3f3365495b27481fbfd8087ccb46f360"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16ae8610758622371935f719cbaa7628"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a16ae8610758622371935f719cbaa7628">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 Handle&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; Current() <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
+<tr class="memdesc:a16ae8610758622371935f719cbaa7628"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current interactive object. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#a16ae8610758622371935f719cbaa7628">More...</a><br /></td></tr>
+<tr class="separator:a16ae8610758622371935f719cbaa7628"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3aaba34c4fcb55287e4e5196ec0c88ab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a3aaba34c4fcb55287e4e5196ec0c88ab">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 Standard_Integer NbCurrents()</td></tr>
+<tr class="memdesc:a3aaba34c4fcb55287e4e5196ec0c88ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if there is an open context.  <a href="#a3aaba34c4fcb55287e4e5196ec0c88ab">More...</a><br /></td></tr>
+<tr class="separator:a3aaba34c4fcb55287e4e5196ec0c88ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63b792f1ce0c5555b1e2109a1b69b5cd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a63b792f1ce0c5555b1e2109a1b69b5cd">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 void HilightCurrents(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>)</td></tr>
+<tr class="memdesc:a63b792f1ce0c5555b1e2109a1b69b5cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Highlights current objects. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#a63b792f1ce0c5555b1e2109a1b69b5cd">More...</a><br /></td></tr>
+<tr class="separator:a63b792f1ce0c5555b1e2109a1b69b5cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa93a313071ddf142fbaedde42eb38f4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#afa93a313071ddf142fbaedde42eb38f4">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 void UnhilightCurrents(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>)</td></tr>
+<tr class="memdesc:afa93a313071ddf142fbaedde42eb38f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes highlighting from current objects. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#afa93a313071ddf142fbaedde42eb38f4">More...</a><br /></td></tr>
+<tr class="separator:afa93a313071ddf142fbaedde42eb38f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20426c88d50e9df97bb0b50056982b10"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a20426c88d50e9df97bb0b50056982b10">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 void ClearCurrents(<a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_a_i_s___interactive_context.html#abbb46566fde1d4910c9f0097081e255a">theToUpdateViewer</a>)</td></tr>
+<tr class="memdesc:a20426c88d50e9df97bb0b50056982b10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empties previous current objects in order to get the current objects detected by the selector using UpdateCurrent. Objects selected when there is no open local context are called current objects; those selected in open local context, selected objects.  <a href="#a20426c88d50e9df97bb0b50056982b10">More...</a><br /></td></tr>
+<tr class="separator:a20426c88d50e9df97bb0b50056982b10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15c38ec2b1d8ad6726bb78df9fdf0619"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#a15c38ec2b1d8ad6726bb78df9fdf0619">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 const <a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a> &amp;DetectedCurrentShape() <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
+<tr class="separator:a15c38ec2b1d8ad6726bb78df9fdf0619"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa207ad045936dd2651e88565f0d53486"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_i_s___interactive_context.html#aa207ad045936dd2651e88565f0d53486">Standard_DEPRECATED</a> (&quot;Local Context is deprecated - local selection should be used without Local Context&quot;) 1 Handle&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; DetectedCurrentObject() <a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a></td></tr>
+<tr class="separator:aa207ad045936dd2651e88565f0d53486"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -1092,26 +1086,23 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a1f7101a745f88861df054ace1f2744b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1f7101a745f88861df054ace1f2744b6">&#9670;&nbsp;</a></span>Activate() <span class="overload">[1/2]</span></h2>
+<a id="a42c02317741462be956be3b7f3d3976e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42c02317741462be956be3b7f3d3976e">&#9670;&nbsp;</a></span>Activate() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void AIS_InteractiveContext::Activate </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>theObj</em>, </td>
+          <td class="paramname"><em>anIobj</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>theMode</em> = <code>0</code>, </td>
+          <td class="paramname"><em>aMode</em> = <code>0</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1125,11 +1116,6 @@ Additional Inherited Members</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Activates the selection mode aMode whose index is given, for the given interactive entity anIobj. </p>
@@ -1192,7 +1178,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the list of activated selection modes. </p>
+<p>Returns the list of activated selection modes in an open context. </p>
 
 </div>
 </div>
@@ -1399,33 +1385,6 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Clear visualization of sensitives. </p>
-
-</div>
-</div>
-<a id="abe2f5fc31d494173dfc995841364f33b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe2f5fc31d494173dfc995841364f33b">&#9670;&nbsp;</a></span>ClearDetected()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> AIS_InteractiveContext::ClearDetected </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theToRedrawImmediate</em> = <code><a class="el" href="_standard___type_def_8hxx.html#a7b6e608c3535f709d07e1ad1c933ae20">Standard_False</a></code></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Clears the list of entities detected by <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> and resets dynamic highlighting. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">theToRedrawImmediate</td><td>if TRUE, the main Viewer will be redrawn on update </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>TRUE if viewer needs to be updated (e.g. there were actually dynamically highlighted entities) </dd></dl>
 
 </div>
 </div>
@@ -1651,54 +1610,43 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ab52951c5a8a42ab76cbbe0f69c4e23f2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab52951c5a8a42ab76cbbe0f69c4e23f2">&#9670;&nbsp;</a></span>Deactivate() <span class="overload">[1/4]</span></h2>
+<a id="a781c9ff6e3d3c1c0b43f80d99c5a73de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a781c9ff6e3d3c1c0b43f80d99c5a73de">&#9670;&nbsp;</a></span>Deactivate() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void AIS_InteractiveContext::Deactivate </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>theObj</em></td><td>)</td>
+          <td class="paramname"><em>anIObj</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Deactivates all the activated selection modes of an object. </p>
 
 </div>
 </div>
-<a id="a6cc8998846c87b08c405a37cb3f7521d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6cc8998846c87b08c405a37cb3f7521d">&#9670;&nbsp;</a></span>Deactivate() <span class="overload">[2/4]</span></h2>
+<a id="a177c25b9e805ead1485014929e27a382"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a177c25b9e805ead1485014929e27a382">&#9670;&nbsp;</a></span>Deactivate() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void AIS_InteractiveContext::Deactivate </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>theObj</em>, </td>
+          <td class="paramname"><em>anIobj</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>theMode</em>&#160;</td>
+          <td class="paramname"><em>aMode</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1706,11 +1654,6 @@ Additional Inherited Members</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Deactivates all the activated selection modes of the interactive object anIobj with a given selection mode aMode. </p>
@@ -2829,14 +2772,14 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a2f00fee096e9d5fa445a5eff74968df8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f00fee096e9d5fa445a5eff74968df8">&#9670;&nbsp;</a></span>GetZLayer()</h2>
+<a id="a4bcd860f5e7a5eb96b44381c84972b00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4bcd860f5e7a5eb96b44381c84972b00">&#9670;&nbsp;</a></span>GetZLayer()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a> AIS_InteractiveContext::GetZLayer </td>
+          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> AIS_InteractiveContext::GetZLayer </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theIObj</em></td><td>)</td>
@@ -3942,7 +3885,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Allows you to load the Interactive Object with a given selection mode, and/or with the desired decomposition option, whether the object is visualized or not. If AllowDecomp = Standard_True and, if the interactive object is of the "Shape" type, these "standard" selection modes will be automatically activated as a function of the modes present in the Local Context. The loaded objects will be selectable but displayable in highlighting only when detected by the Selector. </p>
+<p>Allows you to load the Interactive Object with a given selection mode, and/or with the desired decomposition option, whether the object is visualized or not. If AllowDecomp = Standard_True and, if the interactive object is of the "Shape" type, these "standard" selection modes will be automatically activated as a function of the modes present in the Local Context. The loaded objects will be selectable but displayable in highlighting only when detected by the Selector. This method is available only when Local Contexts are open. </p>
 
 </div>
 </div>
@@ -4098,7 +4041,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call <a class="el" href="class_a_i_s___interactive_context.html#a7271a4f4660877cab946c7fe190abede" title="Redraws immediate structures in all views of the viewer given taking into account its visibility...">RedrawImmediate()</a> to highlight detected object. </p>
+<p>Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call <a class="el" href="class_a_i_s___interactive_context.html#a7271a4f4660877cab946c7fe190abede" title="Redraws immediate structures in all views of the viewer given taking into account its visibility...">RedrawImmediate()</a> to highlight detected object. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_a_i_s___interactive_context.html#a231978eb8b005c5190fa64e1be50b607" title="Return picking strategy; SelectMgr_PickingStrategy_FirstAcceptable by default. ">PickingStrategy()</a> </dd></dl>
 
 </div>
@@ -4337,7 +4280,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Return picking strategy; SelectMgr_PickingStrategy_FirstAcceptable by default. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>/Filters() </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>/Filters() </dd></dl>
 
 </div>
 </div>
@@ -4356,7 +4299,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the pixel tolerance, default is 2. Pixel Tolerance extends sensitivity within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> operation (picking by point) and can be adjusted by application based on user input precision (e.g. screen pixel density, input device precision, etc.). </p>
+<p>Returns the pixel tolerance, default is 2. Pixel Tolerance extends sensitivity within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> operation (picking by point) and can be adjusted by application based on user input precision (e.g. screen pixel density, input device precision, etc.). </p>
 
 </div>
 </div>
@@ -4768,7 +4711,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Removes all the objects from Context. </p>
+<p>Removes all the objects from all opened Local Contexts and from the Neutral Point. </p>
 
 </div>
 </div>
@@ -4958,7 +4901,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Stores and hilights the previous detected; Unhilights the previous picked. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>. </dd></dl>
 
 </div>
 </div>
@@ -6087,64 +6030,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a4798c98112a5889d4b4a04bab3ee0117"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4798c98112a5889d4b4a04bab3ee0117">&#9670;&nbsp;</a></span>SetSelectionModeActive()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void AIS_InteractiveContext::SetSelectionModeActive </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_a_i_s___interactive_object.html">AIS_InteractiveObject</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>theObj</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>theMode</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theToActivate</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_a_i_s___selection_modes_concurrency_8hxx.html#aa92da4f10fd7d1e2ab2a2ccf44b67822">AIS_SelectionModesConcurrency</a>&#160;</td>
-          <td class="paramname"><em>theConcurrency</em> = <code><a class="el" href="_a_i_s___selection_modes_concurrency_8hxx.html#aa92da4f10fd7d1e2ab2a2ccf44b67822a23d9111b73db69dd3a7f7f17a4552f7d">AIS_SelectionModesConcurrency_Multiple</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theIsForce</em> = <code><a class="el" href="_standard___type_def_8hxx.html#a7b6e608c3535f709d07e1ad1c933ae20">Standard_False</a></code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Activates or deactivates the selection mode for specified object. Has no effect if selection mode was already active/deactivated. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">theObj</td><td>object to activate/deactivate selection mode </td></tr>
-    <tr><td class="paramname">theMode</td><td>selection mode to activate/deactivate; deactivation of -1 selection mode will effectively deactivate all selection modes; activation of -1 selection mode with AIS_SelectionModesConcurrency_Single will deactivate all selection modes, and will has no effect otherwise </td></tr>
-    <tr><td class="paramname">theToActivate</td><td>activation/deactivation flag </td></tr>
-    <tr><td class="paramname">theConcurrency</td><td>specifies how to handle already activated selection modes; default value (AIS_SelectionModesConcurrency_Multiple) means active selection modes should be left as is, AIS_SelectionModesConcurrency_Single can be used if only one selection mode is expected to be active and AIS_SelectionModesConcurrency_GlobalOrLocal can be used if either <a class="el" href="class_select_mgr___selectable_object.html#a66ec832d5079d2f56b220085e6010b45" title="Returns the mode for selection of object as a whole. ">AIS_InteractiveObject::GlobalSelectionMode()</a> or any combination of Local selection modes is acceptable; this value is considered only if theToActivate set to TRUE </td></tr>
-    <tr><td class="paramname">theIsForce</td><td>when set to TRUE, the display status will be ignored while activating selection mode </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a5e5e046711bdeb494e39a885c29b366a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5e5e046711bdeb494e39a885c29b366a">&#9670;&nbsp;</a></span>SetSelectionSensitivity()</h2>
 
@@ -6441,8 +6326,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a5c0dc5a55362b6f43161a98c8971358a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c0dc5a55362b6f43161a98c8971358a">&#9670;&nbsp;</a></span>SetZLayer()</h2>
+<a id="a9f743c14e3beb6f692aed6861e3f150d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f743c14e3beb6f692aed6861e3f150d">&#9670;&nbsp;</a></span>SetZLayer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6456,7 +6341,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="class_a_i_s___interactive_context.html#a51285e703d17b6d5564e3b30301a01de">const</a> <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
           <td class="paramname"><em>theLayerId</em>&#160;</td>
         </tr>
         <tr>
@@ -6488,7 +6373,7 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Adds the last detected to the list of previous picked. If the last detected was already declared as picked, removes it from the Picked List. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a>. </dd></dl>
 
 </div>
 </div>
@@ -6938,8 +6823,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="aabba03b9ed6fcaf4bb63f85d23507b84"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aabba03b9ed6fcaf4bb63f85d23507b84">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[18/36]</span></h2>
+<a id="ae22d0760a7534ef20db93b8cdc1062e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae22d0760a7534ef20db93b8cdc1062e6">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[18/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6947,7 +6832,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a1f7101a745f88861df054ace1f2744b6">Activate</a>() and <a class="el" href="class_a_i_s___shape.html#a20fd9d5e034faccd22843fd9a8e54a29">AIS_Shape::SelectionMode</a>() should be used instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
@@ -6958,8 +6843,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="acffc783fa40f71b295b83c9e68b9daea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acffc783fa40f71b295b83c9e68b9daea">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[19/36]</span></h2>
+<a id="adfc38e7affc452318b9f0151ea09ba1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfc38e7affc452318b9f0151ea09ba1a">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[19/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6967,7 +6852,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#ab52951c5a8a42ab76cbbe0f69c4e23f2">Deactivate</a>() should be used instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
@@ -6978,8 +6863,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="afbf6c2d5bfc2e137c84d1f3bc86aae22"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afbf6c2d5bfc2e137c84d1f3bc86aae22">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[20/36]</span></h2>
+<a id="a0b757e87ddc8e7d1af074d23e11b9268"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b757e87ddc8e7d1af074d23e11b9268">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[20/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6987,7 +6872,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - list of activated Selection Modes should be tracked on application side; see also ::<a class="el" href="class_a_i_s___interactive_context.html#abb12589e0af8c4f94ff7fa4daf8bcb7a">ActivatedModes</a>()&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const &amp;</td>
         </tr>
@@ -7118,8 +7003,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="aa56e5268cf9f0c024dc1ae236da4b355"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa56e5268cf9f0c024dc1ae236da4b355">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[27/36]</span></h2>
+<a id="a9a9bfbba52f0c10f6487f5614fa197e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a9bfbba52f0c10f6487f5614fa197e3">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[27/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7127,7 +7012,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#afffabfadddd46d2b00a8339d9835af1a">InitSelected</a>() should be called instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -7138,8 +7023,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a554569eea4c94842134113c816f89a7d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a554569eea4c94842134113c816f89a7d">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[28/36]</span></h2>
+<a id="aecbd2cb1ff6a210937cdaf80d4d860db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aecbd2cb1ff6a210937cdaf80d4d860db">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[28/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7147,7 +7032,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a94bb5be90685631957e5d4001f989066">MoreSelected</a>() should be called instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
@@ -7158,8 +7043,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ac36b6a9e78d8451c15b2fc3b832da69c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac36b6a9e78d8451c15b2fc3b832da69c">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[29/36]</span></h2>
+<a id="a3f3365495b27481fbfd8087ccb46f360"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f3365495b27481fbfd8087ccb46f360">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[29/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7167,7 +7052,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a0de665cf47ace4d86b49012dc9126fb6">NextSelected</a>() should be called instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -7178,8 +7063,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a60debce42115560a211021efd1c1c9ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60debce42115560a211021efd1c1c9ab">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[30/36]</span></h2>
+<a id="a16ae8610758622371935f719cbaa7628"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a16ae8610758622371935f719cbaa7628">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[30/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7187,7 +7072,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#adb264a8536f88e6bb4dcf8ce3eb31e27">SelectedInteractive</a>() should be called instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
@@ -7198,8 +7083,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a3cb3aefb94a26318f0f7cbc671a439b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3cb3aefb94a26318f0f7cbc671a439b8">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[31/36]</span></h2>
+<a id="a3aaba34c4fcb55287e4e5196ec0c88ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3aaba34c4fcb55287e4e5196ec0c88ab">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[31/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7207,7 +7092,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a7cad6fea27e0a63bbe84fc41d6774bf6">NbSelected</a>() should be called instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -7218,8 +7103,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a117af6d5248c0922a1054666326ee637"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a117af6d5248c0922a1054666326ee637">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[32/36]</span></h2>
+<a id="a63b792f1ce0c5555b1e2109a1b69b5cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63b792f1ce0c5555b1e2109a1b69b5cd">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[32/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7227,7 +7112,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a3980a012b9aacf843d48758719b2ade2">HilightSelected</a>() should be called instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
@@ -7238,8 +7123,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a6b533c816eca4309b3c4201322d63795"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b533c816eca4309b3c4201322d63795">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[33/36]</span></h2>
+<a id="afa93a313071ddf142fbaedde42eb38f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa93a313071ddf142fbaedde42eb38f4">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[33/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7247,7 +7132,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a4b645469d8663d4b770116d8b6c6cae6">UnhilightSelected</a>() should be called instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
@@ -7258,8 +7143,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ade28b51285833537cdacc4020331b589"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade28b51285833537cdacc4020331b589">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[34/36]</span></h2>
+<a id="a20426c88d50e9df97bb0b50056982b10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20426c88d50e9df97bb0b50056982b10">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[34/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7267,7 +7152,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a8f0bc5b7062cd13854fa611eb10743fe">ClearSelected</a>() should be called instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
@@ -7278,8 +7163,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a12afab23986482a3eee3c999f16ad5a6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12afab23986482a3eee3c999f16ad5a6">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[35/36]</span></h2>
+<a id="a15c38ec2b1d8ad6726bb78df9fdf0619"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15c38ec2b1d8ad6726bb78df9fdf0619">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[35/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7287,7 +7172,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a1a6ef043cafec39731fd5f6fac9bbd11">DetectedCurrentOwner</a>() should be called instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const &amp;</td>
         </tr>
@@ -7298,8 +7183,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a6b499e84bd40aae8652b97e8c97b2862"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b499e84bd40aae8652b97e8c97b2862">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[36/36]</span></h2>
+<a id="aa207ad045936dd2651e88565f0d53486"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa207ad045936dd2651e88565f0d53486">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[36/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -7307,7 +7192,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">AIS_InteractiveContext::Standard_DEPRECATED </td>
           <td>(</td>
-          <td class="paramtype">&quot;Local Context is deprecated - ::<a class="el" href="class_a_i_s___interactive_context.html#a1a6ef043cafec39731fd5f6fac9bbd11">DetectedCurrentOwner</a>() should be called instead&quot;&#160;</td>
+          <td class="paramtype">&quot;Local Context is deprecated - local selection should be used without Local Context&quot;&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
@@ -7960,7 +7845,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Updates the list of selected objects: i.e. highlights the newly selected ones and unhighlights previously selected objects. </p>
+<p>Updates the list of selected objects: i.e. highlights the newely selected ones and unhighlights previously selected objects. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_a_i_s___interactive_context.html#a3980a012b9aacf843d48758719b2ade2" title="Highlights selected objects. ">HilightSelected()</a>. </dd></dl>
 
 </div>
@@ -8110,7 +7995,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8134,7 +8019,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8158,7 +8043,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8182,7 +8067,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8206,7 +8091,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8230,7 +8115,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8254,7 +8139,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8278,7 +8163,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8302,7 +8187,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8326,7 +8211,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8350,7 +8235,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8374,7 +8259,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8398,7 +8283,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8422,7 +8307,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8446,7 +8331,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8470,7 +8355,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8494,7 +8379,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8518,7 +8403,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8542,7 +8427,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>
@@ -8566,7 +8451,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
+<p>picking strategy to be applied within <a class="el" href="class_a_i_s___interactive_context.html#a6db432be49a4fd328e2f792dfe364f71" title="Relays mouse position in pixels theXPix and theYPix to the interactive context selectors. This is done by the view theView passing this position to the main viewer and updating it. Functions in both Neutral Point and local contexts. If theToRedrawOnUpdate is set to false, callee should call RedrawImmediate() to highlight detected object. ">MoveTo()</a> </p>
 
 </div>
 </div>

@@ -33,8 +33,6 @@ enum View3D_CurrentAction {
   CurAction3d_EndDirectionalLight
 };
 
-class AIS_RubberBand;
-
 class CViewer3dView : public CView
 {
 protected: // create from serialization only
@@ -147,13 +145,16 @@ private:
   Handle(V3d_DirectionalLight)   myCurrent_DirectionalLight;
   Handle(Graphic3d_ClipPlane)    myClippingPlane;
   Handle(AIS_Shape)              myShape;
-  Handle(AIS_RubberBand)         myRect; //!< Rubber rectangle for selection
 
 private:
-
-	void DrawRectangle (Standard_Integer theMinX, Standard_Integer theMinY, Standard_Integer theMaxX, Standard_Integer theMaxY,
-			Standard_Boolean theToDraw, Aspect_TypeOfLine theLineType = Aspect_TOL_SOLID);
-
+	enum LineStyle { Solid, Dot, ShortDash, LongDash, Default };
+	CPen*  m_Pen;
+    virtual void DrawRectangle (const Standard_Integer  MinX  ,
+    					        const Standard_Integer  MinY  ,
+                                const Standard_Integer  MaxX  ,
+				    	        const Standard_Integer  MaxY  ,
+					            const Standard_Boolean  Draw  ,
+                                const LineStyle aLineStyle = Default  );
 	UINT myAxisKey;
 	UINT myScaleDirection;
 	void RedrawVisMode();

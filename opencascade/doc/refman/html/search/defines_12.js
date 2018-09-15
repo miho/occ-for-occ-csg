@@ -28,7 +28,6 @@ var searchData=
   ['standard_5fdividebyzero_5fraise_5fif',['Standard_DivideByZero_Raise_if',['../_standard___divide_by_zero_8hxx.html#aa27d2aa2f6a2e1491056cacc2f798e0b',1,'Standard_DivideByZero.hxx']]],
   ['standard_5fdomainerror_5fraise_5fif',['Standard_DomainError_Raise_if',['../_standard___domain_error_8hxx.html#a78481b51d3fdfd4657630ce7e5e21922',1,'Standard_DomainError.hxx']]],
   ['standard_5fenable_5fdeprecation_5fwarnings',['Standard_ENABLE_DEPRECATION_WARNINGS',['../_standard___macro_8hxx.html#a7c9fca08e65902fcc3a904b891ea2227',1,'Standard_Macro.hxx']]],
-  ['standard_5ffallthrough',['Standard_FALLTHROUGH',['../_standard___macro_8hxx.html#a459e48ae142dd6c49babfe8236f50e69',1,'Standard_Macro.hxx']]],
   ['standard_5ffalse',['Standard_False',['../_standard___type_def_8hxx.html#a7b6e608c3535f709d07e1ad1c933ae20',1,'Standard_TypeDef.hxx']]],
   ['standard_5fguid_5fsize',['Standard_GUID_SIZE',['../_standard___g_u_i_d_8hxx.html#aff2f33ec62d071b86a9905aeb2aa9606',1,'Standard_GUID.hxx']]],
   ['standard_5fguid_5fsize_5falloc',['Standard_GUID_SIZE_ALLOC',['../_standard___g_u_i_d_8hxx.html#a84392d7a7c47ca0fc797b0707a1a088f',1,'Standard_GUID.hxx']]],
@@ -82,5 +81,5 @@ var searchData=
   ['storage_5fstreamtypemismatcherror_5fraise_5fif',['Storage_StreamTypeMismatchError_Raise_if',['../_storage___stream_type_mismatch_error_8hxx.html#a5b315df39de3983747ed7bfc10dfb201',1,'Storage_StreamTypeMismatchError.hxx']]],
   ['storage_5fstreamunknowntypeerror_5fraise_5fif',['Storage_StreamUnknownTypeError_Raise_if',['../_storage___stream_unknown_type_error_8hxx.html#a0354d36445788bb46fc8bddf7c93447c',1,'Storage_StreamUnknownTypeError.hxx']]],
   ['storage_5fstreamwriteerror_5fraise_5fif',['Storage_StreamWriteError_Raise_if',['../_storage___stream_write_error_8hxx.html#adc8875763e6c96a26f581d7a39df634f',1,'Storage_StreamWriteError.hxx']]],
-  ['strict',['STRICT',['../_o_s_d___w_n_t_8hxx.html#a8a7c30a576d5706b6c0821834d01cbbc',1,'STRICT():&#160;OSD_WNT.hxx'],['../_w_n_t___dword_8hxx.html#a8a7c30a576d5706b6c0821834d01cbbc',1,'STRICT():&#160;WNT_Dword.hxx']]]
+  ['strict',['STRICT',['../_o_s_d___w_n_t__1_8hxx.html#a8a7c30a576d5706b6c0821834d01cbbc',1,'STRICT():&#160;OSD_WNT_1.hxx'],['../_w_n_t___dword_8hxx.html#a8a7c30a576d5706b6c0821834d01cbbc',1,'STRICT():&#160;WNT_Dword.hxx']]]
 ];

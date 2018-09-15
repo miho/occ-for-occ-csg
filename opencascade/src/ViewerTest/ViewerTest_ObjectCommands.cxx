@@ -349,42 +349,17 @@ namespace
 
     if (aMapOfArgs.Find ("hidelabels", aValues))
     {
-      Standard_Boolean toHideLabels = Standard_True;
-      if (aValues->Size() == 1)
-      {
-        ViewerTest::ParseOnOff (aValues->First().ToCString(), toHideLabels);
-      }
-      else if (aValues->Size() != 0)
+      if (aValues->Size() == 0)
       {
         std::cout << "Syntax error: -hidelabels expects parameter 'on' or 'off' after.\n";
         return Standard_False;
       }
 
+      Standard_Boolean toHideLabels = Standard_True;
+      ViewerTest::ParseOnOff (aValues->Value (1).ToCString(), toHideLabels);
       if (!theTrihedron->Attributes()->HasOwnDatumAspect())
-      {
-        theTrihedron->Attributes()->SetDatumAspect (new Prs3d_DatumAspect());
-      }
-      theTrihedron->Attributes()->DatumAspect()->SetDrawLabels (!toHideLabels);
-    }
-
-    if (aMapOfArgs.Find ("hidearrows", aValues))
-    {
-      Standard_Boolean toHideArrows = Standard_True;
-      if (aValues->Size() == 1)
-      {
-        ViewerTest::ParseOnOff (aValues->First().ToCString(), toHideArrows);
-      }
-      else if (aValues->Size() != 0)
-      {
-        std::cout << "Syntax error: -hidearrows expects parameter 'on' or 'off' after.\n";
-        return Standard_False;
-      }
-
-      if (!theTrihedron->Attributes()->HasOwnDatumAspect())
-      {
-        theTrihedron->Attributes()->SetDatumAspect (new Prs3d_DatumAspect());
-      }
-      theTrihedron->Attributes()->DatumAspect()->SetDrawArrows (!toHideArrows);
+        theTrihedron->Attributes()->SetDatumAspect(new Prs3d_DatumAspect());
+      theTrihedron->Attributes()->DatumAspect()->SetToDrawLabels (!toHideLabels);
     }
 
     if (aMapOfArgs.Find ("color", aValues))
@@ -2554,8 +2529,6 @@ static int VDrawText (Draw_Interpretor& theDI,
         aDisplayType = Aspect_TODT_DIMENSION;
       else if (aType == "normal")
         aDisplayType = Aspect_TODT_NORMAL;
-      else if (aType == "shadow")
-        aDisplayType = Aspect_TODT_SHADOW;
       else
       {
         std::cout << "Error: wrong display type '" << aType << "'.\n";
@@ -2987,7 +2960,7 @@ static int VDrawSphere (Draw_Interpretor& /*di*/, Standard_Integer argc, const c
   Handle(TColStd_HArray1OfInteger) aColorArray = new TColStd_HArray1OfInteger (1, aNumberPoints);
   for (Standard_Integer aNodeId = 1; aNodeId <= aNumberPoints; ++aNodeId)
   {
-    aColorArray->SetValue (aNodeId, *reinterpret_cast<const Standard_Integer*> (aColor.GetData()));
+    aColorArray->SetValue (aNodeId, *reinterpret_cast<const Standard_Integer*> (&aColor));
   }
   aShape->SetColors (aColorArray);
 
@@ -4326,70 +4299,82 @@ static Standard_Integer VListConnected (Draw_Interpretor& /*di*/,
   return 0;
 }
 
+namespace
+{
+  //! Checks if theMode is already turned on for theObj.
+  static Standard_Boolean InList (const Handle(AIS_InteractiveContext)& theAISContext,
+                                  const Handle(AIS_InteractiveObject)&  theObj,
+                                  const Standard_Integer                theMode)
+  {
+    TColStd_ListOfInteger anActiveModes;
+    theAISContext->ActivatedModes (theObj, anActiveModes);
+    for (TColStd_ListIteratorOfListOfInteger aModeIt (anActiveModes); aModeIt.More(); aModeIt.Next())
+    {
+      if (aModeIt.Value() == theMode)
+      {
+        return Standard_True;
+      }
+    }
+    return Standard_False;
+  }
+}
+
 //===============================================================================================
 //function : VSetSelectionMode
-//purpose  : vselmode
+//purpose  : Sets input selection mode for input object or for all displayed objects 
+//Draw arg : vselmode [object] mode On/Off (1/0)
 //===============================================================================================
 static Standard_Integer VSetSelectionMode (Draw_Interpretor& /*di*/,
-                                           Standard_Integer  theNbArgs,
+                                           Standard_Integer  theArgc,
                                            const char**      theArgv)
 {
   // Check errors
   Handle(AIS_InteractiveContext) anAISContext = ViewerTest::GetAISContext();
   if (anAISContext.IsNull())
   {
-    std::cout << "Error: no active Viewer\n";
+    std::cerr << "Call vinit before!" << std::endl;
     return 1;
   }
 
-  NCollection_Sequence<TCollection_AsciiString> anObjNames;
-  Standard_Integer toOpenLocalCtx = -1;
-  Standard_Integer aSelectionMode = -1;
-  Standard_Boolean toTurnOn = Standard_True;
-  AIS_SelectionModesConcurrency aSelModeConcurrency = AIS_SelectionModesConcurrency_GlobalOrLocal;
-  for (Standard_Integer anArgIter = 1; anArgIter < theNbArgs; ++anArgIter)
+  // Check the arguments
+  if (theArgc < 3 && theArgc > 5)
   {
-    TCollection_AsciiString anArgCase (theArgv[anArgIter]);
-    anArgCase.LowerCase();
-    if (toOpenLocalCtx == -1
-     && anArgCase == "-local")
-    {
-      toOpenLocalCtx = 1;
-    }
-    else if (anArgCase == "-set"
-          || anArgCase == "-replace"
-          || anArgCase == "-single"
-          || anArgCase == "-exclusive")
-    {
-      aSelModeConcurrency = AIS_SelectionModesConcurrency_Single;
-    }
-    else if (anArgCase == "-add"
-          || anArgCase == "-combine"
-          || anArgCase == "-combination"
-          || anArgCase == "-multiple")
-    {
-      aSelModeConcurrency = AIS_SelectionModesConcurrency_Multiple;
-    }
-    else if (anArgCase == "-globalorlocal"
-          || anArgCase == "-localorglobal")
-    {
-      aSelModeConcurrency = AIS_SelectionModesConcurrency_GlobalOrLocal;
-    }
-    else
-    {
-      anObjNames.Append (theArgv[anArgIter]);
-    }
-  }
-  if (anObjNames.Size() < 2
-  || !ViewerTest::ParseOnOff (anObjNames.Last().ToCString(), toTurnOn))
-  {
-    std::cout << "Syntax error: wrong number of arguments\n";
+    std::cerr << "vselmode error : expects at least 2 arguments.\n"
+              << "Type help "<< theArgv[0] <<" for more information." << std::endl;
     return 1;
   }
-  anObjNames.Remove (anObjNames.Upper());
+
+  TCollection_AsciiString aLastArg (theArgv[theArgc - 1]);
+  aLastArg.LowerCase();
+  Standard_Boolean isToOpenLocalCtx = aLastArg == "-local";
+
+  // get objects to change selection mode
+  AIS_ListOfInteractive aTargetIOs;
+  Standard_Integer anArgNb = isToOpenLocalCtx ? theArgc - 1 : theArgc;
+  if (anArgNb == 3)
   {
-    const TCollection_AsciiString aSelModeString = anObjNames.Last();
-    anObjNames.Remove (anObjNames.Upper());
+    anAISContext->DisplayedObjects (aTargetIOs);
+  }
+  else
+  {
+    // Check if there is an object with given name in context
+    const TCollection_AsciiString aNameIO (theArgv[1]);
+    if (GetMapOfAIS().IsBound2 (aNameIO))
+    {
+      Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast (GetMapOfAIS().Find2 (aNameIO));
+      if (anIO.IsNull())
+      {
+        std::cerr << "vselmode error : object name is used for non AIS viewer" << std::endl;
+        return 1;
+      }
+      aTargetIOs.Append (anIO);
+    }
+  }
+
+  Standard_Integer aSelectionMode = -1;
+  Standard_Boolean toTurnOn = Standard_True;
+  {
+    const TCollection_AsciiString aSelModeString (theArgv[anArgNb == 3 ? 1 : 2]);
     TopAbs_ShapeEnum aShapeType = TopAbs_SHAPE;
     if (aSelModeString.IsIntegerValue())
     {
@@ -4405,27 +4390,10 @@ static Standard_Integer VSetSelectionMode (Draw_Interpretor& /*di*/,
       return 1;
     }
   }
-
-  AIS_ListOfInteractive aTargetIOs;
-  for (NCollection_Sequence<TCollection_AsciiString>::Iterator anObjIter (anObjNames); anObjIter.More(); anObjIter.Next())
+  if (!ViewerTest::ParseOnOff (theArgv[anArgNb == 3 ? 2 : 3], toTurnOn))
   {
-    const TCollection_AsciiString& aNameIO = anObjIter.Value();
-    Handle(AIS_InteractiveObject) anIO;
-    if (GetMapOfAIS().IsBound2 (aNameIO))
-    {
-      anIO = Handle(AIS_InteractiveObject)::DownCast (GetMapOfAIS().Find2 (aNameIO));
-    }
-
-    if (anIO.IsNull())
-    {
-      std::cout << "Syntax error: undefined presentable object " << aNameIO << "\n";
-      return 1;
-    }
-    aTargetIOs.Append (anIO);
-  }
-  if (aTargetIOs.IsEmpty())
-  {
-    anAISContext->DisplayedObjects (aTargetIOs);
+    std::cout << "Syntax error: on/off is expected by found '" << theArgv[anArgNb == 3 ? 2 : 3] << "'\n";
+    return 1;
   }
 
   Standard_DISABLE_DEPRECATION_WARNINGS
@@ -4433,24 +4401,66 @@ static Standard_Integer VSetSelectionMode (Draw_Interpretor& /*di*/,
   {
     anAISContext->CloseLocalContext();
   }
-  else if (aSelectionMode != 0 && toTurnOn)
+  Standard_ENABLE_DEPRECATION_WARNINGS
+
+  if (aSelectionMode == 0)
   {
-    if (!anAISContext->HasOpenedContext() && toOpenLocalCtx == 1)
+    if (toTurnOn)
+    {
+      for (AIS_ListIteratorOfListOfInteractive aTargetIt (aTargetIOs); aTargetIt.More(); aTargetIt.Next())
+      {
+        const Handle(AIS_InteractiveObject)& anIO = aTargetIt.Value();
+        TColStd_ListOfInteger anActiveModes;
+        anAISContext->ActivatedModes (anIO, anActiveModes);
+        if (!anActiveModes.IsEmpty())
+        {
+          anAISContext->Deactivate (anIO);
+        }
+        if (!InList (anAISContext, anIO, aSelectionMode))
+        {
+          anAISContext->Activate (anIO);
+        }
+      }
+    }
+    else
+    {
+      for (AIS_ListIteratorOfListOfInteractive aTargetIt (aTargetIOs); aTargetIt.More(); aTargetIt.Next())
+      {
+        const Handle(AIS_InteractiveObject)& anIO = aTargetIt.Value();
+        if (InList (anAISContext, anIO, aSelectionMode))
+        {
+          anAISContext->Deactivate (anIO);
+        }
+      }
+    }
+  }
+
+  if (aSelectionMode != 0 && toTurnOn) // Turn on specified mode
+  {
+    Standard_DISABLE_DEPRECATION_WARNINGS
+    if (!anAISContext->HasOpenedContext() && isToOpenLocalCtx)
     {
       anAISContext->OpenLocalContext (Standard_False);
     }
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
+    Standard_ENABLE_DEPRECATION_WARNINGS
 
-  for (AIS_ListIteratorOfListOfInteractive aTargetIt (aTargetIOs); aTargetIt.More(); aTargetIt.Next())
-  {
-    const Handle(AIS_InteractiveObject)& anIO = aTargetIt.Value();
-    if (toOpenLocalCtx == 1 && toTurnOn && aSelectionMode != 0)
+    for (AIS_ListIteratorOfListOfInteractive aTargetIt (aTargetIOs); aTargetIt.More(); aTargetIt.Next())
     {
+      const Handle(AIS_InteractiveObject)& anIO = aTargetIt.Value();
+      anAISContext->Deactivate (anIO, 0);
       anAISContext->Load (anIO, -1, Standard_True);
+      anAISContext->Activate (anIO, aSelectionMode);
     }
-    anAISContext->SetSelectionModeActive (anIO, aSelectionMode, toTurnOn, aSelModeConcurrency);
   }
+
+  if (aSelectionMode != 0 && !toTurnOn) // Turn off specified mode
+  {
+    for (AIS_ListIteratorOfListOfInteractive aTargetIt (aTargetIOs); aTargetIt.More(); aTargetIt.Next())
+    {
+      anAISContext->Deactivate (aSelectionMode);
+    }
+  }
+
   return 0;
 }
 
@@ -5584,37 +5594,26 @@ static int VFont (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        std::cerr << "Wrong syntax at argument '" << anArg.ToCString() << "'!\n";
         return 1;
       }
-
-      Standard_CString aFontPath = theArgVec[anArgIter++];
-      TCollection_AsciiString aFontName;
+      Standard_CString aFontPath   = theArgVec[anArgIter];
+      Standard_CString aFontName   = NULL;
       Font_FontAspect  aFontAspect = Font_FA_Undefined;
-      Standard_Integer isSingelStroke = -1;
-      for (; anArgIter < theArgNb; ++anArgIter)
+      if (++anArgIter < theArgNb)
       {
-        anArgCase = theArgVec[anArgIter];
-        anArgCase.LowerCase();
-        if (aFontAspect == Font_FA_Undefined
-         && parseFontStyle (anArgCase, aFontAspect))
-        {
-          continue;
-        }
-        else if (anArgCase == "singlestroke"
-              || anArgCase == "singleline"
-              || anArgCase == "oneline")
-        {
-          isSingelStroke = 1;
-        }
-        else if (aFontName.IsEmpty())
+        if (!parseFontStyle (anArgCase, aFontAspect))
         {
           aFontName = theArgVec[anArgIter];
         }
-        else
+        if (++anArgIter < theArgNb)
         {
-          --anArgIter;
-          break;
+          anArgCase = theArgVec[anArgIter];
+          anArgCase.LowerCase();
+          if (!parseFontStyle (anArgCase, aFontAspect))
+          {
+            --anArgIter;
+          }
         }
       }
 
@@ -5626,22 +5625,18 @@ static int VFont (Draw_Interpretor& theDI,
       }
 
       if (aFontAspect != Font_FA_Undefined
-      || !aFontName.IsEmpty())
+       || aFontName   != NULL)
       {
         if (aFontAspect == Font_FA_Undefined)
         {
           aFontAspect = aFont->FontAspect();
         }
         Handle(TCollection_HAsciiString) aName = aFont->FontName();
-        if (!aFontName.IsEmpty())
+        if (aFontName != NULL)
         {
           aName = new TCollection_HAsciiString (aFontName);
         }
         aFont = new Font_SystemFont (aName, aFontAspect, new TCollection_HAsciiString (aFontPath));
-      }
-      if (isSingelStroke != -1)
-      {
-        aFont->SetSingleStrokeFont (isSingelStroke == 1);
       }
 
       aMgr->RegisterFont (aFont, Standard_True);
@@ -5651,7 +5646,7 @@ static int VFont (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cerr << "Warning! Unknown argument '" << anArg << "'\n";
+      std::cerr << "Warning! Unknown argument '" << anArg.ToCString() << "'\n";
     }
   }
 
@@ -6450,9 +6445,8 @@ void ViewerTest::ObjectCommands(Draw_Interpretor& theCommands)
                    "\n\t\t: [-dispMode {wireframe|shading} ]"
                    "\n\t\t: [-origin x y z ]"
                    "\n\t\t: [-zaxis u v w -xaxis u v w ]"
-                   "\n\t\t: [-drawAxes {X|Y|Z|XY|YZ|XZ|XYZ}]"
-                   "\n\t\t: [-hideLabels {on|off}]"
-                   "\n\t\t: [-hideArrows {on|off}]"
+                   "\n\t\t: [-drawaxes {X|Y|Z|XY|YZ|XZ|XYZ}]"
+                   "\n\t\t: [-hidelabels {on|off}]"
                    "\n\t\t: [-label {XAxis|YAxis|ZAxis} value]"
                    "\n\t\t: [-attribute {XAxisLength|YAxisLength|ZAxisLength"
                    "\n\t\t:             |TubeRadiusPercent|ConeRadiusPercent"
@@ -6460,8 +6454,8 @@ void ViewerTest::ObjectCommands(Draw_Interpretor& theCommands)
                    "\n\t\t:             |ShadingNumberOfFacettes} value]"
                    "\n\t\t: [-color {Origin|XAxis|YAxis|ZAxis|XOYAxis|YOZAxis"
                    "\n\t\t:         |XOZAxis|Whole} {r g b | colorName}]"
-                   "\n\t\t: [-textColor {r g b | colorName}]"
-                   "\n\t\t: [-arrowColor {r g b | colorName}]"
+                   "\n\t\t: [-textcolor {r g b | colorName}]"
+                   "\n\t\t: [-arrowscolor {r g b | colorName}]"
                    "\n\t\t: [-priority {Origin|XAxis|YAxis|ZAxis|XArrow"
                    "\n\t\t:            |YArrow|ZArrow|XOYAxis|YOZAxis"
                    "\n\t\t:            |XOZAxis|Whole} value]"
@@ -6476,15 +6470,14 @@ void ViewerTest::ObjectCommands(Draw_Interpretor& theCommands)
                    "\n\t\t: -zaxis/-xaxis allows to set trihedron X and Z"
                    "\n\t\t:               directions. The directions should"
                    "\n\t\t:               be orthogonal. Y direction is calculated."
-                   "\n\t\t: -drawAxes allows to set what axes are drawn in the"
+                   "\n\t\t: -drawaxes allows to set what axes are drawn in the"
                    "\n\t\t:           trihedron, default state is XYZ"
-                   "\n\t\t: -hideLabels allows to show/hide trihedron labels"
-                   "\n\t\t: -hideArrows allows to show/hide trihedron arrows"
+                   "\n\t\t: -hidelabels allows to hide or show trihedron labels"
                    "\n\t\t: -labels allows to change default X/Y/Z titles of axes"
                    "\n\t\t: -attribute sets parameters of trihedron"
                    "\n\t\t: -color sets color properties of parts of trihedron"
-                   "\n\t\t: -textColor sets color properties of trihedron labels"
-                   "\n\t\t: -arrowColor sets color properties of trihedron arrows"
+                   "\n\t\t: -textcolor sets color properties of trihedron labels"
+                   "\n\t\t: -arrowscolor sets color properties of trihedron arrows"
                    "\n\t\t: -priority allows to change default selection priority"
                    "\n\t\t: of trihedron components",
                    __FILE__,VTrihedron,group);
@@ -6586,7 +6579,7 @@ void ViewerTest::ObjectCommands(Draw_Interpretor& theCommands)
                    "\n\t\t X and Y define the coordinate origin in 2d space relative to the view window"
                    "\n\t\t Example: X=0 Y=0 is center, X=1 Y=1 is upper right corner etc..."
                    "\n\t\t Z coordinate defines the gap from border of view window (except center position)."
-                   "\n\t\t: [-disptype {blend|decal|shadow|subtitle|dimension|normal}=normal}"
+                   "\n\t\t: [-disptype {blend|decal|subtitle|dimension|normal}=normal}"
                    "\n\t\t: [-subcolor {R G B|name}=white]"
                    "\n\t\t: [-noupdate]"
                    "\n\t\t: [-plane NormX NormY NormZ DirX DirY DirZ]"
@@ -6660,19 +6653,24 @@ void ViewerTest::ObjectCommands(Draw_Interpretor& theCommands)
 
 
   theCommands.Add("vselmode", 
-                "vselmode [object] selectionMode {on|off}"
-      "\n\t\t:            [{-add|-set|-globalOrLocal}=-globalOrLocal]"
-      "\n\t\t: Switches selection mode for the specified object or for all objects in context."
-      "\n\t\t: Selection mode is either an integer number specific to Interactive Object,"
-      "\n\t\t: or sub-shape type in case of AIS_Shape:"
-      "\n\t\t:   Shape, Vertex, Edge, Wire, Face, Shell, Solid, CompSolid, Compound"
-      "\n\t\t: The integer mode 0 (Shape in case of AIS_Shape) is reserved for selecting object as whole."
-      "\n\t\t: Additional options:"
-      "\n\t\t:  -add           already activated selection modes will be left activated"
-      "\n\t\t:  -set           already activated selection modes will be deactivated"
-      "\n\t\t:  -globalOrLocal (default) if new mode is Global selection mode,"
-      "\n\t\t:                 then active local selection modes will be deactivated"
-      "\n\t\t:                 and the samthen active local selection modes will be deactivated",
+    "vselmode : [object] mode_number is_turned_on=(1|0)\n"
+    "  switches selection mode for the determined object or\n"
+    "  for all objects in context.\n"
+    "  mode_number is non-negative integer that has different\n"
+    "    meaning for different interactive object classes.\n"
+    "    For shapes the following mode_number values are allowed:\n"
+    "      0 - shape\n"
+    "      1 - vertex\n"
+    "      2 - edge\n"
+    "      3 - wire\n"
+    "      4 - face\n"
+    "      5 - shell\n"
+    "      6 - solid\n"
+    "      7 - compsolid\n"
+    "      8 - compound\n"
+    "  is_turned_on is:\n"
+    "    1 if mode is to be switched on\n"
+    "    0 if mode is to be switched off\n", 
     __FILE__, VSetSelectionMode, group);
 
   theCommands.Add("vselnext",
@@ -6723,7 +6721,7 @@ void ViewerTest::ObjectCommands(Draw_Interpretor& theCommands)
                    "\n\t\t: [-plane NormX NormY NormZ DirX DirY DirZ]",
                    __FILE__, TextToBRep, group);
   theCommands.Add ("vfont",
-                            "vfont [add pathToFont [fontName] [regular,bold,italic,bolditalic=undefined] [singleStroke]]"
+                            "vfont [add pathToFont [fontName] [regular,bold,italic,bolditalic=undefined]]"
                    "\n\t\t:        [find fontName [regular,bold,italic,bolditalic=undefined]]",
                    __FILE__, VFont, group);
   

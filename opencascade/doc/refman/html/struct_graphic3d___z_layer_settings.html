@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -88,12 +88,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a53f24c809cc48fc751e17f5f94a47cc6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a53f24c809cc48fc751e17f5f94a47cc6">SetName</a> (const <a class="el" href="class_t_collection___ascii_string.html">TCollection_AsciiString</a> &amp;theName)</td></tr>
 <tr class="memdesc:a53f24c809cc48fc751e17f5f94a47cc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set custom name.  <a href="#a53f24c809cc48fc751e17f5f94a47cc6">More...</a><br /></td></tr>
 <tr class="separator:a53f24c809cc48fc751e17f5f94a47cc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7942f73183349d6b41d1434abdb5052"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#aa7942f73183349d6b41d1434abdb5052">Lights</a> () const</td></tr>
-<tr class="memdesc:aa7942f73183349d6b41d1434abdb5052"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return lights list to be used for rendering presentations within this Z-Layer; NULL by default. NULL list (but not empty list!) means that default lights assigned to the View should be used instead of per-layer lights.  <a href="#aa7942f73183349d6b41d1434abdb5052">More...</a><br /></td></tr>
-<tr class="separator:aa7942f73183349d6b41d1434abdb5052"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac027b0ce3b34de6fe6e6a2707608e60a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#ac027b0ce3b34de6fe6e6a2707608e60a">SetLights</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; &amp;theLights)</td></tr>
-<tr class="memdesc:ac027b0ce3b34de6fe6e6a2707608e60a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign lights list to be used.  <a href="#ac027b0ce3b34de6fe6e6a2707608e60a">More...</a><br /></td></tr>
-<tr class="separator:ac027b0ce3b34de6fe6e6a2707608e60a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8d42ca4ae24fbc0d99cd07e5c8d98c7"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classgp___x_y_z.html">gp_XYZ</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#ad8d42ca4ae24fbc0d99cd07e5c8d98c7">Origin</a> () const</td></tr>
 <tr class="memdesc:ad8d42ca4ae24fbc0d99cd07e5c8d98c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the origin of all objects within the layer.  <a href="#ad8d42ca4ae24fbc0d99cd07e5c8d98c7">More...</a><br /></td></tr>
 <tr class="separator:ad8d42ca4ae24fbc0d99cd07e5c8d98c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -103,24 +97,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae45b28a0df60a15d383ed829031a95cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#ae45b28a0df60a15d383ed829031a95cd">SetOrigin</a> (const <a class="el" href="classgp___x_y_z.html">gp_XYZ</a> &amp;theOrigin)</td></tr>
 <tr class="memdesc:ae45b28a0df60a15d383ed829031a95cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the origin of all objects within the layer.  <a href="#ae45b28a0df60a15d383ed829031a95cd">More...</a><br /></td></tr>
 <tr class="separator:ae45b28a0df60a15d383ed829031a95cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ec901f0cc3ce80124a3276e82e0b96a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a6ec901f0cc3ce80124a3276e82e0b96a">HasCullingDistance</a> () const</td></tr>
-<tr class="memdesc:a6ec901f0cc3ce80124a3276e82e0b96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return TRUE, if culling of distant objects (distance culling) should be performed; FALSE by default.  <a href="#a6ec901f0cc3ce80124a3276e82e0b96a">More...</a><br /></td></tr>
-<tr class="separator:a6ec901f0cc3ce80124a3276e82e0b96a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3081d75897579bf430fbe83d59d4d35"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#ac3081d75897579bf430fbe83d59d4d35">CullingDistance</a> () const</td></tr>
-<tr class="memdesc:ac3081d75897579bf430fbe83d59d4d35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the distance to discard drawing of distant objects (distance from camera Eye point); by default it is Infinite (distance culling is disabled). Since camera eye definition has no strong meaning within orthographic projection, option is considered only within perspective projection. Note also that this option has effect only when frustum culling is enabled.  <a href="#ac3081d75897579bf430fbe83d59d4d35">More...</a><br /></td></tr>
-<tr class="separator:ac3081d75897579bf430fbe83d59d4d35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38222d1edc722facc6a631082aada407"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a38222d1edc722facc6a631082aada407">SetCullingDistance</a> (<a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theDistance)</td></tr>
-<tr class="memdesc:a38222d1edc722facc6a631082aada407"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the distance to discard drawing objects.  <a href="#a38222d1edc722facc6a631082aada407">More...</a><br /></td></tr>
-<tr class="separator:a38222d1edc722facc6a631082aada407"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abef2e3dd94cb13e267a4d2aa317e431b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#abef2e3dd94cb13e267a4d2aa317e431b">HasCullingSize</a> () const</td></tr>
-<tr class="memdesc:abef2e3dd94cb13e267a4d2aa317e431b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return TRUE, if culling of small objects (size culling) should be performed; FALSE by default.  <a href="#abef2e3dd94cb13e267a4d2aa317e431b">More...</a><br /></td></tr>
-<tr class="separator:abef2e3dd94cb13e267a4d2aa317e431b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a198c992d9081b0b6b81c2d598decada4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a198c992d9081b0b6b81c2d598decada4">CullingSize</a> () const</td></tr>
-<tr class="memdesc:a198c992d9081b0b6b81c2d598decada4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the size to discard drawing of small objects; by default it is Infinite (size culling is disabled). Current implementation checks the length of projected diagonal of bounding box in pixels for discarding. Note that this option has effect only when frustum culling is enabled.  <a href="#a198c992d9081b0b6b81c2d598decada4">More...</a><br /></td></tr>
-<tr class="separator:a198c992d9081b0b6b81c2d598decada4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ca82e02e6add14fe8b47d8cf39b3d91"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a7ca82e02e6add14fe8b47d8cf39b3d91">SetCullingSize</a> (<a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theSize)</td></tr>
-<tr class="memdesc:a7ca82e02e6add14fe8b47d8cf39b3d91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the distance to discard drawing objects.  <a href="#a7ca82e02e6add14fe8b47d8cf39b3d91">More...</a><br /></td></tr>
-<tr class="separator:a7ca82e02e6add14fe8b47d8cf39b3d91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8e78a4e69c06a2af2642f1bca61ecbe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#ac8e78a4e69c06a2af2642f1bca61ecbe">IsImmediate</a> () const</td></tr>
 <tr class="memdesc:ac8e78a4e69c06a2af2642f1bca61ecbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if this layer should be drawn after all normal (non-immediate) layers.  <a href="#ac8e78a4e69c06a2af2642f1bca61ecbe">More...</a><br /></td></tr>
 <tr class="separator:ac8e78a4e69c06a2af2642f1bca61ecbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -151,12 +127,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a57e586ed487c187c35a9ae3416d135bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a57e586ed487c187c35a9ae3416d135bc">SetClearDepth</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theValue)</td></tr>
 <tr class="memdesc:a57e586ed487c187c35a9ae3416d135bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set if depth values should be cleared before drawing the layer.  <a href="#a57e586ed487c187c35a9ae3416d135bc">More...</a><br /></td></tr>
 <tr class="separator:a57e586ed487c187c35a9ae3416d135bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add95d856115982d277aa2978e17d829b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#add95d856115982d277aa2978e17d829b">ToRenderInDepthPrepass</a> () const</td></tr>
-<tr class="memdesc:add95d856115982d277aa2978e17d829b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return TRUE if layer should be rendered within depth pre-pass; TRUE by default.  <a href="#add95d856115982d277aa2978e17d829b">More...</a><br /></td></tr>
-<tr class="separator:add95d856115982d277aa2978e17d829b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50aea2ca2b0cc17991a15cc7eae0a503"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a50aea2ca2b0cc17991a15cc7eae0a503">SetRenderInDepthPrepass</a> (<a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theToRender)</td></tr>
-<tr class="memdesc:a50aea2ca2b0cc17991a15cc7eae0a503"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set if layer should be rendered within depth pre-pass.  <a href="#a50aea2ca2b0cc17991a15cc7eae0a503">More...</a><br /></td></tr>
-<tr class="separator:a50aea2ca2b0cc17991a15cc7eae0a503"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64bca7a8fb0ac4e9edbd6637774b27e4"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="struct_graphic3d___polygon_offset.html">Graphic3d_PolygonOffset</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a64bca7a8fb0ac4e9edbd6637774b27e4">PolygonOffset</a> () const</td></tr>
 <tr class="memdesc:a64bca7a8fb0ac4e9edbd6637774b27e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return glPolygonOffset() arguments.  <a href="#a64bca7a8fb0ac4e9edbd6637774b27e4">More...</a><br /></td></tr>
 <tr class="separator:a64bca7a8fb0ac4e9edbd6637774b27e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,21 +157,12 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a8441fbf88f067e674072f1323a332388"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_t_collection___ascii_string.html">TCollection_AsciiString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a8441fbf88f067e674072f1323a332388">myName</a></td></tr>
 <tr class="memdesc:a8441fbf88f067e674072f1323a332388"><td class="mdescLeft">&#160;</td><td class="mdescRight">user-provided name  <a href="#a8441fbf88f067e674072f1323a332388">More...</a><br /></td></tr>
 <tr class="separator:a8441fbf88f067e674072f1323a332388"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b1af815adeb1cc48ebf64c8b62c6dfe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a9b1af815adeb1cc48ebf64c8b62c6dfe">myLights</a></td></tr>
-<tr class="memdesc:a9b1af815adeb1cc48ebf64c8b62c6dfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">lights list  <a href="#a9b1af815adeb1cc48ebf64c8b62c6dfe">More...</a><br /></td></tr>
-<tr class="separator:a9b1af815adeb1cc48ebf64c8b62c6dfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2768727255452397804af027411dfd2e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom___transformation.html">Geom_Transformation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a2768727255452397804af027411dfd2e">myOriginTrsf</a></td></tr>
 <tr class="memdesc:a2768727255452397804af027411dfd2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">transformation to the origin  <a href="#a2768727255452397804af027411dfd2e">More...</a><br /></td></tr>
 <tr class="separator:a2768727255452397804af027411dfd2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50b420b3970d90f37e087cce1b7b6c3a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classgp___x_y_z.html">gp_XYZ</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a50b420b3970d90f37e087cce1b7b6c3a">myOrigin</a></td></tr>
 <tr class="memdesc:a50b420b3970d90f37e087cce1b7b6c3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">the origin of all objects within the layer  <a href="#a50b420b3970d90f37e087cce1b7b6c3a">More...</a><br /></td></tr>
 <tr class="separator:a50b420b3970d90f37e087cce1b7b6c3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26eb2edaa44c8a460bb531341925118d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a26eb2edaa44c8a460bb531341925118d">myCullingDistance</a></td></tr>
-<tr class="memdesc:a26eb2edaa44c8a460bb531341925118d"><td class="mdescLeft">&#160;</td><td class="mdescRight">distance to discard objects  <a href="#a26eb2edaa44c8a460bb531341925118d">More...</a><br /></td></tr>
-<tr class="separator:a26eb2edaa44c8a460bb531341925118d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11c97037652cc810193c7a2877a7628f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a11c97037652cc810193c7a2877a7628f">myCullingSize</a></td></tr>
-<tr class="memdesc:a11c97037652cc810193c7a2877a7628f"><td class="mdescLeft">&#160;</td><td class="mdescRight">size to discard objects  <a href="#a11c97037652cc810193c7a2877a7628f">More...</a><br /></td></tr>
-<tr class="separator:a11c97037652cc810193c7a2877a7628f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26b3a6e412f5b395b146ee9eb6c343a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_graphic3d___polygon_offset.html">Graphic3d_PolygonOffset</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a26b3a6e412f5b395b146ee9eb6c343a1">myPolygonOffset</a></td></tr>
 <tr class="memdesc:a26b3a6e412f5b395b146ee9eb6c343a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">glPolygonOffset() arguments  <a href="#a26b3a6e412f5b395b146ee9eb6c343a1">More...</a><br /></td></tr>
 <tr class="separator:a26b3a6e412f5b395b146ee9eb6c343a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,9 +181,6 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a788e7899bcb096beef66d2f9b3a271ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#a788e7899bcb096beef66d2f9b3a271ad">myToClearDepth</a></td></tr>
 <tr class="memdesc:a788e7899bcb096beef66d2f9b3a271ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">option to clear depth values before drawing the layer  <a href="#a788e7899bcb096beef66d2f9b3a271ad">More...</a><br /></td></tr>
 <tr class="separator:a788e7899bcb096beef66d2f9b3a271ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4b78abcdb18342467da89ecff3b7719"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_graphic3d___z_layer_settings.html#ab4b78abcdb18342467da89ecff3b7719">myToRenderInDepthPrepass</a></td></tr>
-<tr class="memdesc:ab4b78abcdb18342467da89ecff3b7719"><td class="mdescLeft">&#160;</td><td class="mdescRight">option to render layer within depth pre-pass  <a href="#ab4b78abcdb18342467da89ecff3b7719">More...</a><br /></td></tr>
-<tr class="separator:ab4b78abcdb18342467da89ecff3b7719"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Structure defines list of ZLayer properties. </p>
@@ -282,116 +240,6 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ac3081d75897579bf430fbe83d59d4d35"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3081d75897579bf430fbe83d59d4d35">&#9670;&nbsp;</a></span>CullingDistance()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Graphic3d_ZLayerSettings::CullingDistance </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return the distance to discard drawing of distant objects (distance from camera Eye point); by default it is Infinite (distance culling is disabled). Since camera eye definition has no strong meaning within orthographic projection, option is considered only within perspective projection. Note also that this option has effect only when frustum culling is enabled. </p>
-
-</div>
-</div>
-<a id="a198c992d9081b0b6b81c2d598decada4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a198c992d9081b0b6b81c2d598decada4">&#9670;&nbsp;</a></span>CullingSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Graphic3d_ZLayerSettings::CullingSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return the size to discard drawing of small objects; by default it is Infinite (size culling is disabled). Current implementation checks the length of projected diagonal of bounding box in pixels for discarding. Note that this option has effect only when frustum culling is enabled. </p>
-
-</div>
-</div>
-<a id="a6ec901f0cc3ce80124a3276e82e0b96a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6ec901f0cc3ce80124a3276e82e0b96a">&#9670;&nbsp;</a></span>HasCullingDistance()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> Graphic3d_ZLayerSettings::HasCullingDistance </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return TRUE, if culling of distant objects (distance culling) should be performed; FALSE by default. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="struct_graphic3d___z_layer_settings.html#ac3081d75897579bf430fbe83d59d4d35" title="Return the distance to discard drawing of distant objects (distance from camera Eye point); by defaul...">CullingDistance()</a> </dd></dl>
-
-</div>
-</div>
-<a id="abef2e3dd94cb13e267a4d2aa317e431b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abef2e3dd94cb13e267a4d2aa317e431b">&#9670;&nbsp;</a></span>HasCullingSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> Graphic3d_ZLayerSettings::HasCullingSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return TRUE, if culling of small objects (size culling) should be performed; FALSE by default. </p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="struct_graphic3d___z_layer_settings.html#a198c992d9081b0b6b81c2d598decada4" title="Return the size to discard drawing of small objects; by default it is Infinite (size culling is disab...">CullingSize()</a> </dd></dl>
-
-</div>
-</div>
 <a id="ac8e78a4e69c06a2af2642f1bca61ecbe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac8e78a4e69c06a2af2642f1bca61ecbe">&#9670;&nbsp;</a></span>IsImmediate()</h2>
 
@@ -416,33 +264,6 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Return true if this layer should be drawn after all normal (non-immediate) layers. </p>
-
-</div>
-</div>
-<a id="aa7942f73183349d6b41d1434abdb5052"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa7942f73183349d6b41d1434abdb5052">&#9670;&nbsp;</a></span>Lights()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt;&amp; Graphic3d_ZLayerSettings::Lights </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return lights list to be used for rendering presentations within this Z-Layer; NULL by default. NULL list (but not empty list!) means that default lights assigned to the View should be used instead of per-layer lights. </p>
 
 </div>
 </div>
@@ -579,62 +400,6 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Set if depth values should be cleared before drawing the layer. </p>
-
-</div>
-</div>
-<a id="a38222d1edc722facc6a631082aada407"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a38222d1edc722facc6a631082aada407">&#9670;&nbsp;</a></span>SetCullingDistance()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Graphic3d_ZLayerSettings::SetCullingDistance </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td>
-          <td class="paramname"><em>theDistance</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set the distance to discard drawing objects. </p>
-
-</div>
-</div>
-<a id="a7ca82e02e6add14fe8b47d8cf39b3d91"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ca82e02e6add14fe8b47d8cf39b3d91">&#9670;&nbsp;</a></span>SetCullingSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Graphic3d_ZLayerSettings::SetCullingSize </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td>
-          <td class="paramname"><em>theSize</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set the distance to discard drawing objects. </p>
 
 </div>
 </div>
@@ -804,34 +569,6 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ac027b0ce3b34de6fe6e6a2707608e60a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac027b0ce3b34de6fe6e6a2707608e60a">&#9670;&nbsp;</a></span>SetLights()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Graphic3d_ZLayerSettings::SetLights </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>theLights</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assign lights list to be used. </p>
-
-</div>
-</div>
 <a id="a53f24c809cc48fc751e17f5f94a47cc6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a53f24c809cc48fc751e17f5f94a47cc6">&#9670;&nbsp;</a></span>SetName()</h2>
 
@@ -913,34 +650,6 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Setup glPolygonOffset() arguments. </p>
-
-</div>
-</div>
-<a id="a50aea2ca2b0cc17991a15cc7eae0a503"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50aea2ca2b0cc17991a15cc7eae0a503">&#9670;&nbsp;</a></span>SetRenderInDepthPrepass()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Graphic3d_ZLayerSettings::SetRenderInDepthPrepass </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theToRender</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set if layer should be rendered within depth pre-pass. </p>
 
 </div>
 </div>
@@ -1109,33 +818,6 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="add95d856115982d277aa2978e17d829b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add95d856115982d277aa2978e17d829b">&#9670;&nbsp;</a></span>ToRenderInDepthPrepass()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> Graphic3d_ZLayerSettings::ToRenderInDepthPrepass </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return TRUE if layer should be rendered within depth pre-pass; TRUE by default. </p>
-
-</div>
-</div>
 <a id="a05773e2a1ac92dc5a78c066495518eb5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a05773e2a1ac92dc5a78c066495518eb5">&#9670;&nbsp;</a></span>UseEnvironmentTexture()</h2>
 
@@ -1164,54 +846,6 @@ Protected Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Field Documentation</h2>
-<a id="a26eb2edaa44c8a460bb531341925118d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26eb2edaa44c8a460bb531341925118d">&#9670;&nbsp;</a></span>myCullingDistance</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Graphic3d_ZLayerSettings::myCullingDistance</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>distance to discard objects </p>
-
-</div>
-</div>
-<a id="a11c97037652cc810193c7a2877a7628f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11c97037652cc810193c7a2877a7628f">&#9670;&nbsp;</a></span>myCullingSize</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Graphic3d_ZLayerSettings::myCullingSize</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>size to discard objects </p>
-
-</div>
-</div>
 <a id="ae4d67f6a24b3637bf335c37f363b52c2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae4d67f6a24b3637bf335c37f363b52c2">&#9670;&nbsp;</a></span>myIsImmediate</h2>
 
@@ -1233,30 +867,6 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>immediate layer will be drawn after all normal layers </p>
-
-</div>
-</div>
-<a id="a9b1af815adeb1cc48ebf64c8b62c6dfe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b1af815adeb1cc48ebf64c8b62c6dfe">&#9670;&nbsp;</a></span>myLights</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; Graphic3d_ZLayerSettings::myLights</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>lights list </p>
 
 </div>
 </div>
@@ -1425,30 +1035,6 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>option to enable write depth values </p>
-
-</div>
-</div>
-<a id="ab4b78abcdb18342467da89ecff3b7719"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab4b78abcdb18342467da89ecff3b7719">&#9670;&nbsp;</a></span>myToRenderInDepthPrepass</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> Graphic3d_ZLayerSettings::myToRenderInDepthPrepass</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>option to render layer within depth pre-pass </p>
 
 </div>
 </div>

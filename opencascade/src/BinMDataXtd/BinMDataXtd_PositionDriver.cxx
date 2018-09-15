@@ -30,7 +30,7 @@ IMPLEMENT_STANDARD_RTTIEXT(BinMDataXtd_PositionDriver,BinMDF_ADriver)
 //purpose  : Constructor
 //=======================================================================
 BinMDataXtd_PositionDriver::BinMDataXtd_PositionDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
 : BinMDF_ADriver (theMsgDriver, STANDARD_TYPE(TDataXtd_Position)->Name())
 {
 }

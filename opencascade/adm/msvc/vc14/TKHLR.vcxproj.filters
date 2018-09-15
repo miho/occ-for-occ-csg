@@ -2,31 +2,31 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{EA14E800-0417-000B-154F-B52BD651265B}</UniqueIdentifier>
+      <UniqueIdentifier>{7BC01DE8-019C-11CE-0A47-A6B86C95E0BE}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\HLRTopoBRep">
-      <UniqueIdentifier>{AD56E4E2-180A-0574-118B-78E702864265}</UniqueIdentifier>
+      <UniqueIdentifier>{D5DDD60D-0F34-17FA-0470-969197305F2A}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\HLRBRep">
-      <UniqueIdentifier>{71048B0E-1151-0E06-05FE-7AE1E584A9A3}</UniqueIdentifier>
+      <UniqueIdentifier>{B7F03F5F-0A3C-110D-0A73-17E604FE143F}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\HLRAlgo">
-      <UniqueIdentifier>{9D4066DE-10B4-0D61-1764-25CA30FD2BF4}</UniqueIdentifier>
+      <UniqueIdentifier>{E34DBD30-1406-02B4-04DB-29B901311BD1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\HLRAppli">
-      <UniqueIdentifier>{50D3F858-160A-0AFD-0C83-0CE8B882AE86}</UniqueIdentifier>
+      <UniqueIdentifier>{197793EF-1513-0BEB-0F0F-CD4311EE3982}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Intrv">
-      <UniqueIdentifier>{8FFE7348-0DD7-02F6-0022-1A486A8855E0}</UniqueIdentifier>
+      <UniqueIdentifier>{0188D8BB-190F-0A8E-0330-6E0F72B80E4E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\TopBas">
-      <UniqueIdentifier>{BDF2BBD8-0B21-17EC-101A-B315864A3FF5}</UniqueIdentifier>
+      <UniqueIdentifier>{B34C48C5-099D-00F4-0FF8-7A2EA98D77C0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\TopCnx">
-      <UniqueIdentifier>{AD27EE81-1090-0942-1142-04E8843D430B}</UniqueIdentifier>
+      <UniqueIdentifier>{B108978A-0001-0B1F-046A-126BED6BC143}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Contap">
-      <UniqueIdentifier>{FCACBDAB-0483-0E59-0414-3F115089B88C}</UniqueIdentifier>
+      <UniqueIdentifier>{5D547F75-0EE4-0690-176B-222AEA2F986A}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +130,9 @@
       <Filter>Source files\HLRBRep</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\HLRBRep\HLRBRep_PolyHLRToShape.cxx">
+      <Filter>Source files\HLRBRep</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\HLRBRep\HLRBRep_SLPropsATool.cxx">
       <Filter>Source files\HLRBRep</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\HLRBRep\HLRBRep_SLProps_0.cxx">

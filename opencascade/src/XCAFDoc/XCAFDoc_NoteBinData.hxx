@@ -1,4 +1,6 @@
-// Copyright (c) 2017-2018 OPEN CASCADE SAS
+// Created on: 2017-02-13
+// Created by: Sergey NIKONOV
+// Copyright (c) 2000-2017 OPEN CASCADE SAS
 //
 // This file is part of Open CASCADE Technology software library.
 //
@@ -21,13 +23,15 @@
 
 class OSD_File;
 
+class XCAFDoc_NoteBinData;
+DEFINE_STANDARD_HANDLE(XCAFDoc_NoteBinData, XCAFDoc_Note)
+
 class XCAFDoc_NoteBinData : public XCAFDoc_Note
 {
 public:
 
   DEFINE_STANDARD_RTTIEXT(XCAFDoc_NoteBinData, XCAFDoc_Note)
 
-  //! Returns default attribute GUID
   Standard_EXPORT static const Standard_GUID& GetID();
 
   //! Finds a binary data attribute on the given label and returns it, if it is found
@@ -93,16 +97,16 @@ public:
   //! @}
 
   //! Returns the note title.
-  const TCollection_ExtendedString& Title() const { return myTitle; }
+  Standard_EXPORT const TCollection_ExtendedString& Title() const;
 
   //! Returns data MIME type.
-  const TCollection_AsciiString& MIMEtype() const { return myMIMEtype;  }
+  Standard_EXPORT const TCollection_AsciiString& MIMEtype() const;
 
   //! Size of data in bytes.
-  Standard_Integer Size() const { return (!myData.IsNull() ? myData->Length() : 0); }
+  Standard_EXPORT Standard_Integer Size() const;
 
   //! Returns byte data array.
-  const Handle(TColStd_HArray1OfByte)& Data() const { return myData; }
+  Standard_EXPORT const Handle(TColStd_HArray1OfByte)& Data() const;
 
 public:
 
@@ -121,7 +125,5 @@ protected:
   Handle(TColStd_HArray1OfByte) myData;     ///< Byte data array.
 
 };
-
-DEFINE_STANDARD_HANDLE(XCAFDoc_NoteBinData, XCAFDoc_Note)
 
 #endif // _XCAFDoc_NoteBinData_HeaderFile

@@ -28,7 +28,7 @@ const Standard_CString MAGICNUMBER = "FSDFILE";
 const Standard_CString ENDOFNORMALEXTENDEDSECTION = "BEGIN_REF_SECTION";
 const Standard_Integer SIZEOFNORMALEXTENDEDSECTION = 16;
 
-#define USEOSDREAL 1
+//#define USEOSDREAL 1
 
 //=======================================================================
 //function : FSD_File
@@ -175,6 +175,20 @@ void FSD_File::FlushEndOfLine()
 {
   TCollection_AsciiString aDummy;
   ReadLine (aDummy); // flush is nothing more than to read till the line-break
+/*  static char Buffer[8192];
+  char c;
+  Standard_Boolean IsEnd = Standard_False;
+
+  while (!IsEnd && !FSD_File::IsEnd()) {
+    Buffer[0] = '\0';
+    myStream.get(Buffer,8192,'\n');
+
+    if (myStream.get(c) && c != '\n') {
+    }
+    else {
+      IsEnd = Standard_True;
+    }
+  }*/
 }
 
 //=======================================================================
@@ -280,7 +294,7 @@ void FSD_File::ReadExtendedLine(TCollection_ExtendedString& buffer)
 
 void FSD_File::ReadChar(TCollection_AsciiString& buffer, const Standard_Size rsize)
 {
-  char c = '\0';
+  char             c;
   Standard_Size ccount = 0;
 
   buffer.Clear();
@@ -595,7 +609,7 @@ Storage_BaseDriver& FSD_File::GetShortReal(Standard_ShortReal& aValue)
   if (!(myStream >> realbuffer)) throw Storage_StreamTypeMismatchError();
   if (!OSD::CStringToReal(realbuffer,r)) throw Storage_StreamTypeMismatchError();
 
-  aValue = (Standard_ShortReal)r;
+  aValue = r;
 
   return *this;
 #else
@@ -1234,7 +1248,7 @@ Storage_Error FSD_File::BeginReadDataSection()
 void FSD_File::ReadPersistentObjectHeader(Standard_Integer& aRef,
 					  Standard_Integer& aType) 
 {
-  char c = '\0';
+  char c;
 
   myStream.get(c);
 
@@ -1277,7 +1291,7 @@ void FSD_File::ReadPersistentObjectHeader(Standard_Integer& aRef,
 
 void FSD_File::BeginReadPersistentObjectData() 
 {
-  char c = '\0';
+  char c;
   myStream.get(c);
   while (c != '(') {
     if (IsEnd() || (c != ' ') || (c == '\n')) {
@@ -1296,7 +1310,8 @@ void FSD_File::BeginReadPersistentObjectData()
 
 void FSD_File::BeginReadObjectData() 
 {
-  char c = '\0';
+
+  char c;
   myStream.get(c);
   while (c != '(') {
     if (IsEnd() || (c != ' ') || (c == '\n')) {
@@ -1315,7 +1330,8 @@ void FSD_File::BeginReadObjectData()
 
 void FSD_File::EndReadObjectData() 
 {
-  char c = '\0';
+
+  char c;
   myStream.get(c);
   while (c != ')') {
     if (IsEnd() || (c != ' ') || (c == '\n')) {
@@ -1334,7 +1350,8 @@ void FSD_File::EndReadObjectData()
 
 void FSD_File::EndReadPersistentObjectData() 
 {
-  char c = '\0';
+
+  char c;
 
   myStream.get(c);
   while (c != ')') {

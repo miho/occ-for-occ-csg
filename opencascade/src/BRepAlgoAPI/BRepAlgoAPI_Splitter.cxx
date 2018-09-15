@@ -98,7 +98,6 @@ void BRepAlgoAPI_Splitter::Build()
     myDSFiller->SetFuzzyValue(myFuzzyValue);
     myDSFiller->SetNonDestructive(myNonDestructive);
     myDSFiller->SetGlue(myGlue);
-    myDSFiller->SetUseOBB(myUseOBB);
     //
     myDSFiller->Perform();
     //
@@ -122,7 +121,6 @@ void BRepAlgoAPI_Splitter::Build()
   //
   myBuilder->SetRunParallel(myRunParallel);
   myBuilder->SetProgressIndicator(myProgressIndicator);
-  myBuilder->SetCheckInverted(myCheckInverted);
   //
   myBuilder->PerformWithFiller(*myDSFiller);
   //

@@ -17,7 +17,7 @@
 
 #include <BinMDataXtd_ConstraintDriver.hxx>
 #include <BinObjMgt_Persistent.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_Real.hxx>
 #include <TDataXtd_Constraint.hxx>
@@ -31,7 +31,7 @@ IMPLEMENT_STANDARD_RTTIEXT(BinMDataXtd_ConstraintDriver,BinMDF_ADriver)
 //purpose  : Constructor
 //=======================================================================
 BinMDataXtd_ConstraintDriver::BinMDataXtd_ConstraintDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : BinMDF_ADriver (theMsgDriver, NULL)
 {}
 

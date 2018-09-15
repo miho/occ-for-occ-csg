@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class Standard_EXPORT OCC_BaseChildFrame : public CMDIChildWnd  
+class AFX_EXT_CLASS OCC_BaseChildFrame : public CMDIChildWnd  
 {
 	DECLARE_DYNCREATE(OCC_BaseChildFrame)
 public:

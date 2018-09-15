@@ -19,6 +19,7 @@
 #include <BOPAlgo_Operation.hxx>
 #include <BOPAlgo_PaveFiller.hxx>
 #include <BOPAlgo_Section.hxx>
+#include <BOPCol_ListOfShape.hxx>
 #include <BOPDS_DS.hxx>
 #include <BOPTest.hxx>
 #include <BOPTest_Objects.hxx>
@@ -28,7 +29,6 @@
 #include <BRepAlgoAPI_Cut.hxx>
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <BRepAlgoAPI_Section.hxx>
-#include <BRepTest_Objects.hxx>
 #include <DBRep.hxx>
 #include <Draw.hxx>
 #include <DrawTrSurf.hxx>
@@ -42,7 +42,6 @@
 #include <TopoDS_Compound.hxx>
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS_Shape.hxx>
-#include <TopTools_ListOfShape.hxx>
 
 #include <stdio.h>
 //
@@ -102,10 +101,7 @@ static Standard_Integer mkvolume   (Draw_Interpretor&, Standard_Integer, const c
   theCommands.Add("bfuse"   , "use bfuse r s1 s2"   , __FILE__,bfuse, g);
   theCommands.Add("bcut"    , "use bcut r s1 s2"    , __FILE__,bcut, g);
   theCommands.Add("btuc"    , "use btuc r s1 s2"    , __FILE__,btuc, g);
-  theCommands.Add("bsection", "use bsection r s1 s2 [-n2d/-n2d1/-n2d2] [-na]"
-                               "Builds section between shapes. Options:\n"
-                               "-n2d/-n2d1/-n2d2 - disable the PCurve construction;\n"
-                               "-na - disables the approximation of the section curves.\n",
+  theCommands.Add("bsection", "use bsection r s1 s2 [-n2d/-n2d1/-n2d2] [-na]", 
                                                       __FILE__, bsection, g);
   //
   theCommands.Add("bopcurves", "use bopcurves F1 F2 [-2d/-2d1/-2d2] "
@@ -126,7 +122,7 @@ Standard_Integer bop(Draw_Interpretor& di,
   Standard_Boolean bRunParallel, bNonDestructive;
   Standard_Real aTol;
   TopoDS_Shape aS1, aS2;
-  TopTools_ListOfShape aLC;
+  BOPCol_ListOfShape aLC;
   //
   if (n != 3) {
     di << " use bop s1 s2 \n";
@@ -162,10 +158,9 @@ Standard_Integer bop(Draw_Interpretor& di,
   pPF->SetRunParallel(bRunParallel);
   pPF->SetNonDestructive(bNonDestructive);
   pPF->SetGlue(aGlue);
-  pPF->SetUseOBB(BOPTest_Objects::UseOBB());
   //
   pPF->Perform();
-  BOPTest::ReportAlerts(pPF->GetReport());
+  BOPTest::ReportAlerts(*pPF);
   //
   return 0;
 }
@@ -238,7 +233,7 @@ Standard_Integer bopsmt(Draw_Interpretor& di,
   Standard_Integer aNb;
   BOPAlgo_BOP aBOP;
   //
-  const TopTools_ListOfShape& aLC=pPF->Arguments();
+  const BOPCol_ListOfShape& aLC=pPF->Arguments();
   aNb=aLC.Extent();
   if (aNb!=2) {
     Sprintf (buf, " wrong number of arguments %s\n", aNb);
@@ -255,14 +250,9 @@ Standard_Integer bopsmt(Draw_Interpretor& di,
   aBOP.AddTool(aS2);
   aBOP.SetOperation(aOp);
   aBOP.SetRunParallel (bRunParallel);
-  aBOP.SetCheckInverted(BOPTest_Objects::CheckInverted());
   //
   aBOP.PerformWithFiller(*pPF);
-  BOPTest::ReportAlerts(aBOP.GetReport());
-
-  // Store the history of Boolean operation into the session
-  BRepTest_Objects::SetHistory(pPF->Arguments(), aBOP);
-
+  BOPTest::ReportAlerts(aBOP);
   if (aBOP.HasErrors()) {
     return 0;
   }
@@ -304,7 +294,7 @@ Standard_Integer bopsection(Draw_Interpretor& di,
   Standard_Integer aNb;
   BOPAlgo_Section aBOP;
   //
-  const TopTools_ListOfShape& aLC=pPF->Arguments();
+  const BOPCol_ListOfShape& aLC=pPF->Arguments();
   aNb=aLC.Extent();
   if (aNb!=2) {
     Sprintf (buf, " wrong number of arguments %s\n", aNb);
@@ -320,14 +310,9 @@ Standard_Integer bopsection(Draw_Interpretor& di,
   aBOP.AddArgument(aS1);
   aBOP.AddArgument(aS2);
   aBOP.SetRunParallel (bRunParallel);
-  aBOP.SetCheckInverted(BOPTest_Objects::CheckInverted());
   //
   aBOP.PerformWithFiller(*pPF);
-  BOPTest::ReportAlerts(aBOP.GetReport());
-
-  // Store the history of Section operation into the session
-  BRepTest_Objects::SetHistory(pPF->Arguments(), aBOP);
-
+  BOPTest::ReportAlerts(aBOP);
   if (aBOP.HasErrors()) {
     return 0;
   }
@@ -440,13 +425,8 @@ Standard_Integer  bsection(Draw_Interpretor& di,
   aSec.SetRunParallel(bRunParallel);
   aSec.SetNonDestructive(bNonDestructive);
   aSec.SetGlue(aGlue);
-  aSec.SetUseOBB(BOPTest_Objects::UseOBB());
   //
   aSec.Build();
-
-  // Store the history of Section operation into the session
-  BRepTest_Objects::SetHistory(aSec.DSFiller()->Arguments(), aSec);
-
   //
   if (aSec.HasWarnings()) {
     Standard_SStream aSStream;
@@ -480,7 +460,7 @@ Standard_Integer bsmt (Draw_Interpretor& di,
 {
   Standard_Boolean bRunParallel, bNonDestructive;
   TopoDS_Shape aS1, aS2;
-  TopTools_ListOfShape aLC;
+  BOPCol_ListOfShape aLC;
   Standard_Real aTol;
   //
   if (n != 4) {
@@ -514,10 +494,9 @@ Standard_Integer bsmt (Draw_Interpretor& di,
   aPF.SetRunParallel(bRunParallel);
   aPF.SetNonDestructive(bNonDestructive);
   aPF.SetGlue(aGlue);
-  aPF.SetUseOBB(BOPTest_Objects::UseOBB());
   //
   aPF.Perform();
-  BOPTest::ReportAlerts(aPF.GetReport());
+  BOPTest::ReportAlerts(aPF);
   if (aPF.HasErrors()) {
     return 0;
   }
@@ -529,14 +508,9 @@ Standard_Integer bsmt (Draw_Interpretor& di,
   aBOP.AddTool(aS2);
   aBOP.SetOperation(aOp);
   aBOP.SetRunParallel(bRunParallel);
-  aBOP.SetCheckInverted(BOPTest_Objects::CheckInverted());
   // 
   aBOP.PerformWithFiller(aPF);
-  BOPTest::ReportAlerts(aBOP.GetReport());
-
-  // Store the history of Boolean operation into the session
-  BRepTest_Objects::SetHistory(aPF.Arguments(), aBOP);
-
+  BOPTest::ReportAlerts(aBOP);
   if (aBOP.HasErrors()) {
     return 0;
   }
@@ -779,7 +753,7 @@ Standard_Integer mkvolume(Draw_Interpretor& di, Standard_Integer n, const char**
   Standard_Integer i;
   Standard_Real aTol;
   TopoDS_Shape aS;
-  TopTools_ListOfShape aLS;
+  BOPCol_ListOfShape aLS;
   //
   aTol = BOPTest_Objects::FuzzyValue();
   bRunParallel = BOPTest_Objects::RunParallel();
@@ -816,8 +790,8 @@ Standard_Integer mkvolume(Draw_Interpretor& di, Standard_Integer n, const char**
   //
   // treat list of arguments for the case of compounds
   if (bToIntersect && bCompounds) {
-    TopTools_ListOfShape aLSx;
-    TopTools_ListIteratorOfListOfShape aItLS;
+    BOPCol_ListOfShape aLSx;
+    BOPCol_ListIteratorOfListOfShape aItLS;
     //
     aItLS.Initialize(aLS);
     for (; aItLS.More(); aItLS.Next()) {
@@ -841,14 +815,9 @@ Standard_Integer mkvolume(Draw_Interpretor& di, Standard_Integer n, const char**
   aMV.SetNonDestructive(bNonDestructive);
   aMV.SetAvoidInternalShapes(bAvoidInternal);
   aMV.SetGlue(aGlue);
-  aMV.SetUseOBB(BOPTest_Objects::UseOBB());
   //
   aMV.Perform();
-  BOPTest::ReportAlerts(aMV.GetReport());
-
-  // Store the history of Volume Maker into the session
-  BRepTest_Objects::SetHistory(aLS, aMV);
-
+  BOPTest::ReportAlerts(aMV);
   if (aMV.HasErrors()) {
     return 0;
   }

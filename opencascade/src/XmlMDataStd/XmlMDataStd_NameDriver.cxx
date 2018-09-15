@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDF_Attribute.hxx>
@@ -31,7 +31,7 @@ IMPLEMENT_DOMSTRING (AttributeIDString, "nameguid")
 //purpose  : Constructor
 //=======================================================================
 XmlMDataStd_NameDriver::XmlMDataStd_NameDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -53,11 +53,11 @@ Standard_Boolean XmlMDataStd_NameDriver::Paste
                                 const Handle(TDF_Attribute)& theTarget,
                                 XmlObjMgt_RRelocationTable&  ) const
 {
-  if(!theTarget.IsNull()) {
+  if(!theTarget.IsNull()) {	
     TCollection_ExtendedString aString;
     if (XmlObjMgt::GetExtendedString (theSource, aString))
     {
-      Handle(TDataStd_Name)::DownCast(theTarget) -> Set (aString);
+      Handle(TDataStd_Name)::DownCast(theTarget) -> Set (aString);    
       // attribute id
       Standard_GUID aGUID;
       const XmlObjMgt_Element& anElement = theSource;
@@ -68,10 +68,10 @@ Standard_Boolean XmlMDataStd_NameDriver::Paste
         aGUID = Standard_GUID(Standard_CString(aGUIDStr.GetString())); // user defined case
 
       Handle(TDataStd_Name)::DownCast(theTarget)->SetID(aGUID);
-      return Standard_True;
+	  return Standard_True;
     }
   }
-  myMessageDriver->Send("error retrieving ExtendedString for type TDataStd_Name", Message_Fail);
+  WriteMessage("error retrieving ExtendedString for type TDataStd_Name");
   return Standard_False;
 }
 

@@ -63,7 +63,6 @@ enum OpenGl_StateVariable
   OpenGl_OCCT_DISTINGUISH_MODE,
   OpenGl_OCCT_FRONT_MATERIAL,
   OpenGl_OCCT_BACK_MATERIAL,
-  OpenGl_OCCT_ALPHA_CUTOFF,
   OpenGl_OCCT_COLOR,
 
   // Weighted, Blended Order-Independent Transparency rendering state
@@ -177,9 +176,6 @@ public:
   //! Destroys shader program.
   Standard_EXPORT virtual void Release (OpenGl_Context* theCtx) Standard_OVERRIDE;
 
-  //! Returns estimated GPU memory usage - cannot be easily estimated.
-  virtual Standard_Size EstimatedDataSize() const Standard_OVERRIDE { return 0; }
-
   //! Attaches shader object to the program object.
   Standard_EXPORT Standard_Boolean AttachShader (const Handle(OpenGl_Context)&      theCtx,
                                                  const Handle(OpenGl_ShaderObject)& theShader);
@@ -213,29 +209,6 @@ public:
   {
     return myProgramID;
   }
-
-public:
-
-  //! Return TRUE if program defines tessellation stage.
-  Standard_Boolean HasTessellationStage() const { return myHasTessShader; }
-
-  //! Return the length of array of light sources (THE_MAX_LIGHTS),
-  //! to be used for initialization occLightSources (OpenGl_OCC_LIGHT_SOURCE_PARAMS).
-  Standard_Integer NbLightsMax() const { return myNbLightsMax; }
-
-  //! Return the length of array of clipping planes (THE_MAX_CLIP_PLANES),
-  //! to be used for initialization occClipPlaneEquations (OpenGl_OCC_CLIP_PLANE_EQUATIONS).
-  Standard_Integer NbClipPlanesMax() const { return myNbClipPlanesMax; }
-
-  //! Return the length of array of Fragment Shader outputs (THE_NB_FRAG_OUTPUTS),
-  //! to be used for initialization occFragColorArray/occFragColorN.
-  Standard_Integer NbFragmentOutputs() const { return myNbFragOutputs; }
-
-  //! Return true if Fragment Shader should perform alpha test; FALSE by default.
-  Standard_Boolean HasAlphaTest() const { return myHasAlphaTest; }
-
-  //! Return true if Fragment Shader color should output the weighted OIT coverage; FALSE by default.
-  Standard_Boolean HasWeightOitOutput() const { return myHasWeightOitOutput; }
 
 private:
 
@@ -578,12 +551,6 @@ protected:
   OpenGl_ShaderList               myShaderObjects; //!< List of attached shader objects
   Handle(Graphic3d_ShaderProgram) myProxy;         //!< Proxy shader program (from application layer)
   Standard_Integer                myShareCount;    //!< program users count, initialized with 1 (already shared by one user)
-  Standard_Integer                myNbLightsMax;   //!< length of array of light sources (THE_MAX_LIGHTS)
-  Standard_Integer                myNbClipPlanesMax; //!< length of array of clipping planes (THE_MAX_CLIP_PLANES)
-  Standard_Integer                myNbFragOutputs; //!< length of array of Fragment Shader outputs (THE_NB_FRAG_OUTPUTS)
-  Standard_Boolean                myHasAlphaTest;  //!< flag indicating that Fragment Shader should perform alpha-test
-  Standard_Boolean                myHasWeightOitOutput; //!< flag indicating that Fragment Shader includes weighted OIT coverage
-  Standard_Boolean                myHasTessShader; //!< flag indicating that program defines tessellation stage
 
 protected:
 

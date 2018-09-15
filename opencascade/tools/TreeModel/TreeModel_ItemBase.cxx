@@ -17,9 +17,7 @@
 
 #include <inspector/TreeModel_ItemRole.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QStringList>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : Constructor
@@ -46,19 +44,8 @@ void TreeModel_ItemBase::Reset()
       anItem->Reset();
   }
   m_bInitialized = false;
-  myCachedValues.clear();
-}
+  mycachedValues.clear();
 
-// =======================================================================
-// function :  Reset
-// purpose :
-// =======================================================================
-void TreeModel_ItemBase::Reset (int theRole)
-{
-  if (!myCachedValues.contains (theRole))  
-    return;
-
-  myCachedValues.remove (theRole);
 }
 
 // =======================================================================
@@ -96,11 +83,11 @@ const TreeModel_ItemBasePtr TreeModel_ItemBase::currentItem()
 // =======================================================================
 QVariant TreeModel_ItemBase::cachedValue (const int theItemRole) const
 {
-  if (myCachedValues.contains (theItemRole))
-    return myCachedValues[theItemRole];
+  if (mycachedValues.contains (theItemRole))
+    return mycachedValues[theItemRole];
 
-  const_cast<TreeModel_ItemBase*>(this)->myCachedValues.insert (theItemRole,
+  const_cast<TreeModel_ItemBase*>(this)->mycachedValues.insert (theItemRole,
     theItemRole == TreeModel_ItemRole_RowCountRole ? QVariant (initRowCount()) : initValue (theItemRole));
 
-  return myCachedValues.contains (theItemRole) ? myCachedValues[theItemRole] : QVariant();
+  return mycachedValues.contains (theItemRole) ? mycachedValues[theItemRole] : QVariant();
 }

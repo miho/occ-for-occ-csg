@@ -22,7 +22,6 @@
 #include <OpenGl_Text.hxx>
 #include <OpenGl_Workspace.hxx>
 #include <OpenGl_View.hxx>
-#include <OpenGl_VertexBufferCompat.hxx>
 
 #include <Font_FontMgr.hxx>
 #include <Font_FTFont.hxx>
@@ -137,38 +136,6 @@ namespace
     gl2psTextOpt (theText.ToCString(), aPsFont, (GLshort)theHeight, GL2PS_TEXT_BL, (float )theAspect.Aspect()->GetTextAngle());
   }
 #endif
-
-  //! Auxiliary tool for setting polygon offset temporarily.
-  struct BackPolygonOffsetSentry
-  {
-    BackPolygonOffsetSentry (const Handle(OpenGl_Context)& theCtx)
-    : myCtx (theCtx),
-      myOffsetBack (!theCtx.IsNull() ? theCtx->PolygonOffset() : Graphic3d_PolygonOffset())
-    {
-      if (!theCtx.IsNull())
-      {
-        Graphic3d_PolygonOffset aPolyOffset = myOffsetBack;
-        aPolyOffset.Mode = Aspect_POM_Fill;
-        aPolyOffset.Units += 1.0f;
-        theCtx->SetPolygonOffset (aPolyOffset);
-      }
-    }
-
-    ~BackPolygonOffsetSentry()
-    {
-      if (!myCtx.IsNull())
-      {
-        myCtx->SetPolygonOffset (myOffsetBack);
-      }
-    }
-
-  private:
-    BackPolygonOffsetSentry (const BackPolygonOffsetSentry& );
-    BackPolygonOffsetSentry& operator= (const BackPolygonOffsetSentry& );
-  private:
-    const Handle(OpenGl_Context)& myCtx;
-    const Graphic3d_PolygonOffset myOffsetBack;
-  };
 
 } // anonymous namespace
 
@@ -453,11 +420,13 @@ void OpenGl_Text::StringSize (const Handle(OpenGl_Context)& theCtx,
 // =======================================================================
 void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
 {
-  theWorkspace->SetAspectFace (&theWorkspace->FontFaceAspect());
-  theWorkspace->ApplyAspectFace();
   const OpenGl_AspectText*      aTextAspect  = theWorkspace->ApplyAspectText();
   const Handle(OpenGl_Context)& aCtx         = theWorkspace->GetGlContext();
   const Handle(OpenGl_TextureSet) aPrevTexture = aCtx->BindTextures (Handle(OpenGl_TextureSet)());
+#if !defined(GL_ES_VERSION_2_0)
+  const Standard_Integer aPrevPolygonMode  = aCtx->SetPolygonMode (GL_FILL);
+  const bool             aPrevHatchingMode = aCtx->SetPolygonHatchEnabled (false);
+#endif
 
   // Bind custom shader program or generate default version
   aCtx->ShaderManager()->BindFontProgram (aTextAspect->ShaderProgramRes (aCtx));
@@ -477,6 +446,10 @@ void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
   {
     aCtx->BindTextures (aPrevTexture);
   }
+#if !defined(GL_ES_VERSION_2_0)
+  aCtx->SetPolygonMode         (aPrevPolygonMode);
+  aCtx->SetPolygonHatchEnabled (aPrevHatchingMode);
+#endif
 
   // restore Z buffer settings
   if (theWorkspace->UseZBuffer())
@@ -747,21 +720,12 @@ void OpenGl_Text::drawRect (const Handle(OpenGl_Context)& theCtx,
       OpenGl_Vec2(myBndBox.Left,  myBndBox.Bottom),
       OpenGl_Vec2(myBndBox.Left,  myBndBox.Top)
     };
-    if (theCtx->ToUseVbo())
-    {
-      myBndVertsVbo = new OpenGl_VertexBuffer();
-    }
-    else
-    {
-      myBndVertsVbo = new OpenGl_VertexBufferCompat();
-    }
+    myBndVertsVbo = new OpenGl_VertexBuffer();
     myBndVertsVbo->Init (theCtx, 2, 4, aQuad[0].GetData());
   }
 
-  // bind unlit program
-  theCtx->ShaderManager()->BindFaceProgram (Handle(OpenGl_TextureSet)(), Graphic3d_TOSM_UNLIT,
-                                            Graphic3d_AlphaMode_Opaque, Standard_False, Standard_False,
-                                            Handle(OpenGl_ShaderProgram)());
+  // bind flat program
+  theCtx->ShaderManager()->BindFaceProgram (Handle(OpenGl_TextureSet)(), Standard_False, Standard_False, Standard_False, Handle(OpenGl_ShaderProgram)());
 
 #if !defined(GL_ES_VERSION_2_0)
   if (theCtx->core11 != NULL
@@ -771,7 +735,7 @@ void OpenGl_Text::drawRect (const Handle(OpenGl_Context)& theCtx,
   }
 #endif
   theCtx->SetColor4fv (theColorSubs);
-  setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (0.0f, 0.0f, 0.0f));
+  setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (0.0f, 0.0f, 0.00001f));
   myBndVertsVbo->BindAttribute (theCtx, Graphic3d_TOA_POS);
 
   theCtx->core20fwd->glDrawArrays (GL_TRIANGLE_STRIP, 0, 4);
@@ -877,20 +841,15 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   myExportHeight = aPointSize / myExportHeight;
 
 #if !defined(GL_ES_VERSION_2_0)
-  if (theCtx->core11 != NULL
-   && theCtx->caps->ffpEnable)
+  if (theCtx->core11 != NULL)
   {
     glDisable (GL_LIGHTING);
   }
-
-  const Standard_Integer aPrevPolygonMode  = theCtx->SetPolygonMode (GL_FILL);
-  const bool             aPrevHatchingMode = theCtx->SetPolygonHatchEnabled (false);
 #endif
 
   // setup depth test
-  const bool hasDepthTest = !myIs2d
-                         && theTextAspect.Aspect()->Style() != Aspect_TOST_ANNOTATION;
-  if (!hasDepthTest)
+  if (myIs2d
+   || theTextAspect.Aspect()->Style() == Aspect_TOST_ANNOTATION)
   {
     glDisable (GL_DEPTH_TEST);
   }
@@ -904,6 +863,10 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   GLint aTexEnvParam = GL_REPLACE;
   if (theCtx->core11 != NULL)
   {
+    // setup alpha test
+    glAlphaFunc (GL_GEQUAL, 0.285f);
+    glEnable (GL_ALPHA_TEST);
+
     glDisable (GL_TEXTURE_1D);
     glEnable  (GL_TEXTURE_2D);
     glGetTexEnviv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &aTexEnvParam);
@@ -917,7 +880,6 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   // setup blending
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  const bool anAlphaToCoverageOld = theCtx->SetSampleAlphaToCoverage (false);
 
   // extra drawings
   switch (theTextAspect.Aspect()->DisplayType())
@@ -932,29 +894,19 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
     }
     case Aspect_TODT_SUBTITLE:
     {
-      BackPolygonOffsetSentry aPolygonOffsetTmp (hasDepthTest ? theCtx : Handle(OpenGl_Context)());
       drawRect (theCtx, theTextAspect, theColorSubs);
       break;
     }
     case Aspect_TODT_DEKALE:
     {
-      BackPolygonOffsetSentry aPolygonOffsetTmp (hasDepthTest ? theCtx : Handle(OpenGl_Context)());
       theCtx->SetColor4fv (theColorSubs);
-      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, +1.0f, 0.0f));
+      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, +1.0f, 0.00001f));
       drawText    (theCtx, theTextAspect);
-      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (-1.0f, -1.0f, 0.0f));
+      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (-1.0f, -1.0f, 0.00001f));
       drawText    (theCtx, theTextAspect);
-      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (-1.0f, +1.0f, 0.0f));
+      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (-1.0f, +1.0f, 0.00001f));
       drawText    (theCtx, theTextAspect);
-      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, -1.0f, 0.0f));
-      drawText    (theCtx, theTextAspect);
-      break;
-    }
-    case Aspect_TODT_SHADOW:
-    {
-      BackPolygonOffsetSentry aPolygonOffsetTmp (hasDepthTest ? theCtx : Handle(OpenGl_Context)());
-      theCtx->SetColor4fv (theColorSubs);
-      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, -1.0f, 0.0f));
+      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, -1.0f, 0.00001f));
       drawText    (theCtx, theTextAspect);
       break;
     }
@@ -994,9 +946,10 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
     if (theCtx->core11 != NULL)
     {
       glDisable (GL_TEXTURE_2D);
+      glDisable (GL_ALPHA_TEST);
     }
   #endif
-    const bool aColorMaskBack = theCtx->SetColorMask (false);
+    glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
     glClear (GL_STENCIL_BUFFER_BIT);
     glEnable (GL_STENCIL_TEST);
@@ -1007,19 +960,19 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
 
     glStencilFunc (GL_ALWAYS, 0, 0xFF);
 
-    theCtx->SetColorMask (aColorMaskBack);
+    glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
   }
 
   // reset OpenGL state
   glDisable (GL_BLEND);
   glDisable (GL_STENCIL_TEST);
 #if !defined(GL_ES_VERSION_2_0)
+  if (theCtx->core11 != NULL)
+  {
+    glDisable (GL_ALPHA_TEST);
+  }
   glDisable (GL_COLOR_LOGIC_OP);
-
-  theCtx->SetPolygonMode         (aPrevPolygonMode);
-  theCtx->SetPolygonHatchEnabled (aPrevHatchingMode);
 #endif
-  theCtx->SetSampleAlphaToCoverage (anAlphaToCoverageOld);
 
   // model view matrix was modified
   theCtx->WorldViewState.Pop();

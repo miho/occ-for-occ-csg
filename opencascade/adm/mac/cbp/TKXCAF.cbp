@@ -73,11 +73,8 @@
 		<Unit filename="../../../src/XCAFDimTolObjects/XCAFDimTolObjects_DimensionObject.cxx" />
 		<Unit filename="../../../src/XCAFDimTolObjects/XCAFDimTolObjects_GeomToleranceObject.cxx" />
 		<Unit filename="../../../src/XCAFDimTolObjects/XCAFDimTolObjects_Tool.cxx" />
-		<Unit filename="../../../src/XCAFNoteObjects/XCAFNoteObjects_NoteObject.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_Area.cxx" />
-		<Unit filename="../../../src/XCAFDoc/XCAFDoc_AssemblyItemId.cxx" />
-		<Unit filename="../../../src/XCAFDoc/XCAFDoc_AssemblyItemRef.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_Centroid.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_ClippingPlaneTool.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_Color.cxx" />
@@ -94,11 +91,6 @@
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_Location.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_Material.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_MaterialTool.cxx" />
-		<Unit filename="../../../src/XCAFDoc/XCAFDoc_Note.cxx" />
-		<Unit filename="../../../src/XCAFDoc/XCAFDoc_NoteBalloon.cxx" />
-		<Unit filename="../../../src/XCAFDoc/XCAFDoc_NoteBinData.cxx" />
-		<Unit filename="../../../src/XCAFDoc/XCAFDoc_NoteComment.cxx" />
-		<Unit filename="../../../src/XCAFDoc/XCAFDoc_NotesTool.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_ShapeMapTool.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_ShapeTool.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_View.cxx" />

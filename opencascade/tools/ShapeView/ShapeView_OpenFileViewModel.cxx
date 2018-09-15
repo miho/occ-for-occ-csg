@@ -15,12 +15,10 @@
 
 #include <inspector/ShapeView_OpenFileViewModel.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QApplication>
 #include <QFileInfo>
 #include <QIcon>
 #include <QPainter>
-#include <Standard_WarningsRestore.hxx>
 
 const int ICON_SIZE = 40;
 // =======================================================================
@@ -37,9 +35,11 @@ void ShapeView_OpenFileItemDelegate::paint (QPainter* thePainter, const QStyleOp
   // action icon for all indices before the last one
   QIcon anIcon (":/icons/folder_import.png");
   QSize anIconSize (ICON_SIZE, ICON_SIZE);
-  int aDX = (theOption.rect.width() - anIconSize.width()) / 2;
+  int aWidth = theOption.rect.width();
+  int aCenter = aWidth / 2.;
+  int aHalf = anIconSize.width() / 2.;
   int aMargin = qApp->style()->pixelMetric (QStyle::PM_HeaderMargin);
-  thePainter->drawPixmap (QRect (theOption.rect.left() + aDX,
+  thePainter->drawPixmap (QRect (theOption.rect.left() + (aCenter - aHalf),
                           theOption.rect.top() + aMargin,
                           anIconSize.width(),
                           anIconSize.height()),

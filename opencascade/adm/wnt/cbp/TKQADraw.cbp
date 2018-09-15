@@ -17,6 +17,10 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__QABugs_DLL" />
+					<Add option="-D__QADNaming_DLL" />
+					<Add option="-D__QADraw_DLL" />
+					<Add option="-D__QANCollection_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKQADraw_obj.link" />
@@ -35,6 +39,10 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__QABugs_DLL" />
+					<Add option="-D__QADNaming_DLL" />
+					<Add option="-D__QADraw_DLL" />
+					<Add option="-D__QANCollection_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKQADraw_objd.link" />

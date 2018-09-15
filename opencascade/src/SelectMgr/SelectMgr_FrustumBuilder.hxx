@@ -30,7 +30,7 @@ class SelectMgr_FrustumBuilder : public Standard_Transient
 {
 public:
   //! Creates new frustum builder with empty matrices
-  Standard_EXPORT SelectMgr_FrustumBuilder();
+  SelectMgr_FrustumBuilder();
 
   //! Stores current world view transformation matrix
   Standard_EXPORT void SetWorldViewMatrix (const Graphic3d_Mat4d& theWorldViewMatrix);

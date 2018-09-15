@@ -85,11 +85,6 @@
 #include <IVtkDraw_HighlightAndSelectionPipeline.hxx>
 #include <IVtkDraw_Interactor.hxx>
 
-// prevent disabling some MSVC warning messages by VTK headers 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4244)
-#endif
 #include <vtkAlgorithmOutput.h>
 #include <vtkAppendPolyData.h>
 #include <vtkBMPWriter.h>
@@ -112,6 +107,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkTIFFWriter.h>
 #include <vtkWindowToImageFilter.h>
+
 #ifndef _WIN32
 #include <X11/X.h>
 #include <X11/Shell.h>
@@ -122,9 +118,6 @@
 #include <vtkXOpenGLRenderWindow.h>
 #include <X11/Xutil.h>
 #include <tk.h>
-#endif
-#ifdef _MSC_VER
-#pragma warning(pop)
 #endif
 
 // workaround name conflicts with OCCT methods (in class TopoDS_Shape for example)

@@ -444,9 +444,8 @@ static const Standard_ExtString   voidext = { 0 };
   TopoDS_Compound CC;
   BRep_Builder BB;
   BB.MakeCompound(CC);
-  for (TopExp_Explorer aExp (shape,type); aExp.More(); aExp.Next()) {
-    nb ++;
-    sh = aExp.Current();
+  for (TopExp_Explorer expl (shape,type); expl.More(); expl.Next()) {
+    nb ++;  sh = expl.Current();
     BB.Add (CC,sh);
   }
   if (nb == 0) CC.Nullify();

@@ -34,7 +34,7 @@
 
 //=======================================================================
 //function : Expand
-//purpose  : Convert Shape to assembly
+//purpose  : Convert Shape(compound) to assambly
 //=======================================================================
 
 Standard_Boolean XCAFDoc_Editor::Expand (const TDF_Label& Doc, const TDF_Label& Shape,
@@ -46,16 +46,18 @@ Standard_Boolean XCAFDoc_Editor::Expand (const TDF_Label& Doc, const TDF_Label& 
   Handle(XCAFDoc_ColorTool) aColorTool = XCAFDoc_DocumentTool::ColorTool(Doc);
   Handle(XCAFDoc_LayerTool) aLayerTool = XCAFDoc_DocumentTool::LayerTool(Doc);
   Handle(XCAFDoc_ShapeTool) aShapeTool = XCAFDoc_DocumentTool::ShapeTool(Doc);
-  aShapeTool->SetAutoNaming(Standard_False);
 
   TopoDS_Shape aS = aShapeTool->GetShape(Shape);
-  if (aShapeTool->Expand(Shape))
+  if (!aS.IsNull() && aS.ShapeType() == TopAbs_COMPOUND && !aShapeTool->IsAssembly(Shape))
   {
-    //move attributes
+    //convert compound to assembly(without attributes)
+    aShapeTool->Expand(Shape);
+    //move attrributes
     TDF_ChildIterator anIter(Shape, Standard_True);
     for(; anIter.More(); anIter.Next())
     {
       TDF_Label aChild = anIter.Value();
+
       TDF_LabelSequence aLayers;
       TDF_LabelSequence aColors;
       Handle(TDataStd_Name) aName;
@@ -70,34 +72,18 @@ Standard_Boolean XCAFDoc_Editor::Expand (const TDF_Label& Doc, const TDF_Label& 
         if(!aShapeTool->GetShape(aPart.Father()).IsNull())
         {
           TopLoc_Location nulloc;
-          aPart.ForgetAttribute(XCAFDoc::ShapeRefGUID());
-          if (aShapeTool->GetShape(aPart.Father()).ShapeType() == TopAbs_COMPOUND)
           {
-            aShapeTool->SetShape(aPart, aShape);
+            aPart.ForgetAttribute(XCAFDoc::ShapeRefGUID());
+            if(aShapeTool->GetShape(aPart.Father()).ShapeType() == TopAbs_COMPOUND)
+            {
+              aShapeTool->SetShape(aPart, aShape);
+            }
+            aPart.ForgetAttribute(XCAFDoc_ShapeMapTool::GetID());
+            aChild.ForgetAllAttributes(Standard_False);
           }
-          aPart.ForgetAttribute(XCAFDoc_ShapeMapTool::GetID());
-          aChild.ForgetAllAttributes(Standard_False);
         }
         aChild.ForgetAttribute(TNaming_NamedShape::GetID());
         aChild.ForgetAttribute(XCAFDoc_ShapeMapTool::GetID());
-      }
-      else
-      {
-        // If new original shape is not created, try to process this child
-        // as subshape of new part
-        TDF_LabelSequence aUsers;
-        if (aShapeTool->GetUsers(aChild, aUsers) > 0)
-        {
-          for (Standard_Integer i = 1; i <= aUsers.Length(); i++)
-          {
-            TDF_Label aSubLabel = aUsers.Value(i);
-            setParams(Doc, aSubLabel, aColors, aLayers, aName);
-            //remove unnecessary links
-            aSubLabel.ForgetAttribute(XCAFDoc::ShapeRefGUID());
-            aSubLabel.ForgetAttribute(XCAFDoc_ShapeMapTool::GetID());
-          }
-          aChild.ForgetAllAttributes(Standard_False);
-        }
       }
     }
     //if assembly contains compound, expand it recursively(if flag recursively is true)
@@ -110,9 +96,7 @@ Standard_Boolean XCAFDoc_Editor::Expand (const TDF_Label& Doc, const TDF_Label& 
         TDF_Label aPart;
         if(aShapeTool->GetReferredShape(aChild, aPart))
         {
-          TopoDS_Shape aPartShape = aShapeTool->GetShape(aPart);
-          if (!aPartShape.IsNull() && aPartShape.ShapeType() == TopAbs_COMPOUND)
-            Expand(Doc, aPart, recursively);
+          Expand(Doc, aPart, recursively);
         }
       }
     }
@@ -123,7 +107,7 @@ Standard_Boolean XCAFDoc_Editor::Expand (const TDF_Label& Doc, const TDF_Label& 
 
 //=======================================================================
 //function : Expand
-//purpose  : Convert all compounds in Doc to assembly
+//purpose  : Convert all compounds in Doc to assambly
 //=======================================================================
 
 Standard_Boolean XCAFDoc_Editor::Expand (const TDF_Label& Doc, const Standard_Boolean recursively)

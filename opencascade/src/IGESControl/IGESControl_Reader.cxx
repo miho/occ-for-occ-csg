@@ -60,8 +60,7 @@ IGESControl_Reader::IGESControl_Reader ()
   IGESControl_Controller::Init();
   SetWS (new XSControl_WorkSession);
   SetNorm("IGES");
-  Standard_Integer onlyvisible = Interface_Static::IVal("read.iges.onlyvisible");
-  theReadOnlyVisible = (onlyvisible == 1);
+  theReadOnlyVisible = Standard_False;
 }
 
 
@@ -76,9 +75,8 @@ IGESControl_Reader::IGESControl_Reader
   IGESControl_Controller::Init();
   SetWS (WS,scratch);
   SetNorm ("IGES");
-  Standard_Integer onlyvisible = Interface_Static::IVal("read.iges.onlyvisible");
-  theReadOnlyVisible = (onlyvisible == 1);
- }
+  theReadOnlyVisible = Standard_False;
+}
 
 
 //=======================================================================

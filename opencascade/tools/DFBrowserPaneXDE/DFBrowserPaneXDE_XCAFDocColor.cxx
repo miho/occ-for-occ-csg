@@ -20,10 +20,7 @@
 
 #include <Quantity_Color.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QColor>
-#include <Standard_WarningsRestore.hxx>
-
 // =======================================================================
 // function : Constructor
 // purpose :

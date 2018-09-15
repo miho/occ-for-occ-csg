@@ -87,7 +87,7 @@ IMPLEMENT_STANDARD_RTTIEXT(BOPDS_CommonBlock,Standard_Transient)
 // function:  AddFaces
 // purpose: 
 //=======================================================================
-  void BOPDS_CommonBlock::SetFaces(const TColStd_ListOfInteger& aLF)
+  void BOPDS_CommonBlock::SetFaces(const BOPCol_ListOfInteger& aLF)
 {
   myFaces=aLF;
 }
@@ -95,7 +95,7 @@ IMPLEMENT_STANDARD_RTTIEXT(BOPDS_CommonBlock,Standard_Transient)
 // function:  AppendFaces
 // purpose: 
 //=======================================================================
-void BOPDS_CommonBlock::AppendFaces(TColStd_ListOfInteger& aLF)
+void BOPDS_CommonBlock::AppendFaces(BOPCol_ListOfInteger& aLF)
 {
   myFaces.Append(aLF);
 }
@@ -103,7 +103,7 @@ void BOPDS_CommonBlock::AppendFaces(TColStd_ListOfInteger& aLF)
 // function:  Faces
 // purpose: 
 //=======================================================================
-  const TColStd_ListOfInteger& BOPDS_CommonBlock::Faces()const
+  const BOPCol_ListOfInteger& BOPDS_CommonBlock::Faces()const
 {
   return myFaces;
 }
@@ -114,23 +114,6 @@ void BOPDS_CommonBlock::AppendFaces(TColStd_ListOfInteger& aLF)
   const Handle(BOPDS_PaveBlock)& BOPDS_CommonBlock::PaveBlock1()const
 {
   return myPaveBlocks.First();
-}
-//=======================================================================
-// function:  SetRealPaveBlock
-// purpose: 
-//=======================================================================
-void BOPDS_CommonBlock::SetRealPaveBlock(const Handle(BOPDS_PaveBlock)& thePB)
-{
-  BOPDS_ListIteratorOfListOfPaveBlock it(myPaveBlocks);
-  for (; it.More(); it.Next())
-  {
-    if (it.Value() == thePB)
-    {
-      myPaveBlocks.Prepend(thePB);
-      myPaveBlocks.Remove(it);
-      break;
-    }
-  }
 }
 //=======================================================================
 // function:  PaveBlockOnEdge
@@ -161,7 +144,7 @@ void BOPDS_CommonBlock::SetRealPaveBlock(const Handle(BOPDS_PaveBlock)& thePB)
 {
   Standard_Boolean bFound;
   Standard_Integer nF;
-  TColStd_ListIteratorOfListOfInteger anIt;
+  BOPCol_ListIteratorOfListOfInteger anIt;
   //
   bFound=Standard_False;
   anIt.Initialize(myFaces);
@@ -253,7 +236,7 @@ void BOPDS_CommonBlock::SetRealPaveBlock(const Handle(BOPDS_PaveBlock)& thePB)
   Standard_Boolean BOPDS_CommonBlock::Contains(const Standard_Integer theF)const
 {
   Standard_Boolean bFound;
-  TColStd_ListIteratorOfListOfInteger aIt;
+  BOPCol_ListIteratorOfListOfInteger aIt;
   //
   bFound=Standard_False;
   aIt.Initialize(myFaces);
@@ -271,7 +254,7 @@ void BOPDS_CommonBlock::SetRealPaveBlock(const Handle(BOPDS_PaveBlock)& thePB)
   void BOPDS_CommonBlock::Dump()const
 {
   Standard_Integer nF;
-  TColStd_ListIteratorOfListOfInteger aIt;
+  BOPCol_ListIteratorOfListOfInteger aIt;
   BOPDS_ListIteratorOfListOfPaveBlock aItPB;
   //
   printf(" -- CB:\n");

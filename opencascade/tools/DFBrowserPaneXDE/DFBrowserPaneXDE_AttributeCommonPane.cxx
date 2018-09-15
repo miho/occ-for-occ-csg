@@ -32,9 +32,7 @@
 
 #include <set>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QStringList>
-#include <Standard_WarningsRestore.hxx>
 
 static std::set<Standard_CString> AttributeTypes;
 
@@ -164,13 +162,12 @@ int DFBrowserPaneXDE_AttributeCommonPane::GetSelectionKind (QItemSelectionModel*
 // purpose :
 // =======================================================================
 void DFBrowserPaneXDE_AttributeCommonPane::GetSelectionParameters (QItemSelectionModel* theModel,
-                                    NCollection_List<Handle(Standard_Transient)>& theParameters,
-                                    NCollection_List<TCollection_AsciiString>& theItemNames)
+                                    NCollection_List<Handle(Standard_Transient)>& theParameters)
 {
   if (myStandardPane)
-    myStandardPane->GetSelectionParameters (theModel, theParameters, theItemNames);
+    myStandardPane->GetSelectionParameters (theModel, theParameters);
 
-  DFBrowserPane_AttributePane::GetSelectionParameters (theModel, theParameters, theItemNames);
+  DFBrowserPane_AttributePane::GetSelectionParameters (theModel, theParameters);
 }
 
 // =======================================================================

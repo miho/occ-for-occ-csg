@@ -15,7 +15,7 @@
 
 //AGV 150202: Changed prototype XmlObjMgt::SetStringValue()
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <NCollection_LocalArray.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_IntegerArray.hxx>
@@ -37,7 +37,7 @@ IMPLEMENT_DOMSTRING (AttributeIDString, "intarrattguid")
 //=======================================================================
 
 XmlMDataStd_IntegerArrayDriver::XmlMDataStd_IntegerArrayDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -71,7 +71,7 @@ Standard_Boolean XmlMDataStd_IntegerArrayDriver::Paste
       TCollection_ExtendedString("Cannot retrieve the first index"
                                  " for IntegerArray attribute as \"")
         + aFirstIndex + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
 
@@ -81,7 +81,7 @@ Standard_Boolean XmlMDataStd_IntegerArrayDriver::Paste
       TCollection_ExtendedString("Cannot retrieve the last index"
                                  " for IntegerArray attribute as \"")
         + aFirstIndex + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
 
@@ -89,24 +89,16 @@ Standard_Boolean XmlMDataStd_IntegerArrayDriver::Paste
     Handle(TDataStd_IntegerArray)::DownCast(theTarget);
   anIntArray->Init(aFirstInd, aLastInd);
 
-  // attribute id
-  Standard_GUID aGUID;
-  XmlObjMgt_DOMString aGUIDStr = anElement.getAttribute(::AttributeIDString());
-  if (aGUIDStr.Type() == XmlObjMgt_DOMString::LDOM_NULL)
-    aGUID = TDataStd_IntegerArray::GetID(); //default case
-  else
-    aGUID = Standard_GUID(Standard_CString(aGUIDStr.GetString())); // user defined case
-  anIntArray->SetID(aGUID);
-
   if(aFirstInd == aLastInd) {
-    if(!XmlObjMgt::GetStringValue(anElement).GetInteger( aValue)) {
+    Standard_Integer anInteger;
+    if(!XmlObjMgt::GetStringValue(anElement).GetInteger( anInteger)) {
       TCollection_ExtendedString aMessageString =
         TCollection_ExtendedString("Cannot retrieve integer member"
                                    " for IntegerArray attribute as \"");
-      myMessageDriver->Send (aMessageString, Message_Warning);
-      aValue = 0;
+      WriteMessage (aMessageString);
+      return Standard_False;
     }
-    anIntArray->SetValue(aFirstInd, aValue);
+    anIntArray->SetValue(aFirstInd, anInteger);
     
   }
   else {
@@ -121,8 +113,8 @@ Standard_Boolean XmlMDataStd_IntegerArrayDriver::Paste
           TCollection_ExtendedString("Cannot retrieve integer member"
                                      " for IntegerArray attribute as \"")
             + aValueStr + "\"";
-        myMessageDriver->Send (aMessageString, Message_Warning);
-        aValue = 0;
+        WriteMessage (aMessageString);
+        return Standard_False;
       }
       anIntArray->SetValue(ind, aValue);
     }
@@ -137,7 +129,7 @@ Standard_Boolean XmlMDataStd_IntegerArrayDriver::Paste
           TCollection_ExtendedString("Cannot retrieve the isDelta value"
                                      " for IntegerArray attribute as \"")
                                      + aDeltaValue + "\"";
-        myMessageDriver->Send (aMessageString, Message_Fail);
+        WriteMessage (aMessageString);
         return Standard_False;
       } 
     else
@@ -148,6 +140,16 @@ Standard_Boolean XmlMDataStd_IntegerArrayDriver::Paste
     cout << "Current DocVersion field is not initialized. "  <<endl;
 #endif
   anIntArray->SetDelta(aDelta);
+
+  // attribute id
+  Standard_GUID aGUID;
+  XmlObjMgt_DOMString aGUIDStr = anElement.getAttribute(::AttributeIDString());
+  if (aGUIDStr.Type() == XmlObjMgt_DOMString::LDOM_NULL)
+    aGUID = TDataStd_IntegerArray::GetID(); //default case
+  else
+    aGUID = Standard_GUID(Standard_CString(aGUIDStr.GetString())); // user defined case
+
+  anIntArray->SetID(aGUID);
 
   return Standard_True;
 }

@@ -16,9 +16,11 @@
 // commercial license or contractual agreement.
 
 #include <BOPAlgo_PaveFiller.hxx>
-#include <BOPAlgo_Alerts.hxx>
 #include <BOPAlgo_SectionAttribute.hxx>
 #include <BOPAlgo_Tools.hxx>
+#include <BOPCol_IndexedMapOfShape.hxx>
+#include <BOPCol_NCVector.hxx>
+#include <BOPCol_Parallel.hxx>
 #include <BOPDS_CommonBlock.hxx>
 #include <BOPDS_Curve.hxx>
 #include <BOPDS_DS.hxx>
@@ -26,8 +28,6 @@
 #include <BOPDS_Interf.hxx>
 #include <BOPDS_Iterator.hxx>
 #include <BOPDS_ListOfPaveBlock.hxx>
-#include <BOPDS_MapOfCommonBlock.hxx>
-#include <BOPDS_MapOfPair.hxx>
 #include <BOPDS_MapOfPaveBlock.hxx>
 #include <BOPDS_Pave.hxx>
 #include <BOPDS_PaveBlock.hxx>
@@ -38,8 +38,6 @@
 #include <BOPDS_VectorOfListOfPaveBlock.hxx>
 #include <BOPTools_AlgoTools.hxx>
 #include <BOPTools_AlgoTools2D.hxx>
-#include <BOPTools_Parallel.hxx>
-#include <BRepLib.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepBndLib.hxx>
@@ -53,14 +51,12 @@
 #include <gp_Pnt.hxx>
 #include <IntTools_Context.hxx>
 #include <IntTools_Tools.hxx>
-#include <NCollection_Vector.hxx>
 #include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Vertex.hxx>
-#include <TopTools_IndexedMapOfShape.hxx>
 
 
 static
@@ -169,16 +165,16 @@ class BOPAlgo_SplitEdge : public BOPAlgo_Algo  {
 };
 //
 //=======================================================================
-typedef NCollection_Vector
+typedef BOPCol_NCVector
   <BOPAlgo_SplitEdge> BOPAlgo_VectorOfSplitEdge; 
 //
-typedef BOPTools_ContextFunctor
+typedef BOPCol_ContextFunctor
   <BOPAlgo_SplitEdge,
   BOPAlgo_VectorOfSplitEdge,
   Handle(IntTools_Context),
   IntTools_Context> BOPAlgo_SplitEdgeFunctor;
 //
-typedef BOPTools_ContextCnt
+typedef BOPCol_ContextCnt
   <BOPAlgo_SplitEdgeFunctor,
   BOPAlgo_VectorOfSplitEdge,
   Handle(IntTools_Context)> BOPAlgo_SplitEdgeCnt;
@@ -245,78 +241,31 @@ class BOPAlgo_MPC : public BOPAlgo_Algo  {
   }
   //
   virtual void Perform() {
-    try
-    {
-      OCC_CATCH_SIGNALS
-
-      // Check if edge has pcurve. If no then make its copy to avoid data races,
-      // and use it to build pcurve.
-      TopoDS_Edge aCopyE = myE;
-      Standard_Real f, l;
-      Handle(Geom2d_Curve) aC2d = BRep_Tool::CurveOnSurface(aCopyE, myF, f, l);
-      if (aC2d.IsNull())
-      {
-        aCopyE = BOPTools_AlgoTools::CopyEdge(aCopyE);
-
-        Standard_Integer iErr = 1;
-        if (!myEz.IsNull())
-        {
-          // Attach pcurve from the original edge
-          TopoDS_Edge aSpz;
-          BOPTools_AlgoTools::MakeSplitEdge(myEz, myV1, myT1,
-                                            myV2, myT2, aSpz);
-          iErr = BOPTools_AlgoTools2D::AttachExistingPCurve(aSpz,
-                                                            aCopyE, 
-                                                            myF,
-                                                            myContext);
-        }
-        if (iErr)
-          BOPTools_AlgoTools2D::BuildPCurveForEdgeOnFace(aCopyE, myF, myContext);
-
-        myNewC2d = BRep_Tool::CurveOnSurface(aCopyE, myF, f, l);
-        if (myNewC2d.IsNull())
-        {
-          AddError(new BOPAlgo_AlertBuildingPCurveFailed(TopoDS_Shape()));
-          return;
-        }
-        else
-          myNewTol = BRep_Tool::Tolerance(aCopyE);
-      }
-      else
-      {
-        const BRepAdaptor_Surface& aBAS = myContext->SurfaceAdaptor(myF);
-        if (aBAS.IsUPeriodic() || aBAS.IsVPeriodic())
-        {
-          // The curve already exists. Adjust it for periodic cases.
-          BOPTools_AlgoTools2D::AdjustPCurveOnSurf
-            (myContext->SurfaceAdaptor(myF), f, l, aC2d, myNewC2d);
-          if (myNewC2d != aC2d)
-            myNewTol = BRep_Tool::Tolerance(aCopyE);
-          else
-            myNewC2d.Nullify();
-        }
-      }
-
-      if (myFlag) {
-        UpdateVertices(aCopyE, myF);
-      }
+    Standard_Integer iErr;
+    //
+    iErr=1;
+    if (!myEz.IsNull()) {
+      TopoDS_Edge aSpz;
+      //
+      BOPTools_AlgoTools::MakeSplitEdge(myEz,myV1, myT1, 
+                                        myV2, myT2, aSpz);
+      //
+      iErr=
+        BOPTools_AlgoTools2D::AttachExistingPCurve(aSpz, 
+                                                   myE, 
+                                                   myF, 
+                                                   myContext);
     }
-    catch (Standard_Failure)
-    {
-      AddError(new BOPAlgo_AlertBuildingPCurveFailed(TopoDS_Shape()));
+    //
+    if (iErr) { 
+      BOPTools_AlgoTools2D::BuildPCurveForEdgeOnFace(myE, myF, myContext);
+    }
+    // 
+    if (myFlag) {
+      UpdateVertices(myE, myF);
     }
   }
-
-  const Handle(Geom2d_Curve)& GetNewPCurve() const
-  {
-    return myNewC2d;
-  }
-
-  Standard_Real GetNewTolerance() const
-  {
-    return myNewTol;
-  }
-
+  //
  protected:
   Standard_Boolean myFlag;
   TopoDS_Edge myE;
@@ -326,23 +275,21 @@ class BOPAlgo_MPC : public BOPAlgo_Algo  {
   Standard_Real myT1;
   TopoDS_Vertex myV2;
   Standard_Real myT2;
-  Handle(Geom2d_Curve) myNewC2d;
-  Standard_Real myNewTol;
   //
   Handle(IntTools_Context) myContext;
 };
 //
 //=======================================================================
-typedef NCollection_Vector
+typedef BOPCol_NCVector
   <BOPAlgo_MPC> BOPAlgo_VectorOfMPC; 
 //
-typedef BOPTools_ContextFunctor 
+typedef BOPCol_ContextFunctor 
   <BOPAlgo_MPC,
   BOPAlgo_VectorOfMPC,
   Handle(IntTools_Context), 
   IntTools_Context> BOPAlgo_MPCFunctor;
 //
-typedef BOPTools_ContextCnt 
+typedef BOPCol_ContextCnt 
   <BOPAlgo_MPCFunctor,
   BOPAlgo_VectorOfMPC,
   Handle(IntTools_Context)> BOPAlgo_MPCCnt;
@@ -381,7 +328,7 @@ class BOPAlgo_BPC {
   }
   //
   void Perform() {
-    BRepLib::BuildPCurveForEdgeOnPlane(myE, myF, myCurve, myToUpdate);
+    BOPTools_AlgoTools2D::BuildPCurveForEdgeOnPlane (myE, myF, myCurve, myToUpdate);
   };
   //
  protected:
@@ -391,14 +338,14 @@ class BOPAlgo_BPC {
   Standard_Boolean myToUpdate;
 };
 //=======================================================================
-typedef NCollection_Vector
+typedef BOPCol_NCVector
   <BOPAlgo_BPC> BOPAlgo_VectorOfBPC; 
 //
-typedef BOPTools_Functor 
+typedef BOPCol_Functor 
   <BOPAlgo_BPC,
   BOPAlgo_VectorOfBPC> BOPAlgo_BPCFunctor;
 //
-typedef BOPTools_Cnt 
+typedef BOPCol_Cnt 
   <BOPAlgo_BPCFunctor,
   BOPAlgo_VectorOfBPC> BOPAlgo_BPCCnt;
 //
@@ -410,16 +357,17 @@ typedef BOPTools_Cnt
 void BOPAlgo_PaveFiller::MakeSplitEdges()
 {
   BOPDS_VectorOfListOfPaveBlock& aPBP=myDS->ChangePaveBlocksPool();
-  Standard_Integer aNbPBP = aPBP.Length();
+  Standard_Integer aNbPBP = aPBP.Extent();
   if(!aNbPBP) {
     return;
   }
   //
-  Standard_Integer i, nE, nV1, nV2, nSp, aNbVBSE, k;
+  Standard_Boolean bCB, bV1, bV2;
+  Standard_Integer i, nE, nV1, nV2, nSp, aNbPB, aNbVBSE, k;
   Standard_Real aT1, aT2;
   BOPDS_ListIteratorOfListOfPaveBlock aItPB;
   Handle(BOPDS_PaveBlock) aPB;
-  BOPDS_MapOfCommonBlock aMCB(100);
+  BOPDS_MapOfPaveBlock aMPB(100);
   TopoDS_Vertex aV1, aV2;
   TopoDS_Edge aE;
   BOPAlgo_VectorOfSplitEdge aVBSE;
@@ -427,102 +375,83 @@ void BOPAlgo_PaveFiller::MakeSplitEdges()
   //
   UpdateCommonBlocksWithSDVertices();
   //
-  aNbPBP=aPBP.Length();
+  aNbPBP=aPBP.Extent();
   //
-  for (i = 0; i < aNbPBP; ++i)
-  {
-    BOPDS_ListOfPaveBlock& aLPB = aPBP(i);
+  for (i=0; i<aNbPBP; ++i) {
+    BOPDS_ListOfPaveBlock& aLPB=aPBP(i);
+    //
+    aNbPB=aLPB.Extent();
+    if (aNbPB==1) {
+      aPB=aLPB.First();
+      aPB->Indices(nV1, nV2);
+      bV1=myDS->IsNewShape(nV1);
+      bV2=myDS->IsNewShape(nV2);
+      bCB=myDS->IsCommonBlock(aPB);
+      //
+      if (!(bV1 || bV2)) { // no new vertices here
+        if (!myNonDestructive || !bCB) {
+          if (bCB) {
+            if (!aPB->HasEdge()) {
+              const Handle(BOPDS_CommonBlock)& aCB = myDS->CommonBlock(aPB);
+              nE = aCB->PaveBlock1()->OriginalEdge();
+              aCB->SetEdge(nE);
+              // Compute tolerance of the common block and update the edge
+              Standard_Real aTol = BOPAlgo_Tools::ComputeToleranceOfCB(aCB, myDS, myContext);
+              myDS->UpdateEdgeTolerance(nE, aTol);
+            }
+          }
+          else {
+            nE = aPB->OriginalEdge();
+            aPB->SetEdge(nE);
+          }
+          continue;
+        }
+      }
+    }
     //
     aItPB.Initialize(aLPB);
     for (; aItPB.More(); aItPB.Next()) {
-      aPB = aItPB.Value();
-      nE = aPB->OriginalEdge();
-      const BOPDS_ShapeInfo& aSIE = myDS->ShapeInfo(nE);
-      if (aSIE.HasFlag())
-      {
-        // Skip degenerated edges
+      aPB=aItPB.Value();
+      nE=aPB->OriginalEdge();
+      const BOPDS_ShapeInfo& aSIE=myDS->ShapeInfo(nE);
+      if (aSIE.HasFlag()){
         continue;
       }
-
-      const Handle(BOPDS_CommonBlock)& aCB = myDS->CommonBlock(aPB);
-      Standard_Boolean bCB = !aCB.IsNull();
-      if (bCB && !aMCB.Add(aCB))
-        continue;
-
-      aPB->Indices(nV1, nV2);
-      // Check if it is necessary to make the split of the edge
-      {
-        Standard_Boolean bV1 = myDS->IsNewShape(nV1);
-        Standard_Boolean bV2 = myDS->IsNewShape(nV2);
-
-        Standard_Boolean bToSplit = Standard_True;
-        if (!bV1 && !bV2) // no new vertices here
-        {
-          if (!myNonDestructive || !bCB)
-          {
-            if (bCB)
-            {
-              // Find the edge with these vertices
-              BOPDS_ListIteratorOfListOfPaveBlock it(aCB->PaveBlocks());
-              for (; it.More(); it.Next())
-              {
-                nE = it.Value()->OriginalEdge();
-                if (myDS->PaveBlocks(nE).Extent() == 1)
-                  break;
-              }
-              if (it.More())
-              {
-                // The pave block is found
-                bToSplit = Standard_False;
-                aCB->SetRealPaveBlock(it.Value());
-                aCB->SetEdge(nE);
-                // Compute tolerance of the common block and update the edge
-                Standard_Real aTol = BOPAlgo_Tools::ComputeToleranceOfCB(aCB, myDS, myContext);
-                myDS->UpdateEdgeTolerance(nE, aTol);
-              }
-            }
-            else if (aLPB.Extent() == 1)
-            {
-              bToSplit = Standard_False;
-              aPB->SetEdge(nE);
-            }
-            if (!bToSplit)
-              continue;
-          }
-        }
-      }
-
-      // Split the edge
-      if (bCB)
-      {
-        aPB = aCB->PaveBlock1();
-        nE = aPB->OriginalEdge();
-        aPB->Indices(nV1, nV2);
-      }
-      aPB->Range(aT1, aT2);
       //
-      aE = (*(TopoDS_Edge *)(&myDS->Shape(nE)));
-      aE.Orientation(TopAbs_FORWARD);
-      //
-      aV1 = (*(TopoDS_Vertex *)(&myDS->Shape(nV1)));
-      aV1.Orientation(TopAbs_FORWARD);
-      //
-      aV2 = (*(TopoDS_Vertex *)(&myDS->Shape(nV2)));
-      aV2.Orientation(TopAbs_REVERSED);
-      //
-      BOPAlgo_SplitEdge& aBSE = aVBSE.Appended();
-      //
-      aBSE.SetData(aE, aV1, aT1, aV2, aT2);
-      aBSE.SetPaveBlock(aPB);
+      const Handle(BOPDS_CommonBlock)& aCB=myDS->CommonBlock(aPB);
+      bCB=!aCB.IsNull();
       if (bCB) {
-        aBSE.SetCommonBlock(aCB);
+        aPB=aCB->PaveBlock1();
       }
-      aBSE.SetDS(myDS);
-      aBSE.SetProgressIndicator(myProgressIndicator);
+      //
+      if (aMPB.Add(aPB)) {
+        nE=aPB->OriginalEdge();
+        aPB->Indices(nV1, nV2);
+        aPB->Range(aT1, aT2);
+        //
+        aE=(*(TopoDS_Edge *)(&myDS->Shape(nE))); 
+        aE.Orientation(TopAbs_FORWARD);
+        //
+        aV1=(*(TopoDS_Vertex *)(&myDS->Shape(nV1)));
+        aV1.Orientation(TopAbs_FORWARD); 
+        //
+        aV2=(*(TopoDS_Vertex *)(&myDS->Shape(nV2)));
+        aV2.Orientation(TopAbs_REVERSED); 
+        //
+        BOPAlgo_SplitEdge& aBSE=aVBSE.Append1();
+        //
+        aBSE.SetData(aE, aV1, aT1, aV2, aT2);
+        aBSE.SetPaveBlock(aPB);
+        if (bCB) {
+          aBSE.SetCommonBlock(aCB);
+        }
+        aBSE.SetDS(myDS);
+        aBSE.SetProgressIndicator(myProgressIndicator);
+      }
     } // for (; aItPB.More(); aItPB.Next()) {
   }  // for (i=0; i<aNbPBP; ++i) {      
   //
-  aNbVBSE=aVBSE.Length();
+  aNbVBSE=aVBSE.Extent();
   //======================================================
   BOPAlgo_SplitEdgeCnt::Perform(myRunParallel, aVBSE, myContext);
   //======================================================
@@ -602,7 +531,7 @@ void BOPAlgo_PaveFiller::MakePCurves()
       (!mySectionAttribute.PCurveOnS1() && !mySectionAttribute.PCurveOnS2()))
     return;
   Standard_Boolean bHasPC;
-  Standard_Integer i, nF1, aNbC, k, nE, aNbFF, aNbFI, nEx;
+  Standard_Integer i, nF1, nF2, aNbC, k, nE, aNbFF, aNbFI, nEx;
   Standard_Integer j, aNbPBIn, aNbPBOn;
   BOPDS_ListIteratorOfListOfPaveBlock aItLPB;
   TopoDS_Face aF1F, aF2F;
@@ -611,7 +540,7 @@ void BOPAlgo_PaveFiller::MakePCurves()
   // 1. Process Common Blocks 
   const BOPDS_VectorOfFaceInfo& aFIP=myDS->FaceInfoPool();
   //
-  aNbFI=aFIP.Length();
+  aNbFI=aFIP.Extent();
   for (i=0; i<aNbFI; ++i) {
     const BOPDS_FaceInfo& aFI=aFIP(i);
     nF1=aFI.Index();
@@ -626,7 +555,7 @@ void BOPAlgo_PaveFiller::MakePCurves()
       nE=aPB->Edge();
       const TopoDS_Edge& aE=(*(TopoDS_Edge *)(&myDS->Shape(nE)));
       //
-      BOPAlgo_MPC& aMPC=aVMPC.Appended();
+      BOPAlgo_MPC& aMPC=aVMPC.Append1();
       aMPC.SetEdge(aE);
       aMPC.SetFace(aF1F);
       aMPC.SetProgressIndicator(myProgressIndicator);
@@ -654,7 +583,7 @@ void BOPAlgo_PaveFiller::MakePCurves()
         continue;
       }
       //
-      BOPAlgo_MPC& aMPC=aVMPC.Appended();
+      BOPAlgo_MPC& aMPC=aVMPC.Append1();
       //
       aItLPB.Initialize(aLPB);
       for(; aItLPB.More(); aItLPB.Next()) {
@@ -698,52 +627,44 @@ void BOPAlgo_PaveFiller::MakePCurves()
     }
   }// for (i=0; i<aNbFI; ++i) {
   //
-  // 2. Process section edges. P-curves on them must already be computed.
-  // However, we must provide the call to UpdateVertices.
+  // 2. Process section edges
   Standard_Boolean bPCurveOnS[2];
+  Standard_Integer m;
+  TopoDS_Face aFf[2];
+  //
   bPCurveOnS[0]=mySectionAttribute.PCurveOnS1();
   bPCurveOnS[1]=mySectionAttribute.PCurveOnS2();
   //
   if (bPCurveOnS[0] || bPCurveOnS[1]) {
-    // container to remember already added edge-face pairs
-    BOPDS_MapOfPair anEFPairs;
     BOPDS_VectorOfInterfFF& aFFs=myDS->InterfFF();
-    aNbFF=aFFs.Length();
+    aNbFF=aFFs.Extent();
     for (i=0; i<aNbFF; ++i) {
       const BOPDS_InterfFF& aFF=aFFs(i);
-      const BOPDS_VectorOfCurve& aVNC = aFF.Curves();
-      aNbC = aVNC.Length();
-      if (aNbC == 0)
-        continue;
-      Standard_Integer nF[2];
-      aFF.Indices(nF[0], nF[1]);
+      aFF.Indices(nF1, nF2);
       //
-      TopoDS_Face aFf[2];
-      aFf[0] = (*(TopoDS_Face *)(&myDS->Shape(nF[0])));
+      aFf[0]=(*(TopoDS_Face *)(&myDS->Shape(nF1)));
       aFf[0].Orientation(TopAbs_FORWARD);
       //
-      aFf[1]=(*(TopoDS_Face *)(&myDS->Shape(nF[1])));
+      aFf[1]=(*(TopoDS_Face *)(&myDS->Shape(nF2)));
       aFf[1].Orientation(TopAbs_FORWARD);
       //
-      for (k=0; k<aNbC; ++k)
-      {
+      const BOPDS_VectorOfCurve& aVNC=aFF.Curves();
+      aNbC=aVNC.Extent();
+      for (k=0; k<aNbC; ++k) {
         const BOPDS_Curve& aNC=aVNC(k);
         const BOPDS_ListOfPaveBlock& aLPB=aNC.PaveBlocks();
         aItLPB.Initialize(aLPB);
-        for(; aItLPB.More(); aItLPB.Next())
-        {
+        for(; aItLPB.More(); aItLPB.Next()) {
           const Handle(BOPDS_PaveBlock)& aPB=aItLPB.Value();
           nE=aPB->Edge();
           const TopoDS_Edge& aE=(*(TopoDS_Edge *)(&myDS->Shape(nE))); 
           //
-          for (Standard_Integer m = 0; m<2; ++m)
-          {
-            if (bPCurveOnS[m] && anEFPairs.Add(BOPDS_Pair(nE, nF[m])))
-            {
-              BOPAlgo_MPC& aMPC = aVMPC.Appended();
+          for (m=0; m<2; ++m) {
+            if (bPCurveOnS[m]) {
+              BOPAlgo_MPC& aMPC=aVMPC.Append1();
               aMPC.SetEdge(aE);
               aMPC.SetFace(aFf[m]);
-              aMPC.SetFlag(Standard_True);
+              aMPC.SetFlag(bPCurveOnS[m]);
               aMPC.SetProgressIndicator(myProgressIndicator);
             }
           }
@@ -755,29 +676,6 @@ void BOPAlgo_PaveFiller::MakePCurves()
   //======================================================
   BOPAlgo_MPCCnt::Perform(myRunParallel, aVMPC, myContext);
   //======================================================
-
-  // Add warnings of the failed projections and update edges with new pcurves
-  Standard_Integer aNb = aVMPC.Length();
-  for (i = 0; i < aNb; ++i)
-  {
-    const BOPAlgo_MPC& aMPC = aVMPC(i);
-    if (aMPC.HasErrors())
-    {
-      TopoDS_Compound aWC;
-      BRep_Builder().MakeCompound(aWC);
-      BRep_Builder().Add(aWC, aMPC.Edge());
-      BRep_Builder().Add(aWC, aMPC.Face());
-      AddWarning(new BOPAlgo_AlertBuildingPCurveFailed(aWC));
-    }
-    else
-    {
-      const Handle(Geom2d_Curve)& aNewPC = aMPC.GetNewPCurve();
-      // if aNewPC is null we do not need to update the edge because it already contains
-      // valid p-curve, and only vertices have been updated.
-      if (!aNewPC.IsNull())
-        BRep_Builder().UpdateEdge(aMPC.Edge(), aNewPC, aMPC.Face(), aMPC.GetNewTolerance());
-    }
-  }
 }
 //=======================================================================
 //function : UpdateVertices
@@ -840,7 +738,7 @@ void BOPAlgo_PaveFiller::Prepare()
   Standard_Boolean bIsBasedOnPlane;
   Standard_Integer i, aNb, n1, nF, aNbF;
   TopExp_Explorer aExp;
-  TopTools_IndexedMapOfShape aMF;
+  BOPCol_IndexedMapOfShape aMF;
   //
   aNb=3;
   for(i=0; i<aNb; ++i) {
@@ -869,7 +767,7 @@ void BOPAlgo_PaveFiller::Prepare()
     aExp.Init(aF, aType[1]);
     for (; aExp.More(); aExp.Next()) {
       const TopoDS_Edge& aE=*((TopoDS_Edge *)&aExp.Current());
-      BOPAlgo_BPC& aBPC=aVBPC.Appended();
+      BOPAlgo_BPC& aBPC=aVBPC.Append1();
       aBPC.SetEdge(aE);
       aBPC.SetFace(aF);
     }
@@ -882,7 +780,7 @@ void BOPAlgo_PaveFiller::Prepare()
   // pcurves are built, and now update edges
   BRep_Builder aBB;
   TopoDS_Edge E;
-  for (i = 0; i < aVBPC.Length(); i++) {
+  for (i = 0; i < aVBPC.Extent(); i++) {
     const BOPAlgo_BPC& aBPC=aVBPC(i);
     if (aBPC.IsToUpdate()) {
       Standard_Real aTolE = BRep_Tool::Tolerance(aBPC.GetEdge());

@@ -6,232 +6,232 @@
 	objectVersion = 46;
 	objects = {
 
-		18D400F91396115F066D16DA = {isa = PBXBuildFile; fileRef = 172204F20F170EC008E912C9 ;};
-		0A840AA3096503F306040879 = {isa = PBXBuildFile; fileRef = 092904CF094E04D1115606AC ;};
-		01CB02FA12710BFD149F1379 = {isa = PBXBuildFile; fileRef = 022D148F144D07A004CC0B96 ;};
-		16C80742150104F616A30B83 = {isa = PBXBuildFile; fileRef = 0C2E0826106E16080B7E15A6 ;};
-		0CBC163D0DB103530EB40006 = {isa = PBXBuildFile; fileRef = 0CC00E8F164C153F0771028B ;};
-		109614ED10D009270303077B = {isa = PBXBuildFile; fileRef = 12800F6F1155046314350AE6 ;};
-		0CC4110E02BA19640F38172C = {isa = PBXBuildFile; fileRef = 10700FD80FAC0DEC0FD90A7D ;};
-		12A90819011916B610460E71 = {isa = PBXBuildFile; fileRef = 0C7B0D0D0CE204180AAA1758 ;};
-		08850584194E113308E013CF = {isa = PBXBuildFile; fileRef = 08F919070C710769143A0D9F ;};
-		17E110AC044F076318030438 = {isa = PBXBuildFile; fileRef = 015114DA131C0EC904FB0845 ;};
-		008304D8161D078602F41715 = {isa = PBXBuildFile; fileRef = 021E175B183A173306220A3A ;};
-		197D0DE907F90A2F029B0706 = {isa = PBXBuildFile; fileRef = 12F9138A077A020516801418 ;};
-		0B57053F1618116B10111957 = {isa = PBXBuildFile; fileRef = 06A317C11964187008D81515 ;};
-		0E1607711191083700210232 = {isa = PBXBuildFile; fileRef = 0A3F09D40A8302B00A76093F ;};
-		0E291737132414CD0D2A0DB0 = {isa = PBXBuildFile; fileRef = 06F70619056B16EF015A043A ;};
-		1787011E0A3C0A050DED1036 = {isa = PBXBuildFile; fileRef = 01F901C00523008D0FDA1155 ;};
-		15D9124F006D11F8036A172A = {isa = PBXBuildFile; fileRef = 139E16C913960D7D053A08E1 ;};
-		18A0130A0C0E09550E770803 = {isa = PBXBuildFile; fileRef = 141A122406DA061A04580CC8 ;};
-		1966107413C70436041B0B80 = {isa = PBXBuildFile; fileRef = 133B15F40E15047C06991979 ;};
-		0F130A0000B00327151E10CD = {isa = PBXBuildFile; fileRef = 071910FE01B50C38001F152A ;};
-		160D0E370C9D184204A01033 = {isa = PBXBuildFile; fileRef = 041C0E1408910FD302780F79 ;};
-		0767059704A2163905370097 = {isa = PBXBuildFile; fileRef = 04E118B105E10E0003A8164A ;};
-		0F460D7614530CCF000E172E = {isa = PBXBuildFile; fileRef = 125C15280642122204D20C3C ;};
-		02EA015F166B066203320D64 = {isa = PBXBuildFile; fileRef = 08A602DC028617E2033F101E ;};
-		12B40CD70C3A19520BEA02AE = {isa = PBXBuildFile; fileRef = 0A380B5505F71697077B12B4 ;};
-		0C41168107CA0FC80CDB191B = {isa = PBXBuildFile; fileRef = 12E40BA70D4012700352191D ;};
-		03FD10C30414122A0E7114C0 = {isa = PBXBuildFile; fileRef = 04F806DA0D4804E210731554 ;};
-		0B3213620B00025416BF0889 = {isa = PBXBuildFile; fileRef = 120610E917BC0A3514F404D1 ;};
-		03030FB516110A430D10088D = {isa = PBXBuildFile; fileRef = 003012600A7000BC00E80D3A ;};
-		19790E93162504F707DE0D1C = {isa = PBXBuildFile; fileRef = 06100BD211A404510F050DDD ;};
-		18CA1648130418BB06BD0095 = {isa = PBXBuildFile; fileRef = 0D6717970D9C0B38194D0F9E ;};
-		139206A9194E04E608811090 = {isa = PBXBuildFile; fileRef = 030418AC0E3201B8130D01C5 ;};
-		0070180E054B113517A11498 = {isa = PBXBuildFile; fileRef = 18CF18290B2C03B9133810AB ;};
-		0E2913000379040B0DDE149E = {isa = PBXBuildFile; fileRef = 0A4D14D701F708B20F9403DA ;};
-		0EB7142E0981138D07401632 = {isa = PBXBuildFile; fileRef = 0B84189518A111EA14E1049B ;};
-		171302C50B390DB219541594 = {isa = PBXBuildFile; fileRef = 0A4512D707B20D960FDF10BA ;};
+		12040F000C6F18DD17FE0871 = {isa = PBXBuildFile; fileRef = 134C08840ECB04FE143F17CD ;};
+		076E0962122A12E7184202CC = {isa = PBXBuildFile; fileRef = 061F055E03F30D1005910FE1 ;};
+		0D0417B0116F0287185A153E = {isa = PBXBuildFile; fileRef = 1878042D18E108C9166417F0 ;};
+		01B603C905B90FEC0FAB15E2 = {isa = PBXBuildFile; fileRef = 0CA401D8131F078B01AE14D9 ;};
+		0BFA030A0B161174077115F1 = {isa = PBXBuildFile; fileRef = 0B8311D2143C039A141A0D97 ;};
+		04CC01A905FC0D880AB01093 = {isa = PBXBuildFile; fileRef = 02C9136F132A0BEA0DE00904 ;};
+		078D156900D207470E63003F = {isa = PBXBuildFile; fileRef = 0B3C11D210780CA5053F0A2C ;};
+		171A121513EF153905641000 = {isa = PBXBuildFile; fileRef = 0DDC08A3045E086B0A9A0586 ;};
+		08AA135B12B90AE213DB07B8 = {isa = PBXBuildFile; fileRef = 0878037E1026016507FD1439 ;};
+		114301D6157F12B7105D091C = {isa = PBXBuildFile; fileRef = 01B302420A3B022100CB02BE ;};
+		0821008A0392030B0A8102AF = {isa = PBXBuildFile; fileRef = 16280A9618BA049F02181311 ;};
+		0FA319510D36128306EE0DBE = {isa = PBXBuildFile; fileRef = 1540073514550DC8138B0156 ;};
+		11400DE007BB00FC181718C3 = {isa = PBXBuildFile; fileRef = 1985082900B10B9602491484 ;};
+		0E8900D602310F87080D094F = {isa = PBXBuildFile; fileRef = 1299065205791079130F114E ;};
+		011E0379089E10E5011400BD = {isa = PBXBuildFile; fileRef = 0BC0103508EC08CA02210F3D ;};
+		08BA1009026C0C150FD502E6 = {isa = PBXBuildFile; fileRef = 0B9E0B0904D1060B03940D63 ;};
+		0EFD08130E1F19330955076A = {isa = PBXBuildFile; fileRef = 13940A6C0B530D430DD50A3D ;};
+		192B0B8109CB103C0A941777 = {isa = PBXBuildFile; fileRef = 08800CC8180918DB15D00B53 ;};
+		007812BA00780BAF013B15ED = {isa = PBXBuildFile; fileRef = 1239131A18A008750FF913C6 ;};
+		153B0E470956096A101312E0 = {isa = PBXBuildFile; fileRef = 104C09BB06B0056E17FC1975 ;};
+		15220A05020D081914190978 = {isa = PBXBuildFile; fileRef = 15570E560BDF17C90BBD17F7 ;};
+		06250ED0085E149008D11349 = {isa = PBXBuildFile; fileRef = 0AE303970E65176406BD0EE5 ;};
+		1807050306440FF2163A03D8 = {isa = PBXBuildFile; fileRef = 1639033915D1081903A40F7C ;};
+		1898052B183E097D0CFB0135 = {isa = PBXBuildFile; fileRef = 187D17FD077C14C513D705D3 ;};
+		18E307B304FF0FAD07BE187B = {isa = PBXBuildFile; fileRef = 10D30D9F0283102815A50AA7 ;};
+		0BF00141010E0F59099E057B = {isa = PBXBuildFile; fileRef = 03E7084F053D12E213191327 ;};
+		150614C9073003A508E60459 = {isa = PBXBuildFile; fileRef = 15E50355154E082B0AE209CA ;};
+		0B8218F006200E1114E7046D = {isa = PBXBuildFile; fileRef = 0028191C1299145503C81126 ;};
+		05EA12470A77032E100B09C4 = {isa = PBXBuildFile; fileRef = 189217FD0A4404B201B2062A ;};
+		04270130142A0B1B18D811BF = {isa = PBXBuildFile; fileRef = 1674150B012D083514C114C0 ;};
+		0B7F118A0890116F14AB1592 = {isa = PBXBuildFile; fileRef = 18BC10BB18D4146218E81866 ;};
+		012E00F8164617DE16C310AC = {isa = PBXBuildFile; fileRef = 027C13900E9A1891058907C4 ;};
+		08B119830D34161F0EF40241 = {isa = PBXBuildFile; fileRef = 122209850590183212B200D8 ;};
+		08D705450A79058502731423 = {isa = PBXBuildFile; fileRef = 01A915AE02C513A30B0213BC ;};
+		0979044701B216DA154C17FF = {isa = PBXBuildFile; fileRef = 107A02370F9B034710401454 ;};
+		140F0DDF0B940347135F169C = {isa = PBXBuildFile; fileRef = 11B50F5316360F810214104D ;};
 
-		0C2C014B0F1A0CB9188C06A7 = {isa = PBXBuildFile; fileRef = 067818D402E906D112FE169B ; };
-		03A9031F05A416F80936130D = {isa = PBXBuildFile; fileRef = 1346025905E90E5C03E10EE4 ; };
-		092F178F0FF306540FE305E9 = {isa = PBXBuildFile; fileRef = 10790973184916EC022E0E7B ; };
-		106F157418ED0D1F0A06174E = {isa = PBXBuildFile; fileRef = 0D580467011D11BC175402F0 ; };
-		019B06360AAE11220C170FC1 = {isa = PBXBuildFile; fileRef = 140C0F9E0D330DDD13E112CA ; };
-		01FE13290ACD0D790B6A00D0 = {isa = PBXBuildFile; fileRef = 04DC100B0112023C14B80956 ; };
-		16F70A880FD410A2043E090C = {isa = PBXBuildFile; fileRef = 0E97141412E604A5107B0EA5 ; };
-		14E0168D065209F8010100A1 = {isa = PBXBuildFile; fileRef = 072E13E914EB0B7C0F0D1561 ; };
-		014311CE17C208AA16C90CE5 = {isa = PBXBuildFile; fileRef = 07CE18080697023507FE0CA9 ; };
-		147709D10D760C8607920472 = {isa = PBXBuildFile; fileRef = 1901006B0C6700CE158D101D ; };
-		18970D850E6317D6175C0686 = {isa = PBXBuildFile; fileRef = 0BCF12A015B40260135D054C ; };
-		0DB50FC50AE017EB0EB9195F = {isa = PBXBuildFile; fileRef = 18F50B79036E0E95053801E2 ; };
-		0AC200AA0CCB0CF901390061 = {isa = PBXBuildFile; fileRef = 0D7218A211E207CE06DA05E0 ; };
+		00EB06E20498058718A710AB = {isa = PBXBuildFile; fileRef = 12ED101903B917A818B51535 ; };
+		128F023B13A40CC8028A0FD5 = {isa = PBXBuildFile; fileRef = 13C217120EF9032C055E01C8 ; };
+		1411048211E2118401610916 = {isa = PBXBuildFile; fileRef = 05550A5D11CE080415B018E3 ; };
+		0F7F1857101313E7002511F7 = {isa = PBXBuildFile; fileRef = 105D11EB152016FD0E0B088B ; };
+		113108A80B8118011947096C = {isa = PBXBuildFile; fileRef = 0FBE0DC010500BA307050DC2 ; };
+		132009350EBE0350165D08BB = {isa = PBXBuildFile; fileRef = 093B0FA907AA17F301620D44 ; };
+		09EE0C1E056A126F0F670CE3 = {isa = PBXBuildFile; fileRef = 19720D5E15E7142C194F0112 ; };
+		04DF008911B60DE70FCD155F = {isa = PBXBuildFile; fileRef = 0A5D0552027403940B06121A ; };
+		18A10FD514690CEC0A0C01EE = {isa = PBXBuildFile; fileRef = 05D204DD04BA0DC102820CA8 ; };
+		0B6E080E097D0874126A0327 = {isa = PBXBuildFile; fileRef = 12D50A02047C0DDB08B30BC7 ; };
+		069A13A50FCD07CE04A40972 = {isa = PBXBuildFile; fileRef = 134B156618C1063302860AD2 ; };
+		0CF511F204A90F9B025D045F = {isa = PBXBuildFile; fileRef = 021C06ED12D511AE11C40392 ; };
+		136815C6111E13E5113B0380 = {isa = PBXBuildFile; fileRef = 115E04EB0DE30FB9094F1613 ; };
 
-		0A6605C10AA603280B9B0ED8 = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libTKOffset.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		00BF0E6C033F176A0312191D = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libTKOffset.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 
-		172204F20F170EC008E912C9 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BiTgte_Blend.cxx; path = ../../../src/BiTgte/BiTgte_Blend.cxx; sourceTree = "<group>"; };
-		092904CF094E04D1115606AC = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BiTgte_CurveOnEdge.cxx; path = ../../../src/BiTgte/BiTgte_CurveOnEdge.cxx; sourceTree = "<group>"; };
-		022D148F144D07A004CC0B96 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BiTgte_CurveOnVertex.cxx; path = ../../../src/BiTgte/BiTgte_CurveOnVertex.cxx; sourceTree = "<group>"; };
-		0C2E0826106E16080B7E15A6 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BiTgte_HCurveOnEdge_0.cxx; path = ../../../src/BiTgte/BiTgte_HCurveOnEdge_0.cxx; sourceTree = "<group>"; };
-		0CC00E8F164C153F0771028B = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BiTgte_HCurveOnVertex_0.cxx; path = ../../../src/BiTgte/BiTgte_HCurveOnVertex_0.cxx; sourceTree = "<group>"; };
-		12800F6F1155046314350AE6 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset.cxx; path = ../../../src/BRepOffset/BRepOffset.cxx; sourceTree = "<group>"; };
-		10700FD80FAC0DEC0FD90A7D = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Analyse.cxx; path = ../../../src/BRepOffset/BRepOffset_Analyse.cxx; sourceTree = "<group>"; };
-		0C7B0D0D0CE204180AAA1758 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Inter2d.cxx; path = ../../../src/BRepOffset/BRepOffset_Inter2d.cxx; sourceTree = "<group>"; };
-		08F919070C710769143A0D9F = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Inter3d.cxx; path = ../../../src/BRepOffset/BRepOffset_Inter3d.cxx; sourceTree = "<group>"; };
-		015114DA131C0EC904FB0845 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Interval.cxx; path = ../../../src/BRepOffset/BRepOffset_Interval.cxx; sourceTree = "<group>"; };
-		021E175B183A173306220A3A = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_MakeLoops.cxx; path = ../../../src/BRepOffset/BRepOffset_MakeLoops.cxx; sourceTree = "<group>"; };
-		12F9138A077A020516801418 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_MakeOffset.cxx; path = ../../../src/BRepOffset/BRepOffset_MakeOffset.cxx; sourceTree = "<group>"; };
-		06A317C11964187008D81515 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_MakeOffset_1.cxx; path = ../../../src/BRepOffset/BRepOffset_MakeOffset_1.cxx; sourceTree = "<group>"; };
-		0A3F09D40A8302B00A76093F = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_MakeSimpleOffset.cxx; path = ../../../src/BRepOffset/BRepOffset_MakeSimpleOffset.cxx; sourceTree = "<group>"; };
-		06F70619056B16EF015A043A = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Offset.cxx; path = ../../../src/BRepOffset/BRepOffset_Offset.cxx; sourceTree = "<group>"; };
-		01F901C00523008D0FDA1155 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_SimpleOffset.cxx; path = ../../../src/BRepOffset/BRepOffset_SimpleOffset.cxx; sourceTree = "<group>"; };
-		139E16C913960D7D053A08E1 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Tool.cxx; path = ../../../src/BRepOffset/BRepOffset_Tool.cxx; sourceTree = "<group>"; };
-		141A122406DA061A04580CC8 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_DraftAngle.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_DraftAngle.cxx; sourceTree = "<group>"; };
-		133B15F40E15047C06991979 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_FindContigousEdges.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_FindContigousEdges.cxx; sourceTree = "<group>"; };
-		071910FE01B50C38001F152A = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeDraft.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeDraft.cxx; sourceTree = "<group>"; };
-		041C0E1408910FD302780F79 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeEvolved.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeEvolved.cxx; sourceTree = "<group>"; };
-		04E118B105E10E0003A8164A = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeFilling.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeFilling.cxx; sourceTree = "<group>"; };
-		125C15280642122204D20C3C = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeOffset.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeOffset.cxx; sourceTree = "<group>"; };
-		08A602DC028617E2033F101E = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeOffsetShape.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeOffsetShape.cxx; sourceTree = "<group>"; };
-		0A380B5505F71697077B12B4 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakePipe.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakePipe.cxx; sourceTree = "<group>"; };
-		12E40BA70D4012700352191D = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakePipeShell.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakePipeShell.cxx; sourceTree = "<group>"; };
-		04F806DA0D4804E210731554 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeThickSolid.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeThickSolid.cxx; sourceTree = "<group>"; };
-		120610E917BC0A3514F404D1 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MiddlePath.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MiddlePath.cxx; sourceTree = "<group>"; };
-		003012600A7000BC00E80D3A = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_NormalProjection.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_NormalProjection.cxx; sourceTree = "<group>"; };
-		06100BD211A404510F050DDD = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_ThruSections.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_ThruSections.cxx; sourceTree = "<group>"; };
-		0D6717970D9C0B38194D0F9E = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft.cxx; path = ../../../src/Draft/Draft.cxx; sourceTree = "<group>"; };
-		030418AC0E3201B8130D01C5 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft_EdgeInfo.cxx; path = ../../../src/Draft/Draft_EdgeInfo.cxx; sourceTree = "<group>"; };
-		18CF18290B2C03B9133810AB = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft_FaceInfo.cxx; path = ../../../src/Draft/Draft_FaceInfo.cxx; sourceTree = "<group>"; };
-		0A4D14D701F708B20F9403DA = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft_Modification.cxx; path = ../../../src/Draft/Draft_Modification.cxx; sourceTree = "<group>"; };
-		0B84189518A111EA14E1049B = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft_Modification_1.cxx; path = ../../../src/Draft/Draft_Modification_1.cxx; sourceTree = "<group>"; };
-		0A4512D707B20D960FDF10BA = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft_VertexInfo.cxx; path = ../../../src/Draft/Draft_VertexInfo.cxx; sourceTree = "<group>"; };
+		134C08840ECB04FE143F17CD = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BiTgte_Blend.cxx; path = ../../../src/BiTgte/BiTgte_Blend.cxx; sourceTree = "<group>"; };
+		061F055E03F30D1005910FE1 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BiTgte_CurveOnEdge.cxx; path = ../../../src/BiTgte/BiTgte_CurveOnEdge.cxx; sourceTree = "<group>"; };
+		1878042D18E108C9166417F0 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BiTgte_CurveOnVertex.cxx; path = ../../../src/BiTgte/BiTgte_CurveOnVertex.cxx; sourceTree = "<group>"; };
+		0CA401D8131F078B01AE14D9 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BiTgte_HCurveOnEdge_0.cxx; path = ../../../src/BiTgte/BiTgte_HCurveOnEdge_0.cxx; sourceTree = "<group>"; };
+		0B8311D2143C039A141A0D97 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BiTgte_HCurveOnVertex_0.cxx; path = ../../../src/BiTgte/BiTgte_HCurveOnVertex_0.cxx; sourceTree = "<group>"; };
+		02C9136F132A0BEA0DE00904 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset.cxx; path = ../../../src/BRepOffset/BRepOffset.cxx; sourceTree = "<group>"; };
+		0B3C11D210780CA5053F0A2C = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Analyse.cxx; path = ../../../src/BRepOffset/BRepOffset_Analyse.cxx; sourceTree = "<group>"; };
+		0DDC08A3045E086B0A9A0586 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Inter2d.cxx; path = ../../../src/BRepOffset/BRepOffset_Inter2d.cxx; sourceTree = "<group>"; };
+		0878037E1026016507FD1439 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Inter3d.cxx; path = ../../../src/BRepOffset/BRepOffset_Inter3d.cxx; sourceTree = "<group>"; };
+		01B302420A3B022100CB02BE = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Interval.cxx; path = ../../../src/BRepOffset/BRepOffset_Interval.cxx; sourceTree = "<group>"; };
+		16280A9618BA049F02181311 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_MakeLoops.cxx; path = ../../../src/BRepOffset/BRepOffset_MakeLoops.cxx; sourceTree = "<group>"; };
+		1540073514550DC8138B0156 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_MakeOffset.cxx; path = ../../../src/BRepOffset/BRepOffset_MakeOffset.cxx; sourceTree = "<group>"; };
+		1985082900B10B9602491484 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_MakeOffset_1.cxx; path = ../../../src/BRepOffset/BRepOffset_MakeOffset_1.cxx; sourceTree = "<group>"; };
+		1299065205791079130F114E = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_MakeSimpleOffset.cxx; path = ../../../src/BRepOffset/BRepOffset_MakeSimpleOffset.cxx; sourceTree = "<group>"; };
+		0BC0103508EC08CA02210F3D = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Offset.cxx; path = ../../../src/BRepOffset/BRepOffset_Offset.cxx; sourceTree = "<group>"; };
+		0B9E0B0904D1060B03940D63 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_SimpleOffset.cxx; path = ../../../src/BRepOffset/BRepOffset_SimpleOffset.cxx; sourceTree = "<group>"; };
+		13940A6C0B530D430DD50A3D = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffset_Tool.cxx; path = ../../../src/BRepOffset/BRepOffset_Tool.cxx; sourceTree = "<group>"; };
+		08800CC8180918DB15D00B53 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_DraftAngle.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_DraftAngle.cxx; sourceTree = "<group>"; };
+		1239131A18A008750FF913C6 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_FindContigousEdges.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_FindContigousEdges.cxx; sourceTree = "<group>"; };
+		104C09BB06B0056E17FC1975 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeDraft.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeDraft.cxx; sourceTree = "<group>"; };
+		15570E560BDF17C90BBD17F7 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeEvolved.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeEvolved.cxx; sourceTree = "<group>"; };
+		0AE303970E65176406BD0EE5 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeFilling.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeFilling.cxx; sourceTree = "<group>"; };
+		1639033915D1081903A40F7C = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeOffset.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeOffset.cxx; sourceTree = "<group>"; };
+		187D17FD077C14C513D705D3 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeOffsetShape.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeOffsetShape.cxx; sourceTree = "<group>"; };
+		10D30D9F0283102815A50AA7 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakePipe.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakePipe.cxx; sourceTree = "<group>"; };
+		03E7084F053D12E213191327 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakePipeShell.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakePipeShell.cxx; sourceTree = "<group>"; };
+		15E50355154E082B0AE209CA = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MakeThickSolid.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MakeThickSolid.cxx; sourceTree = "<group>"; };
+		0028191C1299145503C81126 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_MiddlePath.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_MiddlePath.cxx; sourceTree = "<group>"; };
+		189217FD0A4404B201B2062A = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_NormalProjection.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_NormalProjection.cxx; sourceTree = "<group>"; };
+		1674150B012D083514C114C0 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BRepOffsetAPI_ThruSections.cxx; path = ../../../src/BRepOffsetAPI/BRepOffsetAPI_ThruSections.cxx; sourceTree = "<group>"; };
+		18BC10BB18D4146218E81866 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft.cxx; path = ../../../src/Draft/Draft.cxx; sourceTree = "<group>"; };
+		027C13900E9A1891058907C4 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft_EdgeInfo.cxx; path = ../../../src/Draft/Draft_EdgeInfo.cxx; sourceTree = "<group>"; };
+		122209850590183212B200D8 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft_FaceInfo.cxx; path = ../../../src/Draft/Draft_FaceInfo.cxx; sourceTree = "<group>"; };
+		01A915AE02C513A30B0213BC = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft_Modification.cxx; path = ../../../src/Draft/Draft_Modification.cxx; sourceTree = "<group>"; };
+		107A02370F9B034710401454 = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft_Modification_1.cxx; path = ../../../src/Draft/Draft_Modification_1.cxx; sourceTree = "<group>"; };
+		11B50F5316360F810214104D = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Draft_VertexInfo.cxx; path = ../../../src/Draft/Draft_VertexInfo.cxx; sourceTree = "<group>"; };
 
-		067818D402E906D112FE169B = {isa = PBXFileReference; lastKnownFileType = file; name = libTKFillet.dylib; path = libTKFillet.dylib; sourceTree = "<group>"; };
-		1346025905E90E5C03E10EE4 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKBRep.dylib; path = libTKBRep.dylib; sourceTree = "<group>"; };
-		10790973184916EC022E0E7B = {isa = PBXFileReference; lastKnownFileType = file; name = libTKTopAlgo.dylib; path = libTKTopAlgo.dylib; sourceTree = "<group>"; };
-		0D580467011D11BC175402F0 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKMath.dylib; path = libTKMath.dylib; sourceTree = "<group>"; };
-		140C0F9E0D330DDD13E112CA = {isa = PBXFileReference; lastKnownFileType = file; name = libTKernel.dylib; path = libTKernel.dylib; sourceTree = "<group>"; };
-		04DC100B0112023C14B80956 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKGeomBase.dylib; path = libTKGeomBase.dylib; sourceTree = "<group>"; };
-		0E97141412E604A5107B0EA5 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKG2d.dylib; path = libTKG2d.dylib; sourceTree = "<group>"; };
-		072E13E914EB0B7C0F0D1561 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKG3d.dylib; path = libTKG3d.dylib; sourceTree = "<group>"; };
-		07CE18080697023507FE0CA9 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKGeomAlgo.dylib; path = libTKGeomAlgo.dylib; sourceTree = "<group>"; };
-		1901006B0C6700CE158D101D = {isa = PBXFileReference; lastKnownFileType = file; name = libTKShHealing.dylib; path = libTKShHealing.dylib; sourceTree = "<group>"; };
-		0BCF12A015B40260135D054C = {isa = PBXFileReference; lastKnownFileType = file; name = libTKBO.dylib; path = libTKBO.dylib; sourceTree = "<group>"; };
-		18F50B79036E0E95053801E2 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKPrim.dylib; path = libTKPrim.dylib; sourceTree = "<group>"; };
-		0D7218A211E207CE06DA05E0 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKBool.dylib; path = libTKBool.dylib; sourceTree = "<group>"; };
+		12ED101903B917A818B51535 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKFillet.dylib; path = libTKFillet.dylib; sourceTree = "<group>"; };
+		13C217120EF9032C055E01C8 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKBRep.dylib; path = libTKBRep.dylib; sourceTree = "<group>"; };
+		05550A5D11CE080415B018E3 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKTopAlgo.dylib; path = libTKTopAlgo.dylib; sourceTree = "<group>"; };
+		105D11EB152016FD0E0B088B = {isa = PBXFileReference; lastKnownFileType = file; name = libTKMath.dylib; path = libTKMath.dylib; sourceTree = "<group>"; };
+		0FBE0DC010500BA307050DC2 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKernel.dylib; path = libTKernel.dylib; sourceTree = "<group>"; };
+		093B0FA907AA17F301620D44 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKGeomBase.dylib; path = libTKGeomBase.dylib; sourceTree = "<group>"; };
+		19720D5E15E7142C194F0112 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKG2d.dylib; path = libTKG2d.dylib; sourceTree = "<group>"; };
+		0A5D0552027403940B06121A = {isa = PBXFileReference; lastKnownFileType = file; name = libTKG3d.dylib; path = libTKG3d.dylib; sourceTree = "<group>"; };
+		05D204DD04BA0DC102820CA8 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKGeomAlgo.dylib; path = libTKGeomAlgo.dylib; sourceTree = "<group>"; };
+		12D50A02047C0DDB08B30BC7 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKShHealing.dylib; path = libTKShHealing.dylib; sourceTree = "<group>"; };
+		134B156618C1063302860AD2 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKBO.dylib; path = libTKBO.dylib; sourceTree = "<group>"; };
+		021C06ED12D511AE11C40392 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKPrim.dylib; path = libTKPrim.dylib; sourceTree = "<group>"; };
+		115E04EB0DE30FB9094F1613 = {isa = PBXFileReference; lastKnownFileType = file; name = libTKBool.dylib; path = libTKBool.dylib; sourceTree = "<group>"; };
 
-		13910ED305AF196E0D6C0318 = {
+		170A1409033F000A17880E95 = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C2C014B0F1A0CB9188C06A7 ,
-				03A9031F05A416F80936130D ,
-				092F178F0FF306540FE305E9 ,
-				106F157418ED0D1F0A06174E ,
-				019B06360AAE11220C170FC1 ,
-				01FE13290ACD0D790B6A00D0 ,
-				16F70A880FD410A2043E090C ,
-				14E0168D065209F8010100A1 ,
-				014311CE17C208AA16C90CE5 ,
-				147709D10D760C8607920472 ,
-				18970D850E6317D6175C0686 ,
-				0DB50FC50AE017EB0EB9195F ,
-				0AC200AA0CCB0CF901390061 ,
+				00EB06E20498058718A710AB ,
+				128F023B13A40CC8028A0FD5 ,
+				1411048211E2118401610916 ,
+				0F7F1857101313E7002511F7 ,
+				113108A80B8118011947096C ,
+				132009350EBE0350165D08BB ,
+				09EE0C1E056A126F0F670CE3 ,
+				04DF008911B60DE70FCD155F ,
+				18A10FD514690CEC0A0C01EE ,
+				0B6E080E097D0874126A0327 ,
+				069A13A50FCD07CE04A40972 ,
+				0CF511F204A90F9B025D045F ,
+				136815C6111E13E5113B0380 ,
 
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 
-		044A06ED057E0C95196C0EAA = {
+		15D20DCD0E6508F213150182 = {
 			isa = PBXGroup;
 			children = (
-				172204F20F170EC008E912C9 ,
-				092904CF094E04D1115606AC ,
-				022D148F144D07A004CC0B96 ,
-				0C2E0826106E16080B7E15A6 ,
-				0CC00E8F164C153F0771028B ,
+				134C08840ECB04FE143F17CD ,
+				061F055E03F30D1005910FE1 ,
+				1878042D18E108C9166417F0 ,
+				0CA401D8131F078B01AE14D9 ,
+				0B8311D2143C039A141A0D97 ,
 			);
 			name = BiTgte;
 			sourceTree = "<group>";
 		};
-		08230E481077136117B900F4 = {
+		02C60099175017AC0B310CD1 = {
 			isa = PBXGroup;
 			children = (
-				12800F6F1155046314350AE6 ,
-				10700FD80FAC0DEC0FD90A7D ,
-				0C7B0D0D0CE204180AAA1758 ,
-				08F919070C710769143A0D9F ,
-				015114DA131C0EC904FB0845 ,
-				021E175B183A173306220A3A ,
-				12F9138A077A020516801418 ,
-				06A317C11964187008D81515 ,
-				0A3F09D40A8302B00A76093F ,
-				06F70619056B16EF015A043A ,
-				01F901C00523008D0FDA1155 ,
-				139E16C913960D7D053A08E1 ,
+				02C9136F132A0BEA0DE00904 ,
+				0B3C11D210780CA5053F0A2C ,
+				0DDC08A3045E086B0A9A0586 ,
+				0878037E1026016507FD1439 ,
+				01B302420A3B022100CB02BE ,
+				16280A9618BA049F02181311 ,
+				1540073514550DC8138B0156 ,
+				1985082900B10B9602491484 ,
+				1299065205791079130F114E ,
+				0BC0103508EC08CA02210F3D ,
+				0B9E0B0904D1060B03940D63 ,
+				13940A6C0B530D430DD50A3D ,
 			);
 			name = BRepOffset;
 			sourceTree = "<group>";
 		};
-		04EE04B3193C020F066A0280 = {
+		05940C1402F509D012970AC7 = {
 			isa = PBXGroup;
 			children = (
-				141A122406DA061A04580CC8 ,
-				133B15F40E15047C06991979 ,
-				071910FE01B50C38001F152A ,
-				041C0E1408910FD302780F79 ,
-				04E118B105E10E0003A8164A ,
-				125C15280642122204D20C3C ,
-				08A602DC028617E2033F101E ,
-				0A380B5505F71697077B12B4 ,
-				12E40BA70D4012700352191D ,
-				04F806DA0D4804E210731554 ,
-				120610E917BC0A3514F404D1 ,
-				003012600A7000BC00E80D3A ,
-				06100BD211A404510F050DDD ,
+				08800CC8180918DB15D00B53 ,
+				1239131A18A008750FF913C6 ,
+				104C09BB06B0056E17FC1975 ,
+				15570E560BDF17C90BBD17F7 ,
+				0AE303970E65176406BD0EE5 ,
+				1639033915D1081903A40F7C ,
+				187D17FD077C14C513D705D3 ,
+				10D30D9F0283102815A50AA7 ,
+				03E7084F053D12E213191327 ,
+				15E50355154E082B0AE209CA ,
+				0028191C1299145503C81126 ,
+				189217FD0A4404B201B2062A ,
+				1674150B012D083514C114C0 ,
 			);
 			name = BRepOffsetAPI;
 			sourceTree = "<group>";
 		};
-		020505E408940D6F0B151270 = {
+		12EB0E04029B01FC069A1086 = {
 			isa = PBXGroup;
 			children = (
-				0D6717970D9C0B38194D0F9E ,
-				030418AC0E3201B8130D01C5 ,
-				18CF18290B2C03B9133810AB ,
-				0A4D14D701F708B20F9403DA ,
-				0B84189518A111EA14E1049B ,
-				0A4512D707B20D960FDF10BA ,
+				18BC10BB18D4146218E81866 ,
+				027C13900E9A1891058907C4 ,
+				122209850590183212B200D8 ,
+				01A915AE02C513A30B0213BC ,
+				107A02370F9B034710401454 ,
+				11B50F5316360F810214104D ,
 			);
 			name = Draft;
 			sourceTree = "<group>";
 		};
 
-		0611100B08A00442192A0844 = {
+		16F2007D0B0B040E0E7C04C2 = {
 			isa = PBXGroup;
 			children = (
-				067818D402E906D112FE169B ,
-				1346025905E90E5C03E10EE4 ,
-				10790973184916EC022E0E7B ,
-				0D580467011D11BC175402F0 ,
-				140C0F9E0D330DDD13E112CA ,
-				04DC100B0112023C14B80956 ,
-				0E97141412E604A5107B0EA5 ,
-				072E13E914EB0B7C0F0D1561 ,
-				07CE18080697023507FE0CA9 ,
-				1901006B0C6700CE158D101D ,
-				0BCF12A015B40260135D054C ,
-				18F50B79036E0E95053801E2 ,
-				0D7218A211E207CE06DA05E0 ,
+				12ED101903B917A818B51535 ,
+				13C217120EF9032C055E01C8 ,
+				05550A5D11CE080415B018E3 ,
+				105D11EB152016FD0E0B088B ,
+				0FBE0DC010500BA307050DC2 ,
+				093B0FA907AA17F301620D44 ,
+				19720D5E15E7142C194F0112 ,
+				0A5D0552027403940B06121A ,
+				05D204DD04BA0DC102820CA8 ,
+				12D50A02047C0DDB08B30BC7 ,
+				134B156618C1063302860AD2 ,
+				021C06ED12D511AE11C40392 ,
+				115E04EB0DE30FB9094F1613 ,
 
-				167A047911560FDD168B0136 ,
-				0A6605C10AA603280B9B0ED8 ,
+				1921055C197A001F19240919 ,
+				00BF0E6C033F176A0312191D ,
 			);
 			sourceTree = "<group>";
 		};
-		167A047911560FDD168B0136 = {
+		1921055C197A001F19240919 = {
 			isa = PBXGroup;
 			children = (
-				044A06ED057E0C95196C0EAA ,
-				08230E481077136117B900F4 ,
-				04EE04B3193C020F066A0280 ,
-				020505E408940D6F0B151270 ,
+				15D20DCD0E6508F213150182 ,
+				02C60099175017AC0B310CD1 ,
+				05940C1402F509D012970AC7 ,
+				12EB0E04029B01FC069A1086 ,
 			);
 			name = "Source files";
 			sourceTree = "<group>";
 		};
 
-		04F6134F0F910413122C036F = {
+		09EA01C7058C048B12FC07E0 = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -239,13 +239,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 
-		1142085A193A0DEB10C00CD1 = {
+		087801FC0B6E03CA17F60A5A = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1019066B02C30E9C02A5195F ;
+			buildConfigurationList = 035806FF124C0EAE014915E8 ;
 			buildPhases = (
-				16A210F90B590C01031A0EC5 ,
-				13910ED305AF196E0D6C0318 ,
-				04F6134F0F910413122C036F ,
+				028407BB07B413AA0B5110A3 ,
+				170A1409033F000A17880E95 ,
+				09EA01C7058C048B12FC07E0 ,
 			);
 			buildRules = (
 			);
@@ -253,77 +253,77 @@
 			);
 			name = TKOffset;
 			productName = TKOffset;
-			productReference = 0A6605C10AA603280B9B0ED8 ;
+			productReference = 00BF0E6C033F176A0312191D ;
 			productType = "com.apple.product-type.library.dynamic";
 		};
 
-		112D04CB07EB00500446093C = {
+		022D07EF0733060B0BE51172 = {
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0430;
 			};
-			buildConfigurationList = 15C3181212900FC9099E0296 ;
+			buildConfigurationList = 1726180C1933139C187A0963 ;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 0611100B08A00442192A0844;
-			productRefGroup = 0611100B08A00442192A0844;
+			mainGroup = 16F2007D0B0B040E0E7C04C2;
+			productRefGroup = 16F2007D0B0B040E0E7C04C2;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1142085A193A0DEB10C00CD1 ,
+				087801FC0B6E03CA17F60A5A ,
 			);
 		};
 
-		16A210F90B590C01031A0EC5 = {
+		028407BB07B413AA0B5110A3 = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				18D400F91396115F066D16DA ,
-				0A840AA3096503F306040879 ,
-				01CB02FA12710BFD149F1379 ,
-				16C80742150104F616A30B83 ,
-				0CBC163D0DB103530EB40006 ,
-				109614ED10D009270303077B ,
-				0CC4110E02BA19640F38172C ,
-				12A90819011916B610460E71 ,
-				08850584194E113308E013CF ,
-				17E110AC044F076318030438 ,
-				008304D8161D078602F41715 ,
-				197D0DE907F90A2F029B0706 ,
-				0B57053F1618116B10111957 ,
-				0E1607711191083700210232 ,
-				0E291737132414CD0D2A0DB0 ,
-				1787011E0A3C0A050DED1036 ,
-				15D9124F006D11F8036A172A ,
-				18A0130A0C0E09550E770803 ,
-				1966107413C70436041B0B80 ,
-				0F130A0000B00327151E10CD ,
-				160D0E370C9D184204A01033 ,
-				0767059704A2163905370097 ,
-				0F460D7614530CCF000E172E ,
-				02EA015F166B066203320D64 ,
-				12B40CD70C3A19520BEA02AE ,
-				0C41168107CA0FC80CDB191B ,
-				03FD10C30414122A0E7114C0 ,
-				0B3213620B00025416BF0889 ,
-				03030FB516110A430D10088D ,
-				19790E93162504F707DE0D1C ,
-				18CA1648130418BB06BD0095 ,
-				139206A9194E04E608811090 ,
-				0070180E054B113517A11498 ,
-				0E2913000379040B0DDE149E ,
-				0EB7142E0981138D07401632 ,
-				171302C50B390DB219541594 ,
+				12040F000C6F18DD17FE0871 ,
+				076E0962122A12E7184202CC ,
+				0D0417B0116F0287185A153E ,
+				01B603C905B90FEC0FAB15E2 ,
+				0BFA030A0B161174077115F1 ,
+				04CC01A905FC0D880AB01093 ,
+				078D156900D207470E63003F ,
+				171A121513EF153905641000 ,
+				08AA135B12B90AE213DB07B8 ,
+				114301D6157F12B7105D091C ,
+				0821008A0392030B0A8102AF ,
+				0FA319510D36128306EE0DBE ,
+				11400DE007BB00FC181718C3 ,
+				0E8900D602310F87080D094F ,
+				011E0379089E10E5011400BD ,
+				08BA1009026C0C150FD502E6 ,
+				0EFD08130E1F19330955076A ,
+				192B0B8109CB103C0A941777 ,
+				007812BA00780BAF013B15ED ,
+				153B0E470956096A101312E0 ,
+				15220A05020D081914190978 ,
+				06250ED0085E149008D11349 ,
+				1807050306440FF2163A03D8 ,
+				1898052B183E097D0CFB0135 ,
+				18E307B304FF0FAD07BE187B ,
+				0BF00141010E0F59099E057B ,
+				150614C9073003A508E60459 ,
+				0B8218F006200E1114E7046D ,
+				05EA12470A77032E100B09C4 ,
+				04270130142A0B1B18D811BF ,
+				0B7F118A0890116F14AB1592 ,
+				012E00F8164617DE16C310AC ,
+				08B119830D34161F0EF40241 ,
+				08D705450A79058502731423 ,
+				0979044701B216DA154C17FF ,
+				140F0DDF0B940347135F169C ,
 
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 
-		17EF0279059E0A650A9A09E5 = {
+		18E1017C0FA7066105C70248 = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -351,7 +351,7 @@
 			};
 			name = Debug;
 		};
-		12990FF21200121E0D040A4C = {
+		16A4088904870CA7068C153A = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -373,7 +373,7 @@
 			};
 			name = Release;
 		};
-		0CB2130A010304270DF1040F = {
+		050904A518D005E10814075F = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_EXTENSION = dylib;
@@ -389,7 +389,7 @@
 					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include,
 					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype,
 					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include,
-					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc,
+					/Users/mnt/builds/IR-2017-08-24_IR-2017-08-24/MacOS-opt/OCCT/inc,
 					"$(CSF_OPT_INC)",
 				);
 				LIBRARY_SEARCH_PATHS = (
@@ -399,7 +399,7 @@
 					/Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/lib,
 					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/lib,
 					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/lib,
-					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/adm/mac/xcd/build/Release,
+					/Users/mnt/builds/IR-2017-08-24_IR-2017-08-24/MacOS-opt/OCCT/adm/mac/xcd/build/Release,
 				);
 				OTHER_CFLAGS = (
 					"$(CSF_OPT_CMPL)",
@@ -408,12 +408,12 @@
 					"$(OTHER_CFLAGS)",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = " ../../../inc /usr/local/include /Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include /Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype /Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include /Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc";
+				USER_HEADER_SEARCH_PATHS = " ../../../inc /usr/local/include /Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include /Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype /Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include /Users/mnt/builds/IR-2017-08-24_IR-2017-08-24/MacOS-opt/OCCT/inc";
 				WRAPPER_EXTENSION = dylib;
 			};
 			name = Debug;
 		};
-		18070DEC00DC033600FD0EA9 = {
+		107A106707FA043E13440F62 = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_EXTENSION = dylib;
@@ -429,7 +429,7 @@
 					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include,
 					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype,
 					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include,
-					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc,
+					/Users/mnt/builds/IR-2017-08-24_IR-2017-08-24/MacOS-opt/OCCT/inc,
 					"$(CSF_OPT_INC)",
 				);
 				LIBRARY_SEARCH_PATHS = (
@@ -439,7 +439,7 @@
 					/Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/lib,
 					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/lib,
 					/Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/lib,
-					/Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/adm/mac/xcd/build/Release,
+					/Users/mnt/builds/IR-2017-08-24_IR-2017-08-24/MacOS-opt/OCCT/adm/mac/xcd/build/Release,
 				);
 				OTHER_CFLAGS = (
 					"$(CSF_OPT_CMPL)",
@@ -448,31 +448,31 @@
 					"$(OTHER_CFLAGS)",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = " ../../../inc /usr/local/include /Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include /Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype /Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include /Users/mnt/builds/CR0-OCCT730_IR-2018-05-25/MacOS-opt/OCCT/inc";
+				USER_HEADER_SEARCH_PATHS = " ../../../inc /usr/local/include /Users/mnt/tools/WOK680/3rdparty/mac64/gl2ps/include /Users/mnt/tools/WOK680/3rdparty/mac64/tbb42_20140416oss/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include /Users/mnt/tools/WOK680/3rdparty/mac64/FreeType2/include/freetype /Users/mnt/tools/WOK680/3rdparty/mac64/FreeImage/include /Users/mnt/builds/IR-2017-08-24_IR-2017-08-24/MacOS-opt/OCCT/inc";
 				WRAPPER_EXTENSION = dylib;
 			};
 			name = Release;
 		};
 
-		15C3181212900FC9099E0296 = {
+		1726180C1933139C187A0963 = {
 			isa = XCConfigurationList;
 		buildConfigurations = (
-				17EF0279059E0A650A9A09E5 ,
-				12990FF21200121E0D040A4C ,
+				18E1017C0FA7066105C70248 ,
+				16A4088904870CA7068C153A ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1019066B02C30E9C02A5195F = {
+		035806FF124C0EAE014915E8 = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0CB2130A010304270DF1040F ,
-				18070DEC00DC033600FD0EA9 ,
+				050904A518D005E10814075F ,
+				107A106707FA043E13440F62 ,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 
 	};
-	rootObject = 112D04CB07EB00500446093C ;
+	rootObject = 022D07EF0733060B0BE51172 ;
 }

@@ -17,6 +17,24 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__math_DLL" />
+					<Add option="-D__ElCLib_DLL" />
+					<Add option="-D__ElSLib_DLL" />
+					<Add option="-D__BSplCLib_DLL" />
+					<Add option="-D__BSplSLib_DLL" />
+					<Add option="-D__PLib_DLL" />
+					<Add option="-D__Precision_DLL" />
+					<Add option="-D__GeomAbs_DLL" />
+					<Add option="-D__Poly_DLL" />
+					<Add option="-D__CSLib_DLL" />
+					<Add option="-D__Convert_DLL" />
+					<Add option="-D__Bnd_DLL" />
+					<Add option="-D__BVH_DLL" />
+					<Add option="-D__gp_DLL" />
+					<Add option="-D__TColgp_DLL" />
+					<Add option="-D__TopLoc_DLL" />
+					<Add option="-D__Expr_DLL" />
+					<Add option="-D__ExprIntrp_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKMath_obj.link" />
@@ -35,6 +53,24 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__math_DLL" />
+					<Add option="-D__ElCLib_DLL" />
+					<Add option="-D__ElSLib_DLL" />
+					<Add option="-D__BSplCLib_DLL" />
+					<Add option="-D__BSplSLib_DLL" />
+					<Add option="-D__PLib_DLL" />
+					<Add option="-D__Precision_DLL" />
+					<Add option="-D__GeomAbs_DLL" />
+					<Add option="-D__Poly_DLL" />
+					<Add option="-D__CSLib_DLL" />
+					<Add option="-D__Convert_DLL" />
+					<Add option="-D__Bnd_DLL" />
+					<Add option="-D__BVH_DLL" />
+					<Add option="-D__gp_DLL" />
+					<Add option="-D__TColgp_DLL" />
+					<Add option="-D__TopLoc_DLL" />
+					<Add option="-D__Expr_DLL" />
+					<Add option="-D__ExprIntrp_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKMath_objd.link" />
@@ -355,9 +391,6 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Bnd/Bnd_Box2d.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/Bnd/Bnd_OBB.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Bnd/Bnd_Range.cxx">

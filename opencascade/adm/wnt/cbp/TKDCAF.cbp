@@ -17,6 +17,12 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__DDF_DLL" />
+					<Add option="-D__DDocStd_DLL" />
+					<Add option="-D__DNaming_DLL" />
+					<Add option="-D__DDataStd_DLL" />
+					<Add option="-D__DPrsStd_DLL" />
+					<Add option="-D__DrawDim_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKDCAF_obj.link" />
@@ -35,6 +41,12 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__DDF_DLL" />
+					<Add option="-D__DDocStd_DLL" />
+					<Add option="-D__DNaming_DLL" />
+					<Add option="-D__DDataStd_DLL" />
+					<Add option="-D__DPrsStd_DLL" />
+					<Add option="-D__DrawDim_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKDCAF_objd.link" />

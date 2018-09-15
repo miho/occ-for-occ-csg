@@ -17,6 +17,10 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__StepElement_DLL" />
+					<Add option="-D__StepFEA_DLL" />
+					<Add option="-D__RWStepElement_DLL" />
+					<Add option="-D__RWStepFEA_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKSTEP209_obj.link" />
@@ -35,6 +39,10 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__StepElement_DLL" />
+					<Add option="-D__StepFEA_DLL" />
+					<Add option="-D__RWStepElement_DLL" />
+					<Add option="-D__RWStepFEA_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKSTEP209_objd.link" />

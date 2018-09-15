@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <LDOM_MemManager.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_ExtStringList.hxx>
@@ -35,7 +35,7 @@ IMPLEMENT_DOMSTRING (AttributeIDString, "extstrlistattguid")
 //function : XmlMDataStd_ExtStringListDriver
 //purpose  : Constructor
 //=======================================================================
-XmlMDataStd_ExtStringListDriver::XmlMDataStd_ExtStringListDriver(const Handle(Message_Messenger)& theMsgDriver)
+XmlMDataStd_ExtStringListDriver::XmlMDataStd_ExtStringListDriver(const Handle(CDM_MessageDriver)& theMsgDriver)
      : XmlMDF_ADriver (theMsgDriver, NULL)
 {
 
@@ -71,7 +71,7 @@ Standard_Boolean XmlMDataStd_ExtStringListDriver::Paste(const XmlObjMgt_Persiste
       TCollection_ExtendedString("Cannot retrieve the first index"
                                  " for ExtStringList attribute as \"")
         + aFirstIndex + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
 
@@ -82,27 +82,18 @@ Standard_Boolean XmlMDataStd_ExtStringListDriver::Paste(const XmlObjMgt_Persiste
       TCollection_ExtendedString("Cannot retrieve the last index"
                                  " for ExtStringList attribute as \"")
         + aFirstIndex + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
 
   const Handle(TDataStd_ExtStringList) anExtStringList = Handle(TDataStd_ExtStringList)::DownCast(theTarget);
-  // attribute id
-  Standard_GUID aGUID;
-  XmlObjMgt_DOMString aGUIDStr = anElement.getAttribute(::AttributeIDString());
-  if (aGUIDStr.Type() == XmlObjMgt_DOMString::LDOM_NULL)
-    aGUID = TDataStd_ExtStringList::GetID(); //default case
-  else
-    aGUID = Standard_GUID(Standard_CString(aGUIDStr.GetString())); // user defined case
-
-  anExtStringList->SetID(aGUID);
-
   if(aLastInd > 0) {
     if (!anElement.hasChildNodes())
     {
       TCollection_ExtendedString aMessageString = 
         TCollection_ExtendedString("Cannot retrieve a list of extended strings");
-      myMessageDriver->Send (aMessageString, Message_Warning);
+      WriteMessage (aMessageString);
+      return Standard_False;
     }
 
     LDOM_Node aCurNode = anElement.getFirstChild();
@@ -119,6 +110,15 @@ Standard_Boolean XmlMDataStd_ExtStringListDriver::Paste(const XmlObjMgt_Persiste
     XmlObjMgt::GetExtendedString( *aCurElement, aValueStr );
     anExtStringList->Append(aValueStr);
   }
+  // attribute id
+  Standard_GUID aGUID;
+  XmlObjMgt_DOMString aGUIDStr = anElement.getAttribute(::AttributeIDString());
+  if (aGUIDStr.Type() == XmlObjMgt_DOMString::LDOM_NULL)
+    aGUID = TDataStd_ExtStringList::GetID(); //default case
+  else
+    aGUID = Standard_GUID(Standard_CString(aGUIDStr.GetString())); // user defined case
+
+  anExtStringList->SetID(aGUID);
 
   return Standard_True;
 }

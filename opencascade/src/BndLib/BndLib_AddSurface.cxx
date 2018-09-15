@@ -460,7 +460,6 @@ void BndLib_AddSurface::Add(const Adaptor3d_Surface& S,
           break;
       }
     }
-    Standard_FALLTHROUGH
   default: 
     {
       Standard_Integer Nu = NbUSamples(S);

@@ -2,16 +2,16 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{42323D2F-188F-0D10-06A2-65FCBFB4993F}</UniqueIdentifier>
+      <UniqueIdentifier>{4E55A65D-1653-1588-0057-EA5EBDF1D588}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\StdLDrivers">
-      <UniqueIdentifier>{B913AB6B-0473-171C-1960-43DC6B3C218F}</UniqueIdentifier>
+      <UniqueIdentifier>{F9FBB27F-0E9E-0F15-0023-05B585D05330}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\StdLPersistent">
-      <UniqueIdentifier>{BF47EC00-03A0-1977-0875-B74CA609337A}</UniqueIdentifier>
+      <UniqueIdentifier>{05992578-0166-1852-11F6-7148353BB2AD}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\StdObjMgt">
-      <UniqueIdentifier>{12B8266F-151F-08DF-1967-A07583830E24}</UniqueIdentifier>
+      <UniqueIdentifier>{4FB1D492-154A-132E-0595-E39AE8CF161C}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

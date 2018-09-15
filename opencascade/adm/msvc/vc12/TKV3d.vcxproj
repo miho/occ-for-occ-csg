@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E25ED94C-0B83-0889-0E15-57B4D12038CE}</ProjectGuid>
+    <ProjectGuid>{B4A9CD8F-08DD-183D-0AF2-9099453E9654}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -89,7 +89,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__V3d_DLL;__Graphic3d_DLL;__Select3D_DLL;__Prs3d_DLL;__StdPrs_DLL;__SelectMgr_DLL;__PrsMgr_DLL;__AIS_DLL;__DsgPrs_DLL;__StdSelect_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -105,7 +105,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);__V3d_DLL;__Graphic3d_DLL;__Select3D_DLL;__Prs3d_DLL;__StdPrs_DLL;__SelectMgr_DLL;__PrsMgr_DLL;__AIS_DLL;__DsgPrs_DLL;__StdSelect_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKMath.lib;TKernel.lib;TKService.lib;TKShHealing.lib;TKTopAlgo.lib;TKG2d.lib;TKG3d.lib;TKGeomBase.lib;TKMesh.lib;TKGeomAlgo.lib;TKHLR.lib;user32.lib;comdlg32.lib;gdi32.lib;opengl32.lib;freetype.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -134,7 +134,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__V3d_DLL;__Graphic3d_DLL;__Select3D_DLL;__Prs3d_DLL;__StdPrs_DLL;__SelectMgr_DLL;__PrsMgr_DLL;__AIS_DLL;__DsgPrs_DLL;__StdSelect_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\..\..\..\win32\vc12\objd\TKV3d/</AssemblerListingLocation>
@@ -151,7 +151,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);__V3d_DLL;__Graphic3d_DLL;__Select3D_DLL;__Prs3d_DLL;__StdPrs_DLL;__SelectMgr_DLL;__PrsMgr_DLL;__AIS_DLL;__DsgPrs_DLL;__StdSelect_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKMath.lib;TKernel.lib;TKService.lib;TKShHealing.lib;TKTopAlgo.lib;TKG2d.lib;TKG3d.lib;TKGeomBase.lib;TKMesh.lib;TKGeomAlgo.lib;TKHLR.lib;user32.lib;comdlg32.lib;gdi32.lib;opengl32.lib;freetype.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -180,7 +180,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__V3d_DLL;__Graphic3d_DLL;__Select3D_DLL;__Prs3d_DLL;__StdPrs_DLL;__SelectMgr_DLL;__PrsMgr_DLL;__AIS_DLL;__DsgPrs_DLL;__StdSelect_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -196,7 +196,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);__V3d_DLL;__Graphic3d_DLL;__Select3D_DLL;__Prs3d_DLL;__StdPrs_DLL;__SelectMgr_DLL;__PrsMgr_DLL;__AIS_DLL;__DsgPrs_DLL;__StdSelect_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKMath.lib;TKernel.lib;TKService.lib;TKShHealing.lib;TKTopAlgo.lib;TKG2d.lib;TKG3d.lib;TKGeomBase.lib;TKMesh.lib;TKGeomAlgo.lib;TKHLR.lib;user32.lib;comdlg32.lib;gdi32.lib;opengl32.lib;freetype.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -225,7 +225,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__V3d_DLL;__Graphic3d_DLL;__Select3D_DLL;__Prs3d_DLL;__StdPrs_DLL;__SelectMgr_DLL;__PrsMgr_DLL;__AIS_DLL;__DsgPrs_DLL;__StdSelect_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\..\..\..\win64\vc12\objd\TKV3d/</AssemblerListingLocation>
@@ -242,7 +242,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);__V3d_DLL;__Graphic3d_DLL;__Select3D_DLL;__Prs3d_DLL;__StdPrs_DLL;__SelectMgr_DLL;__PrsMgr_DLL;__AIS_DLL;__DsgPrs_DLL;__StdSelect_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKMath.lib;TKernel.lib;TKService.lib;TKShHealing.lib;TKTopAlgo.lib;TKG2d.lib;TKG3d.lib;TKGeomBase.lib;TKMesh.lib;TKGeomAlgo.lib;TKHLR.lib;user32.lib;comdlg32.lib;gdi32.lib;opengl32.lib;freetype.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -263,6 +263,8 @@
     <ClCompile Include="..\..\..\src\V3d\V3d_CircularGrid.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\V3d\V3d_DirectionalLight.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\V3d\V3d_Light.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\V3d\V3d_Plane.cxx">
     </ClCompile>
@@ -286,9 +288,29 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\V3d\V3d_Viewer.cxx">
     </ClCompile>
+    <ClCompile Include="..\..\..\src\V3d\V3d_Viewer_3.cxx">
+    </ClCompile>
     <ClCompile Include="..\..\..\src\V3d\V3d_Viewer_4.cxx">
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfPoints.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfPolygons.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfPolylines.cxx">
+    </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfPrimitives.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfQuadrangleStrips.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfQuadrangles.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfSegments.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfTriangleFans.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfTriangleStrips.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfTriangles.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_AspectFillArea3d.cxx">
     </ClCompile>
@@ -299,8 +321,6 @@
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_AspectText3d.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_BSDF.cxx">
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_CLight.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_CStructure.cxx">
     </ClCompile>
@@ -317,8 +337,6 @@
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_Group.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_HatchStyle.cxx">
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_LightSet.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_MarkerImage.cxx">
     </ClCompile>
@@ -361,6 +379,8 @@
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_TextureSet.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_TransformPers.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_Vector.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_Vertex.cxx">
     </ClCompile>

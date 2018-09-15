@@ -2,22 +2,25 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{500D5B29-0D62-0CA9-1437-096A5F26AF9D}</UniqueIdentifier>
+      <UniqueIdentifier>{DBCFBDA2-03E0-0329-08EE-825524A3DE72}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\IntTools">
-      <UniqueIdentifier>{D3828CF1-0FC9-098C-05A8-E5AAA325F25D}</UniqueIdentifier>
+      <UniqueIdentifier>{611A7E01-123F-134D-106C-4BF9CFFDA165}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BRepAlgoAPI">
-      <UniqueIdentifier>{4AF7583B-076E-072C-0BDC-657DA61C3FDB}</UniqueIdentifier>
+      <UniqueIdentifier>{6F1D951F-16C5-060C-0119-508F0BDF2077}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\BOPCol">
+      <UniqueIdentifier>{CC7CAB70-0AFA-137A-06B6-0404A4CCE4F3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BOPDS">
-      <UniqueIdentifier>{A461B1C0-14EA-00F4-17DE-BDC7215C49F5}</UniqueIdentifier>
+      <UniqueIdentifier>{CB2DBAF2-10F7-187F-115F-7BFADF934BD9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BOPAlgo">
-      <UniqueIdentifier>{FB986CFD-18EC-0E4C-107F-726BE108B96D}</UniqueIdentifier>
+      <UniqueIdentifier>{58BD663F-0EB8-0E55-005B-9CA2756DCF70}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BOPTools">
-      <UniqueIdentifier>{C5B0756C-0E7E-0352-123B-F8FCA091740D}</UniqueIdentifier>
+      <UniqueIdentifier>{4DD1282D-1337-0AD6-0434-81085349935A}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -114,9 +117,6 @@
     <ClCompile Include="..\..\..\src\BRepAlgoAPI\BRepAlgoAPI_Cut.cxx">
       <Filter>Source files\BRepAlgoAPI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\BRepAlgoAPI\BRepAlgoAPI_Defeaturing.cxx">
-      <Filter>Source files\BRepAlgoAPI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\BRepAlgoAPI\BRepAlgoAPI_Fuse.cxx">
       <Filter>Source files\BRepAlgoAPI</Filter>
     </ClCompile>
@@ -125,6 +125,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\BRepAlgoAPI\BRepAlgoAPI_Splitter.cxx">
       <Filter>Source files\BRepAlgoAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\BOPCol\BOPCol_Box2DBndTree.cxx">
+      <Filter>Source files\BOPCol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\BOPCol\BOPCol_BoxBndTree.cxx">
+      <Filter>Source files\BOPCol</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPDS\BOPDS_CommonBlock.cxx">
       <Filter>Source files\BOPDS</Filter>
@@ -139,6 +145,9 @@
       <Filter>Source files\BOPDS</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPDS\BOPDS_IteratorSI.cxx">
+      <Filter>Source files\BOPDS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\BOPDS\BOPDS_PassKey.cxx">
       <Filter>Source files\BOPDS</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPDS\BOPDS_Pave.cxx">
@@ -243,10 +252,10 @@
     <ClCompile Include="..\..\..\src\BOPAlgo\BOPAlgo_PaveFiller_9.cxx">
       <Filter>Source files\BOPAlgo</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\BOPAlgo\BOPAlgo_RemoveFeatures.cxx">
+    <ClCompile Include="..\..\..\src\BOPAlgo\BOPAlgo_Section.cxx">
       <Filter>Source files\BOPAlgo</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\BOPAlgo\BOPAlgo_Section.cxx">
+    <ClCompile Include="..\..\..\src\BOPAlgo\BOPAlgo_SectionAttribute.cxx">
       <Filter>Source files\BOPAlgo</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPAlgo\BOPAlgo_ShellSplitter.cxx">
@@ -258,14 +267,14 @@
     <ClCompile Include="..\..\..\src\BOPAlgo\BOPAlgo_Tools.cxx">
       <Filter>Source files\BOPAlgo</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\BOPAlgo\BOPAlgo_ToolsProvider.cxx">
-      <Filter>Source files\BOPAlgo</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\BOPAlgo\BOPAlgo_WireSplitter.cxx">
       <Filter>Source files\BOPAlgo</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPAlgo\BOPAlgo_WireSplitter_1.cxx">
       <Filter>Source files\BOPAlgo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\BOPTools\BOPTools.cxx">
+      <Filter>Source files\BOPTools</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\BOPTools\BOPTools_AlgoTools.cxx">
       <Filter>Source files\BOPTools</Filter>
@@ -285,7 +294,13 @@
     <ClCompile Include="..\..\..\src\BOPTools\BOPTools_AlgoTools_2.cxx">
       <Filter>Source files\BOPTools</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\BOPTools\BOPTools_EdgeSet.cxx">
+      <Filter>Source files\BOPTools</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\BOPTools\BOPTools_Set.cxx">
+      <Filter>Source files\BOPTools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\BOPTools\BOPTools_ShapeSet.cxx">
       <Filter>Source files\BOPTools</Filter>
     </ClCompile>
   </ItemGroup>

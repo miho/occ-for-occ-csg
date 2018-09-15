@@ -44,6 +44,15 @@ Handle(Aspect_Grid) V3d_Viewer::Grid() const
 }
 
 // =======================================================================
+// function : GridType
+// purpose  :
+// =======================================================================
+Aspect_GridType V3d_Viewer::GridType() const
+{
+  return myGridType;
+}
+
+// =======================================================================
 // function : GridDrawMode
 // purpose  :
 // =======================================================================
@@ -248,6 +257,15 @@ void V3d_Viewer::SetGridEcho (const Handle(Graphic3d_AspectMarker3d)& theMarker)
 
   myGridEchoAspect = theMarker;
   myGridEchoGroup->SetPrimitivesAspect (theMarker);
+}
+
+// =======================================================================
+// function : GridEcho
+// purpose  :
+// =======================================================================
+Standard_Boolean V3d_Viewer::GridEcho() const
+{
+  return myGridEcho;
 }
 
 // =======================================================================

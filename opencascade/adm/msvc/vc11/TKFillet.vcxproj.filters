@@ -2,34 +2,34 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{5DBC4EBF-196C-004C-146D-48471532E0FA}</UniqueIdentifier>
+      <UniqueIdentifier>{A2738D25-0240-1946-0F51-ACF40FCB2571}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\ChFiDS">
-      <UniqueIdentifier>{5077258B-0D7D-0E8A-14F0-F9D864EDCBCC}</UniqueIdentifier>
+      <UniqueIdentifier>{07591B36-0FF9-0238-0640-981DE9D3D241}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\ChFi2d">
-      <UniqueIdentifier>{DEBF114D-13F0-1180-0D1A-870E66C2571E}</UniqueIdentifier>
+      <UniqueIdentifier>{90CEC19F-07E7-18AF-02B2-FFD92E0B8C3F}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\ChFi3d">
-      <UniqueIdentifier>{E598EA39-0516-0BEB-0DA8-161F6266806A}</UniqueIdentifier>
+      <UniqueIdentifier>{248767A3-121A-0321-1788-C0EC1ECDC6C8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\ChFiKPart">
-      <UniqueIdentifier>{78D5D261-1740-0949-07D9-6D0C9555399A}</UniqueIdentifier>
+      <UniqueIdentifier>{B5921DE8-1012-196E-111F-61B82D82D09C}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Blend">
-      <UniqueIdentifier>{38ECB833-059A-035D-104E-3F63B6AB5F9A}</UniqueIdentifier>
+      <UniqueIdentifier>{4DF2A777-03EB-0E56-14C0-3335E0162BB2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BRepBlend">
-      <UniqueIdentifier>{118399ED-0BF7-0894-0B8E-1695B7BF2587}</UniqueIdentifier>
+      <UniqueIdentifier>{8EBADAF8-143C-0BA8-0F5D-015F72214BF0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BlendFunc">
-      <UniqueIdentifier>{38C379AA-14EC-1524-0501-0E3D55DCA032}</UniqueIdentifier>
+      <UniqueIdentifier>{0080CF50-0C5A-04DD-10C8-65BDD2915F21}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BRepFilletAPI">
-      <UniqueIdentifier>{995258BE-035A-0AFA-0206-7F4E2EE5ED59}</UniqueIdentifier>
+      <UniqueIdentifier>{FC6FD181-040D-1705-0B4D-7A406018689D}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\FilletSurf">
-      <UniqueIdentifier>{41A0C8CA-1249-0368-03DC-7CCF440BB391}</UniqueIdentifier>
+      <UniqueIdentifier>{7C3BC7B3-168A-15B9-1586-A62487A83CBD}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

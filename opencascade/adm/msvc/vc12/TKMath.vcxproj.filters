@@ -2,52 +2,52 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{86A72984-0D7A-06E8-18BC-A12E1DDA78E8}</UniqueIdentifier>
+      <UniqueIdentifier>{9A386F1E-0DFE-06D7-1103-2637E21F138A}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\math">
-      <UniqueIdentifier>{37F0D06A-0932-0FF6-15CF-C82422BC742E}</UniqueIdentifier>
+      <UniqueIdentifier>{3C018178-0856-0258-153A-4379C4EF4575}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\ElCLib">
-      <UniqueIdentifier>{6F949868-146A-0B83-0658-722573F8CBD1}</UniqueIdentifier>
+      <UniqueIdentifier>{B92A3EF8-193C-03AD-1802-0232302CEDD4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\ElSLib">
-      <UniqueIdentifier>{0D3D34E2-019F-0536-00DC-415C5E1734FE}</UniqueIdentifier>
+      <UniqueIdentifier>{B21598CA-02E1-1249-1468-AD1E1090C35A}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BSplCLib">
-      <UniqueIdentifier>{9824C569-16D5-1279-0477-34F959DE798F}</UniqueIdentifier>
+      <UniqueIdentifier>{0956D2D2-0FB0-06C8-0023-284B8776A547}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BSplSLib">
-      <UniqueIdentifier>{FEA058DD-17D9-152F-0CC3-D5EF9B65BE0E}</UniqueIdentifier>
+      <UniqueIdentifier>{5CFF8908-03BD-0C4D-127D-D7A1E0C4B79E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\PLib">
-      <UniqueIdentifier>{A0C558DF-1095-08C6-132A-5CF1F00FFDB5}</UniqueIdentifier>
+      <UniqueIdentifier>{F304B9DB-05B1-001E-0613-D63AFBBA624D}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Poly">
-      <UniqueIdentifier>{D97CC628-06EB-0C40-022C-A489FB5EC7D0}</UniqueIdentifier>
+      <UniqueIdentifier>{8BDABD6C-031B-083F-17AE-8DE40D773DDF}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\CSLib">
-      <UniqueIdentifier>{9034AC97-17E8-11CE-05D7-313698F76CA6}</UniqueIdentifier>
+      <UniqueIdentifier>{7F3BD333-15EA-1143-07DE-8B09CB2FEFBA}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Convert">
-      <UniqueIdentifier>{FE10046C-127D-1333-04DA-DD61782A2BFC}</UniqueIdentifier>
+      <UniqueIdentifier>{23D8F487-189B-14D6-0716-D47E029CD1F0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Bnd">
-      <UniqueIdentifier>{ADCFD702-04D8-1872-1656-03C7460FC949}</UniqueIdentifier>
+      <UniqueIdentifier>{9B149A66-1425-02CA-0EEB-D9D032F3C32A}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BVH">
-      <UniqueIdentifier>{6804469F-0F00-0E88-06A4-83889C7DD8CD}</UniqueIdentifier>
+      <UniqueIdentifier>{922F3415-0E7B-0167-04BF-2912E697DCFF}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\gp">
-      <UniqueIdentifier>{24ABB578-00E3-0DFD-197D-A696B2EFAE9C}</UniqueIdentifier>
+      <UniqueIdentifier>{2E1CF156-0CDB-11FB-0CB1-D6689E6E65B4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\TopLoc">
-      <UniqueIdentifier>{B0BCAA73-1505-1180-0CA0-E3A0EC59E8F9}</UniqueIdentifier>
+      <UniqueIdentifier>{D744098B-0D1E-1664-1923-D0B1612D89F5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Expr">
-      <UniqueIdentifier>{CE4590C3-0B76-17E6-11A1-359C219D6FFA}</UniqueIdentifier>
+      <UniqueIdentifier>{BC6EE661-0BAA-1932-0003-048A95266F7F}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\ExprIntrp">
-      <UniqueIdentifier>{229232CA-062B-1109-0AE8-62138DF18EB0}</UniqueIdentifier>
+      <UniqueIdentifier>{622F3DC0-0BCA-0480-1848-5122028FC1E1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -349,9 +349,6 @@
       <Filter>Source files\Bnd</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Bnd\Bnd_Box2d.cxx">
-      <Filter>Source files\Bnd</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Bnd\Bnd_OBB.cxx">
       <Filter>Source files\Bnd</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Bnd\Bnd_Range.cxx">

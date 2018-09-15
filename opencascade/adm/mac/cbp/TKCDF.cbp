@@ -58,8 +58,11 @@
 			<Add library="TKernel" />
 		</Linker>
 		<Unit filename="../../../src/CDM/CDM_Application.cxx" />
+		<Unit filename="../../../src/CDM/CDM_COutMessageDriver.cxx" />
 		<Unit filename="../../../src/CDM/CDM_Document.cxx" />
+		<Unit filename="../../../src/CDM/CDM_MessageDriver.cxx" />
 		<Unit filename="../../../src/CDM/CDM_MetaData.cxx" />
+		<Unit filename="../../../src/CDM/CDM_NullMessageDriver.cxx" />
 		<Unit filename="../../../src/CDM/CDM_Reference.cxx" />
 		<Unit filename="../../../src/CDM/CDM_ReferenceIterator.cxx" />
 		<Unit filename="../../../src/PCDM/PCDM.cxx" />

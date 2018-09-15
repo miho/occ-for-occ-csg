@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -151,9 +151,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a867eee4768337327d6aac7a852e1a4c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_shape_analysis___edge.html#a867eee4768337327d6aac7a852e1a4c3">CheckSameParameter</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theEdge, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theFace, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;theMaxdev, const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theNbControl=23)</td></tr>
 <tr class="memdesc:a867eee4768337327d6aac7a852e1a4c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the edge to be SameParameter. Calculates the maximal deviation between 3d curve and each pcurve of the edge on &lt;NbControl&gt; equidistant points (the same algorithm as in <a class="el" href="class_b_rep_check.html" title="This package provides tools to check the validity of the BRep. ">BRepCheck</a>; default value is 23 as in <a class="el" href="class_b_rep_check.html" title="This package provides tools to check the validity of the BRep. ">BRepCheck</a>). This deviation is returned in &lt;maxdev&gt; parameter. If deviation is greater than tolerance of the edge (i.e. incorrect flag) returns False, else returns True.  <a href="#a867eee4768337327d6aac7a852e1a4c3">More...</a><br /></td></tr>
 <tr class="separator:a867eee4768337327d6aac7a852e1a4c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad07f047435f04ab4e814a8c39aef85c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_shape_analysis___edge.html#ad07f047435f04ab4e814a8c39aef85c3">CheckPCurveRange</a> (const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theFirst, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theLast, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt; &amp;thePC)</td></tr>
-<tr class="memdesc:ad07f047435f04ab4e814a8c39aef85c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks possibility for pcurve thePC to have range [theFirst, theLast] (edge range) having respect to real first, last parameters of thePC.  <a href="#ad07f047435f04ab4e814a8c39aef85c3">More...</a><br /></td></tr>
-<tr class="separator:ad07f047435f04ab4e814a8c39aef85c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08352df68f77f447cc096112670b796b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_shape_analysis___edge.html#a08352df68f77f447cc096112670b796b">CheckOverlapping</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theEdge1, const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theEdge2, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;theTolOverlap, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theDomainDist=0.0)</td></tr>
 <tr class="memdesc:a08352df68f77f447cc096112670b796b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the first edge is overlapped with second edge. If distance between two edges is less then theTolOverlap edges is overlapped. theDomainDis - length of part of edges on wich edges is overlapped.  <a href="#a08352df68f77f447cc096112670b796b">More...</a><br /></td></tr>
 <tr class="separator:a08352df68f77f447cc096112670b796b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -383,42 +380,6 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Checks the first edge is overlapped with second edge. If distance between two edges is less then theTolOverlap edges is overlapped. theDomainDis - length of part of edges on wich edges is overlapped. </p>
-
-</div>
-</div>
-<a id="ad07f047435f04ab4e814a8c39aef85c3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad07f047435f04ab4e814a8c39aef85c3">&#9670;&nbsp;</a></span>CheckPCurveRange()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> ShapeAnalysis_Edge::CheckPCurveRange </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td>
-          <td class="paramname"><em>theFirst</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td>
-          <td class="paramname"><em>theLast</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>thePC</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Checks possibility for pcurve thePC to have range [theFirst, theLast] (edge range) having respect to real first, last parameters of thePC. </p>
 
 </div>
 </div>

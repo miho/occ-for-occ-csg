@@ -2,46 +2,46 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{31E0FBCA-0A43-0E0A-0803-7288FC7F9210}</UniqueIdentifier>
+      <UniqueIdentifier>{C97B68FC-0309-024D-01A1-73E7D679C8B0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\FSD">
-      <UniqueIdentifier>{4E91A043-1875-05CE-10D2-D59D0236EFC2}</UniqueIdentifier>
+      <UniqueIdentifier>{66B7C78A-0E22-1292-0207-8853A32B1DB0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\OSD">
-      <UniqueIdentifier>{B6B4F2E2-030E-0F6E-0681-7FB88D2D71DC}</UniqueIdentifier>
+      <UniqueIdentifier>{AA2FC032-07BF-0668-0172-940B1C65916A}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Plugin">
-      <UniqueIdentifier>{8E5D975A-080B-043C-1808-D667C7373B45}</UniqueIdentifier>
+      <UniqueIdentifier>{2E02E00B-00C0-1294-16CB-966DC0FF6459}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Quantity">
-      <UniqueIdentifier>{145513ED-010C-10F3-0425-7D1E505117FA}</UniqueIdentifier>
+      <UniqueIdentifier>{1519D415-0A06-0418-107F-A92D57DFEB34}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Resource">
-      <UniqueIdentifier>{FD23E3F3-02D3-099D-051F-1BF7B32331DB}</UniqueIdentifier>
+      <UniqueIdentifier>{CADB4700-00B0-1786-0880-80E65F949043}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Standard">
-      <UniqueIdentifier>{9E501F19-0CC4-055B-0D33-421322F63150}</UniqueIdentifier>
+      <UniqueIdentifier>{8B3ECE1C-00F3-0559-12B0-2F9BD49F90EF}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Storage">
-      <UniqueIdentifier>{1FADF22D-13F7-10B1-07D3-DFCDF94BD1DD}</UniqueIdentifier>
+      <UniqueIdentifier>{E4491417-090C-0FE4-027C-BB231EFE8982}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\TColStd">
-      <UniqueIdentifier>{BF3AB02A-0E89-073A-0B94-666DCDB2D3E4}</UniqueIdentifier>
+      <UniqueIdentifier>{F5D7240F-04CB-17BA-019E-3B4AAAA2E29B}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\TCollection">
-      <UniqueIdentifier>{752338C5-006D-09BC-0FD4-D5632560193B}</UniqueIdentifier>
+      <UniqueIdentifier>{CB51D496-12E1-1650-0C03-1A63526ED57A}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Units">
-      <UniqueIdentifier>{188B5A26-041D-1181-00D6-69C7A3B1CB2A}</UniqueIdentifier>
+      <UniqueIdentifier>{8153E38A-1776-074D-0B48-2F58DC72F5F9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\UnitsAPI">
-      <UniqueIdentifier>{916481B5-014B-04FD-0F6A-489C921F4AEE}</UniqueIdentifier>
+      <UniqueIdentifier>{72DC501D-0784-0BEE-0D6F-B2249D81EDEF}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\NCollection">
-      <UniqueIdentifier>{7051E290-1643-06DE-12D4-F4548CDAED43}</UniqueIdentifier>
+      <UniqueIdentifier>{2C19F965-0DE6-002B-16C0-F3445B0CD329}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Message">
-      <UniqueIdentifier>{0EE6DE55-156E-0C6F-16D0-1959AF4F15A7}</UniqueIdentifier>
+      <UniqueIdentifier>{FB685F58-140F-169F-0A20-F554DA95E56D}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -99,12 +99,6 @@
     <ClCompile Include="..\..\..\src\OSD\OSD_Parallel.cxx">
       <Filter>Source files\OSD</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\OSD\OSD_Parallel_TBB.cxx">
-      <Filter>Source files\OSD</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\OSD\OSD_Parallel_Threads.cxx">
-      <Filter>Source files\OSD</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\OSD\OSD_Path.cxx">
       <Filter>Source files\OSD</Filter>
     </ClCompile>
@@ -136,6 +130,9 @@
       <Filter>Source files\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Quantity\Quantity_Color.cxx">
+      <Filter>Source files\Quantity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Quantity\Quantity_Convert.cxx">
       <Filter>Source files\Quantity</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Quantity\Quantity_Date.cxx">
@@ -204,16 +201,19 @@
     <ClCompile Include="..\..\..\src\Standard\Standard_Real.cxx">
       <Filter>Source files\Standard</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Standard\Standard_ShortReal.cxx">
+    <ClCompile Include="..\..\..\src\Standard\Standard_SStream.cxx">
       <Filter>Source files\Standard</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\Standard\Standard_Strtod.cxx">
+    <ClCompile Include="..\..\..\src\Standard\Standard_ShortReal.cxx">
       <Filter>Source files\Standard</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Standard\Standard_Transient.cxx">
       <Filter>Source files\Standard</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Standard\Standard_Type.cxx">
+      <Filter>Source files\Standard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Standard\Standard_UUID.cxx">
       <Filter>Source files\Standard</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Standard\Standard_math.cxx">
@@ -255,7 +255,13 @@
     <ClCompile Include="..\..\..\src\Storage\Storage_TypedCallBack.cxx">
       <Filter>Source files\Storage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Storage\Storage_stCONSTclCOM.cxx">
+      <Filter>Source files\Storage</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\TColStd\TColStd_HPackedMapOfInteger.cxx">
+      <Filter>Source files\TColStd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\TColStd\TColStd_MapIteratorOfPackedMapOfInteger.cxx">
       <Filter>Source files\TColStd</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\TColStd\TColStd_PackedMapOfInteger.cxx">

@@ -18,14 +18,12 @@
 
 #include <inspector/DFBrowserPane_AttributePaneModel.hxx>
 
-#include <Standard_WarningsDisable.hxx>
-#include <QHeaderView>
+#include <qheaderview.h>
 #include <QGridLayout>
 #include <QList>
 #include <QTableView>
 #include <QVariant>
 #include <QWidget>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : Constructor

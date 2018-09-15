@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{E2450292-044A-047C-02FA-82C3A7FB1F42}</UniqueIdentifier>
+      <UniqueIdentifier>{33AC2C86-110E-18EE-15D7-239A3C630A73}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\TPrsStd">
-      <UniqueIdentifier>{C1315438-10BA-0A7B-0562-2ABBBD8BB57E}</UniqueIdentifier>
+      <UniqueIdentifier>{43258E95-0EFB-00F1-0F9C-494288AF165C}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

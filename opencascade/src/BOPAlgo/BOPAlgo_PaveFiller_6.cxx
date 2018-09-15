@@ -15,11 +15,17 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#include <BOPAlgo_PaveFiller.hxx>
 #include <Bnd_Box.hxx>
-#include <BOPAlgo_Alerts.hxx>
+#include <BOPAlgo_PaveFiller.hxx>
 #include <BOPAlgo_SectionAttribute.hxx>
 #include <BOPAlgo_Tools.hxx>
+#include <BOPAlgo_Alerts.hxx>
+#include <BOPCol_DataMapOfShapeInteger.hxx>
+#include <BOPCol_ListOfInteger.hxx>
+#include <BOPCol_ListOfShape.hxx>
+#include <BOPCol_MapOfInteger.hxx>
+#include <BOPCol_NCVector.hxx>
+#include <BOPCol_Parallel.hxx>
 #include <BOPDS_CommonBlock.hxx>
 #include <BOPDS_CoupleOfPaveBlocks.hxx>
 #include <BOPDS_Curve.hxx>
@@ -36,20 +42,19 @@
 #include <BOPDS_ShapeInfo.hxx>
 #include <BOPDS_VectorOfCurve.hxx>
 #include <BOPDS_VectorOfPoint.hxx>
+#include <BOPTools.hxx>
 #include <BOPTools_AlgoTools.hxx>
 #include <BOPTools_AlgoTools3D.hxx>
-#include <BOPTools_Parallel.hxx>
 #include <BRep_Builder.hxx>
-#include <BRep_TEdge.hxx>
 #include <BRep_Tool.hxx>
+#include <BRep_TEdge.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
-#include <BRepLib.hxx>
 #include <BRepTools.hxx>
-#include <Geom_Curve.hxx>
 #include <Geom2d_Curve.hxx>
+#include <Geom_Curve.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <gp_Pnt.hxx>
@@ -65,10 +70,7 @@
 #include <IntTools_SequenceOfPntOn2Faces.hxx>
 #include <IntTools_ShrunkRange.hxx>
 #include <IntTools_Tools.hxx>
-#include <NCollection_Vector.hxx>
 #include <Precision.hxx>
-#include <TColStd_ListOfInteger.hxx>
-#include <TColStd_MapOfInteger.hxx>
 #include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
@@ -76,8 +78,6 @@
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Vertex.hxx>
-#include <TopTools_DataMapOfShapeInteger.hxx>
-#include <TopTools_ListOfShape.hxx>
 
 //
 static Standard_Real ToleranceFF(const BRepAdaptor_Surface& aBAS1,
@@ -144,16 +144,7 @@ class BOPAlgo_FaceFace :
   //
   virtual void Perform() {
     BOPAlgo_Algo::UserBreak();
-    try
-    {
-      OCC_CATCH_SIGNALS
-
-      IntTools_FaceFace::Perform(myF1, myF2);
-    }
-    catch (Standard_Failure)
-    {
-      AddError(new BOPAlgo_AlertIntersectionFailed);
-    }
+    IntTools_FaceFace::Perform(myF1, myF2);
   }
   //
  protected:
@@ -165,14 +156,14 @@ class BOPAlgo_FaceFace :
 };
 //
 //=======================================================================
-typedef NCollection_Vector
+typedef BOPCol_NCVector
   <BOPAlgo_FaceFace> BOPAlgo_VectorOfFaceFace; 
 //
-typedef BOPTools_Functor 
+typedef BOPCol_Functor 
   <BOPAlgo_FaceFace,
   BOPAlgo_VectorOfFaceFace> BOPAlgo_FaceFaceFunctor;
 //
-typedef BOPTools_Cnt 
+typedef BOPCol_Cnt 
   <BOPAlgo_FaceFaceFunctor,
   BOPAlgo_VectorOfFaceFace> BOPAlgo_FaceFaceCnt;
 /////////////////////////////////////////////////////////////////////////
@@ -200,64 +191,42 @@ void BOPAlgo_PaveFiller::PerformFF()
   Standard_Boolean bSplitCurve = Standard_False;
   //
   // Fence map to store faces with updated FaceInfo structure
-  TColStd_MapOfInteger aMIFence;
+  BOPCol_MapOfInteger aMIFence;
   // Prepare the pairs of faces for intersection
   BOPAlgo_VectorOfFaceFace aVFaceFace;
   Standard_Integer nF1, nF2;
   //
   for (; myIterator->More(); myIterator->Next()) {
     myIterator->Value(nF1, nF2);
-
-    // Update/Initialize FaceInfo structure for first face
-    if (myDS->HasFaceInfo(nF1))
-    {
-      if (aMIFence.Add(nF1))
-      {
-        myDS->UpdateFaceInfoOn(nF1);
-        myDS->UpdateFaceInfoIn(nF1);
-      }
+    //
+    const TopoDS_Face& aF1=(*(TopoDS_Face *)(&myDS->Shape(nF1)));
+    const TopoDS_Face& aF2=(*(TopoDS_Face *)(&myDS->Shape(nF2)));
+    //
+    if (aMIFence.Add(nF1)) {
+      myDS->UpdateFaceInfoOn(nF1);
+      myDS->UpdateFaceInfoIn(nF1);
     }
-    else if (myDS->HasInterfShapeSubShapes(nF2, nF1))
-    {
-      myDS->ChangeFaceInfo(nF1);
-      aMIFence.Add(nF1);
-    }
-
-    // Update/Initialize FaceInfo structure for second face
-    if (myDS->HasFaceInfo(nF2))
-    {
-      if (aMIFence.Add(nF2))
-      {
-        myDS->UpdateFaceInfoOn(nF2);
-        myDS->UpdateFaceInfoIn(nF2);
-      }
-    }
-    else if (myDS->HasInterfShapeSubShapes(nF1, nF2))
-    {
-      myDS->ChangeFaceInfo(nF2);
-      aMIFence.Add(nF2);
+    if (aMIFence.Add(nF2)) {
+      myDS->UpdateFaceInfoOn(nF2);
+      myDS->UpdateFaceInfoIn(nF2);
     }
     //
-    if (myGlue == BOPAlgo_GlueOff)
-    {
-      const TopoDS_Face& aF1 = (*(TopoDS_Face *)(&myDS->Shape(nF1)));
-      const TopoDS_Face& aF2 = (*(TopoDS_Face *)(&myDS->Shape(nF2)));
-      //
-      const BRepAdaptor_Surface& aBAS1 = myContext->SurfaceAdaptor(aF1);
-      const BRepAdaptor_Surface& aBAS2 = myContext->SurfaceAdaptor(aF2);
-      if (aBAS1.GetType() == GeomAbs_Plane &&
-          aBAS2.GetType() == GeomAbs_Plane) {
-        // Check if the planes are really interfering
-        Standard_Boolean bToIntersect = CheckPlanes(nF1, nF2);
-        if (!bToIntersect) {
-          BOPDS_InterfFF& aFF = aFFs.Appended();
-          aFF.SetIndices(nF1, nF2);
-          aFF.Init(0, 0);
-          continue;
-        }
+    const BRepAdaptor_Surface& aBAS1 = myContext->SurfaceAdaptor(aF1);
+    const BRepAdaptor_Surface& aBAS2 = myContext->SurfaceAdaptor(aF2);
+    if (aBAS1.GetType() == GeomAbs_Plane && 
+        aBAS2.GetType() == GeomAbs_Plane) {
+      // Check if the planes are really interfering
+      Standard_Boolean bToIntersect = CheckPlanes(nF1, nF2);
+      if (!bToIntersect) {
+        BOPDS_InterfFF& aFF=aFFs.Append1();
+        aFF.SetIndices(nF1, nF2);
+        aFF.Init(0, 0);
+        continue;
       }
-      //
-      BOPAlgo_FaceFace& aFaceFace=aVFaceFace.Appended();
+    }
+    //
+    if (myGlue == BOPAlgo_GlueOff) {
+      BOPAlgo_FaceFace& aFaceFace=aVFaceFace.Append1();
       //
       aFaceFace.SetIndices(nF1, nF2);
       aFaceFace.SetFaces(aF1, aF2);
@@ -278,7 +247,7 @@ void BOPAlgo_PaveFiller::PerformFF()
     }
     else {
       // for the Glue mode just add all interferences of that type
-      BOPDS_InterfFF& aFF = aFFs.Appended();
+      BOPDS_InterfFF& aFF = aFFs.Append1();
       aFF.SetIndices(nF1, nF2);
       aFF.SetTangentFaces(Standard_False);
       aFF.Init(0, 0);
@@ -290,16 +259,14 @@ void BOPAlgo_PaveFiller::PerformFF()
   BOPAlgo_FaceFaceCnt::Perform(myRunParallel, aVFaceFace);
   //======================================================
   // Treatment of the results
-  Standard_Integer k, aNbFaceFace = aVFaceFace.Length();
+  Standard_Integer k, aNbFaceFace = aVFaceFace.Extent();
   for (k = 0; k < aNbFaceFace; ++k) {
     BOPAlgo_FaceFace& aFaceFace = aVFaceFace(k);
     aFaceFace.Indices(nF1, nF2);
-    if (!aFaceFace.IsDone() || aFaceFace.HasErrors()) {
-      BOPDS_InterfFF& aFF = aFFs.Appended();
+    if (!aFaceFace.IsDone()) {
+      BOPDS_InterfFF& aFF = aFFs.Append1();
       aFF.SetIndices(nF1, nF2);
       aFF.Init(0, 0);
-      // Warn about failed intersection of faces
-      AddIntersectionFailedWarning(aFaceFace.Face1(), aFaceFace.Face2());
       continue;
     }
     //
@@ -318,7 +285,7 @@ void BOPAlgo_PaveFiller::PerformFF()
       myDS->AddInterf(nF1, nF2);
     }
     //
-    BOPDS_InterfFF& aFF = aFFs.Appended();
+    BOPDS_InterfFF& aFF = aFFs.Append1();
     aFF.SetIndices(nF1, nF2);
     aFF.SetTangentFaces(bTangentFaces);
     aFF.Init(aNbCurves, aNbPoints);
@@ -341,7 +308,7 @@ void BOPAlgo_PaveFiller::PerformFF()
       const IntTools_Curve& aIC = aCvsX(i);
       Standard_Boolean bIsValid = IntTools_Tools::CheckCurve(aIC, aBox);
       if (bIsValid) {
-        BOPDS_Curve& aNC = aVNC.Appended();
+        BOPDS_Curve& aNC = aVNC.Append1();
         aNC.SetCurve(aIC);
         // make sure that the bounding box has the maximal gap
         aBox.Enlarge(aBoxExpandValue);
@@ -356,7 +323,7 @@ void BOPAlgo_PaveFiller::PerformFF()
       const IntTools_PntOn2Faces& aPi = aPntsX(i);
       const gp_Pnt& aP = aPi.P1().Pnt();
       //
-      BOPDS_Point& aNP = aVNP.Appended();
+      BOPDS_Point& aNP = aVNP.Append1();
       aNP.SetPnt(aP);
     }
   }
@@ -372,7 +339,7 @@ void BOPAlgo_PaveFiller::MakeBlocks()
   }
   //
   BOPDS_VectorOfInterfFF& aFFs=myDS->InterfFF();
-  Standard_Integer aNbFF = aFFs.Length();
+  Standard_Integer aNbFF = aFFs.Extent();
   if (!aNbFF) {
     return;
   }
@@ -390,23 +357,22 @@ void BOPAlgo_PaveFiller::MakeBlocks()
   aAllocator=
     NCollection_BaseAllocator::CommonBaseAllocator();
   //
-  TColStd_ListOfInteger aLSE(aAllocator), aLBV(aAllocator);
-  TColStd_MapOfInteger aMVOnIn(100, aAllocator), aMVCommon(100, aAllocator),
+  BOPCol_ListOfInteger aLSE(aAllocator), aLBV(aAllocator);
+  BOPCol_MapOfInteger aMVOnIn(100, aAllocator),
                       aMVStick(100,aAllocator), aMVEF(100, aAllocator),
                       aMI(100, aAllocator), aMVBounds(100, aAllocator);
   BOPDS_IndexedMapOfPaveBlock aMPBOnIn(100, aAllocator);
   BOPDS_MapOfPaveBlock aMPBAdd(100, aAllocator), aMPBCommon;
   BOPDS_ListOfPaveBlock aLPB(aAllocator);
   BOPDS_IndexedDataMapOfShapeCoupleOfPaveBlocks aMSCPB(100, aAllocator); 
-  TopTools_DataMapOfShapeInteger aMVI(100, aAllocator);
+  BOPCol_DataMapOfShapeInteger aMVI(100, aAllocator);
   BOPDS_DataMapOfPaveBlockListOfPaveBlock aDMExEdges(100, aAllocator);
-  TColStd_DataMapOfIntegerReal aMVTol(100, aAllocator);
-  TColStd_DataMapOfIntegerInteger aDMNewSD(100, aAllocator);
-  TColStd_DataMapOfIntegerListOfInteger aDMVLV;
-  TColStd_DataMapOfIntegerListOfInteger aDMBV(100, aAllocator);
-  TColStd_DataMapIteratorOfDataMapOfIntegerReal aItMV;
-  TopTools_IndexedMapOfShape aMicroEdges(100, aAllocator);
-  TopTools_IndexedMapOfShape aVertsOnRejectedPB;
+  BOPCol_DataMapOfIntegerReal aMVTol(100, aAllocator);
+  BOPCol_DataMapOfIntegerInteger aDMNewSD(100, aAllocator);
+  BOPCol_DataMapOfIntegerListOfInteger aDMVLV;
+  BOPCol_DataMapOfIntegerListOfInteger aDMBV(100, aAllocator);
+  BOPCol_DataMapIteratorOfDataMapOfIntegerReal aItMV;
+  BOPCol_IndexedMapOfShape aMicroEdges(100, aAllocator);
   //
   for (i=0; i<aNbFF; ++i) {
     //
@@ -416,9 +382,9 @@ void BOPAlgo_PaveFiller::MakeBlocks()
     aFF.Indices(nF1, nF2);
     //
     BOPDS_VectorOfPoint& aVP=aFF.ChangePoints();
-    aNbP=aVP.Length();
+    aNbP=aVP.Extent();
     BOPDS_VectorOfCurve& aVC=aFF.ChangeCurves();
-    aNbC=aVC.Length();
+    aNbC=aVC.Extent();
     if (!aNbP && !aNbC) {
       continue;
     }
@@ -432,14 +398,13 @@ void BOPAlgo_PaveFiller::MakeBlocks()
     BOPDS_FaceInfo& aFI2 = myDS->ChangeFaceInfo(nF2);
     //
     aMVOnIn.Clear();
-    aMVCommon.Clear();
     aMPBOnIn.Clear();
     aMPBCommon.Clear();
     aDMBV.Clear();
     aMVTol.Clear();
     aLSE.Clear();
     //
-    myDS->SubShapesOnIn(nF1, nF2, aMVOnIn, aMVCommon, aMPBOnIn, aMPBCommon);
+    myDS->SubShapesOnIn(nF1, nF2, aMVOnIn, aMPBOnIn, aMPBCommon);
     myDS->SharedEdges(nF1, nF2, aLSE, aAllocator);
     //
     Standard_Boolean bHasRealSectionEdge = Standard_False;
@@ -471,13 +436,7 @@ void BOPAlgo_PaveFiller::MakeBlocks()
       // DEBt
       aNC.InitPaveBlock1();
       //
-      // In order to avoid problems connected with
-      // extending tolerance of vertex while putting
-      // (e.g. see "bugs modalg_6 bug26789_1" test case),
-      // all not-common vertices will be checked by
-      // BndBoxes before putting. For common-vertices,
-      // filtering by BndBoxes is not necessary.
-      PutPavesOnCurve(aMVOnIn, aMVCommon, aNC, aMI, aMVEF, aMVTol, aDMVLV);
+      PutPavesOnCurve(aMVOnIn, aNC, nF1, nF2, aMI, aMVEF, aMVTol, aDMVLV);
     }
 
     // if some E-F vertex was put on a curve due to large E-F intersection range,
@@ -502,7 +461,7 @@ void BOPAlgo_PaveFiller::MakeBlocks()
         //
         if (!aLBV.IsEmpty()) {
           aDMBV.Bind(j, aLBV);
-          TColStd_ListIteratorOfListOfInteger aItI(aLBV);
+          BOPCol_ListIteratorOfListOfInteger aItI(aLBV);
           for (; aItI.More(); aItI.Next()) {
             aMVBounds.Add(aItI.Value());
           }
@@ -598,19 +557,6 @@ void BOPAlgo_PaveFiller::MakeBlocks()
             if (!bInBothFaces) {
               aMPBAdd.Add(aPBOut);
               PreparePostTreatFF(i, j, aPBOut, aMSCPB, aMVI, aLPBC);
-              // Try fusing the vertices of the existing pave block
-              // with the vertices put on the real section curve (except
-              // for technological vertices, which will be removed)
-              Standard_Integer nVOut1, nVOut2;
-              aPBOut->Indices(nVOut1, nVOut2);
-              if (nV1 != nVOut1 && nV1 != nVOut2 && !aMVBounds.Contains(nV1))
-              {
-                aVertsOnRejectedPB.Add(aV1);
-              }
-              if (nV2 != nVOut1 && nV2 != nVOut2 && !aMVBounds.Contains(nV2))
-              {
-                aVertsOnRejectedPB.Add(aV2);
-              }
             }
           }
           continue;
@@ -690,13 +636,10 @@ void BOPAlgo_PaveFiller::MakeBlocks()
       }
     }
   }//for (i=0; i<aNbFF; ++i) {
-
-  // Remove "micro" section edges
-  RemoveMicroSectionEdges(aMSCPB, aMicroEdges);
-
+  // 
   // post treatment
   MakeSDVerticesFF(aDMVLV, aDMNewSD);
-  PostTreatFF(aMSCPB, aDMExEdges, aDMNewSD, aMicroEdges, aVertsOnRejectedPB, aAllocator);
+  PostTreatFF(aMSCPB, aDMExEdges, aDMNewSD, aMicroEdges, aAllocator);
   if (HasErrors()) {
     return;
   }
@@ -716,7 +659,6 @@ void BOPAlgo_PaveFiller::MakeBlocks()
   aMVStick.Clear();
   aMPBOnIn.Clear();
   aMVOnIn.Clear();
-  aMVCommon.Clear();
   aDMExEdges.Clear();
   aMI.Clear();
   aDMNewSD.Clear();
@@ -727,18 +669,18 @@ void BOPAlgo_PaveFiller::MakeBlocks()
 //purpose  : 
 //=======================================================================
 void BOPAlgo_PaveFiller::MakeSDVerticesFF
-  (const TColStd_DataMapOfIntegerListOfInteger& theDMVLV,
-   TColStd_DataMapOfIntegerInteger& theDMNewSD)
+  (const BOPCol_DataMapOfIntegerListOfInteger& theDMVLV,
+   BOPCol_DataMapOfIntegerInteger& theDMNewSD)
 {
   // Create a new SD vertex for each group of coinciding vertices
   // and put new substitutions to theDMNewSD.
-  TColStd_DataMapIteratorOfDataMapOfIntegerListOfInteger aItG(theDMVLV);
+  BOPCol_DataMapIteratorOfDataMapOfIntegerListOfInteger aItG(theDMVLV);
   for (; aItG.More(); aItG.Next()) {
-    const TColStd_ListOfInteger& aList = aItG.Value();
+    const BOPCol_ListOfInteger& aList = aItG.Value();
     // make SD vertices w/o creation of interfs
     Standard_Integer nSD = MakeSDVertices(aList, Standard_False);
     // update theDMNewSD
-    TColStd_ListIteratorOfListOfInteger aItL(aList);
+    BOPCol_ListIteratorOfListOfInteger aItL(aList);
     for (; aItL.More(); aItL.Next()) {
       Standard_Integer nV = aItL.Value();
       theDMNewSD.Bind(nV, nSD);
@@ -753,9 +695,8 @@ void BOPAlgo_PaveFiller::MakeSDVerticesFF
 void BOPAlgo_PaveFiller::PostTreatFF
     (BOPDS_IndexedDataMapOfShapeCoupleOfPaveBlocks& theMSCPB,
      BOPDS_DataMapOfPaveBlockListOfPaveBlock& aDMExEdges,
-     TColStd_DataMapOfIntegerInteger& aDMNewSD,
-     const TopTools_IndexedMapOfShape& theMicroEdges,
-     const TopTools_IndexedMapOfShape& theVertsOnRejectedPB,
+     BOPCol_DataMapOfIntegerInteger& aDMNewSD,
+     const BOPCol_IndexedMapOfShape& theMicroEdges,
      const Handle(NCollection_BaseAllocator)& theAllocator)
 {
   Standard_Integer aNbS = theMSCPB.Extent();
@@ -768,14 +709,14 @@ void BOPAlgo_PaveFiller::PostTreatFF
   Standard_Integer aNbLPBx;
   TopAbs_ShapeEnum aType;
   TopoDS_Shape aV, aE;
-  TopTools_ListIteratorOfListOfShape aItLS;
+  BOPCol_ListIteratorOfListOfShape aItLS;
   BOPDS_ListIteratorOfListOfPaveBlock aItLPB;
   BOPDS_PDS aPDS;
   Handle(BOPDS_PaveBlock) aPB1;
   BOPDS_Pave aPave[2];
   BOPDS_ShapeInfo aSI;
   //
-  TopTools_ListOfShape aLS(theAllocator);
+  BOPCol_ListOfShape aLS(theAllocator);
   BOPAlgo_PaveFiller aPF(theAllocator);
   aPF.SetIsPrimary(Standard_False);
   aPF.SetNonDestructive(myNonDestructive);
@@ -783,9 +724,8 @@ void BOPAlgo_PaveFiller::PostTreatFF
   BOPDS_VectorOfInterfFF& aFFs=myDS->InterfFF();
   //
   Standard_Integer aNbME = theMicroEdges.Extent();
-  Standard_Integer aNbVOnRPB = theVertsOnRejectedPB.Extent();
   // 0
-  if (aNbS==1 && (aNbME == 0) && (aNbVOnRPB == 0)) {
+  if (aNbS==1 && (aNbME == 0)) {
     const TopoDS_Shape& aS=theMSCPB.FindKey(1);
     const BOPDS_CoupleOfPaveBlocks &aCPB=theMSCPB.FindFromIndex(1);
     //
@@ -821,7 +761,7 @@ void BOPAlgo_PaveFiller::PostTreatFF
   }
   //
   // 1 prepare arguments
-  TopTools_MapOfShape anAddedSD;
+  BOPCol_MapOfShape anAddedSD;
   for (k=1; k<=aNbS; ++k) {
     const TopoDS_Shape& aS=theMSCPB.FindKey(k);
     aLS.Append(aS);
@@ -883,20 +823,6 @@ void BOPAlgo_PaveFiller::PostTreatFF
       aBB.UpdateVertex(aVerts[0], aTolV1 + aDist);
       aBB.UpdateVertex(aVerts[1], aTolV2 + aDist);
     }
-  }
-
-  // Add vertices put on the real section curves to unify them with the
-  // vertices of the edges, by which these sections curves have been rejected
-  for (Standard_Integer i = 1; i <= aNbVOnRPB; ++i)
-  {
-    TopoDS_Shape aVer = theVertsOnRejectedPB(i);
-    Standard_Integer iVer = myDS->Index(aVer);
-    const Standard_Integer* pSD = aDMNewSD.Seek(iVer);
-    if (pSD)
-      aVer = myDS->Shape(*pSD);
-
-    if (anAddedSD.Add(aVer))
-      aLS.Append(aVer);
   }
   //
   // 2 Fuse shapes
@@ -1117,7 +1043,7 @@ void BOPAlgo_PaveFiller::PostTreatFF
   }//for (; aItLS.More(); aItLS.Next()) {
 
   // Update SD for vertices that did not participate in operation
-  TColStd_DataMapOfIntegerInteger::Iterator itDM(aDMNewSD);
+  BOPCol_DataMapOfIntegerInteger::Iterator itDM(aDMNewSD);
   for (; itDM.More(); itDM.Next())
   {
     const Standard_Integer* pSD = aDMNewSD.Seek(itDM.Value());
@@ -1136,15 +1062,15 @@ void BOPAlgo_PaveFiller::PostTreatFF
 //=======================================================================
 void BOPAlgo_PaveFiller::UpdateFaceInfo
   (BOPDS_DataMapOfPaveBlockListOfPaveBlock& theDME,
-   const TColStd_DataMapOfIntegerInteger& theDMV)
+   const BOPCol_DataMapOfIntegerInteger& theDMV)
 {
   Standard_Integer i, j, nV1, nF1, nF2, 
                    aNbFF, aNbC, aNbP;
   BOPDS_ListIteratorOfListOfPaveBlock aItLPB;
-  TColStd_MapOfInteger aMF;
+  BOPCol_MapOfInteger aMF;
   //
   BOPDS_VectorOfInterfFF& aFFs=myDS->InterfFF();
-  aNbFF=aFFs.Length();
+  aNbFF=aFFs.Extent();
   //
   //1. Sections (curves, points);
   for (i=0; i<aNbFF; ++i) {
@@ -1156,7 +1082,7 @@ void BOPAlgo_PaveFiller::UpdateFaceInfo
     //
     // 1.1. Section edges
     BOPDS_VectorOfCurve& aVNC=aFF.ChangeCurves();
-    aNbC=aVNC.Length();
+    aNbC=aVNC.Extent();
     for (j=0; j<aNbC; ++j) {
       BOPDS_Curve& aNC=aVNC(j);
       BOPDS_ListOfPaveBlock& aLPBC=aNC.ChangePaveBlocks();
@@ -1182,7 +1108,7 @@ void BOPAlgo_PaveFiller::UpdateFaceInfo
     //
     // 1.2. Section vertices
     const BOPDS_VectorOfPoint& aVNP=aFF.Points();
-    aNbP=aVNP.Length();
+    aNbP=aVNP.Extent();
     for (j=0; j<aNbP; ++j) {
       const BOPDS_Point& aNP=aVNP(j);
       nV1=aNP.Index();
@@ -1209,8 +1135,8 @@ void BOPAlgo_PaveFiller::UpdateFaceInfo
   // 2. Update Face Info information with new vertices and new
   //    pave blocks created in PostTreatFF from existing ones
   Standard_Integer nV2, aNbPB;
-  TColStd_MapIteratorOfMapOfInteger aItMF;
-  TColStd_DataMapIteratorOfDataMapOfIntegerInteger aItMV;
+  BOPCol_MapIteratorOfMapOfInteger aItMF;
+  BOPCol_DataMapIteratorOfDataMapOfIntegerInteger aItMV;
   //
   aItMF.Initialize(aMF);
   for (; aItMF.More(); aItMF.Next()) {
@@ -1220,8 +1146,8 @@ void BOPAlgo_PaveFiller::UpdateFaceInfo
     //
     // 2.1. Update information about vertices
     if (bVerts) {
-      TColStd_MapOfInteger& aMVOn = aFI.ChangeVerticesOn();
-      TColStd_MapOfInteger& aMVIn = aFI.ChangeVerticesIn();
+      BOPCol_MapOfInteger& aMVOn = aFI.ChangeVerticesOn();
+      BOPCol_MapOfInteger& aMVIn = aFI.ChangeVerticesIn();
       //
       aItMV.Initialize(theDMV);
       for (; aItMV.More(); aItMV.Next()) {
@@ -1280,14 +1206,14 @@ void BOPAlgo_PaveFiller::UpdateFaceInfo
 Standard_Boolean BOPAlgo_PaveFiller::IsExistingVertex
   (const gp_Pnt& aP,
    const Standard_Real theTolR3D,
-   const TColStd_MapOfInteger& aMVOnIn)const
+   const BOPCol_MapOfInteger& aMVOnIn)const
 {
   Standard_Boolean bRet;
   Standard_Integer nV, iFlag;
   Standard_Real aTolCheck;
   gp_Pnt aPV;
   Bnd_Box aBoxP;
-  TColStd_MapIteratorOfMapOfInteger aIt;
+  BOPCol_MapIteratorOfMapOfInteger aIt;
   //
   aTolCheck = theTolR3D + myFuzzyValue;
   bRet=Standard_True;
@@ -1318,7 +1244,7 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingVertex
 Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
   (const Handle(BOPDS_PaveBlock)& thePB,
    const BOPDS_Curve& theNC,
-   const TColStd_ListOfInteger& theLSE)
+   const BOPCol_ListOfInteger& theLSE)
 {
   Standard_Boolean bRet=Standard_True;
   //
@@ -1330,7 +1256,7 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
   Standard_Integer nE, iFlag, nV1, nV2;
   gp_Pnt aPm;
   Bnd_Box aBoxPm;
-  TColStd_ListIteratorOfListOfInteger aItLI;
+  BOPCol_ListIteratorOfListOfInteger aItLI;
   //
   thePB->Range(aT1, aT2);
   thePB->Indices(nV1, nV2);
@@ -1359,9 +1285,6 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
       aTolCheck = Max(aTolE, aTol) + myFuzzyValue;
       iFlag = myContext->ComputePE(aPm, aTolCheck, aE, aTx, aDist);
       if (!iFlag) {
-        if (aDist > aTolE)
-          // Update tolerance of the edge
-          UpdateEdgeTolerance(nE, aDist);
         return bRet;
       }
     }
@@ -1474,58 +1397,6 @@ Standard_Boolean BOPAlgo_PaveFiller::IsExistingPaveBlock
   }
   return bRet;
 }
-
-//=======================================================================
-//function : 
-//purpose  : 
-//=======================================================================
-static void getBoundPaves(const BOPDS_DS* theDS,
-                          BOPDS_Curve& theNC,
-                          Standard_Integer theNV[2])
-{
-  theNV[0] = theNV[1] = -1;
-
-  // get extreme paves
-  Handle(BOPDS_PaveBlock)& aPB = theNC.ChangePaveBlock1();
-  const BOPDS_ListOfPave& aLP = aPB->ExtPaves();
-  Standard_Integer aNbEP = aLP.Extent();
-  if (aNbEP == 0)
-    return;
-  Standard_Real aTmin = RealLast();
-  Standard_Real aTmax = -aTmin;
-  for (BOPDS_ListIteratorOfListOfPave aItLP(aLP); aItLP.More(); aItLP.Next())
-  {
-    const BOPDS_Pave& aPv = aItLP.Value();
-    Standard_Integer nV;
-    Standard_Real aTV;
-    aPv.Contents(nV, aTV);
-    if (aTV < aTmin) {
-      theNV[0] = aPv.Index();
-      aTmin = aTV;
-    }
-    if (aTV > aTmax) {
-      theNV[1] = aPv.Index();
-      aTmax = aTV;
-    }
-  }
-
-  // compare extreme vertices with ends of the curve
-  const IntTools_Curve& aIC = theNC.Curve();
-  Standard_Real aT[2];
-  gp_Pnt aP[2];
-  aIC.Bounds(aT[0], aT[1], aP[0], aP[1]);
-  Standard_Real aTol = Max(theNC.Tolerance(), theNC.TangentialTolerance());
-  aTol += Precision::Confusion();
-  for (Standard_Integer j = 0; j < 2; ++j)
-  {
-    const BOPDS_ShapeInfo& aSIV = theDS->ShapeInfo(theNV[j]);
-    const TopoDS_Vertex& aV = (*(TopoDS_Vertex *)(&aSIV.Shape()));
-    Standard_Integer iFlag = BOPTools_AlgoTools::ComputeVV(aV, aP[j], aTol);
-    if (iFlag != 0)
-      theNV[j] = -1;
-  }
-}
-
 //=======================================================================
 //function : PutBoundPaveOnCurve
 //purpose  : 
@@ -1533,52 +1404,97 @@ static void getBoundPaves(const BOPDS_DS* theDS,
 void BOPAlgo_PaveFiller::PutBoundPaveOnCurve(const TopoDS_Face& aF1,
                                              const TopoDS_Face& aF2,
                                              BOPDS_Curve& aNC,
-                                             TColStd_ListOfInteger& aLVB)
+                                             BOPCol_ListOfInteger& aLVB)
 {
-  const IntTools_Curve& aIC=aNC.Curve();
-  Standard_Real aT[2];
+  Standard_Boolean bVF;
+  Standard_Integer nV, iFlag, nVn, j, aNbEP;
+  Standard_Real aT[2], aTmin, aTmax, aTV, aTol, aTolVnew;
   gp_Pnt aP[2];
+  TopoDS_Vertex aVn;
+  BOPDS_ListIteratorOfListOfPave aItLP;
+  BOPDS_Pave aPn, aPMM[2];
+  //
+  aTolVnew = Precision::Confusion();
+  //
+  const IntTools_Curve& aIC=aNC.Curve();
   aIC.Bounds(aT[0], aT[1], aP[0], aP[1]);
   Standard_Real aTolR3D = Max(aNC.Tolerance(), aNC.TangentialTolerance());
-  Handle(BOPDS_PaveBlock)& aPB = aNC.ChangePaveBlock1();
-  // Get numbers of vertices assigned to the ends of the curve
-  Standard_Integer aBndNV[2];
-  getBoundPaves(myDS, aNC, aBndNV);
   //
-  Standard_Real aTolVnew = Precision::Confusion();
-  for (Standard_Integer j = 0; j<2; ++j)
-  {
-    if (aBndNV[j] < 0)
-    {
-      // no vertex on this end
-      if (j && aP[1].IsEqual(aP[0], aTolVnew)) {
-        //if curve is closed, process only one bound
-        continue;
+  Handle(BOPDS_PaveBlock)& aPB=aNC.ChangePaveBlock1();
+  const BOPDS_ListOfPave& aLP=aPB->ExtPaves();
+  //
+  aNbEP=aLP.Extent();
+  if (aNbEP) {
+    aTmin=1.e10;
+    aTmax=-aTmin;
+    //
+    aItLP.Initialize(aLP);
+    for (; aItLP.More(); aItLP.Next()) {
+      const BOPDS_Pave& aPv=aItLP.Value();
+      aPv.Contents(nV, aTV);
+      if (aTV<aTmin) {
+        aPMM[0]=aPv;
+        aTmin=aTV;
       }
-      Standard_Boolean bVF = myContext->IsValidPointForFaces(aP[j], aF1, aF2, aTolR3D);
+      if (aTV>aTmax) {
+        aPMM[1]=aPv;
+        aTmax=aTV;
+      }
+    }
+  }
+  //
+  for (j=0; j<2; ++j) {
+    //if curve is closed, process only one bound
+    if (j && aP[1].IsEqual(aP[0], aTolVnew)) {
+      continue;
+    }
+    //
+    iFlag=1;
+    //
+    if (aNbEP) {
+      Bnd_Box aBoxP;
+      //
+      aBoxP.Set(aP[j]);
+      aTol = aTolR3D+Precision::Confusion();
+      aBoxP.Enlarge(aTol);
+      const BOPDS_Pave& aPV=aPMM[j];
+      nV=aPV.Index();
+      const BOPDS_ShapeInfo& aSIV=myDS->ShapeInfo(nV);
+      const TopoDS_Vertex& aV=(*(TopoDS_Vertex *)(&aSIV.Shape()));
+      const Bnd_Box& aBoxV=aSIV.Box();
+      if (!aBoxP.IsOut(aBoxV)){
+        iFlag=BOPTools_AlgoTools::ComputeVV(aV, aP[j], aTol);
+      }
+    }
+    if (iFlag) {
+      // 900/L5
+      bVF=myContext->IsValidPointForFaces (aP[j], aF1, aF2, aTolR3D);
       if (!bVF) {
         continue;
       }
-      TopoDS_Vertex aVn;
-      BOPTools_AlgoTools::MakeNewVertex(aP[j], aTolR3D, aVn);
-      BOPTools_AlgoTools::UpdateVertex(aIC, aT[j], aVn);
-      aTolVnew = BRep_Tool::Tolerance(aVn);
-
+      //
       BOPDS_ShapeInfo aSIVn;
+      //
+      BOPTools_AlgoTools::MakeNewVertex(aP[j], aTolR3D, aVn);
       aSIVn.SetShapeType(TopAbs_VERTEX);
       aSIVn.SetShape(aVn);
-
-      Bnd_Box& aBox = aSIVn.ChangeBox();
-      BRepBndLib::Add(aVn, aBox);
-      aBox.SetGap(aBox.GetGap() + Precision::Confusion());
-
-      Standard_Integer nVn = myDS->Append(aSIVn);
-
-      BOPDS_Pave aPn;
+      //
+      nVn=myDS->Append(aSIVn);
+      //
       aPn.SetIndex(nVn);
       aPn.SetParameter(aT[j]);
       aPB->AppendExtPave(aPn);
-
+      //
+      aVn=(*(TopoDS_Vertex *)(&myDS->Shape(nVn)));
+      BOPTools_AlgoTools::UpdateVertex (aIC, aT[j], aVn);
+      //
+      aTolVnew = BRep_Tool::Tolerance(aVn);
+      //
+      BOPDS_ShapeInfo& aSIDS=myDS->ChangeShapeInfo(nVn);
+      Bnd_Box& aBoxDS=aSIDS.ChangeBox();
+      BRepBndLib::Add(aVn, aBoxDS);
+      aBoxDS.SetGap(aBoxDS.GetGap() + Precision::Confusion());
+      //
       aLVB.Append(nVn);
     }
   }
@@ -1588,54 +1504,57 @@ void BOPAlgo_PaveFiller::PutBoundPaveOnCurve(const TopoDS_Face& aF1,
 //function : PutPavesOnCurve
 //purpose  : 
 //=======================================================================
-void BOPAlgo_PaveFiller::PutPavesOnCurve(const TColStd_MapOfInteger& theMVOnIn,
-                                         const TColStd_MapOfInteger& theMVCommon,
-                                         BOPDS_Curve& theNC,
-                                         const TColStd_MapOfInteger& theMI,
-                                         const TColStd_MapOfInteger& theMVEF,
-                                         TColStd_DataMapOfIntegerReal& theMVTol,
-                                         TColStd_DataMapOfIntegerListOfInteger& theDMVLV)
+void BOPAlgo_PaveFiller::PutPavesOnCurve
+  (const BOPCol_MapOfInteger& aMVOnIn,
+   BOPDS_Curve& aNC,
+   const Standard_Integer nF1,
+   const Standard_Integer nF2,
+   const BOPCol_MapOfInteger& aMI,
+   const BOPCol_MapOfInteger& aMVEF,
+   BOPCol_DataMapOfIntegerReal& aMVTol,
+   BOPCol_DataMapOfIntegerListOfInteger& aDMVLV)
 {
+  Standard_Boolean bInBothFaces;
   Standard_Integer nV;
-  TColStd_MapIteratorOfMapOfInteger aIt;
+  BOPCol_MapIteratorOfMapOfInteger aIt;
   //
-  const Bnd_Box& aBoxC = theNC.Box();
-  const Standard_Real aTolR3D = Max(theNC.Tolerance(), theNC.TangentialTolerance());
+  const Bnd_Box& aBoxC=aNC.Box();
+  Standard_Real aTolR3D = Max(aNC.Tolerance(), aNC.TangentialTolerance());
   //
   //Put EF vertices first
-  aIt.Initialize(theMVEF);
-  for (; aIt.More(); aIt.Next())
-  {
-    nV = aIt.Value();
-    PutPaveOnCurve(nV, aTolR3D, theNC, theMI, theMVTol, theDMVLV, 2);
+  aIt.Initialize(aMVEF);
+  for (; aIt.More(); aIt.Next()) {
+    nV=aIt.Value();
+    PutPaveOnCurve(nV, aTolR3D, aNC, aMI, aMVTol, aDMVLV, 2);
   }
-
   //Put all other vertices
-  aIt.Initialize(theMVOnIn);
-  for (; aIt.More(); aIt.Next())
-  {
-    nV = aIt.Value();
-    if (theMVEF.Contains(nV))
-    {
+  aIt.Initialize(aMVOnIn);
+  for (; aIt.More(); aIt.Next()) {
+    nV=aIt.Value();
+    if (aMVEF.Contains(nV)) {
       continue;
     }
-
-    if (!theMVCommon.Contains(nV))
-    {
-      const BOPDS_ShapeInfo& aSIV = myDS->ShapeInfo(nV);
-      const Bnd_Box& aBoxV = aSIV.Box();
+    //
+    const BOPDS_ShapeInfo& aSIV=myDS->ShapeInfo(nV);
+    const Bnd_Box& aBoxV=aSIV.Box();
+    //
+    if (aBoxC.IsOut(aBoxV)){
+      continue;
+    }
+    if (!myDS->IsNewShape(nV)) {
+      const BOPDS_FaceInfo& aFI1 = myDS->FaceInfo(nF1);
+      const BOPDS_FaceInfo& aFI2 = myDS->FaceInfo(nF2);
       //
-      if (aBoxC.IsOut(aBoxV))
-      {
-        continue;
-      }
-      if (!myDS->IsNewShape(nV))
-      {
+      bInBothFaces = (aFI1.VerticesOn().Contains(nV) ||
+                      aFI1.VerticesIn().Contains(nV))&&
+                     (aFI2.VerticesOn().Contains(nV) ||
+                      aFI2.VerticesIn().Contains(nV));
+      if (!bInBothFaces) {
         continue;
       }
     }
     //
-    PutPaveOnCurve(nV, aTolR3D, theNC, theMI, theMVTol, theDMVLV, 1);
+    PutPaveOnCurve(nV, aTolR3D, aNC, aMI, aMVTol, aDMVLV, 1);
   }
 }
 
@@ -1659,7 +1578,7 @@ void BOPAlgo_PaveFiller::FilterPavesOnCurves(const BOPDS_VectorOfCurve& theVNC)
   NCollection_IndexedDataMap<Standard_Integer,NCollection_List<PaveBlockDist> > aIDMVertPBs;
   Standard_Integer i;
   const Standard_Real anEps = gp::Resolution();
-  for (i = 0; i < theVNC.Length(); ++i)
+  for (i = 0; i < theVNC.Extent(); ++i)
   {
     const BOPDS_Curve& aNC = theVNC(i);
     const IntTools_Curve& aIC = aNC.Curve();
@@ -1734,7 +1653,7 @@ void BOPAlgo_PaveFiller::FilterPavesOnCurves(const BOPDS_VectorOfCurve& theVNC)
 //=======================================================================
 Standard_Boolean BOPAlgo_PaveFiller::ExtendedTolerance
   (const Standard_Integer nV,
-   const TColStd_MapOfInteger& aMI,
+   const BOPCol_MapOfInteger& aMI,
    Standard_Real& aTolVExt,
    const Standard_Integer aType)
 {
@@ -1763,7 +1682,7 @@ Standard_Boolean BOPAlgo_PaveFiller::ExtendedTolerance
   BOPDS_VectorOfInterfEF& aEFs=myDS->InterfEF();
   //
   for (; k<aNbInt; ++k) {
-    aNbLines = !k ? aEEs.Length() : aEFs.Length();
+    aNbLines = !k ? aEEs.Extent() : aEFs.Extent();
     for (i = 0; i < aNbLines; ++i) {
       BOPDS_Interf *aInt = !k ? (BOPDS_Interf*) (&aEEs(i)) :
         (BOPDS_Interf*) (&aEFs(i));
@@ -1802,14 +1721,14 @@ void BOPAlgo_PaveFiller::GetEFPnts
 {
   Standard_Integer nE, nF, nFOpposite, aNbEFs, i;
   Standard_Real U1, U2, V1, V2, f, l;
-  TColStd_MapOfInteger aMI;
+  BOPCol_MapOfInteger aMI;
   //
   //collect indexes of all shapes from nF1 and nF2.
   GetFullShapeMap(nF1, aMI);
   GetFullShapeMap(nF2, aMI);
   //
   BOPDS_VectorOfInterfEF& aEFs=myDS->InterfEF();
-  aNbEFs = aEFs.Length();
+  aNbEFs = aEFs.Extent();
   //
   for(i = 0; i < aNbEFs; ++i) {
     const BOPDS_InterfEF& aEF = aEFs(i);
@@ -1873,10 +1792,10 @@ void BOPAlgo_PaveFiller::GetEFPnts
 //=======================================================================
   void BOPAlgo_PaveFiller::PutEFPavesOnCurve
   (BOPDS_Curve& aNC,
-   const TColStd_MapOfInteger& aMI,
-   const TColStd_MapOfInteger& aMVEF,
-   TColStd_DataMapOfIntegerReal& aMVTol,
-   TColStd_DataMapOfIntegerListOfInteger& aDMVLV)
+   const BOPCol_MapOfInteger& aMI,
+   const BOPCol_MapOfInteger& aMVEF,
+   BOPCol_DataMapOfIntegerReal& aMVTol,
+   BOPCol_DataMapOfIntegerListOfInteger& aDMVLV)
 {
   if (!aMVEF.Extent()) {
     return;
@@ -1890,7 +1809,7 @@ void BOPAlgo_PaveFiller::GetEFPnts
   }
   //
   Standard_Integer nV;
-  TColStd_MapOfInteger aMV;
+  BOPCol_MapOfInteger aMV;
   //
   aMV.Assign(aMVEF);
   RemoveUsedVertices(aNC, aMV);
@@ -1904,7 +1823,7 @@ void BOPAlgo_PaveFiller::GetEFPnts
   const Handle(Geom_Curve)& aC3D=aIC.Curve();
   GeomAPI_ProjectPointOnCurve& aProjPT = myContext->ProjPT(aC3D);
   //
-  TColStd_MapIteratorOfMapOfInteger aItMI;
+  BOPCol_MapIteratorOfMapOfInteger aItMI;
   aItMI.Initialize(aMV);
   for (; aItMI.More(); aItMI.Next()) {
     nV = aItMI.Value();
@@ -1920,27 +1839,19 @@ void BOPAlgo_PaveFiller::GetEFPnts
 }
 
 //=======================================================================
-//function : PutStickPavesOnCurve
+//function : ProcessUnUsedVertices
 //purpose  : 
 //=======================================================================
   void BOPAlgo_PaveFiller::PutStickPavesOnCurve
   (const TopoDS_Face& aF1,
    const TopoDS_Face& aF2,
-   const TColStd_MapOfInteger& aMI,
+   const BOPCol_MapOfInteger& aMI,
    BOPDS_Curve& aNC,
-   const TColStd_MapOfInteger& aMVStick,
-   TColStd_DataMapOfIntegerReal& aMVTol,
-   TColStd_DataMapOfIntegerListOfInteger& aDMVLV)
+   const BOPCol_MapOfInteger& aMVStick,
+   BOPCol_DataMapOfIntegerReal& aMVTol,
+   BOPCol_DataMapOfIntegerListOfInteger& aDMVLV)
 {
-  // Get numbers of vertices assigned to the ends of the curve
-  Standard_Integer aBndNV[2];
-  getBoundPaves(myDS, aNC, aBndNV);
-  if (aBndNV[0] >= 0 && aBndNV[1] >= 0)
-  {
-    // both curve ends already have assigned vertices
-    return;
-  }
-  TColStd_MapOfInteger aMV;
+  BOPCol_MapOfInteger aMV;
   aMV.Assign(aMVStick);
   RemoveUsedVertices(aNC, aMV);
   //
@@ -1963,7 +1874,7 @@ void BOPAlgo_PaveFiller::GetEFPnts
     gp_Pnt aPC[2], aPV;
     gp_Dir aDN[2];
     gp_Pnt2d aP2D;
-    TColStd_MapIteratorOfMapOfInteger aItMI, aItMI1;
+    BOPCol_MapIteratorOfMapOfInteger aItMI, aItMI1;
     //
     aDT2=2e-7;     // the rich criteria
     aDScPr=5.e-9;  // the creasing criteria
@@ -1976,8 +1887,6 @@ void BOPAlgo_PaveFiller::GetEFPnts
       aPV=BRep_Tool::Pnt(aV);
       //
       for (m=0; m<2; ++m) {
-        if (aBndNV[m] >= 0)
-          continue;
         aD2=aPC[m].SquareDistance(aPV);
         if (aD2>aDT2) {// no rich
           continue; 
@@ -2007,6 +1916,8 @@ void BOPAlgo_PaveFiller::GetEFPnts
       }
     }//for (jVU=1; jVU=aNbVU; ++jVU) {
   }
+  //}//if (aTypeC==GeomAbs_BezierCurve || aTypeC==GeomAbs_BSplineCurve) {
+  //}//if(aType1==GeomAbs_Torus  || aType2==GeomAbs_Torus) {
 }
 
 //=======================================================================
@@ -2015,9 +1926,9 @@ void BOPAlgo_PaveFiller::GetEFPnts
 //=======================================================================
 void BOPAlgo_PaveFiller::GetStickVertices(const Standard_Integer nF1,
                                           const Standard_Integer nF2,
-                                          TColStd_MapOfInteger& aMVStick,
-                                          TColStd_MapOfInteger& aMVEF,
-                                          TColStd_MapOfInteger& aMI)
+                                          BOPCol_MapOfInteger& aMVStick,
+                                          BOPCol_MapOfInteger& aMVEF,
+                                          BOPCol_MapOfInteger& aMI)
 {
   Standard_Integer nS1, nS2, nVNew, aTypeInt, i;
   //
@@ -2028,8 +1939,8 @@ void BOPAlgo_PaveFiller::GetStickVertices(const Standard_Integer nF1,
   BOPDS_VectorOfInterfEF& aEFs=myDS->InterfEF();
   //
   Standard_Integer aNbLines[5] = {
-    aVVs.Length(), aVEs.Length(), aEEs.Length(),
-    aVFs.Length(), aEFs.Length()
+    aVVs.Extent(), aVEs.Extent(), aEEs.Extent(),
+    aVFs.Extent(), aEFs.Extent()
     };
   //collect indices of all shapes from nF1 and nF2.
   aMI.Clear();
@@ -2071,13 +1982,13 @@ void BOPAlgo_PaveFiller::GetStickVertices(const Standard_Integer nF1,
 // purpose: 
 //=======================================================================
 void BOPAlgo_PaveFiller::GetFullShapeMap(const Standard_Integer nF,
-                                         TColStd_MapOfInteger& aMI)
+                                         BOPCol_MapOfInteger& aMI)
 {
-  TColStd_ListIteratorOfListOfInteger aIt;
+  BOPCol_ListIteratorOfListOfInteger aIt;
   Standard_Integer nS;
   //
   const BOPDS_ShapeInfo& aSI = myDS->ShapeInfo(nF);
-  const TColStd_ListOfInteger& aLI = aSI.SubShapes();
+  const BOPCol_ListOfInteger& aLI = aSI.SubShapes();
   //
   aMI.Add(nF);
   aIt.Initialize(aLI);
@@ -2092,7 +2003,7 @@ void BOPAlgo_PaveFiller::GetFullShapeMap(const Standard_Integer nF,
 // purpose: 
 //=======================================================================
 void BOPAlgo_PaveFiller::RemoveUsedVertices(BOPDS_Curve& aNC,
-                                            TColStd_MapOfInteger& aMV)
+                                            BOPCol_MapOfInteger& aMV)
 {
   if (!aMV.Extent()) {
     return;
@@ -2119,9 +2030,9 @@ void BOPAlgo_PaveFiller::PutPaveOnCurve
   (const Standard_Integer nV,
    const Standard_Real aTolR3D,
    const BOPDS_Curve& aNC,
-   const TColStd_MapOfInteger& aMI,
-   TColStd_DataMapOfIntegerReal& aMVTol,
-   TColStd_DataMapOfIntegerListOfInteger& aDMVLV,
+   const BOPCol_MapOfInteger& aMI,
+   BOPCol_DataMapOfIntegerReal& aMVTol,
+   BOPCol_DataMapOfIntegerListOfInteger& aDMVLV,
    const Standard_Integer iCheckExtend)
 {
   Standard_Boolean bIsVertexOnLine;
@@ -2153,9 +2064,9 @@ void BOPAlgo_PaveFiller::PutPaveOnCurve
     bExist = aPB->ContainsParameter(aT, aPTol, nVUsed);
     if (bExist) {
       // use existing pave
-      TColStd_ListOfInteger* pList = aDMVLV.ChangeSeek(nVUsed);
+      BOPCol_ListOfInteger* pList = aDMVLV.ChangeSeek(nVUsed);
       if (!pList) {
-        pList = aDMVLV.Bound(nVUsed, TColStd_ListOfInteger());
+        pList = aDMVLV.Bound(nVUsed, BOPCol_ListOfInteger());
         pList->Append(nVUsed);
         if (!aMVTol.IsBound(nVUsed)) {
           const TopoDS_Vertex& aVUsed = (*(TopoDS_Vertex *)(&myDS->Shape(nVUsed)));
@@ -2164,7 +2075,7 @@ void BOPAlgo_PaveFiller::PutPaveOnCurve
         }
       }
       // avoid repeated elements in the list
-      TColStd_ListIteratorOfListOfInteger aItLI(*pList);
+      BOPCol_ListIteratorOfListOfInteger aItLI(*pList);
       for (; aItLI.More(); aItLI.Next()) {
         if (aItLI.Value() == nV) {
           break;
@@ -2213,9 +2124,9 @@ void BOPAlgo_PaveFiller::PutPaveOnCurve
 void BOPAlgo_PaveFiller::ProcessExistingPaveBlocks
     (const Standard_Integer theInt,
      const BOPDS_IndexedMapOfPaveBlock& aMPBOnIn,
-     const TColStd_DataMapOfIntegerListOfInteger& aDMBV,
+     const BOPCol_DataMapOfIntegerListOfInteger& aDMBV,
      BOPDS_IndexedDataMapOfShapeCoupleOfPaveBlocks& aMSCPB,
-     TopTools_DataMapOfShapeInteger& aMVI,
+     BOPCol_DataMapOfShapeInteger& aMVI,
      BOPDS_MapOfPaveBlock& aMPB)
 {
   if (aDMBV.IsEmpty()) {
@@ -2224,8 +2135,8 @@ void BOPAlgo_PaveFiller::ProcessExistingPaveBlocks
   //
   Standard_Real aT, dummy;
   Standard_Integer i, nV, nE, iC, aNbPB, iFlag;
-  TColStd_ListIteratorOfListOfInteger aItLI;
-  TColStd_DataMapIteratorOfDataMapOfIntegerListOfInteger aItBV;
+  BOPCol_ListIteratorOfListOfInteger aItLI;
+  BOPCol_DataMapIteratorOfDataMapOfIntegerListOfInteger aItBV;
   //
   BOPDS_VectorOfInterfFF& aFFs = myDS->InterfFF();
   BOPDS_InterfFF& aFF = aFFs(theInt);
@@ -2236,7 +2147,7 @@ void BOPAlgo_PaveFiller::ProcessExistingPaveBlocks
   aItBV.Initialize(aDMBV);
   for (; aItBV.More(); aItBV.Next()) {
     iC = aItBV.Key();
-    const TColStd_ListOfInteger& aLBV = aItBV.Value();
+    const BOPCol_ListOfInteger& aLBV = aItBV.Value();
     //
     BOPDS_Curve& aNC = aVC.ChangeValue(iC);
     BOPDS_ListOfPaveBlock& aLPBC = aNC.ChangePaveBlocks();
@@ -2341,7 +2252,7 @@ void BOPAlgo_PaveFiller::UpdateExistingPaveBlocks
   if (bCB) {
     // Create new common blocks
     BOPDS_ListOfPaveBlock aLPBNew;
-    const TColStd_ListOfInteger& aFaces = aCB1->Faces();
+    const BOPCol_ListOfInteger& aFaces = aCB1->Faces();
     aIt.Initialize(aLPB);
     for (; aIt.More(); aIt.Next()) {
       const Handle(BOPDS_PaveBlock)& aPBValue = aIt.Value();
@@ -2486,74 +2397,54 @@ void BOPAlgo_PaveFiller::UpdateExistingPaveBlocks
 //=======================================================================
 void BOPAlgo_PaveFiller::PutClosingPaveOnCurve(BOPDS_Curve& aNC)
 {
-  const IntTools_Curve& aIC = aNC.Curve();
-  const Handle(Geom_Curve)& aC3D = aIC.Curve();
-  // check 3d curve
-  if (aC3D.IsNull())
+  Standard_Boolean bIsClosed, bHasBounds, bAdded;
+  Standard_Integer nVC, j;
+  Standard_Real aT[2], aTC, dT, aTx;
+  gp_Pnt aP[2] ; 
+  BOPDS_Pave aPVx;
+  BOPDS_ListIteratorOfListOfPave aItLP;
+  //
+  const IntTools_Curve& aIC=aNC.Curve();
+  const Handle(Geom_Curve)& aC3D=aIC.Curve();
+  if(aC3D.IsNull()) {
     return;
-
-  // check bounds
-  if (!aIC.HasBounds())
+  }
+  //
+  bIsClosed=IntTools_Tools::IsClosed(aC3D);
+  if (!bIsClosed) {
     return;
-
-  // check closeness
-  Standard_Real aT[2];
-  gp_Pnt aP[2];
-  aIC.Bounds(aT[0], aT[1], aP[0], aP[1]);
-
-  // Find the pave which has been put at one of the ends
-  Standard_Integer nV = -1;
-  // Keep the opposite parameter
-  Standard_Real aTOp = 0.;
-
-  Standard_Boolean bFound = Standard_False;
-
-  Handle(BOPDS_PaveBlock)& aPB = aNC.ChangePaveBlock1();
-  BOPDS_ListOfPave& aLP = aPB->ChangeExtPaves();
-  BOPDS_ListIteratorOfListOfPave aItLP(aLP);
-  for (; aItLP.More() && !bFound; aItLP.Next())
-  {
-    const BOPDS_Pave& aPC = aItLP.Value();
-    Standard_Real aTC = aPC.Parameter();
-    for (Standard_Integer j = 0; j < 2; ++j)
-    {
-      if (Abs(aTC - aT[j]) < Precision::PConfusion())
-      {
-        nV = aPC.Index();
-        aTOp = (!j) ? aT[1] : aT[0];
-        bFound = Standard_True;
+  }
+  //
+  bHasBounds=aIC.HasBounds ();
+  if (!bHasBounds){
+    return;
+  }
+  // 
+  bAdded=Standard_False;
+  dT=Precision::PConfusion();
+  aIC.Bounds (aT[0], aT[1], aP[0], aP[1]);
+  //
+  Handle(BOPDS_PaveBlock)& aPB=aNC.ChangePaveBlock1();
+  BOPDS_ListOfPave& aLP=aPB->ChangeExtPaves();
+  //
+  aItLP.Initialize(aLP);
+  for (; aItLP.More() && !bAdded; aItLP.Next()) {
+    const BOPDS_Pave& aPC=aItLP.Value();
+    nVC=aPC.Index();
+    aTC=aPC.Parameter();
+    //
+    for (j=0; j<2; ++j) {
+      if (fabs(aTC-aT[j]) < dT) {
+        aTx=(!j) ? aT[1] : aT[0];
+        aPVx.SetIndex(nVC);
+        aPVx.SetParameter(aTx);
+        aLP.Append(aPVx);
+        //
+        bAdded=Standard_True;
         break;
       }
     }
   }
-
-  if (!bFound)
-    return;
-
-  // Check if the curve is closed using the tolerance
-  // of found vertex
-  const TopoDS_Vertex& aV = TopoDS::Vertex(myDS->Shape(nV));
-  const Standard_Real aTolV = BRep_Tool::Tolerance(aV);
-
-  Standard_Real aDist = aP[0].Distance(aP[1]);
-  if (aDist > aTolV)
-    return;
-
-  // Check if there will be valid range on the curve
-  Standard_Real aFirst, aLast;
-  if (!BRepLib::FindValidRange(GeomAdaptor_Curve(aIC.Curve()), aIC.Tolerance(),
-                               aT[0], aP[0], aTolV,
-                               aT[1], aP[1], aTolV,
-                               aFirst, aLast))
-  {
-    return;
-  }
-
-  // Add closing pave to the curve
-  BOPDS_Pave aPave;
-  aPave.SetIndex(nV);
-  aPave.SetParameter(aTOp);
-  aLP.Append(aPave);
 }
 //=======================================================================
 //function : PreparePostTreatFF
@@ -2564,7 +2455,7 @@ void BOPAlgo_PaveFiller::PreparePostTreatFF
      const Standard_Integer aCur,
      const Handle(BOPDS_PaveBlock)& aPB,
      BOPDS_IndexedDataMapOfShapeCoupleOfPaveBlocks& aMSCPB,
-     TopTools_DataMapOfShapeInteger& aMVI,
+     BOPCol_DataMapOfShapeInteger& aMVI,
      BOPDS_ListOfPaveBlock& aLPBC)
 {
   Standard_Integer nV1, nV2;
@@ -2596,19 +2487,19 @@ Standard_Boolean BOPAlgo_PaveFiller::CheckPlanes
 {
   Standard_Boolean bToIntersect;
   Standard_Integer i, nV2, iCnt;
-  TColStd_MapIteratorOfMapOfInteger aIt;
+  BOPCol_MapIteratorOfMapOfInteger aIt;
   //
   bToIntersect=Standard_False;
   //
   const BOPDS_FaceInfo& aFI1=myDS->ChangeFaceInfo(nF1);
   const BOPDS_FaceInfo& aFI2=myDS->ChangeFaceInfo(nF2);
   //
-  const TColStd_MapOfInteger& aMVIn1=aFI1.VerticesIn();
-  const TColStd_MapOfInteger& aMVOn1=aFI1.VerticesOn();
+  const BOPCol_MapOfInteger& aMVIn1=aFI1.VerticesIn();
+  const BOPCol_MapOfInteger& aMVOn1=aFI1.VerticesOn();
   //
   iCnt=0;
   for (i=0; (i<2 && !bToIntersect); ++i) {
-    const TColStd_MapOfInteger& aMV2=(!i) ? aFI2.VerticesIn() 
+    const BOPCol_MapOfInteger& aMV2=(!i) ? aFI2.VerticesIn() 
       : aFI2.VerticesOn();
     //
     aIt.Initialize(aMV2);
@@ -2631,7 +2522,7 @@ Standard_Boolean BOPAlgo_PaveFiller::CheckPlanes
 //purpose  : 
 //=======================================================================
 void BOPAlgo_PaveFiller::UpdatePaveBlocks
-(const TColStd_DataMapOfIntegerInteger& aDMNewSD)
+(const BOPCol_DataMapOfIntegerInteger& aDMNewSD)
 {
   if (aDMNewSD.IsEmpty()) {
     return;
@@ -2642,18 +2533,18 @@ void BOPAlgo_PaveFiller::UpdatePaveBlocks
   Standard_Boolean bCB, bRebuild;
   BOPDS_ListIteratorOfListOfPaveBlock aItPB;
   BOPDS_MapOfPaveBlock aMPB;
-  TColStd_MapOfInteger aMicroEdges;
+  BOPCol_MapOfInteger aMicroEdges;
   //
   BOPDS_ListOfPaveBlock anAllPBs;
 
   // Get pave blocks of section edges
   BOPDS_VectorOfInterfFF& aFFs = myDS->InterfFF();
-  Standard_Integer aNbFF = aFFs.Length();
+  Standard_Integer aNbFF = aFFs.Extent();
   for (i = 0; i < aNbFF; ++i)
   {
     const BOPDS_InterfFF& aFF = aFFs(i);
     const BOPDS_VectorOfCurve& aVNC = aFF.Curves();
-    Standard_Integer aNbC = aVNC.Length();
+    Standard_Integer aNbC = aVNC.Extent();
     for (j = 0; j < aNbC; ++j)
     {
       const BOPDS_Curve& aNC = aVNC(j);
@@ -2666,7 +2557,7 @@ void BOPAlgo_PaveFiller::UpdatePaveBlocks
 
   // Get pave blocks from the pool
   BOPDS_VectorOfListOfPaveBlock& aPBP = myDS->ChangePaveBlocksPool();
-  aNbPBP = aPBP.Length();
+  aNbPBP = aPBP.Extent();
   for (i = 0; i < aNbPBP; ++i) {
     BOPDS_ListOfPaveBlock& aLPB = aPBP(i);
     aItPB.Initialize(aLPB);
@@ -2721,9 +2612,11 @@ void BOPAlgo_PaveFiller::UpdatePaveBlocks
         if (wasRegularEdge && !isDegEdge && nV[0] == nV[1]) {
           // now edge has the same vertex on both ends;
           // check if it is not a regular closed curve.
-          FillShrunkData(aPB);
-          if (!aPB->HasShrunkData())
-          {
+          const TopoDS_Edge& aE = TopoDS::Edge(myDS->Shape(nE));
+          const TopoDS_Vertex& aV = TopoDS::Vertex(myDS->Shape(nV[0]));
+          Standard_Real aLength = IntTools::Length(aE);
+          Standard_Real aTolV = BRep_Tool::Tolerance(aV);
+          if (aLength <= aTolV * 2.) {
             // micro edge, so mark it for removal
             aMicroEdges.Add(nE);
             continue;
@@ -2746,13 +2639,13 @@ void BOPAlgo_PaveFiller::UpdatePaveBlocks
 //function : RemovePaveBlocks
 //purpose  : 
 //=======================================================================
-void BOPAlgo_PaveFiller::RemovePaveBlocks(const TColStd_MapOfInteger theEdges)
+void BOPAlgo_PaveFiller::RemovePaveBlocks(const BOPCol_MapOfInteger theEdges)
 {
   // Remove all pave blocks referring to input edges:
   //
   // 1. from the Pave Blocks Pool
   BOPDS_VectorOfListOfPaveBlock& aPBP = myDS->ChangePaveBlocksPool();
-  Standard_Integer aNbPBP = aPBP.Length(), i;
+  Standard_Integer aNbPBP = aPBP.Extent(), i;
   for (i = 0; i < aNbPBP; ++i) {
     BOPDS_ListOfPaveBlock& aLPB = aPBP(i);
     //
@@ -2767,9 +2660,9 @@ void BOPAlgo_PaveFiller::RemovePaveBlocks(const TColStd_MapOfInteger theEdges)
   }
 
   // 2. from Face Info and section curves
-  TColStd_MapOfInteger aMPassed;
+  BOPCol_MapOfInteger aMPassed;
   BOPDS_VectorOfInterfFF& aFFs = myDS->InterfFF();
-  Standard_Integer aNbFF = aFFs.Length(), j;
+  Standard_Integer aNbFF = aFFs.Extent(), j;
   for (i = 0; i < aNbFF; ++i) {
     BOPDS_InterfFF& aFF = aFFs(i);
     Standard_Integer nF1, nF2;
@@ -2803,7 +2696,7 @@ void BOPAlgo_PaveFiller::RemovePaveBlocks(const TColStd_MapOfInteger theEdges)
     }
     // remove from Section pave blocks
     BOPDS_VectorOfCurve& aVNC = aFF.ChangeCurves();
-    Standard_Integer aNbC = aVNC.Length();
+    Standard_Integer aNbC = aVNC.Extent();
     for (j = 0; j < aNbC; ++j) {
       BOPDS_Curve& aNC = aVNC(j);
       BOPDS_ListOfPaveBlock& aLPB = aNC.ChangePaveBlocks();
@@ -2861,7 +2754,7 @@ void BOPAlgo_PaveFiller::UpdateBlocksWithSharedVertices()
   Standard_Integer aNbFF;
   //
   BOPDS_VectorOfInterfFF& aFFs=myDS->InterfFF();
-  aNbFF=aFFs.Length();
+  aNbFF=aFFs.Extent();
   if (!aNbFF) {
     return;
   }
@@ -2869,13 +2762,13 @@ void BOPAlgo_PaveFiller::UpdateBlocksWithSharedVertices()
   Standard_Boolean bOnCurve, bHasShapeSD;
   Standard_Integer i, nF1, nF2, aNbC, j, nV, nVSD;
   Standard_Real aTolV;
-  TColStd_MapOfInteger aMF;
+  BOPCol_MapOfInteger aMF;
   //
   for (i=0; i<aNbFF; ++i) {
     BOPDS_InterfFF& aFF=aFFs(i);
     //
     BOPDS_VectorOfCurve& aVC=aFF.ChangeCurves();
-    aNbC=aVC.Length();
+    aNbC=aVC.Extent();
     if (!aNbC) {
       continue;
     }
@@ -2890,19 +2783,19 @@ void BOPAlgo_PaveFiller::UpdateBlocksWithSharedVertices()
     }
     //
     // Collect old vertices that are shared for nF1, nF2 ->aMI;
-    TColStd_MapOfInteger aMI;
-    TColStd_MapIteratorOfMapOfInteger aItMI;
+    BOPCol_MapOfInteger aMI;
+    BOPCol_MapIteratorOfMapOfInteger aItMI;
     //
     BOPDS_FaceInfo& aFI1=myDS->ChangeFaceInfo(nF1);
     BOPDS_FaceInfo& aFI2=myDS->ChangeFaceInfo(nF2);
     //
-    const TColStd_MapOfInteger& aMVOn1=aFI1.VerticesOn();
-    const TColStd_MapOfInteger& aMVIn1=aFI1.VerticesIn();
-    const TColStd_MapOfInteger& aMVOn2=aFI2.VerticesOn();
-    const TColStd_MapOfInteger& aMVIn2=aFI2.VerticesIn();
+    const BOPCol_MapOfInteger& aMVOn1=aFI1.VerticesOn();
+    const BOPCol_MapOfInteger& aMVIn1=aFI1.VerticesIn();
+    const BOPCol_MapOfInteger& aMVOn2=aFI2.VerticesOn();
+    const BOPCol_MapOfInteger& aMVIn2=aFI2.VerticesIn();
     //
     for (j=0; j<2; ++j) {
-      const TColStd_MapOfInteger& aMV1=(!j) ? aMVOn1 : aMVIn1;
+      const BOPCol_MapOfInteger& aMV1=(!j) ? aMVOn1 : aMVIn1;
       aItMI.Initialize(aMV1);
       for (; aItMI.More(); aItMI.Next()) {
         nV=aItMI.Value();
@@ -2971,17 +2864,17 @@ void BOPAlgo_PaveFiller::CorrectToleranceOfSE()
 {
   BOPDS_VectorOfInterfFF& aFFs = myDS->InterfFF();
   NCollection_IndexedDataMap<Standard_Integer,BOPDS_ListOfPaveBlock> aMVIPBs;
-  TColStd_MapOfInteger aMVIToReduce;
+  BOPCol_MapOfInteger aMVIToReduce;
   // Fence map to avoid repeated checking of the same edge
   BOPDS_MapOfPaveBlock aMPB;
   //
   // 1. iterate on all sections F-F
-  Standard_Integer aNb = aFFs.Length(), i;
+  Standard_Integer aNb = aFFs.Extent(), i;
   for (i = 0; i < aNb; ++i) {
     BOPDS_InterfFF& aFF = aFFs(i);
     //
     BOPDS_VectorOfCurve& aVNC = aFF.ChangeCurves();
-    Standard_Integer aNbC = aVNC.Length(), k;
+    Standard_Integer aNbC = aVNC.Extent(), k;
     for (k = 0; k < aNbC; ++k) {
       BOPDS_Curve& aNC = aVNC(k);
       BOPDS_ListOfPaveBlock& aLPB = aNC.ChangePaveBlocks();
@@ -3049,9 +2942,9 @@ void BOPAlgo_PaveFiller::CorrectToleranceOfSE()
   //     reducing the tolerance to the value less than the tolerances of edges,
   //     i.e. minimal tolerance for the vertex is the max tolerance of the
   //     edges containing this vertex
-  TColStd_DataMapOfIntegerReal aMVITol;
+  BOPCol_DataMapOfIntegerReal aMVITol;
   BOPDS_VectorOfListOfPaveBlock& aPBP = myDS->ChangePaveBlocksPool();
-  aNb = aPBP.Length();
+  aNb = aPBP.Extent();
   for (i = 0; i < aNb; ++i) {
     const BOPDS_ListOfPaveBlock& aLPB = aPBP(i);
     BOPDS_ListIteratorOfListOfPaveBlock aItLPB(aLPB);
@@ -3150,11 +3043,11 @@ void BOPAlgo_PaveFiller::PutSEInOtherFaces()
   BOPDS_IndexedMapOfPaveBlock aMPBScAll;
   //
   BOPDS_VectorOfInterfFF& aFFs = myDS->InterfFF();
-  Standard_Integer i, j, aNbFF = aFFs.Length();
+  Standard_Integer i, j, aNbFF = aFFs.Extent();
   //
   for (i = 0; i < aNbFF; ++i) {
     const BOPDS_VectorOfCurve& aVNC = aFFs(i).Curves();
-    Standard_Integer aNbC = aVNC.Length();
+    Standard_Integer aNbC = aVNC.Extent();
     for (j = 0; j < aNbC; ++j) {
       const BOPDS_ListOfPaveBlock& aLPBC = aVNC(j).PaveBlocks();
       BOPDS_ListIteratorOfListOfPaveBlock aItPB(aLPBC);
@@ -3184,7 +3077,7 @@ void BOPAlgo_PaveFiller::PutSEInOtherFaces()
     //
     // Get vertices of the face to check that vertices of the
     // processed section edge belong to the face
-    TColStd_MapOfInteger aMFVerts;
+    BOPCol_MapOfInteger aMFVerts;
     // Get vertices from ON, IN and Sc pave blocks of the face
     for (j = 0; j < 3; ++j) {
       const BOPDS_IndexedMapOfPaveBlock& aMPB =
@@ -3198,9 +3091,9 @@ void BOPAlgo_PaveFiller::PutSEInOtherFaces()
     }
     // Add ON, IN and Sc vertices of the face
     for (j = 0; j < 3; ++j) {
-      const TColStd_MapOfInteger& aMFV = !j ? aFI.VerticesOn() :
+      const BOPCol_MapOfInteger& aMFV = !j ? aFI.VerticesOn() :
         (j == 1 ? aFI.VerticesIn() : aFI.VerticesSc());
-      TColStd_MapIteratorOfMapOfInteger aItMI(aMFV);
+      BOPCol_MapIteratorOfMapOfInteger aItMI(aMFV);
       for (; aItMI.More(); aItMI.Next()) {
         aMFVerts.Add(aItMI.Value());
       }
@@ -3248,80 +3141,4 @@ void BOPAlgo_PaveFiller::PutSEInOtherFaces()
       }
     }
   }
-}
-
-//=======================================================================
-//function : RemoveMicroSectionEdges
-//purpose  : 
-//=======================================================================
-void BOPAlgo_PaveFiller::RemoveMicroSectionEdges
-  (BOPDS_IndexedDataMapOfShapeCoupleOfPaveBlocks& theMSCPB,
-   TopTools_IndexedMapOfShape& theMicroEdges)
-{
-  if (theMSCPB.IsEmpty())
-    // no section edges
-    return;
-
-  // Get all F/F interferences
-  BOPDS_VectorOfInterfFF& aFFs = myDS->InterfFF();
-
-  // Build the new map of section edges avoiding the micro edges
-  BOPDS_IndexedDataMapOfShapeCoupleOfPaveBlocks aSEPBMap;
-  // Analyze all section edges
-  Standard_Integer aNbCPB = theMSCPB.Extent();
-  for (Standard_Integer i = 1; i <= aNbCPB; ++i)
-  {
-    const TopoDS_Shape& aSI = theMSCPB.FindKey(i);
-    const BOPDS_CoupleOfPaveBlocks& aCPB = theMSCPB(i);
-
-    if (aSI.ShapeType() != TopAbs_EDGE)
-    {
-      // Not an edge
-      aSEPBMap.Add(aSI, aCPB);
-      continue;
-    }
-
-    // Get pave block for analysis
-    const Handle(BOPDS_PaveBlock)& aPB = aCPB.PaveBlock1();
-    if (aPB->HasEdge())
-    {
-      // Not a real section edge
-      aSEPBMap.Add(aSI, aCPB);
-      continue;
-    }
-
-    if (!BOPTools_AlgoTools::IsMicroEdge(TopoDS::Edge(aSI), myContext, Standard_False))
-    {
-      // Normal edge
-      aSEPBMap.Add(aSI, aCPB);
-      continue;
-    }
-
-    // Micro edge is found, avoid it in the <theMSCPB> map
-    // and remove from the F/F Intersection info structure
-
-    // Get F/F interference which created this micro edge
-    BOPDS_InterfFF& aFF = aFFs(aCPB.IndexInterf());
-    // Get curve from which this edge has been created
-    BOPDS_Curve& aCurve = aFF.ChangeCurves().ChangeValue(aCPB.Index());
-    // Get all section pave blocks created from this curve
-    BOPDS_ListOfPaveBlock& aLPBC = aCurve.ChangePaveBlocks();
-    // Remove pave block from the list
-    for (BOPDS_ListIteratorOfListOfPaveBlock it(aLPBC); it.More(); it.Next())
-    {
-      if (it.Value() == aPB)
-      {
-        aLPBC.Remove(it);
-        break;
-      }
-    }
-
-    // Add the "micro" edge to the map of "micro" edges for
-    // unification of its vertices in the PostTreatFF method
-    theMicroEdges.Add(aSI);
-  }
-
-  // Overwrite the old map if necessary
-  if (aSEPBMap.Extent() != theMSCPB.Extent())
-    theMSCPB = aSEPBMap;
 }

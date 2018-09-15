@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="occ_logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -70,33 +70,23 @@ $(document).ready(function(){initNavTree('samples_qml_android_occt.html','');});
 <li>Android SDK from 2014.07.02 or newer</li>
 <li>Android NDK r9d or newer</li>
 <li>Apache Ant 1.9.4 or higher</li>
-<li>OCCT compiled under Android platform and placed in directories:<ul>
-<li>occt/libs/armeabi-v7a/*.so and occt/inc/*.hxx (libraries and include files of OCCT install)</li>
-<li>android/assets/opencascade/shared/Shaders/* (Shaders folder of OCCT install: /share/opencascade/resources/Shaders)</li>
-<li>3rdparty/include/freetype2/*, 3rdparty/include/FreeImage.h and 3rdparty/libs/armeabi-v7a/libFreeImage.so and 3rdparty/libs/armeabi-v7a/libfreetype.so</li>
 </ul>
-</li>
-</ul>
-<p>It is also possible to to correct OCCT.pri file an get resources from another tree of directories.</p>
-<p>When AndroidQt will be started, it may be helpful to have some default data files(BRep) on Device for opening in AndroidQt. Copy these files into "android\assets\opencascade\shared" and it will be installed to device during compilation procedure.</p>
-<p>Having prepared all these products, configure AndroidQt project for building sample:</p>
+<p>Configure project for building sample:</p>
 <p>In QtCreator, open AndroidQt.pro project-file: </p><div class="fragment"><div class="line">File -&gt; Open file or Project... </div></div><!-- fragment --><p>Specify Android configurations: </p><div class="fragment"><div class="line">Tools-&gt;Options-&gt;Android</div></div><!-- fragment --><ul>
 <li>In JDK location specify path to Java Development Kit</li>
 <li>In Android SDK location specify path to Android SDK</li>
-<li>In Android NDK location specify path to Android NDK (During this location definition, warning is possible and OK: "Qt version for architecture mips is missing. To add the Qt version, select Options &gt; Build &amp; Run &gt; Qt Versins.")</li>
+<li>In Android NDK location specify path to Android NDK</li>
 <li>In Ant executable specify path to ant.bat file located in Apache Ant bin directory</li>
 </ul>
-<p>Make sure that "Android for armeabi-v7a" kit has been detected (present in the list). </p><div class="fragment"><div class="line">Tools-&gt;Options-&gt;Build &amp; Run</div></div><!-- fragment --><p>also or it can be checked or corrected in: </p><div class="fragment"><div class="line">Projects-&gt;Android for armeabi-v7a option should be checked</div></div><!-- fragment --><p>Switch On device, connect it to PC and define it in Qt Creator: </p><div class="fragment"><div class="line">Projects-&gt;Manage Kits...-&gt;Devices-&gt;Device: Run on Android</div></div><!-- fragment --><p> Check that "Current state" is "Ready to use" on this page.</p>
-<div class="fragment"><div class="line">Projects-&gt;Build Settings-&gt;General: Shadow build is switched OFF</div></div><!-- fragment --><p>Start configuration:</p>
-<div class="fragment"><div class="line">Call Build -&gt; Run qmake</div></div><!-- fragment --><p> Check content of "Compile Output" view.</p>
-<p>In order to perform qmake correctly, for example if you have the following error: </p><div class="fragment"><div class="line">Running steps for project AndroidQt...</div><div class="line">Could not start process &quot;&lt;qt_dir&gt;\android_armv7\bin\qmake.exe&quot; &lt;occt_dir&gt;\samples\qt\AndroidQt\AndroidQt.pro -r -spec android-g++ &quot;CONFIG+=debug&quot; &quot;CONFIG+=declarative_debug&quot; &quot;CONFIG+=qml_debug&quot;</div><div class="line">Error while building/deploying project AndroidQt (kit: Android for armeabi-v7a (GCC 4.9, Qt 5.3.2))</div><div class="line">When executing step &quot;qmake&quot;</div></div><!-- fragment --><div class="fragment"><div class="line">Projects-&gt;Build Settings-&gt;General: switch OFF Shadow build</div><div class="line">Build-&gt;Build Project &quot;Android Qt&quot;</div><div class="line">Build-&gt;Run</div></div><!-- fragment --><p>Dialog to "Select Android Device" is shown. Select Compatible Device, Ok. In case of any error, see log in "Application Output" view.</p>
-<p>After successful build the application can be deployed to device or emulator. </p>
+<p>Make sure that "Android for armeabi-v7a" kit has been detected </p><div class="fragment"><div class="line">Tools-&gt;Options-&gt;Build &amp; Run</div></div><!-- fragment --><p>The paths to OCCT and 3rdparty libraries are specified in "OCCT.pri" file:</p>
+<p>the paths to the headers: </p><div class="fragment"><div class="line">INCLUDEPATH += /occt/inc /3rdparty/include</div><div class="line">DEPENDPATH  += /occt/inc /3rdparty/include</div></div><!-- fragment --><p>the libraries location: </p><div class="fragment"><div class="line">LIBS += -L/occt/libs/armeabi-v7a</div></div><!-- fragment --><p>OCCT resources (Shaders, SHMessage, StdResource, TObj, <a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_units_a_p_i.html">UnitsAPI</a> and XSMessage folder) should be copied to androidqt_dir/android/assets/opencascade/shared/ directory. Current sample requires at least Shaders folder.</p>
+<p>Select build configuration: Debug or Release and click Build-&gt;Build Project "AndroidQt" or (Ctrl + B). After successful build the application can be deployed to device or emulator. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sat May 26 2018 14:12:04 for Open CASCADE Technology by
+    <li class="footer">Generated on Wed Aug 30 2017 17:08:49 for Open CASCADE Technology by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

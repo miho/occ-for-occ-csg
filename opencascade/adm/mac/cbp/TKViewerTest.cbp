@@ -58,7 +58,7 @@
 			<Add option="-framework Tcl" />
 			<Add option="-framework Tk" />
 			<Add option="-framework OpenGL" />
-			<Add option="-framework AppKit" />
+			<Add option="-framework Appkit" />
 			<Add option="-framework IOKit" />
 			<Add library="objc" />
 			<Add library="freetype" />

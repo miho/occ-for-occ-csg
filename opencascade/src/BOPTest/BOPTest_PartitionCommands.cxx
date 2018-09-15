@@ -22,7 +22,6 @@
 #include <BOPTest.hxx>
 #include <BOPTest_DrawableShape.hxx>
 #include <BOPTest_Objects.hxx>
-#include <BRepTest_Objects.hxx>
 #include <DBRep.hxx>
 #include <Draw.hxx>
 #include <Draw_Color.hxx>
@@ -73,9 +72,9 @@ Standard_Integer bfillds(Draw_Interpretor& di,
   Standard_Boolean bRunParallel, bNonDestructive, bShowTime;
   Standard_Integer i, aNbS;
   Standard_Real aTol;
-  TopTools_ListIteratorOfListOfShape aIt;
-  TopTools_ListOfShape aLC;
-  TopTools_ListOfShape& aLS=BOPTest_Objects::Shapes();
+  BOPCol_ListIteratorOfListOfShape aIt;
+  BOPCol_ListOfShape aLC;
+  BOPCol_ListOfShape& aLS=BOPTest_Objects::Shapes();
   aNbS=aLS.Extent();
   if (!aNbS) {
     di << " no objects to process\n";
@@ -95,7 +94,7 @@ Standard_Integer bfillds(Draw_Interpretor& di,
     }
   }
   //
-  TopTools_ListOfShape& aLT=BOPTest_Objects::Tools();
+  BOPCol_ListOfShape& aLT=BOPTest_Objects::Tools();
   //
   aIt.Initialize(aLS);
   for (; aIt.More(); aIt.Next()) {
@@ -116,13 +115,12 @@ Standard_Integer bfillds(Draw_Interpretor& di,
   aPF.SetNonDestructive(bNonDestructive);
   aPF.SetFuzzyValue(aTol);
   aPF.SetGlue(aGlue);
-  aPF.SetUseOBB(BOPTest_Objects::UseOBB());
   //
   OSD_Timer aTimer;
   aTimer.Start();
   //
   aPF.Perform();
-  BOPTest::ReportAlerts(aPF.GetReport());
+  BOPTest::ReportAlerts(aPF);
   if (aPF.HasErrors()) {
     return 0;
   }
@@ -160,7 +158,7 @@ Standard_Integer bbuild(Draw_Interpretor& di,
   Standard_Boolean bRunParallel, bShowTime;
   Standard_Integer i;
 
-  TopTools_ListIteratorOfListOfShape aIt;
+  BOPCol_ListIteratorOfListOfShape aIt;
   //
   BOPAlgo_PaveFiller& aPF=BOPTest_Objects::PaveFiller();
   //
@@ -168,14 +166,14 @@ Standard_Integer bbuild(Draw_Interpretor& di,
   BOPAlgo_Builder& aBuilder=BOPTest_Objects::Builder();
   aBuilder.Clear();
   //
-  TopTools_ListOfShape& aLSObj=BOPTest_Objects::Shapes();
+  BOPCol_ListOfShape& aLSObj=BOPTest_Objects::Shapes();
   aIt.Initialize(aLSObj);
   for (; aIt.More(); aIt.Next()) {
     const TopoDS_Shape& aS=aIt.Value();
     aBuilder.AddArgument(aS);
   }
   //
-  TopTools_ListOfShape& aLSTool=BOPTest_Objects::Tools();
+  BOPCol_ListOfShape& aLSTool=BOPTest_Objects::Tools();
   aIt.Initialize(aLSTool);
   for (; aIt.More(); aIt.Next()) {
     const TopoDS_Shape& aS=aIt.Value();
@@ -190,18 +188,13 @@ Standard_Integer bbuild(Draw_Interpretor& di,
     }
   }
   aBuilder.SetRunParallel(bRunParallel);
-  aBuilder.SetCheckInverted(BOPTest_Objects::CheckInverted());
   //
   //
   OSD_Timer aTimer;
   aTimer.Start();
   //
   aBuilder.PerformWithFiller(aPF); 
-  BOPTest::ReportAlerts(aBuilder.GetReport());
-
-  // Set history of GF operation into the session
-  BRepTest_Objects::SetHistory(aPF.Arguments(), aBuilder);
-
+  BOPTest::ReportAlerts(aBuilder);
   if (aBuilder.HasErrors()) {
     return 0;
   }
@@ -246,7 +239,7 @@ Standard_Integer bbop(Draw_Interpretor& di,
   Standard_Boolean bRunParallel, bShowTime;
   Standard_Integer iOp, i;
   BOPAlgo_Operation aOp;
-  TopTools_ListIteratorOfListOfShape aIt; 
+  BOPCol_ListIteratorOfListOfShape aIt; 
   //
   iOp=Draw::Atoi(a[2]);
   if (iOp<0 || iOp>4) {
@@ -276,7 +269,7 @@ Standard_Integer bbop(Draw_Interpretor& di,
   //
   pBuilder->Clear();
   //
-  TopTools_ListOfShape& aLSObj=BOPTest_Objects::Shapes();
+  BOPCol_ListOfShape& aLSObj=BOPTest_Objects::Shapes();
   aIt.Initialize(aLSObj);
   for (; aIt.More(); aIt.Next()) {
     const TopoDS_Shape& aS=aIt.Value();
@@ -286,7 +279,7 @@ Standard_Integer bbop(Draw_Interpretor& di,
   if (aOp!=BOPAlgo_SECTION) {
     BOPAlgo_BOP *pBOP=(BOPAlgo_BOP *)pBuilder;
     //
-    TopTools_ListOfShape& aLSTools=BOPTest_Objects::Tools();
+    BOPCol_ListOfShape& aLSTools=BOPTest_Objects::Tools();
     aIt.Initialize(aLSTools);
     for (; aIt.More(); aIt.Next()) {
       const TopoDS_Shape& aS=aIt.Value();
@@ -296,7 +289,7 @@ Standard_Integer bbop(Draw_Interpretor& di,
     pBOP->SetOperation(aOp);
   }
   else {
-    TopTools_ListOfShape& aLSTools=BOPTest_Objects::Tools();
+    BOPCol_ListOfShape& aLSTools=BOPTest_Objects::Tools();
     aIt.Initialize(aLSTools);
     for (; aIt.More(); aIt.Next()) {
       const TopoDS_Shape& aS=aIt.Value();
@@ -305,17 +298,12 @@ Standard_Integer bbop(Draw_Interpretor& di,
   }
   //
   pBuilder->SetRunParallel(bRunParallel);
-  pBuilder->SetCheckInverted(BOPTest_Objects::CheckInverted());
   //
   OSD_Timer aTimer;
   aTimer.Start();
   //
   pBuilder->PerformWithFiller(aPF);
-  BOPTest::ReportAlerts(pBuilder->GetReport());
-
-  // Set history of Boolean operation into the session
-  BRepTest_Objects::SetHistory(aPF.Arguments(), *pBuilder);
-
+  BOPTest::ReportAlerts(*pBuilder);
   if (pBuilder->HasErrors()) {
     return 0;
   }
@@ -364,18 +352,17 @@ Standard_Integer bsplit(Draw_Interpretor& di,
   pSplitter->Clear();
   //
   // set objects
-  const TopTools_ListOfShape& aLSObjects = BOPTest_Objects::Shapes();
+  const BOPCol_ListOfShape& aLSObjects = BOPTest_Objects::Shapes();
   pSplitter->SetArguments(aLSObjects);
   //
   // set tools
-  TopTools_ListOfShape& aLSTools = BOPTest_Objects::Tools();
+  BOPCol_ListOfShape& aLSTools = BOPTest_Objects::Tools();
   pSplitter->SetTools(aLSTools);
   //
   // set options
   pSplitter->SetRunParallel(BOPTest_Objects::RunParallel());
   pSplitter->SetNonDestructive(BOPTest_Objects::NonDestructive());
   pSplitter->SetFuzzyValue(BOPTest_Objects::FuzzyValue());
-  pSplitter->SetCheckInverted(BOPTest_Objects::CheckInverted());
   //
   // measure the time of the operation
   OSD_Timer aTimer;
@@ -385,11 +372,7 @@ Standard_Integer bsplit(Draw_Interpretor& di,
   pSplitter->PerformWithFiller(aPF);
   //
   aTimer.Stop();
-  BOPTest::ReportAlerts(pSplitter->GetReport());
-
-  // Set history of Split operation into the session
-  BRepTest_Objects::SetHistory(aPF.Arguments(), *pSplitter);
-
+  BOPTest::ReportAlerts(*pSplitter);
   if (pSplitter->HasErrors()) {
     return 0;
   }
@@ -401,7 +384,7 @@ Standard_Integer bsplit(Draw_Interpretor& di,
     di << buf;
   }
   //
-  // Debug commands support
+  // DRAW history support
   BOPTest_Objects::SetBuilder(pSplitter);
   //
   const TopoDS_Shape& aR = pSplitter->Shape();

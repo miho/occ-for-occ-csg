@@ -29,7 +29,6 @@
 
 #include <OpenGl_AspectLine.hxx>
 #include <OpenGl_Context.hxx>
-#include <OpenGl_FrameStats.hxx>
 #include <OpenGl_Matrix.hxx>
 #include <OpenGl_Workspace.hxx>
 #include <OpenGl_View.hxx>
@@ -98,8 +97,7 @@ void OpenGl_View::drawBackground (const Handle(OpenGl_Workspace)& theWorkspace)
   {
   #if !defined(GL_ES_VERSION_2_0)
     GLint aShadingModelOld = GL_SMOOTH;
-    if (aCtx->core11 != NULL
-     && aCtx->caps->ffpEnable)
+    if (aCtx->core11 != NULL)
     {
       aCtx->core11fwd->glDisable (GL_LIGHTING);
       aCtx->core11fwd->glGetIntegerv (GL_SHADE_MODEL, &aShadingModelOld);
@@ -110,8 +108,7 @@ void OpenGl_View::drawBackground (const Handle(OpenGl_Workspace)& theWorkspace)
     myBgGradientArray->Render (theWorkspace);
 
   #if !defined(GL_ES_VERSION_2_0)
-    if (aCtx->core11 != NULL
-     && aCtx->caps->ffpEnable)
+    if (aCtx->core11 != NULL)
     {
       aCtx->core11->glShadeModel (aShadingModelOld);
     }
@@ -166,7 +163,6 @@ void OpenGl_View::Redraw()
   const Graphic3d_StereoMode   aStereoMode  = myRenderParams.StereoMode;
   Graphic3d_Camera::Projection aProjectType = myCamera->ProjectionType();
   Handle(OpenGl_Context)       aCtx         = myWorkspace->GetGlContext();
-  aCtx->FrameStats()->FrameStart (myWorkspace);
 
   // release pending GL resources
   aCtx->ReleaseDelayed();
@@ -545,10 +541,7 @@ void OpenGl_View::Redraw()
 
   // reset state for safety
   aCtx->BindProgram (Handle(OpenGl_ShaderProgram)());
-  if (aCtx->caps->ffpEnable)
-  {
-    aCtx->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
-  }
+  aCtx->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
 
   // Swap the buffers
   if (toSwap)
@@ -566,7 +559,6 @@ void OpenGl_View::Redraw()
 
   // reset render mode state
   aCtx->FetchState();
-  aCtx->FrameStats()->FrameEnd (myWorkspace);
 
   myWasRedrawnGL = Standard_True;
 }
@@ -592,7 +584,6 @@ void OpenGl_View::RedrawImmediate()
   const Graphic3d_StereoMode   aStereoMode  = myRenderParams.StereoMode;
   Graphic3d_Camera::Projection aProjectType = myCamera->ProjectionType();
   OpenGl_FrameBuffer*          aFrameBuffer = myFBO.operator->();
-  aCtx->FrameStats()->FrameStart (myWorkspace);
 
   if ( aFrameBuffer == NULL
    && !aCtx->DefaultFrameBuffer().IsNull()
@@ -720,10 +711,7 @@ void OpenGl_View::RedrawImmediate()
 
   // reset state for safety
   aCtx->BindProgram (Handle(OpenGl_ShaderProgram)());
-  if (aCtx->caps->ffpEnable)
-  {
-    aCtx->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
-  }
+  aCtx->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
 
   if (toSwap && !aCtx->caps->buffersNoSwap)
   {
@@ -733,7 +721,6 @@ void OpenGl_View::RedrawImmediate()
   {
     aCtx->core11fwd->glFlush();
   }
-  aCtx->FrameStats()->FrameEnd (myWorkspace);
 
   myWasRedrawnGL = Standard_True;
 }
@@ -813,8 +800,7 @@ bool OpenGl_View::redrawImmediate (const Graphic3d_Camera::Projection theProject
   #if !defined(GL_ES_VERSION_2_0)
     aCtx->core11fwd->glGetBooleanv (GL_DOUBLEBUFFER, &toCopyBackToFront);
   #endif
-    if (toCopyBackToFront
-     && myTransientDrawToFront)
+    if (toCopyBackToFront)
     {
       if (!HasImmediateStructures()
        && !theIsPartialUpdate)
@@ -869,7 +855,6 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
   // ==================================
 
   const Handle(OpenGl_Context)& aContext = myWorkspace->GetGlContext();
-  aContext->SetSampleAlphaToCoverage (myRenderParams.ToEnableAlphaToCoverage);
 
 #if !defined(GL_ES_VERSION_2_0)
   // Disable current clipping planes
@@ -883,24 +868,14 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
   }
 #endif
 
-  // update states of OpenGl_BVHTreeSelector (frustum culling algorithm);
-  // note that we pass here window dimensions ignoring Graphic3d_RenderingParams::RenderResolutionScale
+  // Update states of OpenGl_BVHTreeSelector (frustum culling algorithm).
   myBVHSelector.SetViewVolume (myCamera);
-  myBVHSelector.SetViewportSize (myWindow->Width(), myWindow->Height(), myRenderParams.ResolutionRatio());
-  myBVHSelector.CacheClipPtsProjections();
+  myBVHSelector.SetViewportSize (myWindow->Width(), myWindow->Height());
 
-  const Handle(OpenGl_ShaderManager)& aManager = aContext->ShaderManager();
-  const Handle(Graphic3d_LightSet)&   aLights  = myShadingModel == Graphic3d_TOSM_UNLIT ? myNoShadingLight : myLights;
-  Standard_Size aLightsRevision = 0;
-  if (!aLights.IsNull())
+  const Handle(OpenGl_ShaderManager)& aManager   = aContext->ShaderManager();
+  if (StateInfo (myCurrLightSourceState, aManager->LightSourceState().Index()) != myLastLightSourceState)
   {
-    aLightsRevision = aLights->UpdateRevision();
-  }
-  if (StateInfo (myCurrLightSourceState, aManager->LightSourceState().Index()) != myLastLightSourceState
-   || aLightsRevision != myLightsRevision)
-  {
-    myLightsRevision = aLightsRevision;
-    aManager->UpdateLightSourceStateTo (aLights);
+    aManager->UpdateLightSourceStateTo (myShadingModel == Graphic3d_TOSM_NONE ? &myNoShadingLight : &myLights);
     myLastLightSourceState = StateInfo (myCurrLightSourceState, aManager->LightSourceState().Index());
   }
 
@@ -934,8 +909,7 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
 
 #if !defined(GL_ES_VERSION_2_0)
   // Switch off lighting by default
-  if (aContext->core11 != NULL
-   && aContext->caps->ffpEnable)
+  if (aContext->core11 != NULL)
   {
     glDisable(GL_LIGHTING);
   }
@@ -978,7 +952,7 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
   if (aContext->core11 != NULL)
   {
     aContext->core11->glShadeModel (myShadingModel == Graphic3d_TOSM_FACET
-                                 || myShadingModel == Graphic3d_TOSM_UNLIT ? GL_FLAT : GL_SMOOTH);
+                                 || myShadingModel == Graphic3d_TOSM_NONE ? GL_FLAT : GL_SMOOTH);
   }
 #endif
 
@@ -1028,20 +1002,10 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
         glDisable (GL_CULL_FACE);
     }
   }
-  else
-  {
-    renderFrameStats();
-  }
-
-  myWorkspace->ResetAppliedAspect();
-  aContext->SetSampleAlphaToCoverage (false);
 
   // reset FFP state for safety
   aContext->BindProgram (Handle(OpenGl_ShaderProgram)());
-  if (aContext->caps->ffpEnable)
-  {
-    aContext->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
-  }
+  aContext->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
 
   // ==============================================================
   //      Step 6: Keep shader manager informed about last View
@@ -1079,8 +1043,6 @@ void OpenGl_View::renderStructs (Graphic3d_Camera::Projection theProjection,
     myRenderParams.Method != Graphic3d_RM_RAYTRACING ||
     myRaytraceInitStatus == OpenGl_RT_FAIL ||
     aCtx->IsFeedback();
-
-  myZLayers.UpdateCulling (myWorkspace, theToDrawImmediate);
 
   if (!toRenderGL)
   {
@@ -1167,20 +1129,6 @@ void OpenGl_View::renderTrihedron (const Handle(OpenGl_Workspace) &theWorkspace)
   if (myToShowGradTrihedron)
   {
     myGraduatedTrihedron.Render (theWorkspace);
-  }
-}
-
-//=======================================================================
-//function : renderFrameStats
-//purpose  :
-//=======================================================================
-void OpenGl_View::renderFrameStats()
-{
-  if (myRenderParams.ToShowStats
-   && myRenderParams.CollectedStats != Graphic3d_RenderingParams::PerfCounters_NONE)
-  {
-    myFrameStatsPrs.Update (myWorkspace);
-    myFrameStatsPrs.Render (myWorkspace);
   }
 }
 

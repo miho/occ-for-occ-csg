@@ -32,7 +32,6 @@
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepAdaptor_Curve.hxx>
-#include <BRepBuilderAPI_GTransform.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepFill.hxx>
 #include <BRepGProp.hxx>
@@ -84,7 +83,6 @@
 #include <IGESData_IGESEntity.hxx>
 #include <IGESData_IGESModel.hxx>
 #include <IGESData_ToolLocation.hxx>
-#include <IGESData_TransfEntity.hxx>
 #include <IGESGeom_BoundedSurface.hxx>
 #include <IGESGeom_BSplineSurface.hxx>
 #include <IGESGeom_CircularArc.hxx>
@@ -1021,15 +1019,14 @@ TopoDS_Shape IGESToBRep_TopoSurface::TransferOffsetSurface
     }
   case TopAbs_SHELL :
     {
+      SendWarning(st, "The First Surface only will be transfered.");
       TopoDS_Iterator dabovil(igesShape);
       if (dabovil.More()) {
-        SendWarning(st, "The First Surface only will be transfered.");
-        face = TopoDS::Face(dabovil.Value());
-        break;
+	face = TopoDS::Face(dabovil.Value());
+	break;
       }
       /* else  AddF("... */
     }
-    Standard_FALLTHROUGH
   default:
     {
       Message_Msg msg1156("IGES_1156");
@@ -1225,42 +1222,6 @@ TopoDS_Shape IGESToBRep_TopoSurface::TransferTrimmedSurface
   for (Standard_Integer i = 1; i <= st->NbInnerContours(); i++) {
     TopoDS_Shape myshape2 = TC.TransferCurveOnFace (face, st->InnerContour(i), trans, uFact, Standard_False);
   }
-
-  Handle(IGESData_TransfEntity) aTransf = st->Transf();
-  if (!aTransf.IsNull()) {
-    // make transformation
-    gp_GTrsf aGT = aTransf->Value();
-    gp_XYZ aTrans = aGT.TranslationPart();
-    gp_Mat aMat = aGT.VectorialPart();
-    Standard_Real s1 = aMat.Value(1, 1)*aMat.Value(1, 1) + aMat.Value(2, 1)*aMat.Value(2, 1) + aMat.Value(3, 1)*aMat.Value(3, 1);
-    Standard_Real s2 = aMat.Value(1, 2)*aMat.Value(1, 2) + aMat.Value(2, 2)*aMat.Value(2, 2) + aMat.Value(3, 2)*aMat.Value(3, 2);
-    Standard_Real s3 = aMat.Value(1, 3)*aMat.Value(1, 3) + aMat.Value(2, 3)*aMat.Value(2, 3) + aMat.Value(3, 3)*aMat.Value(3, 3);
-    if (fabs(s1 - s2) > Precision::Confusion() || fabs(s1 - s3) > Precision::Confusion()) {
-      BRepBuilderAPI_GTransform aTransform(aGT);
-      aTransform.Perform(face, Standard_True);
-      if (aTransform.IsDone()) {
-        if (aTransform.Shape().ShapeType() == TopAbs_FACE) {
-          face = TopoDS::Face(aTransform.Shape());
-        }
-      }
-    }
-    else {
-      Standard_Real tmpVal = fabs(aMat.Value(1, 1) - 1.) + fabs(aMat.Value(1, 2)) + fabs(aMat.Value(1, 3)) +
-        fabs(aMat.Value(2, 1)) + fabs(aMat.Value(2, 2) - 1.) + fabs(aMat.Value(2, 3)) +
-        fabs(aMat.Value(3, 1)) + fabs(aMat.Value(3, 2)) + fabs(aMat.Value(3, 3) - 1.);
-      if ((tmpVal + aTrans.Modulus()) > Precision::Confusion()) {
-        // not Identity
-        gp_Trsf aT;
-        aT.SetValues(
-          aMat.Value(1, 1), aMat.Value(1, 2), aMat.Value(1, 3), aTrans.X(),
-          aMat.Value(2, 1), aMat.Value(2, 2), aMat.Value(2, 3), aTrans.Y(),
-          aMat.Value(3, 1), aMat.Value(3, 2), aMat.Value(3, 3), aTrans.Z());
-        TopLoc_Location aLoc(aT);
-        face.Move(aLoc);
-      }
-    }
-  }
-
   BRepTools::Update ( face ); //:p4
   //%16 pdn 08.04.99
   return face;

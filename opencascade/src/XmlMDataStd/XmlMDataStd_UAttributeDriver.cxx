@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_UAttribute.hxx>
 #include <TDF_Attribute.hxx>
@@ -30,7 +30,7 @@ IMPLEMENT_DOMSTRING (GuidString, "guid")
 //=======================================================================
 
 XmlMDataStd_UAttributeDriver::XmlMDataStd_UAttributeDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -56,7 +56,7 @@ Standard_Boolean XmlMDataStd_UAttributeDriver::Paste
     theSource.Element().getAttribute (::GuidString());
   Standard_CString aGuidStr = (Standard_CString)aGuidDomStr.GetString();
   if (aGuidStr[0] == '\0') {
-    myMessageDriver->Send ("error retrieving GUID for type TDataStd_UAttribute", Message_Fail);
+    WriteMessage ("error retrieving GUID for type TDataStd_UAttribute");
     return Standard_False;
   }
 

@@ -14,8 +14,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-#ifndef Storage_MapOfTypes_HeaderFile
-#define Storage_MapOfTypes_HeaderFile
+#ifndef Storage_PType_HeaderFile
+#define Storage_PType_HeaderFile
 
 #include <TCollection_AsciiString.hxx>
 #include <Standard_Integer.hxx>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -105,16 +105,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a4f676a67ca12ad407faa3e88a7e72aaa"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_lib.html#a4f676a67ca12ad407faa3e88a7e72aaa">BuildCurves3d</a> (const <a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a> &amp;S)</td></tr>
 <tr class="memdesc:a4f676a67ca12ad407faa3e88a7e72aaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the 3d curves for all the edges of &lt;S&gt; return False if one of the computation failed.  <a href="#a4f676a67ca12ad407faa3e88a7e72aaa">More...</a><br /></td></tr>
 <tr class="separator:a4f676a67ca12ad407faa3e88a7e72aaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69b3f10d8cdec44b4037a50a0ef32b5e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_lib.html#a69b3f10d8cdec44b4037a50a0ef32b5e">BuildPCurveForEdgeOnPlane</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF)</td></tr>
-<tr class="memdesc:a69b3f10d8cdec44b4037a50a0ef32b5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds pcurve of edge on face if the surface is plane, and updates the edge.  <a href="#a69b3f10d8cdec44b4037a50a0ef32b5e">More...</a><br /></td></tr>
-<tr class="separator:a69b3f10d8cdec44b4037a50a0ef32b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6da250d2475d3d8f925e53cdee217c8e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_lib.html#a6da250d2475d3d8f925e53cdee217c8e">BuildPCurveForEdgeOnPlane</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt; &amp;aC2D, <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> &amp;bToUpdate)</td></tr>
-<tr class="memdesc:a6da250d2475d3d8f925e53cdee217c8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds pcurve of edge on face if the surface is plane, but does not update the edge. The output are the pcurve and the flag telling that pcurve was built.  <a href="#a6da250d2475d3d8f925e53cdee217c8e">More...</a><br /></td></tr>
-<tr class="separator:a6da250d2475d3d8f925e53cdee217c8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8684685713d30ed8998f4106f2dc801"><td class="memTemplParams" colspan="2">template&lt;class TCont &gt; </td></tr>
-<tr class="memitem:ad8684685713d30ed8998f4106f2dc801"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_b_rep_lib.html#ad8684685713d30ed8998f4106f2dc801">BuildPCurveForEdgesOnPlane</a> (const TCont &amp;theLE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF)</td></tr>
-<tr class="memdesc:ad8684685713d30ed8998f4106f2dc801"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds pcurves of edges on face if the surface is plane, and update the edges.  <a href="#ad8684685713d30ed8998f4106f2dc801">More...</a><br /></td></tr>
-<tr class="separator:ad8684685713d30ed8998f4106f2dc801"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37a6b78b001f8566275b6da2510b797f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_lib.html#a37a6b78b001f8566275b6da2510b797f">UpdateEdgeTol</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;E, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> MinToleranceRequest, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> MaxToleranceToCheck)</td></tr>
 <tr class="memdesc:a37a6b78b001f8566275b6da2510b797f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the edge has a Tolerance smaller than &ndash; &ndash; &ndash; &ndash; MaxToleranceToCheck if so it will compute the radius of &ndash; the cylindrical pipe surface that MinToleranceRequest is the minimum tolerance before it is usefull to start testing. Usually it should be arround 10e-5 contains all &ndash; the curve represenation of the edge returns True if the Edge tolerance had to be updated.  <a href="#a37a6b78b001f8566275b6da2510b797f">More...</a><br /></td></tr>
 <tr class="separator:a37a6b78b001f8566275b6da2510b797f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -175,9 +165,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a69185ac56135760e42788156aba8dc39"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_lib.html#a69185ac56135760e42788156aba8dc39">FindValidRange</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theEdge, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;theFirst, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;theLast)</td></tr>
 <tr class="memdesc:a69185ac56135760e42788156aba8dc39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds a range of 3d curve of the edge not covered by vertices tolerances. Returns false if there is no such range. Otherwise, sets theFirst and theLast as its bounds.  <a href="#a69185ac56135760e42788156aba8dc39">More...</a><br /></td></tr>
 <tr class="separator:a69185ac56135760e42788156aba8dc39"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0d81c1866d4d168b94775bcc7b7df46"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_lib.html#ae0d81c1866d4d168b94775bcc7b7df46">ExtendFace</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theExtVal, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theExtUMin, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theExtUMax, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theExtVMin, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theExtVMax, <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theFExtended)</td></tr>
-<tr class="memdesc:ae0d81c1866d4d168b94775bcc7b7df46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enlarges the face on the given value.  <a href="#ae0d81c1866d4d168b94775bcc7b7df46">More...</a><br /></td></tr>
-<tr class="separator:ae0d81c1866d4d168b94775bcc7b7df46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="class_b_rep_lib.html" title="The BRepLib package provides general utilities for BRep. ">BRepLib</a> package provides general utilities for BRep. </p>
@@ -367,134 +354,6 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Computes the 3d curves for all the edges of &lt;S&gt; return False if one of the computation failed. </p>
-
-</div>
-</div>
-<a id="a69b3f10d8cdec44b4037a50a0ef32b5e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69b3f10d8cdec44b4037a50a0ef32b5e">&#9670;&nbsp;</a></span>BuildPCurveForEdgeOnPlane() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void BRepLib::BuildPCurveForEdgeOnPlane </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;&#160;</td>
-          <td class="paramname"><em>theE</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
-          <td class="paramname"><em>theF</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Builds pcurve of edge on face if the surface is plane, and updates the edge. </p>
-
-</div>
-</div>
-<a id="a6da250d2475d3d8f925e53cdee217c8e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6da250d2475d3d8f925e53cdee217c8e">&#9670;&nbsp;</a></span>BuildPCurveForEdgeOnPlane() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void BRepLib::BuildPCurveForEdgeOnPlane </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;&#160;</td>
-          <td class="paramname"><em>theE</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
-          <td class="paramname"><em>theF</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>aC2D</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> &amp;&#160;</td>
-          <td class="paramname"><em>bToUpdate</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Builds pcurve of edge on face if the surface is plane, but does not update the edge. The output are the pcurve and the flag telling that pcurve was built. </p>
-
-</div>
-</div>
-<a id="ad8684685713d30ed8998f4106f2dc801"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8684685713d30ed8998f4106f2dc801">&#9670;&nbsp;</a></span>BuildPCurveForEdgesOnPlane()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class TCont &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void BRepLib::BuildPCurveForEdgesOnPlane </td>
-          <td>(</td>
-          <td class="paramtype">const TCont &amp;&#160;</td>
-          <td class="paramname"><em>theLE</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
-          <td class="paramname"><em>theF</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Builds pcurves of edges on face if the surface is plane, and update the edges. </p>
 
 </div>
 </div>
@@ -709,86 +568,6 @@ template&lt;class TCont &gt; </div>
 </div><div class="memdoc">
 
 <p>Corrects the normals in <a class="el" href="class_poly___triangulation.html" title="Provides a triangulation for a surface, a set of surfaces, or more generally a shape. A triangulation consists of an approximate representation of the actual shape, using a collection of points and triangles. The points are located on the surface. The edges of the triangles connect adjacent points with a straight line that approximates the true curve on the surface. A triangulation comprises: ">Poly_Triangulation</a> of faces, in such way that normals at nodes lying along smooth edges have the same value on both adjacent triangulations. Returns TRUE if any correction is done. </p>
-
-</div>
-</div>
-<a id="ae0d81c1866d4d168b94775bcc7b7df46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0d81c1866d4d168b94775bcc7b7df46">&#9670;&nbsp;</a></span>ExtendFace()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void BRepLib::ExtendFace </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
-          <td class="paramname"><em>theF</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td>
-          <td class="paramname"><em>theExtVal</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theExtUMin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theExtUMax</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theExtVMin</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theExtVMax</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
-          <td class="paramname"><em>theFExtended</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Enlarges the face on the given value. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">theF</td><td>[in] The face to extend </td></tr>
-    <tr><td class="paramname">theExtVal</td><td>[in] The extension value </td></tr>
-    <tr><td class="paramname">theExtUMin</td><td>[in] Defines whether to extend the face in UMin direction </td></tr>
-    <tr><td class="paramname">theExtUMax</td><td>[in] Defines whether to extend the face in UMax direction </td></tr>
-    <tr><td class="paramname">theExtVMin</td><td>[in] Defines whether to extend the face in VMin direction </td></tr>
-    <tr><td class="paramname">theExtVMax</td><td>[in] Defines whether to extend the face in VMax direction </td></tr>
-    <tr><td class="paramname">theFExtended</td><td>[in] The extended face </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>

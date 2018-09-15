@@ -13,7 +13,6 @@ var searchData=
   ['xcafdimtolobjects_5fgeomtolerancetype',['XCAFDimTolObjects_GeomToleranceType',['../_x_c_a_f_dim_tol_objects___geom_tolerance_type_8hxx.html#a4224751e415974cdcba1d744128e0614',1,'XCAFDimTolObjects_GeomToleranceType.hxx']]],
   ['xcafdimtolobjects_5fgeomtolerancetypevalue',['XCAFDimTolObjects_GeomToleranceTypeValue',['../_x_c_a_f_dim_tol_objects___geom_tolerance_type_value_8hxx.html#a54fba64e402029fcd68ce57cf15af9ff',1,'XCAFDimTolObjects_GeomToleranceTypeValue.hxx']]],
   ['xcafdimtolobjects_5fgeomtolerancezonemodif',['XCAFDimTolObjects_GeomToleranceZoneModif',['../_x_c_a_f_dim_tol_objects___geom_tolerance_zone_modif_8hxx.html#a9d64034d27268dd198ebb6a16008a45a',1,'XCAFDimTolObjects_GeomToleranceZoneModif.hxx']]],
-  ['xcafdimtolobjects_5ftolerancezoneaffectedplane',['XCAFDimTolObjects_ToleranceZoneAffectedPlane',['../_x_c_a_f_dim_tol_objects___tolerance_zone_affected_plane_8hxx.html#a80e30f82a3995168db0a313d9eac951e',1,'XCAFDimTolObjects_ToleranceZoneAffectedPlane.hxx']]],
   ['xcafdoc_5fcolortype',['XCAFDoc_ColorType',['../_x_c_a_f_doc___color_type_8hxx.html#afd67c3231631c38abbeee38e17d50eaf',1,'XCAFDoc_ColorType.hxx']]],
   ['xcafview_5fprojectiontype',['XCAFView_ProjectionType',['../_x_c_a_f_view___projection_type_8hxx.html#aef6e37c3e64fce3c8413598aba74f3fe',1,'XCAFView_ProjectionType.hxx']]],
   ['xsalgo_5fcaller',['XSAlgo_Caller',['../_x_s_algo___caller_8hxx.html#aea98794a9d85a2fb605b0bc8ae0239b5',1,'XSAlgo_Caller.hxx']]]

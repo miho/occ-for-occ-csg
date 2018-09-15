@@ -47,6 +47,7 @@ class Graphic3d_StructureManager;
 class Graphic3d_DataStructureManager;
 class Bnd_Box;
 class gp_Pnt;
+class Graphic3d_Vector;
 
 
 class Graphic3d_Structure;

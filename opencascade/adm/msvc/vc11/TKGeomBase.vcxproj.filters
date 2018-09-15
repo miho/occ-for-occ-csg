@@ -2,73 +2,73 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{52041278-0F00-1157-0538-0261714B770F}</UniqueIdentifier>
+      <UniqueIdentifier>{133BA7EB-133F-18FE-049F-47C02397583C}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\ProjLib">
-      <UniqueIdentifier>{75B56F0D-0E35-1721-06A0-2886137A5CF7}</UniqueIdentifier>
+      <UniqueIdentifier>{21FE38CB-1234-01AB-0C0B-96777E7F25D0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\GeomProjLib">
-      <UniqueIdentifier>{6D73F7CD-1629-09E0-1023-BA387BD23369}</UniqueIdentifier>
+      <UniqueIdentifier>{8B8B5AF6-0AD9-0F4F-1274-863846D8A681}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\GCPnts">
-      <UniqueIdentifier>{2D4D1351-17D9-1707-0515-CE55B45CB90B}</UniqueIdentifier>
+      <UniqueIdentifier>{9B67CAFB-0BB7-0737-1217-C23A2777EDE9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\CPnts">
-      <UniqueIdentifier>{78A7D465-12A4-05D5-0FCB-C6403AA2D9AD}</UniqueIdentifier>
+      <UniqueIdentifier>{A471C742-03E6-0122-04F1-0CCA48B471D2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Approx">
-      <UniqueIdentifier>{812202ED-06D7-13AA-100D-568D8B66C230}</UniqueIdentifier>
+      <UniqueIdentifier>{9CCFE711-1328-13D8-0CBB-3FAFBB2A3846}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\AppParCurves">
-      <UniqueIdentifier>{56EA5753-0208-0E05-1249-546C368C63F6}</UniqueIdentifier>
+      <UniqueIdentifier>{D4891597-0A5D-0176-001E-4635B26F6C8C}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\FEmTool">
-      <UniqueIdentifier>{F6D9EB65-0B18-048C-01EE-652367F74EC8}</UniqueIdentifier>
+      <UniqueIdentifier>{3F7AD6B9-166B-0D8A-11FA-37AF59D92220}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\AppCont">
-      <UniqueIdentifier>{552D7A21-0071-0EAC-05E5-6A106F5D164C}</UniqueIdentifier>
+      <UniqueIdentifier>{4F69FA5B-0831-0517-0415-7A2650695289}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Extrema">
-      <UniqueIdentifier>{62DFF895-0EC9-0E37-0C1D-1360952A0B11}</UniqueIdentifier>
+      <UniqueIdentifier>{A9A6395E-0751-0644-1411-46CB87DC104F}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\IntAna">
-      <UniqueIdentifier>{3C9E340B-086A-0811-0B61-AE8608E18671}</UniqueIdentifier>
+      <UniqueIdentifier>{B2E3B3D8-0A39-119E-0F59-A74972C70EFE}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\IntAna2d">
-      <UniqueIdentifier>{417BBC12-04BA-13F2-0451-26FEF92DA28A}</UniqueIdentifier>
+      <UniqueIdentifier>{A957887B-10B6-16E9-182D-D96A7DDE619A}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\GeomConvert">
-      <UniqueIdentifier>{0A326D97-0704-10AC-0B2A-21DD7E549258}</UniqueIdentifier>
+      <UniqueIdentifier>{D9C6EEA9-087C-0696-11F1-1630FDEA5266}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\AdvApp2Var">
-      <UniqueIdentifier>{53D4B46B-127E-11A8-1727-045262BCB3F1}</UniqueIdentifier>
+      <UniqueIdentifier>{C7CC7363-132A-0847-1457-CE7308E24B90}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\GeomLib">
-      <UniqueIdentifier>{C999BF78-1346-1017-0975-17C44255E75D}</UniqueIdentifier>
+      <UniqueIdentifier>{CF098D77-0514-0436-1751-6A06FAF02F4E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Geom2dConvert">
-      <UniqueIdentifier>{C8959C7D-161A-0C35-0493-FBE1C2A2C07A}</UniqueIdentifier>
+      <UniqueIdentifier>{B1B398A8-0B59-0BAC-1484-E6EEE94F428B}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Hermit">
-      <UniqueIdentifier>{0AB812EB-18DB-0E16-1666-C2B7F6BBA376}</UniqueIdentifier>
+      <UniqueIdentifier>{99F05B97-10A7-10EC-0B97-C00715111986}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\BndLib">
-      <UniqueIdentifier>{E8CA9E14-1544-0417-0837-2C857FF074BC}</UniqueIdentifier>
+      <UniqueIdentifier>{A2DCA964-0D03-16AA-11B0-D4D3DAA0BFE7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\AppDef">
-      <UniqueIdentifier>{80124F53-163C-0C01-0158-04DE89AE1534}</UniqueIdentifier>
+      <UniqueIdentifier>{96D80A04-07E6-16EC-0ADE-FDF079B6B31D}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\GeomTools">
-      <UniqueIdentifier>{F24A68FF-0BA3-167A-0DAA-3BC3A8AA7027}</UniqueIdentifier>
+      <UniqueIdentifier>{A93AED05-1428-064A-0F7C-81386C9F4912}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\GC">
-      <UniqueIdentifier>{A94B4128-08D7-09D6-0712-AE40FB2C3AC8}</UniqueIdentifier>
+      <UniqueIdentifier>{7671E412-0719-14B3-13BB-C6CEA0279A79}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\GCE2d">
-      <UniqueIdentifier>{C756ECF1-048F-02EA-0855-8B98A7D337B7}</UniqueIdentifier>
+      <UniqueIdentifier>{0E920439-0B2E-0651-0E2E-E47B1A4E0293}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\gce">
-      <UniqueIdentifier>{EF0D59E5-0EF4-01BA-0C64-34099360AA1B}</UniqueIdentifier>
+      <UniqueIdentifier>{8B30C052-0B34-1084-07AF-03408B826B53}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDF_Attribute.hxx>
 #include <TDF_Tool.hxx>
@@ -32,7 +32,7 @@ IMPLEMENT_DOMSTRING (FailureString, "failure")
 //purpose  : Constructor
 //=======================================================================
 XmlMFunction_FunctionDriver::XmlMFunction_FunctionDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -62,7 +62,7 @@ Standard_Boolean XmlMFunction_FunctionDriver::Paste
   Standard_CString aGuidStr = (Standard_CString)aGuidDomStr.GetString();
   if (aGuidStr[0] == '\0')
   {
-    myMessageDriver->Send ("error retrieving GUID for type TFunction_Function", Message_Fail);
+    WriteMessage ("error retrieving GUID for type TFunction_Function");
     return Standard_False;
   }
   aF->SetDriverGUID(aGuidStr);
@@ -76,7 +76,7 @@ Standard_Boolean XmlMFunction_FunctionDriver::Paste
       TCollection_ExtendedString
         ("Cannot retrieve failure number for TFunction_Function attribute from \"")
           + aFStr + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
   aF->SetFailure(aValue);

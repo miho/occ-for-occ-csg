@@ -101,15 +101,17 @@
 		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Check.cxx" />
 		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Common.cxx" />
 		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Cut.cxx" />
-		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Defeaturing.cxx" />
 		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Fuse.cxx" />
 		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Section.cxx" />
 		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Splitter.cxx" />
+		<Unit filename="../../../src/BOPCol/BOPCol_Box2DBndTree.cxx" />
+		<Unit filename="../../../src/BOPCol/BOPCol_BoxBndTree.cxx" />
 		<Unit filename="../../../src/BOPDS/BOPDS_CommonBlock.cxx" />
 		<Unit filename="../../../src/BOPDS/BOPDS_DS.cxx" />
 		<Unit filename="../../../src/BOPDS/BOPDS_IndexRange.cxx" />
 		<Unit filename="../../../src/BOPDS/BOPDS_Iterator.cxx" />
 		<Unit filename="../../../src/BOPDS/BOPDS_IteratorSI.cxx" />
+		<Unit filename="../../../src/BOPDS/BOPDS_PassKey.cxx" />
 		<Unit filename="../../../src/BOPDS/BOPDS_Pave.cxx" />
 		<Unit filename="../../../src/BOPDS/BOPDS_PaveBlock.cxx" />
 		<Unit filename="../../../src/BOPDS/BOPDS_ShapeInfo.cxx" />
@@ -144,20 +146,22 @@
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_PaveFiller_7.cxx" />
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_PaveFiller_8.cxx" />
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_PaveFiller_9.cxx" />
-		<Unit filename="../../../src/BOPAlgo/BOPAlgo_RemoveFeatures.cxx" />
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_Section.cxx" />
+		<Unit filename="../../../src/BOPAlgo/BOPAlgo_SectionAttribute.cxx" />
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_ShellSplitter.cxx" />
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_Splitter.cxx" />
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_Tools.cxx" />
-		<Unit filename="../../../src/BOPAlgo/BOPAlgo_ToolsProvider.cxx" />
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_WireSplitter.cxx" />
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_WireSplitter_1.cxx" />
+		<Unit filename="../../../src/BOPTools/BOPTools.cxx" />
 		<Unit filename="../../../src/BOPTools/BOPTools_AlgoTools.cxx" />
 		<Unit filename="../../../src/BOPTools/BOPTools_AlgoTools2D.cxx" />
 		<Unit filename="../../../src/BOPTools/BOPTools_AlgoTools2D_1.cxx" />
 		<Unit filename="../../../src/BOPTools/BOPTools_AlgoTools3D.cxx" />
 		<Unit filename="../../../src/BOPTools/BOPTools_AlgoTools_1.cxx" />
 		<Unit filename="../../../src/BOPTools/BOPTools_AlgoTools_2.cxx" />
+		<Unit filename="../../../src/BOPTools/BOPTools_EdgeSet.cxx" />
 		<Unit filename="../../../src/BOPTools/BOPTools_Set.cxx" />
+		<Unit filename="../../../src/BOPTools/BOPTools_ShapeSet.cxx" />
 	</Project>
 </CodeBlocks_project_file>

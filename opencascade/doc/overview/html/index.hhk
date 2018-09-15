@@ -36,7 +36,6 @@
   <LI><OBJECT type="text/sitemap"><param name="Local" value="samples_qml_android_occt.html"><param name="Name" value="OCCT AndroidQt sample for Android"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="samples_csharp_occt.html"><param name="Name" value="OCCT CSharp sample"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="samples_java_android_occt.html"><param name="Name" value="OCCT JniViewer sample for Android"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Local" value="occt_samples_ios_uikit.html"><param name="Name" value="OCCT sample for iOS"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="occt_user_guides__shape_healing.html"><param name="Name" value="Shape Healing"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="occt_user_guides__step.html"><param name="Name" value="STEP processor"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Local" value="technical_overview.html"><param name="Name" value="Technical Overview"></OBJECT>

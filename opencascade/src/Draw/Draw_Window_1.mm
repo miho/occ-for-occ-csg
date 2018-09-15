@@ -18,25 +18,6 @@
 #include <Draw_Window.hxx>
 #include <Cocoa_LocalPool.hxx>
 
-#if !defined(MAC_OS_X_VERSION_10_12) || (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
-  // replacements for macOS versions before 10.12
-  #define NSEventTypeLeftMouseDown    NSLeftMouseDown
-  #define NSEventTypeRightMouseDown   NSRightMouseDown
-  #define NSEventTypeLeftMouseDragged NSLeftMouseDragged
-  #define NSEventTypeMouseMoved       NSMouseMoved
-
-  #define NSEventMaskLeftMouseDragged NSLeftMouseDraggedMask
-  #define NSEventMaskMouseMoved       NSMouseMovedMask
-  #define NSEventMaskLeftMouseDown    NSLeftMouseDownMask
-  #define NSEventMaskRightMouseDown   NSRightMouseDownMask
-
-  #define NSWindowStyleMaskResizable  NSResizableWindowMask
-  #define NSWindowStyleMaskClosable   NSClosableWindowMask
-  #define NSWindowStyleMaskTitled     NSTitledWindowMask
-
-  #define NSCompositingOperationSourceOver NSCompositeSourceOver
-#endif
-
 @interface Draw_CocoaView : NSView
 {
   NSImage* myImage;
@@ -72,7 +53,7 @@
 
   [myImage drawInRect: aBounds
              fromRect: NSZeroRect
-            operation: NSCompositingOperationSourceOver
+            operation: NSCompositeSourceOver
              fraction: 1
        respectFlipped: YES
                 hints: nil];
@@ -218,7 +199,7 @@ void Draw_Window::Init (const Standard_Integer& theXLeft, const Standard_Integer
   if (myWindow == NULL)
   {
     NSRect     aRectNs   = NSMakeRect (theXLeft, anYTop, theWidth, theHeight);
-    NSUInteger aWinStyle = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable;
+    NSUInteger aWinStyle = NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask;
 
     myWindow = [[NSWindow alloc] initWithContentRect: aRectNs
                                            styleMask: aWinStyle
@@ -599,11 +580,11 @@ void GetNextEvent (Standard_Boolean  theWait,
 {
   Cocoa_LocalPool aLocalPool;
 
-  unsigned int anEventMatchMask = NSEventMaskLeftMouseDown | NSEventMaskRightMouseDown;
+  unsigned int anEventMatchMask = NSLeftMouseDownMask | NSRightMouseDownMask;
 
   if (!theWait)
   {
-    anEventMatchMask = anEventMatchMask | NSEventMaskMouseMoved | NSEventMaskLeftMouseDragged;
+    anEventMatchMask = anEventMatchMask | NSMouseMovedMask | NSLeftMouseDraggedMask;
     Draw_IsInZoomingMode = Standard_True;
   }
 
@@ -623,15 +604,15 @@ void GetNextEvent (Standard_Boolean  theWait,
 
   NSEventType anEventType = [anEvent type];
 
-  if (anEventType == NSEventTypeLeftMouseDown)
+  if (anEventType == NSLeftMouseDown)
   {
     theButton = 1;
   }
-  else if (anEventType == NSEventTypeRightMouseDown)
+  else if (anEventType == NSRightMouseDown)
   {
     theButton = 3;
   }
-  else if ((anEventType == NSEventTypeMouseMoved || anEventType == NSEventTypeLeftMouseDragged) && !theWait)
+  else if ((anEventType == NSMouseMoved || anEventType == NSLeftMouseDragged) && !theWait)
   {
     theButton = 0;
   }

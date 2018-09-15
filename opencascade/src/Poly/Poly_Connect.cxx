@@ -82,11 +82,13 @@ void Poly_Connect::Load (const Handle(Poly_Triangulation)& theTriangulation)
     const Standard_Integer aNbAdjs = 6 * nbTriangles;
     if (myTriangles.Size() != nbNodes)
     {
-      myTriangles.Resize (1, nbNodes, Standard_False);
+      TColStd_Array1OfInteger aTriArray (1, nbNodes);
+      myTriangles.Move (std::move (aTriArray));
     }
     if (myAdjacents.Size() != aNbAdjs)
     {
-      myAdjacents.Resize (1, aNbAdjs, Standard_False);
+      TColStd_Array1OfInteger anAdjArray (1, aNbAdjs);
+      myAdjacents.Move (std::move (anAdjArray));
     }
   }
 

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -113,12 +113,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2f9f7113059ca0c2534ae585f5d61d4b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a2f9f7113059ca0c2534ae585f5d61d4b">IsRemoved</a> () const</td></tr>
 <tr class="memdesc:a2f9f7113059ca0c2534ae585f5d61d4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the view was removed.  <a href="#a2f9f7113059ca0c2534ae585f5d61d4b">More...</a><br /></td></tr>
 <tr class="separator:a2f9f7113059ca0c2534ae585f5d61d4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11a4433feadfa1817505756d83d4aae0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a11a4433feadfa1817505756d83d4aae0">ShadingModel</a> () const</td></tr>
-<tr class="memdesc:a11a4433feadfa1817505756d83d4aae0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns default Shading Model of the view; Graphic3d_TOSM_FRAGMENT by default.  <a href="#a11a4433feadfa1817505756d83d4aae0">More...</a><br /></td></tr>
-<tr class="separator:a11a4433feadfa1817505756d83d4aae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a330c32d92d5d938f9263bfd4cdd718af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a330c32d92d5d938f9263bfd4cdd718af">SetShadingModel</a> (<a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> theModel)</td></tr>
-<tr class="memdesc:a330c32d92d5d938f9263bfd4cdd718af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets default Shading Model of the view. Will throw an exception on attempt to set Graphic3d_TOSM_DEFAULT.  <a href="#a330c32d92d5d938f9263bfd4cdd718af">More...</a><br /></td></tr>
-<tr class="separator:a330c32d92d5d938f9263bfd4cdd718af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e71cda116fef0abf0104c85495203a4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_visualization_8hxx.html#a34e18a8ee0f907cce2c120179d588c9e">Graphic3d_TypeOfVisualization</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a9e71cda116fef0abf0104c85495203a4">VisualizationType</a> () const</td></tr>
 <tr class="memdesc:a9e71cda116fef0abf0104c85495203a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns visualization type of the view.  <a href="#a9e71cda116fef0abf0104c85495203a4">More...</a><br /></td></tr>
 <tr class="separator:a9e71cda116fef0abf0104c85495203a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -134,7 +128,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a42821c4ee071011bc3ba3a52e7c8150c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a42821c4ee071011bc3ba3a52e7c8150c">ReCompute</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___structure.html">Graphic3d_Structure</a> &gt; &amp;theStructure)</td></tr>
 <tr class="memdesc:a42821c4ee071011bc3ba3a52e7c8150c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the new presentation of the structure displayed in this view with the type Graphic3d_TOS_COMPUTED.  <a href="#a42821c4ee071011bc3ba3a52e7c8150c">More...</a><br /></td></tr>
 <tr class="separator:a42821c4ee071011bc3ba3a52e7c8150c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7bda5ca8037366a522ca7e3d0857c80b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a7bda5ca8037366a522ca7e3d0857c80b">Update</a> (const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a> theLayerId=<a class="el" href="_graphic3d___z_layer_id_8hxx.html#a05589fbab0657f08285ebdfe93f5ec9eae04f0dff1da76dd13e2bb60fd647c5ff">Graphic3d_ZLayerId_UNKNOWN</a>)</td></tr>
+<tr class="memitem:a7bda5ca8037366a522ca7e3d0857c80b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a7bda5ca8037366a522ca7e3d0857c80b">Update</a> (const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a> theLayerId=<a class="el" href="_graphic3d___z_layer_id_8hxx.html#abc5c98fcc1211af2b80116dd6e0a035dae04f0dff1da76dd13e2bb60fd647c5ff">Graphic3d_ZLayerId_UNKNOWN</a>)</td></tr>
 <tr class="memdesc:a7bda5ca8037366a522ca7e3d0857c80b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Invalidates bounding box of specified ZLayerId.  <a href="#a7bda5ca8037366a522ca7e3d0857c80b">More...</a><br /></td></tr>
 <tr class="separator:a7bda5ca8037366a522ca7e3d0857c80b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46c61f22c3559877a1f405bcec328416"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a46c61f22c3559877a1f405bcec328416">Compute</a> ()</td></tr>
@@ -214,9 +208,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab53489d2fab98aad67e9b24233bde0c7"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#ab53489d2fab98aad67e9b24233bde0c7">Export</a> (const <a class="el" href="_standard___type_def_8hxx.html#aee98bfe6774a1f4d9570c388805de3cc">Standard_CString</a> theFileName, const <a class="el" href="_graphic3d___export_format_8hxx.html#aa12258da95bb12312fd1f2d3b6d69754">Graphic3d_ExportFormat</a> theFormat, const <a class="el" href="_graphic3d___sort_type_8hxx.html#a71af52e4e8d4ca113c9cbd6ba4371987">Graphic3d_SortType</a> theSortType=<a class="el" href="_graphic3d___sort_type_8hxx.html#a71af52e4e8d4ca113c9cbd6ba4371987acacd58ebb1ea49e8debb59ce5b9b5033">Graphic3d_ST_BSP_Tree</a>)=0</td></tr>
 <tr class="memdesc:ab53489d2fab98aad67e9b24233bde0c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Export scene into the one of the Vector graphics formats (SVG, PS, PDF...). In contrast to Bitmaps, Vector graphics is scalable (so you may got quality benefits on printing to laser printer). Notice however that results may differ a lot and do not contain some elements.  <a href="#ab53489d2fab98aad67e9b24233bde0c7">More...</a><br /></td></tr>
 <tr class="separator:ab53489d2fab98aad67e9b24233bde0c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45ae74c207a36fb44153789c9feff4b3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a45ae74c207a36fb44153789c9feff4b3">InvalidateBVHData</a> (const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a> theLayerId)=0</td></tr>
-<tr class="memdesc:a45ae74c207a36fb44153789c9feff4b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Marks <a class="el" href="namespace_b_v_h.html">BVH</a> tree and the set of <a class="el" href="namespace_b_v_h.html">BVH</a> primitives of correspondent priority list with id theLayerId as outdated.  <a href="#a45ae74c207a36fb44153789c9feff4b3">More...</a><br /></td></tr>
-<tr class="separator:a45ae74c207a36fb44153789c9feff4b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0c670bd9ae85d1b1a68b3de1016aad5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#ad0c670bd9ae85d1b1a68b3de1016aad5">InvalidateBVHData</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theLayerId)=0</td></tr>
+<tr class="memdesc:ad0c670bd9ae85d1b1a68b3de1016aad5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Marks <a class="el" href="namespace_b_v_h.html">BVH</a> tree and the set of <a class="el" href="namespace_b_v_h.html">BVH</a> primitives of correspondent priority list with id theLayerId as outdated.  <a href="#ad0c670bd9ae85d1b1a68b3de1016aad5">More...</a><br /></td></tr>
+<tr class="separator:ad0c670bd9ae85d1b1a68b3de1016aad5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03e0f8a2e0acdd921b0023e0ac34fbc5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a03e0f8a2e0acdd921b0023e0ac34fbc5">AddZLayer</a> (const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a> theLayerId)=0</td></tr>
 <tr class="memdesc:a03e0f8a2e0acdd921b0023e0ac34fbc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a new top-level z layer with ID &lt;theLayerId&gt; for the view. Z layers allow drawing structures in higher layers in foreground of structures in lower layers. To add a structure to desired layer on display it is necessary to set the layer ID for the structure.  <a href="#a03e0f8a2e0acdd921b0023e0ac34fbc5">More...</a><br /></td></tr>
 <tr class="separator:a03e0f8a2e0acdd921b0023e0ac34fbc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -301,6 +295,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7dcf83f8eb3d82d54dafd81df0abd7ec"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a7dcf83f8eb3d82d54dafd81df0abd7ec">SetCullingEnabled</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theIsEnabled)=0</td></tr>
 <tr class="memdesc:a7dcf83f8eb3d82d54dafd81df0abd7ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enables or disables frustum culling optimization.  <a href="#a7dcf83f8eb3d82d54dafd81df0abd7ec">More...</a><br /></td></tr>
 <tr class="separator:a7dcf83f8eb3d82d54dafd81df0abd7ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9aac15f77838efbef5f995a7d1c690f4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a9aac15f77838efbef5f995a7d1c690f4">ShadingModel</a> () const =0</td></tr>
+<tr class="memdesc:a9aac15f77838efbef5f995a7d1c690f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns shading model of the view.  <a href="#a9aac15f77838efbef5f995a7d1c690f4">More...</a><br /></td></tr>
+<tr class="separator:a9aac15f77838efbef5f995a7d1c690f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a529fe520f3be7bd5b2652238ecdea18f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a529fe520f3be7bd5b2652238ecdea18f">SetShadingModel</a> (const <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> theModel)=0</td></tr>
+<tr class="memdesc:a529fe520f3be7bd5b2652238ecdea18f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets shading model of the view.  <a href="#a529fe520f3be7bd5b2652238ecdea18f">More...</a><br /></td></tr>
+<tr class="separator:a529fe520f3be7bd5b2652238ecdea18f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d4761d33d7e02852cd5574ae28d8ecf"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_graphic3d___type_of_backfacing_model_8hxx.html#ac6b20ac0f4dce6a4cb02f146cf101628">Graphic3d_TypeOfBackfacingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a6d4761d33d7e02852cd5574ae28d8ecf">BackfacingModel</a> () const =0</td></tr>
 <tr class="memdesc:a6d4761d33d7e02852cd5574ae28d8ecf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return backfacing model used for the view.  <a href="#a6d4761d33d7e02852cd5574ae28d8ecf">More...</a><br /></td></tr>
 <tr class="separator:a6d4761d33d7e02852cd5574ae28d8ecf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -313,12 +313,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6c2d358d651320f2022c5f8546051655"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a6c2d358d651320f2022c5f8546051655">SetCamera</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___camera.html">Graphic3d_Camera</a> &gt; &amp;theCamera)=0</td></tr>
 <tr class="memdesc:a6c2d358d651320f2022c5f8546051655"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets camera used by the view.  <a href="#a6c2d358d651320f2022c5f8546051655">More...</a><br /></td></tr>
 <tr class="separator:a6c2d358d651320f2022c5f8546051655"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06dc75332bb771272cfdf68f871e57ca"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a06dc75332bb771272cfdf68f871e57ca">Lights</a> () const =0</td></tr>
-<tr class="memdesc:a06dc75332bb771272cfdf68f871e57ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns list of lights of the view.  <a href="#a06dc75332bb771272cfdf68f871e57ca">More...</a><br /></td></tr>
-<tr class="separator:a06dc75332bb771272cfdf68f871e57ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a862e0cc413a900220a30c13b80921bca"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a862e0cc413a900220a30c13b80921bca">SetLights</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; &amp;theLights)=0</td></tr>
-<tr class="memdesc:a862e0cc413a900220a30c13b80921bca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets list of lights for the view.  <a href="#a862e0cc413a900220a30c13b80921bca">More...</a><br /></td></tr>
-<tr class="separator:a862e0cc413a900220a30c13b80921bca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9662c60a4ede4ce108e77a3d99d408b4"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="_graphic3d___c_light_8hxx.html#abe4316813ad795869a8bcef07acefbde">Graphic3d_ListOfCLight</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a9662c60a4ede4ce108e77a3d99d408b4">Lights</a> () const =0</td></tr>
+<tr class="memdesc:a9662c60a4ede4ce108e77a3d99d408b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns list of lights of the view.  <a href="#a9662c60a4ede4ce108e77a3d99d408b4">More...</a><br /></td></tr>
+<tr class="separator:a9662c60a4ede4ce108e77a3d99d408b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae80e4a15c65dcc42f430e5ac0d2690ae"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#ae80e4a15c65dcc42f430e5ac0d2690ae">SetLights</a> (const <a class="el" href="_graphic3d___c_light_8hxx.html#abe4316813ad795869a8bcef07acefbde">Graphic3d_ListOfCLight</a> &amp;theLights)=0</td></tr>
+<tr class="memdesc:ae80e4a15c65dcc42f430e5ac0d2690ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets list of lights for the view.  <a href="#ae80e4a15c65dcc42f430e5ac0d2690ae">More...</a><br /></td></tr>
+<tr class="separator:ae80e4a15c65dcc42f430e5ac0d2690ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ad70483dcc92f1437365a72c9b31a39"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___sequence_of_h_clip_plane.html">Graphic3d_SequenceOfHClipPlane</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a7ad70483dcc92f1437365a72c9b31a39">ClipPlanes</a> () const =0</td></tr>
 <tr class="memdesc:a7ad70483dcc92f1437365a72c9b31a39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns list of clip planes set for the view.  <a href="#a7ad70483dcc92f1437365a72c9b31a39">More...</a><br /></td></tr>
 <tr class="separator:a7ad70483dcc92f1437365a72c9b31a39"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -394,8 +394,6 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:adfaf6ef225374c942698e8dde6e77687"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9533cfc8c7769364ce6078b2d0d2a1de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a9533cfc8c7769364ce6078b2d0d2a1de">myIsRemoved</a></td></tr>
 <tr class="separator:a9533cfc8c7769364ce6078b2d0d2a1de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4055e5124817696fcc33f7a586a71e35"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a4055e5124817696fcc33f7a586a71e35">myShadingModel</a></td></tr>
-<tr class="separator:a4055e5124817696fcc33f7a586a71e35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4771d87bd99a4b9576ba109e4514677c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_visualization_8hxx.html#a34e18a8ee0f907cce2c120179d588c9e">Graphic3d_TypeOfVisualization</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___c_view.html#a4771d87bd99a4b9576ba109e4514677c">myVisualization</a></td></tr>
 <tr class="separator:a4771d87bd99a4b9576ba109e4514677c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -1509,8 +1507,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a45ae74c207a36fb44153789c9feff4b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45ae74c207a36fb44153789c9feff4b3">&#9670;&nbsp;</a></span>InvalidateBVHData()</h2>
+<a id="ad0c670bd9ae85d1b1a68b3de1016aad5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0c670bd9ae85d1b1a68b3de1016aad5">&#9670;&nbsp;</a></span>InvalidateBVHData()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1521,7 +1519,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">virtual void Graphic3d_CView::InvalidateBVHData </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
           <td class="paramname"><em>theLayerId</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1535,7 +1533,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Marks <a class="el" href="namespace_b_v_h.html">BVH</a> tree and the set of <a class="el" href="namespace_b_v_h.html">BVH</a> primitives of correspondent priority list with id theLayerId as outdated. </p>
 
-<p>Implemented in <a class="el" href="class_open_gl___view.html#a3e4bf5f3000b9286bd531977ad47162d">OpenGl_View</a>.</p>
+<p>Implemented in <a class="el" href="class_open_gl___view.html#aa13c732a7420bb05ed0da0cd3166817c">OpenGl_View</a>.</p>
 
 </div>
 </div>
@@ -1740,8 +1738,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a06dc75332bb771272cfdf68f871e57ca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a06dc75332bb771272cfdf68f871e57ca">&#9670;&nbsp;</a></span>Lights()</h2>
+<a id="a9662c60a4ede4ce108e77a3d99d408b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9662c60a4ede4ce108e77a3d99d408b4">&#9670;&nbsp;</a></span>Lights()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1750,7 +1748,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt;&amp; Graphic3d_CView::Lights </td>
+          <td class="memname">virtual const <a class="el" href="_graphic3d___c_light_8hxx.html#abe4316813ad795869a8bcef07acefbde">Graphic3d_ListOfCLight</a>&amp; Graphic3d_CView::Lights </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -1765,7 +1763,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Returns list of lights of the view. </p>
 
-<p>Implemented in <a class="el" href="class_open_gl___view.html#a4061523958ed6f7e4f4a9255b5f892fb">OpenGl_View</a>.</p>
+<p>Implemented in <a class="el" href="class_open_gl___view.html#ae1a24c1c5b4ce2d7a1c480a90d833c9f">OpenGl_View</a>.</p>
 
 </div>
 </div>
@@ -2383,8 +2381,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a862e0cc413a900220a30c13b80921bca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a862e0cc413a900220a30c13b80921bca">&#9670;&nbsp;</a></span>SetLights()</h2>
+<a id="ae80e4a15c65dcc42f430e5ac0d2690ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae80e4a15c65dcc42f430e5ac0d2690ae">&#9670;&nbsp;</a></span>SetLights()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2395,7 +2393,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">virtual void Graphic3d_CView::SetLights </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___light_set.html">Graphic3d_LightSet</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="_graphic3d___c_light_8hxx.html#abe4316813ad795869a8bcef07acefbde">Graphic3d_ListOfCLight</a> &amp;&#160;</td>
           <td class="paramname"><em>theLights</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2409,27 +2407,37 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Sets list of lights for the view. </p>
 
-<p>Implemented in <a class="el" href="class_open_gl___view.html#a1a1dc43f42b418addfff390a82117c80">OpenGl_View</a>.</p>
+<p>Implemented in <a class="el" href="class_open_gl___view.html#a86db226c662ebfafc01f5c6b57ff87e8">OpenGl_View</a>.</p>
 
 </div>
 </div>
-<a id="a330c32d92d5d938f9263bfd4cdd718af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a330c32d92d5d938f9263bfd4cdd718af">&#9670;&nbsp;</a></span>SetShadingModel()</h2>
+<a id="a529fe520f3be7bd5b2652238ecdea18f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a529fe520f3be7bd5b2652238ecdea18f">&#9670;&nbsp;</a></span>SetShadingModel()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void Graphic3d_CView::SetShadingModel </td>
+          <td class="memname">virtual void Graphic3d_CView::SetShadingModel </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td>
           <td class="paramname"><em>theModel</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Sets default Shading Model of the view. Will throw an exception on attempt to set Graphic3d_TOSM_DEFAULT. </p>
+<p>Sets shading model of the view. </p>
+
+<p>Implemented in <a class="el" href="class_open_gl___view.html#abd47afc16732b18fe1998e61c5729057">OpenGl_View</a>.</p>
 
 </div>
 </div>
@@ -2578,8 +2586,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a11a4433feadfa1817505756d83d4aae0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11a4433feadfa1817505756d83d4aae0">&#9670;&nbsp;</a></span>ShadingModel()</h2>
+<a id="a9aac15f77838efbef5f995a7d1c690f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9aac15f77838efbef5f995a7d1c690f4">&#9670;&nbsp;</a></span>ShadingModel()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2588,7 +2596,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> Graphic3d_CView::ShadingModel </td>
+          <td class="memname">virtual <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> Graphic3d_CView::ShadingModel </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -2596,12 +2604,14 @@ Additional Inherited Members</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns default Shading Model of the view; Graphic3d_TOSM_FRAGMENT by default. </p>
+<p>Returns shading model of the view. </p>
+
+<p>Implemented in <a class="el" href="class_open_gl___view.html#a68e5e64a0e6ca76158566ec8b29a83d9">OpenGl_View</a>.</p>
 
 </div>
 </div>
@@ -2671,7 +2681,7 @@ Additional Inherited Members</h2></td></tr>
           <td class="memname">void Graphic3d_CView::Update </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="_graphic3d___z_layer_id_8hxx.html#af467858966a2af8a39fd281d3a2f5ab3">Graphic3d_ZLayerId</a>&#160;</td>
-          <td class="paramname"><em>theLayerId</em> = <code><a class="el" href="_graphic3d___z_layer_id_8hxx.html#a05589fbab0657f08285ebdfe93f5ec9eae04f0dff1da76dd13e2bb60fd647c5ff">Graphic3d_ZLayerId_UNKNOWN</a></code></td><td>)</td>
+          <td class="paramname"><em>theLayerId</em> = <code><a class="el" href="_graphic3d___z_layer_id_8hxx.html#abc5c98fcc1211af2b80116dd6e0a035dae04f0dff1da76dd13e2bb60fd647c5ff">Graphic3d_ZLayerId_UNKNOWN</a></code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -2957,28 +2967,6 @@ Additional Inherited Members</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="class_graphic3d___rendering_params.html">Graphic3d_RenderingParams</a> Graphic3d_CView::myRenderParams</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4055e5124817696fcc33f7a586a71e35"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4055e5124817696fcc33f7a586a71e35">&#9670;&nbsp;</a></span>myShadingModel</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> Graphic3d_CView::myShadingModel</td>
         </tr>
       </table>
   </td>

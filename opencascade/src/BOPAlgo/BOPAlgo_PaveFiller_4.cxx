@@ -17,8 +17,10 @@
 
 
 #include <BOPAlgo_PaveFiller.hxx>
-#include <BOPAlgo_Alerts.hxx>
 #include <BOPAlgo_SectionAttribute.hxx>
+#include <BOPCol_MapOfInteger.hxx>
+#include <BOPCol_NCVector.hxx>
+#include <BOPCol_Parallel.hxx>
 #include <BOPDS_Curve.hxx>
 #include <BOPDS_DS.hxx>
 #include <BOPDS_FaceInfo.hxx>
@@ -28,14 +30,11 @@
 #include <BOPDS_PaveBlock.hxx>
 #include <BOPDS_SubIterator.hxx>
 #include <BOPDS_VectorOfInterfVF.hxx>
-#include <BOPTools_Parallel.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepBndLib.hxx>
 #include <gp_Pnt.hxx>
 #include <IntTools_Context.hxx>
-#include <NCollection_Vector.hxx>
-#include <TColStd_MapOfInteger.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Vertex.hxx>
 
@@ -108,16 +107,7 @@ class BOPAlgo_VertexFace : public BOPAlgo_Algo {
   //
   virtual void Perform() {
     BOPAlgo_Algo::UserBreak();
-    try
-    {
-      OCC_CATCH_SIGNALS
-
-      myFlag=myContext->ComputeVF(myV, myF, myT1, myT2, myTolVNew, myFuzzyValue);
-    }
-    catch (Standard_Failure)
-    {
-      AddError(new BOPAlgo_AlertIntersectionFailed);
-    }
+    myFlag=myContext->ComputeVF(myV, myF, myT1, myT2, myTolVNew, myFuzzyValue);
   }
   //
  protected:
@@ -132,16 +122,16 @@ class BOPAlgo_VertexFace : public BOPAlgo_Algo {
   Handle(IntTools_Context) myContext;
 };
 //=======================================================================
-typedef NCollection_Vector<BOPAlgo_VertexFace>
+typedef BOPCol_NCVector<BOPAlgo_VertexFace>
   BOPAlgo_VectorOfVertexFace; 
 //
-typedef BOPTools_ContextFunctor 
+typedef BOPCol_ContextFunctor 
   <BOPAlgo_VertexFace,
   BOPAlgo_VectorOfVertexFace,
   Handle(IntTools_Context), 
   IntTools_Context> BOPAlgo_VertexFaceFunctor;
 //
-typedef BOPTools_ContextCnt 
+typedef BOPCol_ContextCnt 
   <BOPAlgo_VertexFaceFunctor,
   BOPAlgo_VectorOfVertexFace,
   Handle(IntTools_Context)> BOPAlgo_VertexFaceCnt;
@@ -204,7 +194,7 @@ void BOPAlgo_PaveFiller::PerformVF()
     const TopoDS_Vertex& aV=(*(TopoDS_Vertex *)(&myDS->Shape(nVx))); 
     const TopoDS_Face& aF=(*(TopoDS_Face *)(&myDS->Shape(nF))); 
     //
-    BOPAlgo_VertexFace& aVertexFace=aVVF.Appended();
+    BOPAlgo_VertexFace& aVertexFace=aVVF.Append1();
     //
     aVertexFace.SetIndices(nV, nF);
     aVertexFace.SetVertex(aV);
@@ -213,7 +203,7 @@ void BOPAlgo_PaveFiller::PerformVF()
     aVertexFace.SetProgressIndicator(myProgressIndicator);
   }//for (; myIterator->More(); myIterator->Next()) {
   //
-  aNbVF=aVVF.Length();
+  aNbVF=aVVF.Extent();
   //================================================================
   BOPAlgo_VertexFaceCnt::Perform(myRunParallel, aVVF, myContext);
   //================================================================
@@ -222,19 +212,14 @@ void BOPAlgo_PaveFiller::PerformVF()
     const BOPAlgo_VertexFace& aVertexFace=aVVF(k);
     // 
     iFlag=aVertexFace.Flag();
-    if (iFlag != 0) {
-      if (aVertexFace.HasErrors())
-      {
-        // Warn about failed intersection of sub-shapes
-        AddIntersectionFailedWarning(aVertexFace.Vertex(), aVertexFace.Face());
-      }
+    if (iFlag) {
       continue;
     }
     //
     aVertexFace.Indices(nV, nF);
     aVertexFace.Parameters(aT1, aT2);
     // 1
-    BOPDS_InterfVF& aVF=aVFs.Appended();
+    BOPDS_InterfVF& aVF=aVFs.Append1();
     aVF.SetIndices(nV, nF);
     aVF.SetUV(aT1, aT2);
     // 2
@@ -250,7 +235,7 @@ void BOPAlgo_PaveFiller::PerformVF()
     }
     // 5 update FaceInfo
     BOPDS_FaceInfo& aFI=myDS->ChangeFaceInfo(nF);
-    TColStd_MapOfInteger& aMVIn=aFI.ChangeVerticesIn();
+    BOPCol_MapOfInteger& aMVIn=aFI.ChangeVerticesIn();
     aMVIn.Add(nVx);
   }//for (k=0; k < aNbVF; ++k) {
   //
@@ -264,19 +249,19 @@ void BOPAlgo_PaveFiller::TreatVerticesEE()
 {
   Standard_Integer i, aNbS,aNbEEs, nF, nV, iFlag;
   Standard_Real aT1, aT2, dummy;
-  TColStd_ListIteratorOfListOfInteger aItLI;
+  BOPCol_ListIteratorOfListOfInteger aItLI;
   Handle(NCollection_BaseAllocator) aAllocator;
   //
   aAllocator=
     NCollection_BaseAllocator::CommonBaseAllocator();
-  TColStd_ListOfInteger aLIV(aAllocator), aLIF(aAllocator);
-  TColStd_MapOfInteger aMI(100, aAllocator);
+  BOPCol_ListOfInteger aLIV(aAllocator), aLIF(aAllocator);
+  BOPCol_MapOfInteger aMI(100, aAllocator);
   BOPDS_MapOfPaveBlock aMPBF(100, aAllocator);
   //
   aNbS=myDS->NbSourceShapes();
   //
   BOPDS_VectorOfInterfEE& aEEs=myDS->InterfEE();
-  aNbEEs=aEEs.Length();
+  aNbEEs=aEEs.Extent();
   for (i=0; i<aNbEEs; ++i) {
     BOPDS_InterfEE& aEE=aEEs(i);
     if (aEE.HasIndexNew()) {
@@ -316,7 +301,7 @@ void BOPAlgo_PaveFiller::TreatVerticesEE()
     aIt.Value(nV, nF);
     //
     BOPDS_FaceInfo& aFI=myDS->ChangeFaceInfo(nF);
-    const TColStd_MapOfInteger& aMVOn=aFI.VerticesOn();
+    const BOPCol_MapOfInteger& aMVOn=aFI.VerticesOn();
     //
     if (!aMVOn.Contains(nV)) {
       const TopoDS_Vertex& aV=(*(TopoDS_Vertex *)(&myDS->Shape(nV))); 
@@ -324,14 +309,14 @@ void BOPAlgo_PaveFiller::TreatVerticesEE()
       iFlag = myContext->ComputeVF(aV, aF, aT1, aT2, dummy, myFuzzyValue);
       if (!iFlag) {
         // 1
-        BOPDS_InterfVF& aVF=aVFs.Appended();
-        i=aVFs.Length()-1;
+        BOPDS_InterfVF& aVF=aVFs.Append1();
+        i=aVFs.Extent()-1;
         aVF.SetIndices(nV, nF);
         aVF.SetUV(aT1, aT2);
         // 2
         myDS->AddInterf(nV, nF);
         //
-        TColStd_MapOfInteger& aMVIn=aFI.ChangeVerticesIn();
+        BOPCol_MapOfInteger& aMVIn=aFI.ChangeVerticesIn();
         aMVIn.Add(nV);
       }
     }

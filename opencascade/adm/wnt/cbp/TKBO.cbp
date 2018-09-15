@@ -17,6 +17,12 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__IntTools_DLL" />
+					<Add option="-D__BRepAlgoAPI_DLL" />
+					<Add option="-D__BOPCol_DLL" />
+					<Add option="-D__BOPDS_DLL" />
+					<Add option="-D__BOPAlgo_DLL" />
+					<Add option="-D__BOPTools_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKBO_obj.link" />
@@ -35,6 +41,12 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__IntTools_DLL" />
+					<Add option="-D__BRepAlgoAPI_DLL" />
+					<Add option="-D__BOPCol_DLL" />
+					<Add option="-D__BOPDS_DLL" />
+					<Add option="-D__BOPAlgo_DLL" />
+					<Add option="-D__BOPTools_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKBO_objd.link" />
@@ -159,9 +171,6 @@
 		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Cut.cxx">
 			<Option link="0" />
 		</Unit>
-		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Defeaturing.cxx">
-			<Option link="0" />
-		</Unit>
 		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Fuse.cxx">
 			<Option link="0" />
 		</Unit>
@@ -169,6 +178,12 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BRepAlgoAPI/BRepAlgoAPI_Splitter.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/BOPCol/BOPCol_Box2DBndTree.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/BOPCol/BOPCol_BoxBndTree.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BOPDS/BOPDS_CommonBlock.cxx">
@@ -184,6 +199,9 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BOPDS/BOPDS_IteratorSI.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/BOPDS/BOPDS_PassKey.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BOPDS/BOPDS_Pave.cxx">
@@ -288,10 +306,10 @@
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_PaveFiller_9.cxx">
 			<Option link="0" />
 		</Unit>
-		<Unit filename="../../../src/BOPAlgo/BOPAlgo_RemoveFeatures.cxx">
+		<Unit filename="../../../src/BOPAlgo/BOPAlgo_Section.cxx">
 			<Option link="0" />
 		</Unit>
-		<Unit filename="../../../src/BOPAlgo/BOPAlgo_Section.cxx">
+		<Unit filename="../../../src/BOPAlgo/BOPAlgo_SectionAttribute.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_ShellSplitter.cxx">
@@ -303,13 +321,13 @@
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_Tools.cxx">
 			<Option link="0" />
 		</Unit>
-		<Unit filename="../../../src/BOPAlgo/BOPAlgo_ToolsProvider.cxx">
-			<Option link="0" />
-		</Unit>
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_WireSplitter.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BOPAlgo/BOPAlgo_WireSplitter_1.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/BOPTools/BOPTools.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BOPTools/BOPTools_AlgoTools.cxx">
@@ -330,7 +348,13 @@
 		<Unit filename="../../../src/BOPTools/BOPTools_AlgoTools_2.cxx">
 			<Option link="0" />
 		</Unit>
+		<Unit filename="../../../src/BOPTools/BOPTools_EdgeSet.cxx">
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../../src/BOPTools/BOPTools_Set.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/BOPTools/BOPTools_ShapeSet.cxx">
 			<Option link="0" />
 		</Unit>
 	</Project>

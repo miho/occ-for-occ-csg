@@ -63,18 +63,6 @@ void TopExp::MapShapes(const TopoDS_Shape& S,
 }
 
 //=======================================================================
-//function : MapShapes
-//purpose  : 
-//=======================================================================
-void TopExp::MapShapes(const TopoDS_Shape& S,
-                       TopTools_MapOfShape& M)
-{
-  M.Add(S);
-  for (TopoDS_Iterator it(S); it.More(); it.Next())
-    MapShapes(it.Value(), M);
-}
-
-//=======================================================================
 //function : MapShapesAndAncestors
 //purpose  : 
 //=======================================================================

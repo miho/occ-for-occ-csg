@@ -21,14 +21,12 @@
 #include <OSD_OpenFile.hxx>
 #include <inspector/TreeModel_ModelBase.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QAbstractItemModel>
 #include <QDir>
 #include <QFile>
 #include <QPlainTextEdit>
 #include <QTextStream>
 #include <QWidget>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : onSelectionChanged

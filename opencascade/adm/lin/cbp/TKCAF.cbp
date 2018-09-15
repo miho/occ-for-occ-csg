@@ -91,6 +91,7 @@
 		<Unit filename="../../../src/TNaming/TNaming_NamedShape.cxx" />
 		<Unit filename="../../../src/TNaming/TNaming_Naming.cxx" />
 		<Unit filename="../../../src/TNaming/TNaming_NamingTool.cxx" />
+		<Unit filename="../../../src/TNaming/TNaming_SameShapeIterator.cxx" />
 		<Unit filename="../../../src/TNaming/TNaming_Scope.cxx" />
 		<Unit filename="../../../src/TNaming/TNaming_Selector.cxx" />
 		<Unit filename="../../../src/TNaming/TNaming_ShapesSet.cxx" />

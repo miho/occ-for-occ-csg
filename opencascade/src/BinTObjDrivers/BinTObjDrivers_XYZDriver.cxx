@@ -17,7 +17,7 @@
 
 
 #include <BinTObjDrivers_XYZDriver.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <TDF_Attribute.hxx>
 #include <BinObjMgt_Persistent.hxx>
 #include <TObj_TXYZ.hxx>
@@ -31,7 +31,7 @@ IMPLEMENT_STANDARD_RTTIEXT(BinTObjDrivers_XYZDriver,BinMDF_ADriver)
 //=======================================================================
 
 BinTObjDrivers_XYZDriver::BinTObjDrivers_XYZDriver
-                         (const Handle(Message_Messenger)& theMessageDriver)
+                         (const Handle(CDM_MessageDriver)& theMessageDriver)
 : BinMDF_ADriver( theMessageDriver, NULL)
 {
 }

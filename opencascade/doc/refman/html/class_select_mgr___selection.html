@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -65,7 +65,8 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">SelectMgr_Selection Class Reference</div>  </div>
 </div><!--header-->
@@ -94,7 +95,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad042d621832766a7d5d87550c54daa58"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#ad042d621832766a7d5d87550c54daa58">Destroy</a> ()</td></tr>
 <tr class="separator:ad042d621832766a7d5d87550c54daa58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7804b3af431c77a4c2b586129bc66b0e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a7804b3af431c77a4c2b586129bc66b0e">Add</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_basics___sensitive_entity.html">SelectBasics_SensitiveEntity</a> &gt; &amp;theSensitive)</td></tr>
-<tr class="memdesc:a7804b3af431c77a4c2b586129bc66b0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds the sensitive primitive to the list of stored entities in this object. Raises NullObject if the primitive is a null handle.  <a href="#a7804b3af431c77a4c2b586129bc66b0e">More...</a><br /></td></tr>
+<tr class="memdesc:a7804b3af431c77a4c2b586129bc66b0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds the sensitive primitive aprimitive to the list of stored entities in this object. Raises NullObject if the primitive is a null handle.  <a href="#a7804b3af431c77a4c2b586129bc66b0e">More...</a><br /></td></tr>
 <tr class="separator:a7804b3af431c77a4c2b586129bc66b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af35afb2cd21e4621dd17bed91497cc9f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#af35afb2cd21e4621dd17bed91497cc9f">Clear</a> ()</td></tr>
 <tr class="memdesc:af35afb2cd21e4621dd17bed91497cc9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">empties the selection from all the stored entities  <a href="#af35afb2cd21e4621dd17bed91497cc9f">More...</a><br /></td></tr>
@@ -105,24 +106,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a838358634abb2c243662faf6c0ed197b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a838358634abb2c243662faf6c0ed197b">Mode</a> () const</td></tr>
 <tr class="memdesc:a838358634abb2c243662faf6c0ed197b"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the selection mode represented by this selection  <a href="#a838358634abb2c243662faf6c0ed197b">More...</a><br /></td></tr>
 <tr class="separator:a838358634abb2c243662faf6c0ed197b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a604884210106f87f81de8ffd6e781e96"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_n_collection___vector.html">NCollection_Vector</a>&lt; <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___sensitive_entity.html">SelectMgr_SensitiveEntity</a> &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a604884210106f87f81de8ffd6e781e96">Entities</a> () const</td></tr>
-<tr class="memdesc:a604884210106f87f81de8ffd6e781e96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return entities.  <a href="#a604884210106f87f81de8ffd6e781e96">More...</a><br /></td></tr>
-<tr class="separator:a604884210106f87f81de8ffd6e781e96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9ca989f4c22e4c1285634eed3a8f5d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_n_collection___vector.html">NCollection_Vector</a>&lt; <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___sensitive_entity.html">SelectMgr_SensitiveEntity</a> &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#ad9ca989f4c22e4c1285634eed3a8f5d6">ChangeEntities</a> ()</td></tr>
-<tr class="memdesc:ad9ca989f4c22e4c1285634eed3a8f5d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return entities.  <a href="#ad9ca989f4c22e4c1285634eed3a8f5d6">More...</a><br /></td></tr>
-<tr class="separator:ad9ca989f4c22e4c1285634eed3a8f5d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a68148748d131caf22862d37ab1271f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a1a68148748d131caf22862d37ab1271f">Standard_DEPRECATED</a> (&quot;Deprecated method, <a class="el" href="class_select_mgr___selection.html#a604884210106f87f81de8ffd6e781e96">Entities</a>() should be used instead&quot;) void Init()</td></tr>
-<tr class="memdesc:a1a68148748d131caf22862d37ab1271f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begins an iteration scanning for sensitive primitives.  <a href="#a1a68148748d131caf22862d37ab1271f">More...</a><br /></td></tr>
-<tr class="separator:a1a68148748d131caf22862d37ab1271f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91381a6eff668a8e03026fc68d843bf8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a91381a6eff668a8e03026fc68d843bf8">Standard_DEPRECATED</a> (&quot;Deprecated method, <a class="el" href="class_select_mgr___selection.html#a604884210106f87f81de8ffd6e781e96">Entities</a>() should be used instead&quot;) Standard_Boolean More() const</td></tr>
-<tr class="memdesc:a91381a6eff668a8e03026fc68d843bf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Continues the iteration scanning for sensitive primitives with the mode defined in this framework.  <a href="#a91381a6eff668a8e03026fc68d843bf8">More...</a><br /></td></tr>
-<tr class="separator:a91381a6eff668a8e03026fc68d843bf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fdd5b829b60d8c6eaf883192d6bbde0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a3fdd5b829b60d8c6eaf883192d6bbde0">Standard_DEPRECATED</a> (&quot;Deprecated method, <a class="el" href="class_select_mgr___selection.html#a604884210106f87f81de8ffd6e781e96">Entities</a>() should be used instead&quot;) void Next()</td></tr>
-<tr class="memdesc:a3fdd5b829b60d8c6eaf883192d6bbde0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the next sensitive primitive found in the iteration. This is a scan for entities with the mode defined in this framework.  <a href="#a3fdd5b829b60d8c6eaf883192d6bbde0">More...</a><br /></td></tr>
-<tr class="separator:a3fdd5b829b60d8c6eaf883192d6bbde0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3c1e3b35bd677d5664959de8168631a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#ad3c1e3b35bd677d5664959de8168631a">Standard_DEPRECATED</a> (&quot;Deprecated method, <a class="el" href="class_select_mgr___selection.html#a604884210106f87f81de8ffd6e781e96">Entities</a>() should be used instead&quot;) const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___sensitive_entity.html">SelectMgr_SensitiveEntity</a> &gt; &amp;Sensitive() const</td></tr>
-<tr class="memdesc:ad3c1e3b35bd677d5664959de8168631a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns any sensitive primitive in this framework.  <a href="#ad3c1e3b35bd677d5664959de8168631a">More...</a><br /></td></tr>
-<tr class="separator:ad3c1e3b35bd677d5664959de8168631a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae30ce633885d30587f94dded42c638d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#ae30ce633885d30587f94dded42c638d8">Init</a> ()</td></tr>
+<tr class="memdesc:ae30ce633885d30587f94dded42c638d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Begins an iteration scanning for sensitive primitives.  <a href="#ae30ce633885d30587f94dded42c638d8">More...</a><br /></td></tr>
+<tr class="separator:ae30ce633885d30587f94dded42c638d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6772bc215dd5580e95f192db547afbc2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a6772bc215dd5580e95f192db547afbc2">More</a> () const</td></tr>
+<tr class="memdesc:a6772bc215dd5580e95f192db547afbc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Continues the iteration scanning for sensitive primitives with the mode defined in this framework.  <a href="#a6772bc215dd5580e95f192db547afbc2">More...</a><br /></td></tr>
+<tr class="separator:a6772bc215dd5580e95f192db547afbc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e884a14619743da2c3f9813ac6beb84"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a9e884a14619743da2c3f9813ac6beb84">Next</a> ()</td></tr>
+<tr class="memdesc:a9e884a14619743da2c3f9813ac6beb84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the next sensitive primitive found in the iteration. This is a scan for entities with the mode defined in this framework.  <a href="#a9e884a14619743da2c3f9813ac6beb84">More...</a><br /></td></tr>
+<tr class="separator:a9e884a14619743da2c3f9813ac6beb84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e8b6eb3919b05b6ccd6aae160d20834"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___sensitive_entity.html">SelectMgr_SensitiveEntity</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a7e8b6eb3919b05b6ccd6aae160d20834">Sensitive</a> () const</td></tr>
+<tr class="memdesc:a7e8b6eb3919b05b6ccd6aae160d20834"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns any sensitive primitive in this framework.  <a href="#a7e8b6eb3919b05b6ccd6aae160d20834">More...</a><br /></td></tr>
+<tr class="separator:a7e8b6eb3919b05b6ccd6aae160d20834"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5aeab19d367fd70ac1b999f3859ef4b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_select_mgr___type_of_update_8hxx.html#a92d9ab55b48de0d8a23450eeb02c4fbd">SelectMgr_TypeOfUpdate</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a5aeab19d367fd70ac1b999f3859ef4b4">UpdateStatus</a> () const</td></tr>
 <tr class="memdesc:a5aeab19d367fd70ac1b999f3859ef4b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the flag UpdateFlag. This flage gives the update status of this framework in a ViewerSelector object:  <a href="#a5aeab19d367fd70ac1b999f3859ef4b4">More...</a><br /></td></tr>
 <tr class="separator:a5aeab19d367fd70ac1b999f3859ef4b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,6 +182,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad50aac4b364cfcdadd80c2bed3b8c00a inherit pub_methods_class_standard___transient"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_standard___transient.html#ad50aac4b364cfcdadd80c2bed3b8c00a">DecrementRefCounter</a> () const</td></tr>
 <tr class="memdesc:ad50aac4b364cfcdadd80c2bed3b8c00a inherit pub_methods_class_standard___transient"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrements the reference counter of this object; returns the decremented value.  <a href="class_standard___transient.html#ad50aac4b364cfcdadd80c2bed3b8c00a">More...</a><br /></td></tr>
 <tr class="separator:ad50aac4b364cfcdadd80c2bed3b8c00a inherit pub_methods_class_standard___transient"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a54227eb7a60ee7e5b4ee5000294b6aa0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___sensitive_entity.html">SelectMgr_SensitiveEntity</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_select_mgr___selection.html#a54227eb7a60ee7e5b4ee5000294b6aa0">GetEntityById</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theIdx)</td></tr>
+<tr class="memdesc:a54227eb7a60ee7e5b4ee5000294b6aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns sensitive entity stored by index theIdx in entites vector.  <a href="#a54227eb7a60ee7e5b4ee5000294b6aa0">More...</a><br /></td></tr>
+<tr class="separator:a54227eb7a60ee7e5b4ee5000294b6aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -278,7 +279,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Adds the sensitive primitive to the list of stored entities in this object. Raises NullObject if the primitive is a null handle. </p>
+<p>Adds the sensitive primitive aprimitive to the list of stored entities in this object. Raises NullObject if the primitive is a null handle. </p>
 
 </div>
 </div>
@@ -287,9 +288,6 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_select_mgr___type_of_b_v_h_update_8hxx.html#af4fc5fd390b606679eae62bafb6a96b2">SelectMgr_TypeOfBVHUpdate</a> SelectMgr_Selection::BVHUpdateStatus </td>
@@ -298,39 +296,7 @@ Additional Inherited Members</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad9ca989f4c22e4c1285634eed3a8f5d6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad9ca989f4c22e4c1285634eed3a8f5d6">&#9670;&nbsp;</a></span>ChangeEntities()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_n_collection___vector.html">NCollection_Vector</a>&lt;<a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___sensitive_entity.html">SelectMgr_SensitiveEntity</a> &gt; &gt;&amp; SelectMgr_Selection::ChangeEntities </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return entities. </p>
 
 </div>
 </div>
@@ -370,8 +336,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a604884210106f87f81de8ffd6e781e96"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a604884210106f87f81de8ffd6e781e96">&#9670;&nbsp;</a></span>Entities()</h2>
+<a id="a54227eb7a60ee7e5b4ee5000294b6aa0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54227eb7a60ee7e5b4ee5000294b6aa0">&#9670;&nbsp;</a></span>GetEntityById()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -380,20 +346,21 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="class_n_collection___vector.html">NCollection_Vector</a>&lt;<a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___sensitive_entity.html">SelectMgr_SensitiveEntity</a> &gt; &gt;&amp; SelectMgr_Selection::Entities </td>
+          <td class="memname"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___sensitive_entity.html">SelectMgr_SensitiveEntity</a> &gt;&amp; SelectMgr_Selection::GetEntityById </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
+          <td class="paramname"><em>theIdx</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Return entities. </p>
+<p>Returns sensitive entity stored by index theIdx in entites vector. </p>
 
 </div>
 </div>
@@ -402,9 +369,6 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_select_mgr___state_of_selection_8hxx.html#a16b270ab6f5665e8054c6835d273d164">SelectMgr_StateOfSelection</a> SelectMgr_Selection::GetSelectionState </td>
@@ -413,14 +377,28 @@ Additional Inherited Members</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Returns status of selection. </p>
+
+</div>
+</div>
+<a id="ae30ce633885d30587f94dded42c638d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae30ce633885d30587f94dded42c638d8">&#9670;&nbsp;</a></span>Init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SelectMgr_Selection::Init </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Begins an iteration scanning for sensitive primitives. </p>
 
 </div>
 </div>
@@ -429,23 +407,14 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> SelectMgr_Selection::IsEmpty </td>
           <td>(</td>
-          <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>returns true if no sensitive entity is stored. </p>
@@ -457,9 +426,6 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SelectMgr_Selection::Mode </td>
@@ -468,14 +434,66 @@ Additional Inherited Members</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>returns the selection mode represented by this selection </p>
+
+</div>
+</div>
+<a id="a6772bc215dd5580e95f192db547afbc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6772bc215dd5580e95f192db547afbc2">&#9670;&nbsp;</a></span>More()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> SelectMgr_Selection::More </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Continues the iteration scanning for sensitive primitives with the mode defined in this framework. </p>
+
+</div>
+</div>
+<a id="a9e884a14619743da2c3f9813ac6beb84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e884a14619743da2c3f9813ac6beb84">&#9670;&nbsp;</a></span>Next()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SelectMgr_Selection::Next </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the next sensitive primitive found in the iteration. This is a scan for entities with the mode defined in this framework. </p>
+
+</div>
+</div>
+<a id="a7e8b6eb3919b05b6ccd6aae160d20834"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e8b6eb3919b05b6ccd6aae160d20834">&#9670;&nbsp;</a></span>Sensitive()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_select_mgr___sensitive_entity.html">SelectMgr_SensitiveEntity</a> &gt;&amp; SelectMgr_Selection::Sensitive </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns any sensitive primitive in this framework. </p>
 
 </div>
 </div>
@@ -484,9 +502,6 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SelectMgr_Selection::Sensitivity </td>
@@ -495,11 +510,6 @@ Additional Inherited Members</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Returns sensitivity of the selection. </p>
@@ -511,9 +521,6 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void SelectMgr_Selection::SetSelectionState </td>
@@ -523,11 +530,6 @@ Additional Inherited Members</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Sets status of selection. </p>
@@ -554,166 +556,11 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a1a68148748d131caf22862d37ab1271f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a68148748d131caf22862d37ab1271f">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[1/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">SelectMgr_Selection::Standard_DEPRECATED </td>
-          <td>(</td>
-          <td class="paramtype">&quot;Deprecated&#160;</td>
-          <td class="paramname"><em>method</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_select_mgr___selection.html#a604884210106f87f81de8ffd6e781e96">Entities</a>() should be used instead&quot;&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Begins an iteration scanning for sensitive primitives. </p>
-
-</div>
-</div>
-<a id="a91381a6eff668a8e03026fc68d843bf8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91381a6eff668a8e03026fc68d843bf8">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[2/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">SelectMgr_Selection::Standard_DEPRECATED </td>
-          <td>(</td>
-          <td class="paramtype">&quot;Deprecated&#160;</td>
-          <td class="paramname"><em>method</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_select_mgr___selection.html#a604884210106f87f81de8ffd6e781e96">Entities</a>() should be used instead&quot;&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Continues the iteration scanning for sensitive primitives with the mode defined in this framework. </p>
-
-</div>
-</div>
-<a id="a3fdd5b829b60d8c6eaf883192d6bbde0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3fdd5b829b60d8c6eaf883192d6bbde0">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[3/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">SelectMgr_Selection::Standard_DEPRECATED </td>
-          <td>(</td>
-          <td class="paramtype">&quot;Deprecated&#160;</td>
-          <td class="paramname"><em>method</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_select_mgr___selection.html#a604884210106f87f81de8ffd6e781e96">Entities</a>() should be used instead&quot;&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns the next sensitive primitive found in the iteration. This is a scan for entities with the mode defined in this framework. </p>
-
-</div>
-</div>
-<a id="ad3c1e3b35bd677d5664959de8168631a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3c1e3b35bd677d5664959de8168631a">&#9670;&nbsp;</a></span>Standard_DEPRECATED() <span class="overload">[4/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">SelectMgr_Selection::Standard_DEPRECATED </td>
-          <td>(</td>
-          <td class="paramtype">&quot;Deprecated&#160;</td>
-          <td class="paramname"><em>method</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_select_mgr___selection.html#a604884210106f87f81de8ffd6e781e96">Entities</a>() should be used instead&quot;&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const &amp;</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns any sensitive primitive in this framework. </p>
-
-</div>
-</div>
 <a id="a09a0444adabb2d4b0635a54f4e7db6b8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a09a0444adabb2d4b0635a54f4e7db6b8">&#9670;&nbsp;</a></span>UpdateBVHStatus()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void SelectMgr_Selection::UpdateBVHStatus </td>
@@ -723,11 +570,6 @@ Additional Inherited Members</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
@@ -737,9 +579,6 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_select_mgr___type_of_update_8hxx.html#a92d9ab55b48de0d8a23450eeb02c4fbd">SelectMgr_TypeOfUpdate</a> SelectMgr_Selection::UpdateStatus </td>
@@ -748,11 +587,6 @@ Additional Inherited Members</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Returns the flag UpdateFlag. This flage gives the update status of this framework in a ViewerSelector object: </p>
@@ -769,9 +603,6 @@ Additional Inherited Members</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void SelectMgr_Selection::UpdateStatus </td>
@@ -781,11 +612,6 @@ Additional Inherited Members</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>

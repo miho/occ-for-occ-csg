@@ -34,7 +34,7 @@ class XCAFView_Object;
 class XCAFDoc_View;
 DEFINE_STANDARD_HANDLE(XCAFDoc_View, TDF_Attribute)
 
-//! Attribute to store view
+//! attribute to store view
 class XCAFDoc_View : public TDF_Attribute
 {
 
@@ -54,11 +54,8 @@ public:
   
   Standard_EXPORT void Paste (const Handle(TDF_Attribute)& Into, const Handle(TDF_RelocationTable)& RT) const Standard_OVERRIDE;
   
-  //! Updates parent's label and its sub-labels with data taken from theViewObject.
-  //! Old data associated with the label will be lost.
-  Standard_EXPORT void SetObject(const Handle(XCAFView_Object)& theViewObject);
+  Standard_EXPORT void SetObject (const Handle(XCAFView_Object)& theViewObject);
   
-  //! Returns view object data taken from the paren's label and its sub-labels.
   Standard_EXPORT Handle(XCAFView_Object) GetObject() const;
 
   DEFINE_STANDARD_RTTIEXT(XCAFDoc_View, TDF_Attribute)

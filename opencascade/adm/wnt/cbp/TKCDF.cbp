@@ -17,6 +17,11 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__CDM_DLL" />
+					<Add option="-D__PCDM_DLL" />
+					<Add option="-D__CDF_DLL" />
+					<Add option="-D__UTL_DLL" />
+					<Add option="-D__LDOM_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKCDF_obj.link" />
@@ -35,6 +40,11 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__CDM_DLL" />
+					<Add option="-D__PCDM_DLL" />
+					<Add option="-D__CDF_DLL" />
+					<Add option="-D__UTL_DLL" />
+					<Add option="-D__LDOM_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKCDF_objd.link" />
@@ -60,10 +70,19 @@
 			<Add library="TKernel" />
 		</Linker>
 		<Unit filename="../../../src/CDM/CDM_Application.cxx" />
+		<Unit filename="../../../src/CDM/CDM_COutMessageDriver.cxx">
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../../src/CDM/CDM_Document.cxx">
 			<Option link="0" />
 		</Unit>
+		<Unit filename="../../../src/CDM/CDM_MessageDriver.cxx">
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../../src/CDM/CDM_MetaData.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/CDM/CDM_NullMessageDriver.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/CDM/CDM_Reference.cxx">

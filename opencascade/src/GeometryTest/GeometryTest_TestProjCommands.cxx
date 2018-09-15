@@ -365,7 +365,7 @@ static Standard_Integer xdistcs(Draw_Interpretor& di, Standard_Integer n, const 
     // report error or warning if distance is greater than tolerance
     if (aD > anErrTol)
     {
-      di << "Error in " << a[1] << ":";
+      di << "Error :";
     }
     else if (aD > aWarnTol)
     {

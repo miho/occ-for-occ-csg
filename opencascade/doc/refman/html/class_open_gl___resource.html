@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -110,9 +110,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3f12aa1bc7392013841a3c9258829461"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___resource.html#a3f12aa1bc7392013841a3c9258829461">Release</a> (<a class="el" href="class_open_gl___context.html">OpenGl_Context</a> *theGlCtx)=0</td></tr>
 <tr class="memdesc:a3f12aa1bc7392013841a3c9258829461"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release GPU resources. Notice that implementation should be SAFE for several consecutive calls (thus should invalidate internal structures / ids to avoid multiple-free errors).  <a href="#a3f12aa1bc7392013841a3c9258829461">More...</a><br /></td></tr>
 <tr class="separator:a3f12aa1bc7392013841a3c9258829461"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a897bbee62a1f3cfeecd056899274c9a4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_standard___type_def_8hxx.html#aafd0aa27030c44cea49764e622cedd68">Standard_Size</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___resource.html#a897bbee62a1f3cfeecd056899274c9a4">EstimatedDataSize</a> () const =0</td></tr>
-<tr class="memdesc:a897bbee62a1f3cfeecd056899274c9a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns estimated GPU memory usage for holding data without considering overheads and allocation alignment rules.  <a href="#a897bbee62a1f3cfeecd056899274c9a4">More...</a><br /></td></tr>
-<tr class="separator:a897bbee62a1f3cfeecd056899274c9a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_standard___transient"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_standard___transient')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_standard___transient.html">Standard_Transient</a></td></tr>
 <tr class="memitem:a28c37998a6ef973851f456840b34de64 inherit pub_methods_class_standard___transient"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_standard___transient.html#a28c37998a6ef973851f456840b34de64">Standard_Transient</a> ()</td></tr>
 <tr class="memdesc:a28c37998a6ef973851f456840b34de64 inherit pub_methods_class_standard___transient"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty constructor.  <a href="class_standard___transient.html#a28c37998a6ef973851f456840b34de64">More...</a><br /></td></tr>
@@ -227,35 +224,6 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a897bbee62a1f3cfeecd056899274c9a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a897bbee62a1f3cfeecd056899274c9a4">&#9670;&nbsp;</a></span>EstimatedDataSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="_standard___type_def_8hxx.html#aafd0aa27030c44cea49764e622cedd68">Standard_Size</a> OpenGl_Resource::EstimatedDataSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns estimated GPU memory usage for holding data without considering overheads and allocation alignment rules. </p>
-
-<p>Implemented in <a class="el" href="class_open_gl___texture.html#afc5bf41cb0d2c13157142ca76c8e891c">OpenGl_Texture</a>, <a class="el" href="class_open_gl___frame_buffer.html#aa318442335aeda133b976f3b1e2a5eb2">OpenGl_FrameBuffer</a>, <a class="el" href="class_open_gl___vertex_buffer.html#ad4e20d7607436cdbc4cd4e073e6cc730">OpenGl_VertexBuffer</a>, <a class="el" href="class_open_gl___shader_program.html#a2be0e35d52a9a1f93023e79136c055dc">OpenGl_ShaderProgram</a>, <a class="el" href="class_open_gl___font.html#a70e5046fe87ea0ce63de26f39da3615f">OpenGl_Font</a>, <a class="el" href="class_open_gl___line_attributes.html#a7c7f3bdb4f58831a292873295b126abe">OpenGl_LineAttributes</a>, <a class="el" href="class_open_gl___shader_object.html#ab5d11f73fb0234538386ef886cef0059">OpenGl_ShaderObject</a>, <a class="el" href="class_open_gl___capping_plane_resource.html#a9007b72c893f5f5d890e6fb68a41ad03">OpenGl_CappingPlaneResource</a>, and <a class="el" href="class_open_gl___sampler.html#a5bc4283200ae9533688d59ad83e36626">OpenGl_Sampler</a>.</p>
-
-</div>
-</div>
 <a id="a3f12aa1bc7392013841a3c9258829461"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3f12aa1bc7392013841a3c9258829461">&#9670;&nbsp;</a></span>Release()</h2>
 
@@ -288,7 +256,7 @@ Additional Inherited Members</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_open_gl___texture.html#a7dafca5aa9650666b02f3d2523dd7b24">OpenGl_Texture</a>, <a class="el" href="class_open_gl___shader_program.html#ac80ef04904ed43919f0db964f214793f">OpenGl_ShaderProgram</a>, <a class="el" href="class_open_gl___vertex_buffer.html#a7e5e772f0fee459b1774b21810e1a1e6">OpenGl_VertexBuffer</a>, <a class="el" href="class_open_gl___frame_buffer.html#ab309082e5f0f3605207169ec02617ca5">OpenGl_FrameBuffer</a>, <a class="el" href="class_open_gl___font.html#a34b5ece2b59fd029659ace46f95ce800">OpenGl_Font</a>, <a class="el" href="class_open_gl___texture_buffer_arb.html#ad40e54e5e9c93201438b142ddfdad532">OpenGl_TextureBufferArb</a>, <a class="el" href="class_open_gl___line_attributes.html#a84bcedc1c2fd5c850894155b883fd634">OpenGl_LineAttributes</a>, <a class="el" href="class_open_gl___shader_object.html#aa15591980bf92aa887bd7a54ccfbe6c3">OpenGl_ShaderObject</a>, <a class="el" href="class_open_gl___capping_plane_resource.html#ac46e2c9780b47aa95f321316e7b6e20a">OpenGl_CappingPlaneResource</a>, <a class="el" href="class_open_gl___vertex_buffer_compat.html#ae05afa38235a4a41620e533d432e7072">OpenGl_VertexBufferCompat</a>, <a class="el" href="class_open_gl___sampler.html#aae6acb0046d707a68b1a26e924c9363c">OpenGl_Sampler</a>, and <a class="el" href="class_open_gl___point_sprite.html#a342e5b050fa7d05bc432d9eda10c77a6">OpenGl_PointSprite</a>.</p>
+<p>Implemented in <a class="el" href="class_open_gl___texture.html#a7dafca5aa9650666b02f3d2523dd7b24">OpenGl_Texture</a>, <a class="el" href="class_open_gl___shader_program.html#ac80ef04904ed43919f0db964f214793f">OpenGl_ShaderProgram</a>, <a class="el" href="class_open_gl___vertex_buffer.html#a7e5e772f0fee459b1774b21810e1a1e6">OpenGl_VertexBuffer</a>, <a class="el" href="class_open_gl___font.html#a34b5ece2b59fd029659ace46f95ce800">OpenGl_Font</a>, <a class="el" href="class_open_gl___texture_buffer_arb.html#ad40e54e5e9c93201438b142ddfdad532">OpenGl_TextureBufferArb</a>, <a class="el" href="class_open_gl___line_attributes.html#a84bcedc1c2fd5c850894155b883fd634">OpenGl_LineAttributes</a>, <a class="el" href="class_open_gl___shader_object.html#aa15591980bf92aa887bd7a54ccfbe6c3">OpenGl_ShaderObject</a>, <a class="el" href="class_open_gl___capping_plane_resource.html#ac46e2c9780b47aa95f321316e7b6e20a">OpenGl_CappingPlaneResource</a>, <a class="el" href="class_open_gl___frame_buffer.html#ab309082e5f0f3605207169ec02617ca5">OpenGl_FrameBuffer</a>, <a class="el" href="class_open_gl___vertex_buffer_compat.html#ae05afa38235a4a41620e533d432e7072">OpenGl_VertexBufferCompat</a>, <a class="el" href="class_open_gl___sampler.html#aae6acb0046d707a68b1a26e924c9363c">OpenGl_Sampler</a>, and <a class="el" href="class_open_gl___point_sprite.html#a342e5b050fa7d05bc432d9eda10c77a6">OpenGl_PointSprite</a>.</p>
 
 </div>
 </div>

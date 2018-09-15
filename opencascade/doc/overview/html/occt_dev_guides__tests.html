@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="occ_logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -155,7 +155,7 @@ Introduction</h1>
 <h2><a class="anchor" id="testmanual_intro_basic"></a>
 Basic Information</h2>
 <p>OCCT automatic testing system is organized around <a class="el" href="occt_user_guides__test_harness.html">DRAW Test Harness</a>, a console application based on Tcl (a scripting language) interpreter extended by OCCT-related commands.</p>
-<p><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_standard.html">Standard</a> OCCT tests are included with OCCT sources and are located in subdirectory <em>tests</em> of the OCCT root folder. Other test folders can be included in the test system, e.g. for testing applications based on OCCT.</p>
+<p><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_standard.html">Standard</a> OCCT tests are included with OCCT sources and are located in subdirectory <em>tests</em> of the OCCT root folder. Other test folders can be included in the test system, e.g. for testing applications based on OCCT.</p>
 <p>The tests are organized in three levels:</p>
 <ul>
 <li>Group: a group of related test grids, usually testing a particular OCCT functionality (e.g. blend);</li>
@@ -205,7 +205,7 @@ Creating a New Test</h3>
 <p>The detailed rules of creation of new tests are given in <a class="el" href="occt_dev_guides__tests.html#testmanual_3">Creation and modification of tests</a> chapter. The following short description covers the most typical situations:</p>
 <p>Use prefix <em>bug</em> followed by Mantis issue ID and, if necessary, additional suffixes, for naming the test script, data files, and DRAW commands specific for this test case.</p>
 <ol type="1">
-<li>If the test requires C++ code, add it as new DRAW command(s) in one of files in <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_q_a_bugs.html">QABugs</a></em> package.</li>
+<li>If the test requires C++ code, add it as new DRAW command(s) in one of files in <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_q_a_bugs.html">QABugs</a></em> package.</li>
 <li>Add script(s) for the test case in the subfolder corresponding to the relevant OCCT module of the group <em>bugs</em> <em>($CASROOT/tests/bugs)</em>. See <a class="el" href="occt_dev_guides__tests.html#testmanual_5_2">the correspondence map</a>.</li>
 <li>In the test script:<ul>
 <li>Load all necessary DRAW modules by command <em>pload</em>.</li>
@@ -217,7 +217,7 @@ Creating a New Test</h3>
 <li>If the test case produces error messages (contained in parse.rules), which are expected in that test and should not be considered as its failure (e.g. test for <em>checkshape</em> command), add REQUIRED statement for each error to mark it as required output.</li>
 </ul>
 </li>
-<li>To check whether the data files needed for the test are already present in the database, use DRAW command <em>testfile</em> (see below). If the data file is already present, use it for a new test instead of adding a duplicate. If the data file(s) are not yet present in the test database, put them to a folder and add it to the environment variable <em>CSF_TestDataPath</em> to be found by the test system. The location of the data files, which need to be accessed by OCC team and put to the official database, should be provided in the comment to Mantis issue, clearly indicating how the names of the files used by the test script match the actual names of the files. The simplest way is to attach the data files to the Mantis issue, with the same names as used by the test script.</li>
+<li>If the test uses data file(s) that are not yet present in the test database, it is possible to put them to (sub)directory pointed out by <em>CSF_TestDataPath</em> variable for running test. The files should be attached to the Mantis issue corresponding to the tested modification.</li>
 <li>Check that the test case runs as expected (test for fix: OK with the fix, FAILED without the fix; test for existing problem: BAD), and integrate it to the Git branch created for the issue.</li>
 </ol>
 <p>Example:</p>
@@ -227,12 +227,11 @@ Creating a New Test</h3>
 <div class="fragment"><div class="line">git status -short</div><div class="line">A tests/bugs/heal/data/bug210_a.brep</div><div class="line">A tests/bugs/heal/data/bug210_b.brep</div><div class="line">A tests/bugs/heal/bug210_1</div><div class="line">A tests/bugs/heal/bug210_2</div></div><!-- fragment --><ul>
 <li>Test script</li>
 </ul>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="keyword">puts</span> &quot;OCC210 (case 1): Improve FixShape for touching wires&quot;<span class="comment"></span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"></span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;restore [locate_data_file bug210_a.brep] a<span class="comment"> </span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;fixshape result a 0.01 0.01<span class="comment"></span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"></span>checkshape result</div></div><!-- fragment --><p>DRAW command <em>testfile</em> should be used to check the data files used by the test for possible duplication of content or names. The command accepts the list of paths to files to be checked (as a single argument) and gives a conclusion on each of the files, for instance:</p>
-<div class="fragment"><div class="line">Draw[1]&gt; testfile [glob /my/data/path/bug12345*]</div><div class="line">Collecting info on test data files repository...</div><div class="line">Checking new file(s)...</div><div class="line"></div><div class="line">* /my/data/path/bug12345.brep: duplicate</div><div class="line">  already present under name bug28773_1.brep</div><div class="line">  --&gt; //server/occt_tests_data/public/brep/bug28773_1.brep</div><div class="line"></div><div class="line">* /my/data/path/cadso.brep: new file</div><div class="line">  Warning: DOS encoding detected, consider converting to</div><div class="line">           UNIX unless DOS line ends are needed for the test</div><div class="line">  Warning: shape contains triangulation (946 triangles),</div><div class="line">           consider removing them unless they are needed for the test!</div><div class="line">  BREP size=201 KiB, nbfaces=33, nbedges=94 -&gt; private</div><div class="line"></div><div class="line">* /my/data/path/case_8_wire3.brep: already present</div><div class="line">  --&gt; //server/occt_tests_data/public/brep/case_8_wire3.brep</div><div class="line"></div><div class="line">* /my/data/path/case_8_wire4.brep: error</div><div class="line">  name is already used by existing file</div><div class="line">  --&gt; //server/occt_tests_data/public/brep/case_8_wire4.brep</div></div><!-- fragment --><h1><a class="anchor" id="testmanual_2"></a>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="keyword">puts</span> &quot;OCC210 (case 1): Improve FixShape for touching wires&quot;<span class="comment"></span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"></span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;restore [locate_data_file bug210_a.brep] a<span class="comment"> </span></div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"></span></div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;fixshape result a 0.01 0.01<span class="comment"></span></div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment"></span>checkshape result</div></div><!-- fragment --><h1><a class="anchor" id="testmanual_2"></a>
 Organization of Test Scripts</h1>
 <h2><a class="anchor" id="testmanual_2_1"></a>
 General Layout</h2>
-<p><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_standard.html">Standard</a> OCCT tests are located in subdirectory tests of the OCCT root folder ($CASROOT).</p>
+<p><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_standard.html">Standard</a> OCCT tests are located in subdirectory tests of the OCCT root folder ($CASROOT).</p>
 <p>Additional test folders can be added to the test system by defining environment variable <em>CSF_TestScriptsPath</em>. This should be list of paths separated by semicolons (*;*) on Windows or colons (*:*) on Linux or Mac. Upon DRAW launch, path to <em>tests</em> subfolder of OCCT is added at the end of this variable automatically.</p>
 <p>Each test folder is expected to contain:</p><ul>
 <li>Optional file <em>parse.rules</em> defining patterns for interpretation of test results, common for all groups in this folder</li>
@@ -263,7 +262,7 @@ File "grids.list"</h3>
 <div class="fragment"><div class="line">001 gridname1</div><div class="line">002 gridname2</div><div class="line">...</div><div class="line">NNN gridnameN</div></div><!-- fragment --><p>Example:</p>
 <div class="fragment"><div class="line">001 basic</div><div class="line">002 advanced</div></div><!-- fragment --><h3><a class="anchor" id="testmanual_2_2_3"></a>
 File "begin"</h3>
-<p>This file is a Tcl script. It is executed before every test in the current group. Usually it loads necessary <a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_draw.html">Draw</a> commands, sets common parameters and defines additional Tcl functions used in test scripts.</p>
+<p>This file is a Tcl script. It is executed before every test in the current group. Usually it loads necessary <a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_draw.html">Draw</a> commands, sets common parameters and defines additional Tcl functions used in test scripts.</p>
 <p>Example:</p>
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;pload TOPTEST<span class="comment"> ;</span><span class="comment"># load topological command</span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"></span><span class="keyword">set</span> cpulimit 300<span class="comment"> ;</span><span class="comment"># set maximum time allowed for script execution</span></div></div><!-- fragment --><h3><a class="anchor" id="testmanual_2_2_4"></a>
 File "end"</h3>
@@ -325,7 +324,7 @@ Choosing Group, Grid, and Test Case Name</h2>
 <p>The new tests are usually added in the frame of processing issues in OCCT Mantis tracker. Such tests in general should be added to group bugs, in the grid corresponding to the affected OCCT functionality. See <a class="el" href="occt_dev_guides__tests.html#testmanual_5_2">Mapping of OCCT functionality to grid names in group bugs</a>.</p>
 <p>New grids can be added as necessary to contain tests for the functionality not yet covered by existing test grids. The test case name in the bugs group should be prefixed by the ID of the corresponding issue in Mantis (without leading zeroes) with prefix <em>bug</em>. It is recommended to add a suffix providing a hint on the tested situation. If more than one test is added for a bug, they should be distinguished by suffixes; either meaningful or just ordinal numbers.</p>
 <p>Example:</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;bug12345_coaxial<span class="comment"></span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"></span>bug12345_orthogonal_1<span class="comment"></span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"></span>bug12345_orthogonal_2</div></div><!-- fragment --><p>If the new test corresponds to a functionality already covered by the existing systematic test grid (e.g. group <em>mesh</em> for <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/namespace_b_rep_mesh.html">BRepMesh</a></em> issues), this test can be added (or moved later by OCC team) to that grid.</p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;bug12345_coaxial<span class="comment"></span></div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"></span>bug12345_orthogonal_1<span class="comment"></span></div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"></span>bug12345_orthogonal_2</div></div><!-- fragment --><p>If the new test corresponds to a functionality already covered by the existing systematic test grid (e.g. group <em>mesh</em> for <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/namespace_b_rep_mesh.html">BRepMesh</a></em> issues), this test can be added (or moved later by OCC team) to that grid.</p>
 <h2><a class="anchor" id="testmanual_3_2"></a>
 Adding Data Files Required for a Test</h2>
 <p>It is advisable to make self-contained test scripts whenever possible, so as they could be used in the environments where data files are not available. For that simple geometric objects and shapes can be created using DRAW commands in the test script itself.</p>
@@ -337,7 +336,7 @@ Adding new DRAW commands</h2>
 <p>If the test cannot be implemented using available DRAW commands, consider the following possibilities:</p><ul>
 <li>If the existing DRAW command can be extended to enable possibility required for a test in a natural way (e.g. by adding an option to activate a specific mode of the algorithm), this way is recommended. This change should be appropriately documented in a relevant Mantis issue.</li>
 <li>If the new command is needed to access OCCT functionality not exposed to DRAW previously, and this command can be potentially reused (for other tests), it should be added to the package where similar commands are implemented (use <em>getsource</em> DRAW command to get the package name). The name and arguments of the new command should be chosen to keep similarity with the existing commands. This change should be documented in a relevant Mantis issue.</li>
-<li>Otherwise the new command implementing the actions needed for this particular test should be added in <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_q_a_bugs.html">QABugs</a></em> package. The command name should be formed by the Mantis issue ID prefixed by <em>bug</em>, e.g. <em>bug12345</em>.</li>
+<li>Otherwise the new command implementing the actions needed for this particular test should be added in <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_q_a_bugs.html">QABugs</a></em> package. The command name should be formed by the Mantis issue ID prefixed by <em>bug</em>, e.g. <em>bug12345</em>.</li>
 </ul>
 <p>Note that a DRAW command is expected to return 0 in case of a normal completion, and 1 (Tcl exception) if it is incorrectly used (e.g. a wrong number of input arguments). Thus if the new command needs to report a test error, this should be done by outputting an appropriate error message rather than by returning a non-zero value. File names must be encoded in the script rather than in the DRAW command and passed to the DRAW command as an argument.</p>
 <h2><a class="anchor" id="testmanual_3_4"></a>
@@ -487,7 +486,7 @@ blend</h3>
 <h3><a class="anchor" id="testmanual_5_1_3"></a>
 boolean</h3>
 <p>This group allows testing Boolean operations.</p>
-<p>DRAW module: MODELING (packages <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_o_p_test.html">BOPTest</a></em> and <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>).</p>
+<p>DRAW module: MODELING (packages <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_o_p_test.html">BOPTest</a></em> and <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>).</p>
 <p>Grids names are based on name of the command used, with suffixes:</p><ul>
 <li><em>_2d</em> &ndash; for tests operating with 2d objects (wires, wires, 3d objects, etc.);</li>
 <li><em>_simple</em> &ndash; for tests operating on simple shapes (boxes, cylinders, toruses, etc.);</li>
@@ -563,7 +562,7 @@ caf</h3>
 <tr>
 <td align="left">driver </td><td align="left"></td><td align="left">OCAF drivers </td></tr>
 <tr>
-<td align="left">named_shape </td><td align="left"></td><td align="left"><em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_t_naming___named_shape.html">TNaming_NamedShape</a></em> attribute </td></tr>
+<td align="left">named_shape </td><td align="left"></td><td align="left"><em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_t_naming___named_shape.html">TNaming_NamedShape</a></em> attribute </td></tr>
 <tr>
 <td align="left">presentation </td><td align="left"></td><td align="left"><em>AISPresentation</em> attributes </td></tr>
 <tr>
@@ -624,7 +623,7 @@ draft</h3>
 <h3><a class="anchor" id="testmanual_5_1_9"></a>
 feat</h3>
 <p>This group allows testing creation of features on a shape.</p>
-<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>).</p>
+<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>).</p>
 <table class="doxtable">
 <tr>
 <th align="left">Grid </th><th align="left">Commands </th><th align="left">Functionality  </th></tr>
@@ -642,7 +641,7 @@ feat</h3>
 <h3><a class="anchor" id="testmanual_5_1_10"></a>
 heal</h3>
 <p>This group allows testing the functionality provided by <em>ShapeHealing</em> toolkit.</p>
-<p>DRAW module: <a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_x_s_d_r_a_w.html">XSDRAW</a></p>
+<p>DRAW module: <a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_x_s_d_r_a_w.html">XSDRAW</a></p>
 <table class="doxtable">
 <tr>
 <th align="left">Grid </th><th align="left">Commands </th><th align="left">Functionality  </th></tr>
@@ -689,8 +688,8 @@ heal</h3>
 </table>
 <h3><a class="anchor" id="testmanual_5_1_11"></a>
 mesh</h3>
-<p>This group allows testing shape tessellation (<em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/namespace_b_rep_mesh.html">BRepMesh</a></em>) and shading.</p>
-<p>DRAW modules: MODELING (package <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_mesh_test.html">MeshTest</a></em>), VISUALIZATION (package <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_viewer_test.html">ViewerTest</a></em>)</p>
+<p>This group allows testing shape tessellation (<em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/namespace_b_rep_mesh.html">BRepMesh</a></em>) and shading.</p>
+<p>DRAW modules: MODELING (package <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_mesh_test.html">MeshTest</a></em>), VISUALIZATION (package <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_viewer_test.html">ViewerTest</a></em>)</p>
 <table class="doxtable">
 <tr>
 <th align="left">Grid </th><th align="left">Commands </th><th align="left">Functionality  </th></tr>
@@ -714,7 +713,7 @@ mesh</h3>
 <h3><a class="anchor" id="testmanual_5_1_12"></a>
 mkface</h3>
 <p>This group allows testing creation of simple surfaces.</p>
-<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
+<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
 <table class="doxtable">
 <tr>
 <th align="left">Grid </th><th align="left">Commands </th><th align="left">Functionality  </th></tr>
@@ -734,7 +733,7 @@ mkface</h3>
 <h3><a class="anchor" id="testmanual_5_1_13"></a>
 nproject</h3>
 <p>This group allows testing normal projection of edges and wires onto a face.</p>
-<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
+<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
 <table class="doxtable">
 <tr>
 <th align="left">Grid </th><th align="left">Commands </th><th align="left">Functionality  </th></tr>
@@ -744,7 +743,7 @@ nproject</h3>
 <h3><a class="anchor" id="testmanual_5_1_14"></a>
 offset</h3>
 <p>This group allows testing offset functionality for curves and surfaces.</p>
-<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
+<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
 <table class="doxtable">
 <tr>
 <th align="left">Grid </th><th align="left">Commands </th><th align="left">Functionality  </th></tr>
@@ -766,17 +765,17 @@ offset</h3>
 <h3><a class="anchor" id="testmanual_5_1_15"></a>
 pipe</h3>
 <p>This group allows testing construction of pipes (sweeping of a contour along profile).</p>
-<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
+<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
 <table class="doxtable">
 <tr>
 <th align="left">Grid </th><th align="left">Commands </th><th align="left">Functionality  </th></tr>
 <tr>
-<td align="left"><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_standard.html">Standard</a> </td><td align="left">pipe </td><td align="left"></td></tr>
+<td align="left"><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_standard.html">Standard</a> </td><td align="left">pipe </td><td align="left"></td></tr>
 </table>
 <h3><a class="anchor" id="testmanual_5_1_16"></a>
 prism</h3>
 <p>This group allows testing construction of prisms.</p>
-<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
+<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
 <table class="doxtable">
 <tr>
 <th align="left">Grid </th><th align="left">Commands </th><th align="left">Functionality  </th></tr>
@@ -786,7 +785,7 @@ prism</h3>
 <h3><a class="anchor" id="testmanual_5_1_17"></a>
 sewing</h3>
 <p>This group allows testing sewing of faces by connecting edges.</p>
-<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
+<p>DRAW module: MODELING (package <em><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_test.html">BRepTest</a></em>)</p>
 <table class="doxtable">
 <tr>
 <th align="left">Grid </th><th align="left">Commands </th><th align="left">Functionality  </th></tr>
@@ -825,7 +824,7 @@ Mapping of OCCT functionality to grid names in group *bugs*</h2>
 <tr>
 <td align="left">Application Framework </td><td align="left">PTKernel, TKPShape, TKCDF, TKLCAF, TKCAF, TKBinL, TKXmlL, TKShapeSchema, TKPLCAF, TKBin, TKXml, TKPCAF, FWOSPlugin, TKStdLSchema, TKStdSchema, TKTObj, TKBinTObj, TKXmlTObj </td><td align="left">caf </td></tr>
 <tr>
-<td align="left"><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_draw.html">Draw</a> </td><td align="left">TKDraw, TKTopTest, TKViewerTest, TKXSDRAW, TKDCAF, TKXDEDRAW, TKTObjDRAW, TKQADraw, DRAWEXE, Problems of testing system </td><td align="left">draw </td></tr>
+<td align="left"><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_draw.html">Draw</a> </td><td align="left">TKDraw, TKTopTest, TKViewerTest, TKXSDRAW, TKDCAF, TKXDEDRAW, TKTObjDRAW, TKQADraw, DRAWEXE, Problems of testing system </td><td align="left">draw </td></tr>
 <tr>
 <td align="left">Shape Healing </td><td align="left">TKShHealing </td><td align="left">heal </td></tr>
 <tr>
@@ -999,7 +998,7 @@ Check maximum deflection, number of triangles and nodes in mesh</h3>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sat May 26 2018 14:12:05 for Open CASCADE Technology by
+    <li class="footer">Generated on Wed Aug 30 2017 17:08:51 for Open CASCADE Technology by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

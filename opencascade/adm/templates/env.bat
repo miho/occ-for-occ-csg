@@ -82,8 +82,6 @@ set "VisualStudioExpressName=VCExpress"
 
 if not "%DevEnvDir%" == "" (
   rem If DevEnvDir is already defined (e.g. in custom.bat), use that value
-) else if /I "%VCFMT%" == "vc9" (
-  set "DevEnvDir=%VS90COMNTOOLS%..\IDE"
 ) else if /I "%VCFMT%" == "vc10" (
   set "DevEnvDir=%VS100COMNTOOLS%..\IDE"
 ) else if /I "%VCFMT%" == "vc11" (
@@ -103,22 +101,12 @@ if not "%DevEnvDir%" == "" (
 ) else if /I "%VCFMT%" == "gcc" (
   rem MinGW
 ) else (
-  echo Error: first argument ^(%VCVER%^) should specify supported version of Visual C++, 
-  echo one of: 
-  echo vc9   = VS 2008 ^(SP1^)
-  echo vc10  = VS 2010 ^(SP3^)
-  echo vc11  = VS 2012 ^(SP3^)
-  echo vc12  = VS 2013 ^(SP3^)
-  echo vc14  = VS 2015
-  echo vc141 = VS 2017
+  echo Error: wrong VS identifier
   exit /B
 )
 
 rem ----- Parsing vcvarsall for qt samples and define PlatformToolset -----
-if /I "%VCFMT%" == "vc9" (
-  set "VCVARS=%VS90COMNTOOLS%..\..\VC\vcvarsall.bat"
-  set "VCPlatformToolSet=v90"
-) else if /I "%VCFMT%" == "vc10" (
+if /I "%VCFMT%" == "vc10" (
   set "VCVARS=%VS100COMNTOOLS%..\..\VC\vcvarsall.bat"
   set "VCPlatformToolSet=v100"
 ) else if /I "%VCFMT%" == "vc11" (
@@ -138,8 +126,9 @@ if /I "%VCFMT%" == "vc9" (
 ) else if /I "%VCFMT%" == "gcc" (
   rem MinGW
 ) else (
-  echo Error: wrong VS identifier
-  exit /B
+  echo Error: first argument ^(%VCVER%^) should specify supported version of Visual C++,
+  echo one of: vc10 ^(VS 2010 SP3^), vc11 ^(VS 2012 SP3^), vc12 ^(VS 2013^) or vc14 ^(VS 2015^)
+  exit
 )
 
 set "CSF_OPT_LIB32D=%CSF_OPT_LIB32%"

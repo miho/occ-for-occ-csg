@@ -17,10 +17,8 @@
 
 #include <TDataStd_AsciiString.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QVariant>
 #include <QIcon>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : GetValues

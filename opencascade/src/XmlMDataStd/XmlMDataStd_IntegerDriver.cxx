@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_Integer.hxx>
 #include <TDF_Attribute.hxx>
@@ -29,7 +29,7 @@ IMPLEMENT_DOMSTRING (AttributeIDString, "intattguid")
 //purpose  : Constructor
 //=======================================================================
 XmlMDataStd_IntegerDriver::XmlMDataStd_IntegerDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -58,8 +58,8 @@ Standard_Boolean XmlMDataStd_IntegerDriver::Paste
     TCollection_ExtendedString aMessageString =
       TCollection_ExtendedString("Cannot retrieve Integer attribute from \"")
         + anIntStr + "\"";
-    myMessageDriver->Send (aMessageString, Message_Warning);
-    aValue = 0;
+    WriteMessage (aMessageString);
+    return Standard_False;
   }
 
   Handle(TDataStd_Integer) anInt= Handle(TDataStd_Integer)::DownCast(theTarget);

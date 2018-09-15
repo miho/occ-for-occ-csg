@@ -124,9 +124,7 @@
 #include <StepRepr_RepresentationRelationship.hxx>
 #include <StepRepr_RepresentedDefinition.hxx>
 #include <StepRepr_ReprItemAndLengthMeasureWithUnit.hxx>
-#include <StepRepr_ReprItemAndLengthMeasureWithUnitAndQRI.hxx>
 #include <StepRepr_ReprItemAndPlaneAngleMeasureWithUnit.hxx>
-#include <StepRepr_ReprItemAndPlaneAngleMeasureWithUnitAndQRI.hxx>
 #include <StepRepr_SequenceOfRepresentationItem.hxx>
 #include <StepRepr_ShapeAspect.hxx>
 #include <StepRepr_ShapeAspectDerivingRelationship.hxx>
@@ -305,6 +303,16 @@ TCollection_AsciiString AddrToString(const TopoDS_Shape& theShape)
   return aStr;
 }
 #endif
+
+//=======================================================================
+//function : AllocateSubLabel
+//purpose  :
+//=======================================================================
+
+static TDF_Label AllocateSubLabel(TDF_Label& theRoot)
+{
+  return TDF_TagSource::NewChild(theRoot);
+}
 
 //=======================================================================
 //function : STEPCAFControl_Reader
@@ -2736,27 +2744,21 @@ TDF_Label STEPCAFControl_Reader::createGDTObjectInXCAF(const Handle(Standard_Tra
   {
     return aGDTL;
   }
-
-  Handle(TCollection_HAsciiString) aSemanticName;
-
   // protection against invalid input
   if (theEnt->IsKind(STANDARD_TYPE(StepDimTol_GeometricTolerance))) {
     Handle(StepDimTol_GeometricTolerance) aGeomTol = Handle(StepDimTol_GeometricTolerance)::DownCast(theEnt);
     if (aGeomTol->TolerancedShapeAspect().IsNull())
       return aGDTL;
-    aSemanticName = aGeomTol->Name();
   }
   if (theEnt->IsKind(STANDARD_TYPE(StepShape_DimensionalSize))) {
     Handle(StepShape_DimensionalSize) aDim = Handle(StepShape_DimensionalSize)::DownCast(theEnt);
     if (aDim->AppliesTo().IsNull())
       return aGDTL;
-    aSemanticName = aDim->Name();
   }
   if (theEnt->IsKind(STANDARD_TYPE(StepShape_DimensionalLocation))) {
     Handle(StepShape_DimensionalLocation) aDim = Handle(StepShape_DimensionalLocation)::DownCast(theEnt);
     if (aDim->RelatedShapeAspect().IsNull() || aDim->RelatingShapeAspect().IsNull())
       return aGDTL;
-    aSemanticName = aDim->Name();
   }
 
   Handle(XCAFDoc_ShapeTool) aSTool = XCAFDoc_DocumentTool::ShapeTool( theDoc->Main() );
@@ -3062,7 +3064,7 @@ TDF_Label STEPCAFControl_Reader::createGDTObjectInXCAF(const Handle(Standard_Tra
   {
     Standard_Integer anIndex = FindShapeIndexForDGT(aSeqRI1.Value(i), theWS);
     TopoDS_Shape aSh;
-    if(anIndex > 0) {
+    if(anIndex >0) {
       Handle(Transfer_Binder) aBinder = aTP->MapItem(anIndex);
       aSh = TransferBRep::ShapeResult(aBinder);
     }
@@ -3070,20 +3072,7 @@ TDF_Label STEPCAFControl_Reader::createGDTObjectInXCAF(const Handle(Standard_Tra
     {
       TDF_Label aShL;
       aSTool->Search(aSh, aShL, Standard_True, Standard_True, Standard_True);
-      if (aShL.IsNull() && aSh.ShapeType() == TopAbs_WIRE)
-      {
-        TopExp_Explorer ex(aSh, TopAbs_EDGE, TopAbs_SHAPE);
-        while (ex.More())
-        {
-          TDF_Label edgeL;
-          aSTool->Search(ex.Current(), edgeL, Standard_True, Standard_True, Standard_True);
-          if (!edgeL.IsNull())
-            aShLS1.Append(edgeL);
-          ex.Next();
-        }
-      }
-      if (!aShL.IsNull())
-        aShLS1.Append(aShL);
+      aShLS1.Append(aShL);
     }
   }
   if (!aSeqRI2.IsEmpty())
@@ -3101,20 +3090,7 @@ TDF_Label STEPCAFControl_Reader::createGDTObjectInXCAF(const Handle(Standard_Tra
       {
         TDF_Label aShL;
         aSTool->Search(aSh, aShL, Standard_True, Standard_True, Standard_True);
-        if (aShL.IsNull() && aSh.ShapeType() == TopAbs_WIRE)
-        {
-          TopExp_Explorer ex(aSh, TopAbs_EDGE, TopAbs_SHAPE);
-          while (ex.More())
-          {
-            TDF_Label edgeL;
-            aSTool->Search(ex.Current(), edgeL, Standard_True, Standard_True, Standard_True);
-            if (!edgeL.IsNull())
-              aShLS2.Append(edgeL);
-            ex.Next();
-          }
-        }
-        if (!aShL.IsNull())
-          aShLS2.Append(aShL);
+        aShLS2.Append(aShL);
       }
     }
   }
@@ -3165,13 +3141,6 @@ TDF_Label STEPCAFControl_Reader::createGDTObjectInXCAF(const Handle(Standard_Tra
         anObj->AddModifier(XCAFDimTolObjects_GeomToleranceModif_All_Over);
       aGTol->SetObject(anObj);
     }
-
-    if (aSemanticName)
-    {
-      TCollection_ExtendedString str(aSemanticName->String());
-      TDataStd_Name::Set(aGDTL, str);
-    }
-
     readDatumsAP242(theEnt, aGDTL, theDoc, theWS);
   }
   return aGDTL;
@@ -3203,7 +3172,6 @@ static void setDimObjectToXCAF(const Handle(Standard_Transient)& theEnt,
 
   aDimObj = new XCAFDimTolObjects_DimensionObject();
   Standard_Real aDim1=-1.,aDim2=-1.,aDim3=-1.;
-  Standard_Boolean isPlusMinusTolerance = Standard_False;
   Handle(StepShape_TypeQualifier) aTQ;
   Handle(StepShape_ValueFormatTypeQualifier) aVFTQ;
   Handle(StepShape_ToleranceValue) aTV;
@@ -3237,65 +3205,79 @@ static void setDimObjectToXCAF(const Handle(Standard_Transient)& theEnt,
             Handle(StepRepr_RepresentationItem) aDRI = aHARI->Value(nr);
             if(aDRI.IsNull()) continue;
 
-            if (aDRI->IsKind(STANDARD_TYPE(StepRepr_ReprItemAndMeasureWithUnit))) {
-              // simple value / range
-              Handle(StepRepr_ReprItemAndMeasureWithUnit) aMWU =
-                Handle(StepRepr_ReprItemAndMeasureWithUnit)::DownCast(aDRI);
-              Standard_Real aVal = aMWU->GetMeasureWithUnit()->ValueComponent();
-              StepBasic_Unit anUnit = aMWU->GetMeasureWithUnit()->UnitComponent();
-              Standard_Real aFact = 1.;
-              if (anUnit.IsNull()) 
-                continue;
-              if (!(anUnit.CaseNum(anUnit.Value()) == 1)) 
-                continue;
+            if(aDRI->IsKind(STANDARD_TYPE(StepRepr_ReprItemAndLengthMeasureWithUnit))) {
+              //get values
+              Handle(StepRepr_ReprItemAndLengthMeasureWithUnit) aRILMWU =
+                Handle(StepRepr_ReprItemAndLengthMeasureWithUnit)::DownCast(aDRI);
+              Standard_Real aVal = aRILMWU->GetMeasureWithUnit()->ValueComponent();
+              StepBasic_Unit anUnit = aRILMWU->GetMeasureWithUnit()->UnitComponent();
+              Standard_Real aFact=1.;
+              if(anUnit.IsNull()) continue;
+              if( !(anUnit.CaseNum(anUnit.Value())==1) ) continue;
               Handle(StepBasic_NamedUnit) NU = anUnit.NamedUnit();
-              if (aMWU->IsKind(STANDARD_TYPE(StepRepr_ReprItemAndLengthMeasureWithUnit))) {
-                if (GetLengthConversionFactor(NU, aFact))
-                  aVal = aVal * aFact;
+              if(GetLengthConversionFactor(NU,aFact)) aVal=aVal*aFact;
+              if(aDim2 > 0)
+              {
+                if(aDim1 > aDim2)
+                {
+                  Standard_Real aTmp = aDim1;
+                  aDim1 = aDim2;
+                  aDim2 = aTmp;
+                }
+                if(aVal < aDim1)
+                  aDim1 = aVal;
+                else if(aVal > aDim2)
+                  aDim2 = aVal;
+              }
+              else if(aDim1 > 0)
+              {
+                if (aVal > aDim1)
+                  aDim2 = aVal;
+                else
+                {
+                  aDim2 = aDim1;
+                  aDim1 = aVal;
+                }
               }
               else
-                if (aMWU->IsKind(STANDARD_TYPE(StepRepr_ReprItemAndPlaneAngleMeasureWithUnit))) {
-                  if (GetAngleConversionFactor(NU, aFact))
-                    aVal = aVal * aFact;
-                }
-              Handle(TCollection_HAsciiString) aName = aMWU->Name();
-              if (aName->Search("upper") > 0) // upper limit
-                aDim2 = aVal;
-              else // lower limit or simple nominal value
                 aDim1 = aVal;
             }
-            else if (aDRI->IsKind(STANDARD_TYPE(StepRepr_ReprItemAndMeasureWithUnitAndQRI))) {
-              // value with qualifier (minimum/maximum/average)
-              Handle(StepRepr_ReprItemAndMeasureWithUnitAndQRI) aMWU =
-                Handle(StepRepr_ReprItemAndMeasureWithUnitAndQRI)::DownCast(aDRI);
-              Standard_Real aVal = aMWU->GetMeasureWithUnit()->ValueComponent();
-              StepBasic_Unit anUnit = aMWU->GetMeasureWithUnit()->UnitComponent();
-              Standard_Real aFact = 1.;
-              if(anUnit.IsNull())
-                continue;
-              if( !(anUnit.CaseNum(anUnit.Value()) == 1) )
-                continue;
+            else if(aDRI->IsKind(STANDARD_TYPE(StepRepr_ReprItemAndPlaneAngleMeasureWithUnit))) {
+              //get values
+              Handle(StepRepr_ReprItemAndPlaneAngleMeasureWithUnit) aRIPAMWU =
+                Handle(StepRepr_ReprItemAndPlaneAngleMeasureWithUnit)::DownCast(aDRI);
+              Standard_Real aVal = aRIPAMWU->GetMeasureWithUnit()->ValueComponent();
+              StepBasic_Unit anUnit = aRIPAMWU->GetMeasureWithUnit()->UnitComponent();
+              Standard_Real aFact=1.;
+              if(anUnit.IsNull()) continue;
+              if( !(anUnit.CaseNum(anUnit.Value())==1) ) continue;
               Handle(StepBasic_NamedUnit) NU = anUnit.NamedUnit();
-              if (aMWU->IsKind(STANDARD_TYPE(StepRepr_ReprItemAndLengthMeasureWithUnitAndQRI))) {
-                if (GetLengthConversionFactor(NU, aFact))
-                  aVal = aVal * aFact;
+              if(GetAngleConversionFactor(NU,aFact)) aVal=aVal*aFact;
+              if(aDim2 > 0)
+              {
+                if(aDim1 > aDim2)
+                {
+                  Standard_Real aTmp = aDim1;
+                  aDim1 = aDim2;
+                  aDim2 = aTmp;
+                }
+                if(aVal < aDim1)
+                  aDim1 = aVal;
+                else if(aVal > aDim2)
+                  aDim2 = aVal;
+              }
+              else if(aDim1 > 0)
+              {
+                if (aVal > aDim1)
+                  aDim2 = aVal;
+                else
+                {
+                  aDim2 = aDim1;
+                  aDim1 = aVal;
+                }
               }
               else
-                if (aMWU->IsKind(STANDARD_TYPE(StepRepr_ReprItemAndPlaneAngleMeasureWithUnitAndQRI))) {
-                  if (GetAngleConversionFactor(NU, aFact))
-                    aVal = aVal * aFact;
-                }
-              Handle(StepShape_QualifiedRepresentationItem) aQRI = aMWU->GetQualifiedRepresentationItem();
-              if (aQRI->Qualifiers()->Length() == 0) {
                 aDim1 = aVal;
-                continue;
-              }
-              Handle(StepShape_TypeQualifier) aValueType = aQRI->Qualifiers()->Value(1).TypeQualifier();
-              if (aValueType->Name()->String().IsEqual("minimum"))
-                aDim2 = aVal;
-              else if (aValueType->Name()->String().IsEqual("maximum"))
-                aDim3 = aVal;
-              else aDim1 = aVal;
             }
             else if(aDRI->IsKind(STANDARD_TYPE(StepShape_QualifiedRepresentationItem))) {
               //get qualifier
@@ -3325,7 +3307,6 @@ static void setDimObjectToXCAF(const Handle(Standard_Transient)& theEnt,
     }
     else if (!aPMT.IsNull())
     {
-      isPlusMinusTolerance = Standard_True;
       StepShape_ToleranceMethodDefinition aTMD = aPMT->Range();
       if(aPMT.IsNull()) continue;
       if(aTMD.CaseNumber() == 1)
@@ -3376,11 +3357,6 @@ static void setDimObjectToXCAF(const Handle(Standard_Transient)& theEnt,
   else
   {
     Handle(TColStd_HArray1OfReal) anArr = new TColStd_HArray1OfReal(1,3);
-    if (!isPlusMinusTolerance)
-    {
-      aDim2 = aDim1 - aDim2;
-      aDim3 = aDim3 - aDim1;
-    }
     anArr->SetValue(1,aDim1);
     anArr->SetValue(2,aDim2);
     anArr->SetValue(3,aDim3);
@@ -3415,7 +3391,7 @@ static void setDimObjectToXCAF(const Handle(Standard_Transient)& theEnt,
     aDimObj->SetClassOfTolerance(aHolle, aFV, aG);
   }
 
-  if (!aCRI.IsNull() && !aCRI->ItemElement().IsNull() && aCRI->ItemElement()->Length() > 0)
+  if (!aCRI.IsNull() && aCRI->ItemElement()->Length() > 0)
   {
     //get modifiers
     XCAFDimTolObjects_DimensionModifiersSequence aModifiers;
@@ -4357,7 +4333,7 @@ Standard_Boolean STEPCAFControl_Reader::ReadViews(const Handle(XSControl_WorkSes
 //=======================================================================
 
 TDF_Label STEPCAFControl_Reader::SettleShapeData(const Handle(StepRepr_RepresentationItem)& theItem,
-                                                 const TDF_Label& theLab,
+                                                 TDF_Label& theLab,
                                                  const Handle(XCAFDoc_ShapeTool)& theShapeTool,
                                                  const Handle(Transfer_TransientProcess)& TP) const
 {
@@ -4376,43 +4352,13 @@ TDF_Label STEPCAFControl_Reader::SettleShapeData(const Handle(StepRepr_Represent
     return aResult;
 
   // Allocate sub-Label
-  aResult = theShapeTool->AddSubShape(theLab, aShape);
-  if (aResult.IsNull())
-    return aResult;
+  aResult = AllocateSubLabel(theLab);
 
   TCollection_AsciiString aName = hName->String();
   TDataStd_Name::Set(aResult, aName);
   theShapeTool->SetShape(aResult, aShape);
 
   return aResult;
-}
-
-//=======================================================================
-//function : collectRepresentationItems
-//purpose  : recursive collection of representation items for given representation 
-//           with all representations, related to it.
-//=======================================================================
-
-void collectRepresentationItems(const Interface_Graph& theGraph,
-                                const Handle(StepShape_ShapeRepresentation)& theRepresentation,
-                                NCollection_Sequence<Handle(StepRepr_RepresentationItem)>& theItems)
-{
-  Handle(StepRepr_HArray1OfRepresentationItem) aReprItems = theRepresentation->Items();
-  for (Standard_Integer itemIt = aReprItems->Lower(); itemIt <= aReprItems->Upper(); itemIt++)
-    theItems.Append(aReprItems->Value(itemIt));
-
-  Interface_EntityIterator entIt = theGraph.TypedSharings(theRepresentation, STANDARD_TYPE(StepRepr_RepresentationRelationship));
-  for (entIt.Start(); entIt.More(); entIt.Next())
-  {
-    Handle(StepRepr_RepresentationRelationship) aRelationship = Handle(StepRepr_RepresentationRelationship)::DownCast(entIt.Value());
-    if (aRelationship->Rep1() == theRepresentation)
-    {
-      Handle(StepShape_ShapeRepresentation)
-        aRepr = Handle(StepShape_ShapeRepresentation)::DownCast(aRelationship->Rep2());
-      if (!aRepr.IsNull())
-        collectRepresentationItems(theGraph, aRepr, theItems);
-    }
-  }
 }
 
 //=======================================================================
@@ -4465,29 +4411,24 @@ void STEPCAFControl_Reader::ExpandSubShapes(const Handle(XCAFDoc_ShapeTool)& Sha
       continue;
 
     // Access representation items
-    NCollection_Sequence<Handle(StepRepr_RepresentationItem)> aReprItems;
-    collectRepresentationItems(Graph, aShapeRepr, aReprItems);
+    Handle(StepRepr_HArray1OfRepresentationItem) aReprItems = aShapeRepr->Items();
 
-    if (aReprItems.Length() == 0)
+    if ( aReprItems.IsNull() )
       continue;
 
     if ( !ShapeLabelMap.IsBound(aRootShape) )
       continue;
 
     TDF_Label aRootLab = ShapeLabelMap.Find(aRootShape);
-    // Do not add subshapes to assembly,
-    // they will be processed with corresponding Shape_Product_Definition of necessary part.
-    if (ShapeTool->IsAssembly(aRootLab))
-      continue;
 
     StepRepr_SequenceOfRepresentationItem aMSBSeq;
     StepRepr_SequenceOfRepresentationItem aSBSMSeq;
 
     // Iterate over the top level representation items collecting the
     // topological containers to expand
-    for (Standard_Integer i = 1; i <= aReprItems.Length(); ++i)
+    for ( Standard_Integer i = aReprItems->Lower(); i <= aReprItems->Upper(); ++i )
     {
-      Handle(StepRepr_RepresentationItem) aTRepr = aReprItems.Value(i);
+      Handle(StepRepr_RepresentationItem) aTRepr = aReprItems->Value(i);
       if ( aTRepr->IsKind( STANDARD_TYPE(StepShape_ManifoldSolidBrep) ) )
         aMSBSeq.Append(aTRepr);
       else if ( aTRepr->IsKind( STANDARD_TYPE(StepShape_ShellBasedSurfaceModel) ) )
@@ -4501,11 +4442,16 @@ void STEPCAFControl_Reader::ExpandSubShapes(const Handle(XCAFDoc_ShapeTool)& Sha
     // Expand Manifold Solid BReps
     for ( Standard_Integer i = 1; i <= aMSBSeq.Length(); ++i )
     {
-      // Put additional Label for SOLID
-      if (doInsertSolidLab)
-        SettleShapeData(aMSBSeq.Value(i), aRootLab, ShapeTool, TP);
+      const Handle(StepRepr_RepresentationItem)& aManiRepr = aMSBSeq.Value(i);
 
-      ExpandManifoldSolidBrep(aRootLab, aMSBSeq.Value(i), TP, ShapeTool);
+      // Put additional Label for SOLID
+      TDF_Label aManiLab;
+      if ( doInsertSolidLab )
+        aManiLab = SettleShapeData(aManiRepr, aRootLab, ShapeTool, TP);
+      else
+        aManiLab = aRootLab;
+
+      ExpandManifoldSolidBrep(aManiLab, aMSBSeq.Value(i), TP, ShapeTool);
     }
 
     // Expand Shell-Based Surface Models
@@ -4573,18 +4519,16 @@ void STEPCAFControl_Reader::ExpandShell(const Handle(StepShape_ConnectedFaceSet)
                                         const Handle(XCAFDoc_ShapeTool)& ShapeTool) const
 {
   // Record CAF data
-  SettleShapeData(Shell, RootLab, ShapeTool, TP);
+  TDF_Label aShellLab = SettleShapeData(Shell, RootLab, ShapeTool, TP);
 
   // Access faces
   Handle(StepShape_HArray1OfFace) aFaces = Shell->CfsFaces();
   for ( Standard_Integer f = aFaces->Lower(); f <= aFaces->Upper(); ++f )
   {
     const Handle(StepShape_Face)& aFace = aFaces->Value(f);
-    if (aFace.IsNull())
-      continue;
 
     // Record CAF data
-    SettleShapeData(aFace, RootLab, ShapeTool, TP);
+    TDF_Label aFaceLab = SettleShapeData(aFace, aShellLab, ShapeTool, TP);
 
     // Access face bounds
     Handle(StepShape_HArray1OfFaceBound) aWires = aFace->Bounds();
@@ -4593,7 +4537,7 @@ void STEPCAFControl_Reader::ExpandShell(const Handle(StepShape_ConnectedFaceSet)
       const Handle(StepShape_Loop)& aWire = aWires->Value(w)->Bound();
 
       // Record CAF data
-      SettleShapeData(aWire, RootLab, ShapeTool, TP);
+      TDF_Label aWireLab = SettleShapeData(aWire, aFaceLab, ShapeTool, TP);
 
       // Access wire edges
       // Currently only EDGE LOOPs are considered (!)
@@ -4608,15 +4552,15 @@ void STEPCAFControl_Reader::ExpandShell(const Handle(StepShape_ConnectedFaceSet)
         Handle(StepShape_Edge) anEdge = anEdges->Value(e)->EdgeElement();
 
         // Record CAF data
-        SettleShapeData(anEdge, RootLab, ShapeTool, TP);
+        TDF_Label anEdgeLab = SettleShapeData(anEdge, aWireLab, ShapeTool, TP);
 
         // Access vertices
         Handle(StepShape_Vertex) aV1 = anEdge->EdgeStart();
         Handle(StepShape_Vertex) aV2 = anEdge->EdgeEnd();
 
         // Record CAF data
-        SettleShapeData(aV1, RootLab, ShapeTool, TP);
-        SettleShapeData(aV2, RootLab, ShapeTool, TP);
+        SettleShapeData(aV1, anEdgeLab, ShapeTool, TP);
+        SettleShapeData(aV2, anEdgeLab, ShapeTool, TP);
       }
     }
   }

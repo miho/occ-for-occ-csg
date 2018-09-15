@@ -17,6 +17,39 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__Hatch_DLL" />
+					<Add option="-D__GeomInt_DLL" />
+					<Add option="-D__IntStart_DLL" />
+					<Add option="-D__IntWalk_DLL" />
+					<Add option="-D__IntImp_DLL" />
+					<Add option="-D__IntCurveSurface_DLL" />
+					<Add option="-D__IntSurf_DLL" />
+					<Add option="-D__IntPatch_DLL" />
+					<Add option="-D__Geom2dInt_DLL" />
+					<Add option="-D__IntImpParGen_DLL" />
+					<Add option="-D__IntRes2d_DLL" />
+					<Add option="-D__IntCurve_DLL" />
+					<Add option="-D__TopTrans_DLL" />
+					<Add option="-D__Intf_DLL" />
+					<Add option="-D__ApproxInt_DLL" />
+					<Add option="-D__GccAna_DLL" />
+					<Add option="-D__GccEnt_DLL" />
+					<Add option="-D__GccInt_DLL" />
+					<Add option="-D__HatchGen_DLL" />
+					<Add option="-D__Geom2dHatch_DLL" />
+					<Add option="-D__Law_DLL" />
+					<Add option="-D__AppBlend_DLL" />
+					<Add option="-D__Plate_DLL" />
+					<Add option="-D__GeomPlate_DLL" />
+					<Add option="-D__LocalAnalysis_DLL" />
+					<Add option="-D__GeomAPI_DLL" />
+					<Add option="-D__GeomFill_DLL" />
+					<Add option="-D__Geom2dAPI_DLL" />
+					<Add option="-D__Geom2dGcc_DLL" />
+					<Add option="-D__FairCurve_DLL" />
+					<Add option="-D__NLPlate_DLL" />
+					<Add option="-D__IntPolyh_DLL" />
+					<Add option="-D__TopClass_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKGeomAlgo_obj.link" />
@@ -35,6 +68,39 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__Hatch_DLL" />
+					<Add option="-D__GeomInt_DLL" />
+					<Add option="-D__IntStart_DLL" />
+					<Add option="-D__IntWalk_DLL" />
+					<Add option="-D__IntImp_DLL" />
+					<Add option="-D__IntCurveSurface_DLL" />
+					<Add option="-D__IntSurf_DLL" />
+					<Add option="-D__IntPatch_DLL" />
+					<Add option="-D__Geom2dInt_DLL" />
+					<Add option="-D__IntImpParGen_DLL" />
+					<Add option="-D__IntRes2d_DLL" />
+					<Add option="-D__IntCurve_DLL" />
+					<Add option="-D__TopTrans_DLL" />
+					<Add option="-D__Intf_DLL" />
+					<Add option="-D__ApproxInt_DLL" />
+					<Add option="-D__GccAna_DLL" />
+					<Add option="-D__GccEnt_DLL" />
+					<Add option="-D__GccInt_DLL" />
+					<Add option="-D__HatchGen_DLL" />
+					<Add option="-D__Geom2dHatch_DLL" />
+					<Add option="-D__Law_DLL" />
+					<Add option="-D__AppBlend_DLL" />
+					<Add option="-D__Plate_DLL" />
+					<Add option="-D__GeomPlate_DLL" />
+					<Add option="-D__LocalAnalysis_DLL" />
+					<Add option="-D__GeomAPI_DLL" />
+					<Add option="-D__GeomFill_DLL" />
+					<Add option="-D__Geom2dAPI_DLL" />
+					<Add option="-D__Geom2dGcc_DLL" />
+					<Add option="-D__FairCurve_DLL" />
+					<Add option="-D__NLPlate_DLL" />
+					<Add option="-D__IntPolyh_DLL" />
+					<Add option="-D__TopClass_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKGeomAlgo_objd.link" />
@@ -794,6 +860,9 @@
 		<Unit filename="../../../src/GeomAPI/GeomAPI_IntCS.cxx">
 			<Option link="0" />
 		</Unit>
+		<Unit filename="../../../src/GeomAPI/GeomAPI_IntSS.cxx">
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../../src/GeomAPI/GeomAPI_Interpolate.cxx">
 			<Option link="0" />
 		</Unit>
@@ -1133,6 +1202,9 @@
 		<Unit filename="../../../src/IntPolyh/IntPolyh_Intersection.cxx">
 			<Option link="0" />
 		</Unit>
+		<Unit filename="../../../src/IntPolyh/IntPolyh_Intersection_1.cxx">
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../../src/IntPolyh/IntPolyh_MaillageAffinage.cxx">
 			<Option link="0" />
 		</Unit>
@@ -1145,13 +1217,13 @@
 		<Unit filename="../../../src/IntPolyh/IntPolyh_StartPoint.cxx">
 			<Option link="0" />
 		</Unit>
-		<Unit filename="../../../src/IntPolyh/IntPolyh_Tools.cxx">
-			<Option link="0" />
-		</Unit>
 		<Unit filename="../../../src/IntPolyh/IntPolyh_Triangle.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/TopClass/TopClass.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/TopClass/TopClass_Intersection3d.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/TopClass/TopClass_SolidExplorer.cxx">

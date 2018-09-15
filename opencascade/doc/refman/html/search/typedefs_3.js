@@ -2,9 +2,6 @@ var searchData=
 [
   ['d_5ffp',['D_fp',['../_adv_app2_var___data__f2c_8hxx.html#aa1e01592bfa48221180d8e57f3d2664b',1,'AdvApp2Var_Data_f2c.hxx']]],
   ['datamapofdrawercompd',['DataMapOfDrawerCompd',['../class_a_i_s___colored_shape.html#adf6bc0d05cf2d8251e92eb7c91078470',1,'AIS_ColoredShape']]],
-  ['datamapofedgepcurve',['DataMapOfEdgePCurve',['../class_d_b_rep___iso_builder.html#aba869c5c85ff993e40b4f3606b1f0471',1,'DBRep_IsoBuilder']]],
-  ['datamapofshapeaddress',['DataMapOfShapeAddress',['../class_int_tools___context.html#a294a2be126c58028f36d84ac9c3bcf6f',1,'IntTools_Context']]],
-  ['datamapoftransientaddress',['DataMapOfTransientAddress',['../class_int_tools___context.html#a35d8dbdb873ac143d1861216b2e8159d',1,'IntTools_Context']]],
   ['dbrep_5flistiteratoroflistofedge',['DBRep_ListIteratorOfListOfEdge',['../_d_b_rep___list_of_edge_8hxx.html#a7c129b7921fab69976cf063c32c26205',1,'DBRep_ListOfEdge.hxx']]],
   ['dbrep_5flistiteratoroflistofface',['DBRep_ListIteratorOfListOfFace',['../_d_b_rep___list_of_face_8hxx.html#aac66abf05b21cfa86abff946aad0c945',1,'DBRep_ListOfFace.hxx']]],
   ['dbrep_5flistiteratoroflistofhidedata',['DBRep_ListIteratorOfListOfHideData',['../_d_b_rep___list_of_hide_data_8hxx.html#afc58bf6ede7234b6a42167dafca3900b',1,'DBRep_ListOfHideData.hxx']]],
@@ -13,7 +10,7 @@ var searchData=
   ['dbrep_5flistofhidedata',['DBRep_ListOfHideData',['../_d_b_rep___list_of_hide_data_8hxx.html#af5936dad59a8a0f0d4a91e81906a537a',1,'DBRep_ListOfHideData.hxx']]],
   ['ddf_5flistiteratoroftransactionstack',['DDF_ListIteratorOfTransactionStack',['../_d_d_f___transaction_stack_8hxx.html#a248a9ffa0c2e4d51d0f447b2bc9b8328',1,'DDF_TransactionStack.hxx']]],
   ['ddf_5ftransactionstack',['DDF_TransactionStack',['../_d_d_f___transaction_stack_8hxx.html#a9d211eaf637b5a80ae44da202c45f70d',1,'DDF_TransactionStack.hxx']]],
-  ['delete_5fdir_5fproc',['DELETE_DIR_PROC',['../_o_s_d___w_n_t_8hxx.html#a1f371e5a3d96d2a7dc92b62de0a5e21b',1,'OSD_WNT.hxx']]],
+  ['delete_5fdir_5fproc',['DELETE_DIR_PROC',['../_o_s_d___w_n_t__1_8hxx.html#a1f371e5a3d96d2a7dc92b62de0a5e21b',1,'OSD_WNT_1.hxx']]],
   ['difference_5ftype',['difference_type',['../class_n_collection___std_allocator.html#a1c790506e1965aba72ea998c0553b052',1,'NCollection_StdAllocator']]],
   ['dir',['Dir',['../class_shape_persistent___h_array1.html#a3001d543a857ef6e729badae6d99a132',1,'ShapePersistent_HArray1::Dir()'],['../class_shape_persistent___h_array2.html#af30a3849e8f7f5ea307acaa69183c001',1,'ShapePersistent_HArray2::Dir()'],['../class_shape_persistent___h_sequence.html#a1d8749ae84d8c3bb4b4ba4430a494cb4',1,'ShapePersistent_HSequence::Dir()']]],
   ['dir2d',['Dir2d',['../class_shape_persistent___h_array1.html#a88adc039beb4e9c2071b25314c753c08',1,'ShapePersistent_HArray1::Dir2d()'],['../class_shape_persistent___h_array2.html#aa41a6508eca7a38379e30d88dfe008aa',1,'ShapePersistent_HArray2::Dir2d()']]],

@@ -68,8 +68,7 @@ static Handle(TDataStd_RealArray) SetAttr(const TDF_Label&       label,
 //purpose  : Empty Constructor
 //=======================================================================
 
-TDataStd_RealArray::TDataStd_RealArray() : myIsDelta(Standard_False),
-  myID(GetID())
+TDataStd_RealArray::TDataStd_RealArray() : myIsDelta(Standard_False)
 {}
 
 //=======================================================================

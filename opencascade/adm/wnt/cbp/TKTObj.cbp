@@ -17,6 +17,7 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__TObj_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKTObj_obj.link" />
@@ -35,6 +36,7 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__TObj_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKTObj_objd.link" />

@@ -185,6 +185,8 @@ private:
   Standard_Boolean myCopyMesh;
 };
 
+DEFINE_STANDARD_HANDLE(BRepBuilderAPI_Copy_Modification, BRepTools_Modification)
+
 } // anonymous namespace
 
 //=======================================================================

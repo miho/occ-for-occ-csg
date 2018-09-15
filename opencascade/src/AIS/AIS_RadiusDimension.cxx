@@ -238,8 +238,9 @@ Standard_Boolean AIS_RadiusDimension::IsValidAnchor (const gp_Circ& theCircle,
 {
   gp_Pln aCirclePlane (theCircle.Location(), theCircle.Axis().Direction());
   Standard_Real anAnchorDist = theAnchor.Distance (theCircle.Location());
+  Standard_Real aRadius      = myCircle.Radius();
 
-  return anAnchorDist > Precision::Confusion()
+  return Abs (anAnchorDist - aRadius) <= Precision::Confusion()
       && aCirclePlane.Contains (theAnchor, Precision::Confusion());
 }
 

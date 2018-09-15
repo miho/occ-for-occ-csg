@@ -30,7 +30,6 @@
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Qt"><param name="Local" value="index.html#OCCT_OVW_SECTION_7_3_2"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="C#"><param name="Local" value="index.html#OCCT_OVW_SECTION_7_3_3"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Android"><param name="Local" value="index.html#OCCT_OVW_SECTION_7_3_4"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="iOS"><param name="Local" value="index.html#OCCT_OVW_SECTION_7_3_5"><param name="ImageNumber" value="11"></OBJECT>
       </UL>
     </UL>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="MFC samples"><param name="Local" value="samples_mfc_standard.html"><param name="ImageNumber" value="11"></OBJECT>
@@ -38,7 +37,6 @@
   <LI><OBJECT type="text/sitemap"><param name="Name" value="Direct3D CSharp sample"><param name="Local" value="samples_csharp_direct3d.html"><param name="ImageNumber" value="11"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="OCCT JniViewer sample for Android"><param name="Local" value="samples_java_android_occt.html"><param name="ImageNumber" value="11"></OBJECT>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="OCCT AndroidQt sample for Android"><param name="Local" value="samples_qml_android_occt.html"><param name="ImageNumber" value="11"></OBJECT>
-  <LI><OBJECT type="text/sitemap"><param name="Name" value="OCCT sample for iOS"><param name="Local" value="occt_samples_ios_uikit.html"><param name="ImageNumber" value="11"></OBJECT>
   </UL>
 <LI><OBJECT type="text/sitemap"><param name="Name" value="Tutorial"><param name="Local" value="occt__tutorial.html"><param name="ImageNumber" value="1"></OBJECT>
   <UL>
@@ -227,19 +225,6 @@
         </UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Storage of shapes"><param name="Local" value="occt_user_guides__modeling_data.html#occt_modat_5_6"><param name="ImageNumber" value="11"></OBJECT>
       </UL>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="Bounding boxes"><param name="Local" value="occt_user_guides__modeling_data.html#occt_modat_6"><param name="ImageNumber" value="1"></OBJECT>
-      <UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Brief description of some algorithms working with OBB"><param name="Local" value="occt_user_guides__modeling_data.html#occt_modat_6_1"><param name="ImageNumber" value="1"></OBJECT>
-        <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Creation of OBB from set of points"><param name="Local" value="occt_user_guides__modeling_data.html#occt_modat_6_1_1"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Creation of OBB based on Axes of inertia"><param name="Local" value="occt_user_guides__modeling_data.html#occt_modat_6_1_2"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Method IsOut for a point"><param name="Local" value="occt_user_guides__modeling_data.html#occt_modat_6_1_3"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Method IsOut for another OBB"><param name="Local" value="occt_user_guides__modeling_data.html#occt_modat_6_1_4"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Method Add for point or another bounding box"><param name="Local" value="occt_user_guides__modeling_data.html#occt_modat_6_1_5"><param name="ImageNumber" value="11"></OBJECT>
-        </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Add a shape"><param name="Local" value="occt_user_guides__modeling_data.html#occt_modat_6_2"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Limitations of algorithm for OBB creation."><param name="Local" value="occt_user_guides__modeling_data.html#occt_modat_6_3"><param name="ImageNumber" value="11"></OBJECT>
-      </UL>
     </UL>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="BRep Format"><param name="Local" value="occt_user_guides__brep_wp.html"><param name="ImageNumber" value="1"></OBJECT>
     <UL>
@@ -352,14 +337,6 @@
     <LI><OBJECT type="text/sitemap"><param name="Name" value="The Topology API"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_3a"><param name="ImageNumber" value="1"></OBJECT>
       <UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Error Handling in the Topology API"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_3a_1"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="History support"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_hist"><param name="ImageNumber" value="1"></OBJECT>
-        <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Deleted shapes"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_hist_del"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Modified shapes"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_hist_mod"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Generated shapes"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_hist_gen"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="BRepTools_History"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_hist_tool"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="DRAW history support"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_hist_draw"><param name="ImageNumber" value="11"></OBJECT>
-        </UL>
       </UL>
     <LI><OBJECT type="text/sitemap"><param name="Name" value="Standard  Topological Objects"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_3"><param name="ImageNumber" value="1"></OBJECT>
       <UL>
@@ -460,11 +437,6 @@
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Mesh presentations"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_11_1"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Meshing algorithm"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_11_2"><param name="ImageNumber" value="11"></OBJECT>
       </UL>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="3D Model Defeaturing"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_defeaturing"><param name="ImageNumber" value="1"></OBJECT>
-      <UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Usage"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_defeaturing_usage"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Examples"><param name="Local" value="occt_user_guides__modeling_algos.html#occt_modalg_defeaturing_examples"><param name="ImageNumber" value="11"></OBJECT>
-      </UL>
     </UL>
   <LI><OBJECT type="text/sitemap"><param name="Name" value="Boolean Operations"><param name="Local" value="occt_user_guides__boolean_operations.html"><param name="ImageNumber" value="1"></OBJECT>
     <UL>
@@ -537,8 +509,6 @@
       <UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Arguments"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_7_1"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Results"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_7_2"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Options"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_7_3a"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Usage"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_7_3b"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Examples"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_7_3"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Case 1: Three edges intersecting at a point"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_7_3_1"><param name="ImageNumber" value="11"></OBJECT>
@@ -700,25 +670,8 @@
         <UL>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Usage"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_11a_3_1"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="How to disable check of input solids for inverted status"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_11a_4"><param name="ImageNumber" value="1"></OBJECT>
-        <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Usage"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_11a_4_1"><param name="ImageNumber" value="11"></OBJECT>
-        </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Usage of Oriented Bounding Boxes"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_11a_5_obb"><param name="ImageNumber" value="1"></OBJECT>
-        <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Usage"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_11a_5_obb_1"><param name="ImageNumber" value="11"></OBJECT>
-        </UL>
       </UL>
     <LI><OBJECT type="text/sitemap"><param name="Name" value="Errors and warnings reporting system"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_ers"><param name="ImageNumber" value="11"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="History Information"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_history"><param name="ImageNumber" value="1"></OBJECT>
-      <UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Examples"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_history_ex"><param name="ImageNumber" value="1"></OBJECT>
-        <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Deleted shapes"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_history_ex_del"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Modified shapes"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_history_ex_modif"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Generated shapes"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_history_gen"><param name="ImageNumber" value="11"></OBJECT>
-        </UL>
-      </UL>
     <LI><OBJECT type="text/sitemap"><param name="Name" value="Usage"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_11b"><param name="ImageNumber" value="1"></OBJECT>
       <UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Package BRepAlgoAPI"><param name="Local" value="occt_user_guides__boolean_operations.html#occt_algorithms_11b_1"><param name="ImageNumber" value="11"></OBJECT>
@@ -1181,10 +1134,7 @@
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Validation Properties"><param name="Local" value="occt_user_guides__xde.html#occt_xde_1_4"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Names"><param name="Local" value="occt_user_guides__xde.html#occt_xde_1_5"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Colors and Layers"><param name="Local" value="occt_user_guides__xde.html#occt_xde_1_6"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Geometric Dimensions &amp; Tolerances (GD&amp;T)"><param name="Local" value="occt_user_guides__xde.html#occt_xde_1_7"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Clipping planes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_1_8"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Saved views"><param name="Local" value="occt_user_guides__xde.html#occt_xde_1_9"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Custom notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_1_10"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Custom notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_1_7"><param name="ImageNumber" value="11"></OBJECT>
       </UL>
     <LI><OBJECT type="text/sitemap"><param name="Name" value="Working with XDE"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2"><param name="ImageNumber" value="1"></OBJECT>
       <UL>
@@ -1222,37 +1172,26 @@
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Queries on Colors"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_6_3"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Editing Colors"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_6_4"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Geometric Dimensions &amp; Tolerances (GD&amp;T)"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7"><param name="ImageNumber" value="1"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Custom notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Initialization"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_1"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Adding a GD&amp;T"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_2"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Editing a GD&amp;T"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_3"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Linking GD&amp;Ts"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_4"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Finding GD&amp;Ts and reference shapes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_5"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Storing custom data"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_6"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Creating Notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_2"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Editing a Note"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_3"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Adding Notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_4"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Finding Notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_5"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Removing Notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_6"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Deleting Notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_7_7"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Clipping planes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_8"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Saved views"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_9"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Custom notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_10"><param name="ImageNumber" value="1"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Reading and Writing STEP or IGES"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_8"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Initialization"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_10_1"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Creating Notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_10_2"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Editing a Note"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_10_3"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Adding Notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_10_4"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Finding Notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_10_5"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Removing Notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_10_6"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Deleting Notes"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_10_7"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Reading a STEP file"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_8_1"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Writing a STEP file"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_8_2"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Reading an IGES File"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_8_3"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Writing an IGES File"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_8_4"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Reading and Writing STEP or IGES"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_11"><param name="ImageNumber" value="1"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="Using an XDE Document"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_9"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Reading a STEP file"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_11_1"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Writing a STEP file"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_11_2"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Reading an IGES File"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_11_3"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Writing an IGES File"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_11_4"><param name="ImageNumber" value="11"></OBJECT>
-        </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Using an XDE Document"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_12"><param name="ImageNumber" value="1"></OBJECT>
-        <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="XDE Data inside an Application Document"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_12_1"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="XDE Data inside an Application Document"><param name="Local" value="occt_user_guides__xde.html#occt_xde_2_91"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
       </UL>
     </UL>
@@ -1350,8 +1289,6 @@
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Comparison  and analysis of approaches"><param name="Local" value="occt_user_guides__ocaf.html#occt_ocaf_6_2_3"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Conclusion"><param name="Local" value="occt_user_guides__ocaf.html#occt_ocaf_6_2_4"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Standard Attributes with User Defined GUID"><param name="Local" value="occt_user_guides__ocaf.html#occt_ocaf_6_4"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Creation Attributes with User Defined GUID."><param name="Local" value="occt_user_guides__ocaf.html#occt_ocaf_6_4_1"><param name="ImageNumber" value="11"></OBJECT>
       </UL>
     <LI><OBJECT type="text/sitemap"><param name="Name" value="Visualization Attributes"><param name="Local" value="occt_user_guides__ocaf.html#occt_ocaf_7"><param name="ImageNumber" value="1"></OBJECT>
       <UL>
@@ -1813,8 +1750,7 @@
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Intersections"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_6_7"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="intersect"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_6_7_1"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="2dintersect"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_6_7_2"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="intconcon"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_6_7_3"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="dintersect"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_6_7_2"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Approximations"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_6_8"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
@@ -1907,12 +1843,10 @@
         <LI><OBJECT type="text/sitemap"><param name="Name" value="bcutblend"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_8_4a"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="mkevol, updatevol, buildevol"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_8_5"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Defeaturing"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_defeaturing"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Analysis of topology and geometry"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_9"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="lprops, sprops, vprops"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_9_1"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="bounding"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_9_2"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="isbbinterf"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_9_2a"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="distmini"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_9_3"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="xdistef, xdistcs, xdistcc, xdistc2dc2dss, xdistcc2ds"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_9_4"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="checkshape"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_9_5"><param name="ImageNumber" value="11"></OBJECT>
@@ -1932,14 +1866,6 @@
         <LI><OBJECT type="text/sitemap"><param name="Name" value="deform"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_11_4"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="nurbsconvert"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_11_5"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="edgestofaces"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_11_6"><param name="ImageNumber" value="11"></OBJECT>
-        </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="History commands"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_hist"><param name="ImageNumber" value="1"></OBJECT>
-        <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="savehistory"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_hist_save"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="isdeleted"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_hist_isdel"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="modified"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_hist_mod"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="generated"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_hist_gen"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Enabling Draw history support for the algorithms"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_hist_extension"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Texture Mapping to a Shape"><param name="Local" value="occt_user_guides__test_harness.html#occt_draw_7_12"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
@@ -2192,7 +2118,7 @@
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Overview"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_1_1"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Getting started"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_1_3"><param name="ImageNumber" value="11"></OBJECT>
       </UL>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="Inspector Plugins"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2"><param name="ImageNumber" value="1"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Inspector"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2"><param name="ImageNumber" value="1"></OBJECT>
       <UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Overview"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_1"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="DFBrowser Plugin"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_2"><param name="ImageNumber" value="1"></OBJECT>
@@ -2207,45 +2133,34 @@
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Overview"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_3_1"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Elements"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_3_2"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Elements cooperation"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_3_3"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="VInspector tree view columns"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_3_4"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="ShapeView Plugin"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_4"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Overview"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_4_1"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Elements"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_4_2"><param name="ImageNumber" value="11"></OBJECT>
         <LI><OBJECT type="text/sitemap"><param name="Name" value="Elements cooperation"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_4_3"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="ShapeView tree view columns"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_2_4_4"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
       </UL>
     <LI><OBJECT type="text/sitemap"><param name="Name" value="Common controls"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3"><param name="ImageNumber" value="1"></OBJECT>
       <UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Tree View"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3_1"><param name="ImageNumber" value="1"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="3D View"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3_1"><param name="ImageNumber" value="1"></OBJECT>
         <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Tree View preferences"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3_1_1"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Overview"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3_1_1"><param name="ImageNumber" value="11"></OBJECT>
+        <LI><OBJECT type="text/sitemap"><param name="Name" value="Elements"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3_1_2"><param name="ImageNumber" value="11"></OBJECT>
         </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="3D View"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3_2"><param name="ImageNumber" value="1"></OBJECT>
-        <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Overview"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3_2_1"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="Elements"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3_2_2"><param name="ImageNumber" value="11"></OBJECT>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="3D View preferences."><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3_2_3"><param name="ImageNumber" value="11"></OBJECT>
-        </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Preferences context menu"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_3_3"><param name="ImageNumber" value="11"></OBJECT>
       </UL>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="Getting Started"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_4"><param name="ImageNumber" value="1"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="TInspectorEXE sample"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_6"><param name="ImageNumber" value="11"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Launch in DRAW Test Harness"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_7"><param name="ImageNumber" value="11"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Using in a custom application"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_8"><param name="ImageNumber" value="11"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Build procedure"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_4"><param name="ImageNumber" value="11"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Sources and packaging"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_5"><param name="ImageNumber" value="11"></OBJECT>
+    <LI><OBJECT type="text/sitemap"><param name="Name" value="Glossary"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_9"><param name="ImageNumber" value="1"></OBJECT>
       <UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="TInspectorEXE sample"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_4_1"><param name="ImageNumber" value="1"></OBJECT>
-        <UL>
-        <LI><OBJECT type="text/sitemap"><param name="Name" value="TInspectorEXE preferences"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_4_1_1"><param name="ImageNumber" value="11"></OBJECT>
-        </UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="How to launch the Inspector in DRAW Test Harness"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_4_2"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="How to use the Inspector in a custom application"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_4_3"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="TDF_Attribute Simple types"><param name="Local" value="occt_user_guides__inspector.html#occt_attribute_simple_types"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="TDF_Attribute List types"><param name="Local" value="occt_user_guides__inspector.html#occt_attribute_list_types"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="TDF_Attribute Array types"><param name="Local" value="occt_user_guides__inspector.html#occt_attribute_array_types"><param name="ImageNumber" value="11"></OBJECT>
+      <LI><OBJECT type="text/sitemap"><param name="Name" value="XDE tree node ID description"><param name="Local" value="occt_user_guides__inspector.html#occt_attribute_xde_tree_node_id"><param name="ImageNumber" value="11"></OBJECT>
       </UL>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="Build procedure"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_5"><param name="ImageNumber" value="1"></OBJECT>
-      <UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Building with CMake within OCCT"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_5_1"><param name="ImageNumber" value="11"></OBJECT>
-      </UL>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="Sources and packaging"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_6"><param name="ImageNumber" value="11"></OBJECT>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="Glossary"><param name="Local" value="occt_user_guides__inspector.html#occt_inspector_7"><param name="ImageNumber" value="11"></OBJECT>
     </UL>
   </UL>
 <LI><OBJECT type="text/sitemap"><param name="Name" value="Developer Guides"><param name="Local" value="dev_guides.html"><param name="ImageNumber" value="1"></OBJECT>
@@ -2698,24 +2613,6 @@
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Change in algorithm ShapeUpgrade_UnifySameDomain"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_720_UnifySameDomain"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Changes in STL Reader / Writer"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_720_Change_In_RWStl"><param name="ImageNumber" value="11"></OBJECT>
       <LI><OBJECT type="text/sitemap"><param name="Name" value="Refactoring of the Error/Warning reporting system in Boolean Component"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_720_New_Error_Warning_system_in_BOA"><param name="ImageNumber" value="11"></OBJECT>
-      </UL>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="Upgrade to OCCT 7.2.1"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_occt721"><param name="ImageNumber" value="1"></OBJECT>
-      <UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Changes in ShapeUpgrade_UnifySameDomain"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_721_Changes_In_USD"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Moving BuildPCurveForEdgeOnPlane from BOPTools_AlgoTools2D to BRepLib"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_721_Move_BuildPCurveForEdgeOnPlane"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Removed features"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_721_removed"><param name="ImageNumber" value="11"></OBJECT>
-      </UL>
-    <LI><OBJECT type="text/sitemap"><param name="Name" value="Upgrade to OCCT 7.3.0"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_occt730"><param name="ImageNumber" value="1"></OBJECT>
-      <UL>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Light sources"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_730_lights"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Shading Models"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_730_shadingmodels"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Custom low-level OpenGL elements"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_730_tkopengl"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Changes in BOPAlgo_Section"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_730_BOPAlgo_Section"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Changes in BRepAdaptor_CompCurve"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_730_BRepAdaptor_CompCurve"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Removed features"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_730_removed"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Boolean Operations - Solid Builder algorithm"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_730_BuilderSolid"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Boolean Operation classes in BRepAlgo are deprecated"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_730_BRepAlgoBO"><param name="ImageNumber" value="11"></OBJECT>
-      <LI><OBJECT type="text/sitemap"><param name="Name" value="Unification of the Error/Warning reporting system of Application Framework"><param name="Local" value="occt_dev_guides__upgrade.html#upgrade_730_replace_CDM_MessageDriver_interface_by_Message_Messenger"><param name="ImageNumber" value="11"></OBJECT>
       </UL>
     </UL>
   </UL>

@@ -76,7 +76,7 @@ Standard_Integer HashCodes (const Standard_CString Value,
   // and newlocale/uselocale/freelocale to switch locale within current thread only.
   // So we switch to C locale temporarily
   #define SAVE_TL() Standard_CLocaleSentry aLocaleSentry;
-  #ifndef OCCT_CLOCALE_POSIX2008
+  #ifndef HAVE_XLOCALE_H
     // glibc version for android platform use locale-independent implementation of
     // strtod, strtol, strtoll functions. For other system with locale-depended
     // implementations problems may appear if "C" locale is not set explicitly.
@@ -90,12 +90,10 @@ Standard_Integer HashCodes (const Standard_CString Value,
   #define vfprintf_l(theFile,   theLocale, theFormat, theArgPtr) vfprintf(theFile,   theFormat, theArgPtr)
 #endif
 
-/*
 double Strtod (const char* theStr, char** theNextPtr)
 {
   return strtod_l (theStr, theNextPtr, Standard_CLocaleSentry::GetCLocale());
 }
-*/
 
 double Atof (const char* theStr)
 {

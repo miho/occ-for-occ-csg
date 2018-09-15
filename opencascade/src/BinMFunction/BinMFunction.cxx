@@ -19,14 +19,14 @@
 #include <BinMFunction_FunctionDriver.hxx>
 #include <BinMFunction_GraphNodeDriver.hxx>
 #include <BinMFunction_ScopeDriver.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 
 //=======================================================================
 //function : AddDrivers
 //purpose  : 
 //=======================================================================
 void BinMFunction::AddDrivers (const Handle(BinMDF_ADriverTable)& theDriverTable,
-			       const Handle(Message_Messenger)&   theMsgDriver)
+			       const Handle(CDM_MessageDriver)&   theMsgDriver)
 {
   theDriverTable->AddDriver (new BinMFunction_FunctionDriver  (theMsgDriver) );
   theDriverTable->AddDriver (new BinMFunction_GraphNodeDriver (theMsgDriver) );

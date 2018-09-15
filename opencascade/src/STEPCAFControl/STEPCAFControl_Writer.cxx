@@ -233,7 +233,7 @@
 #include <XCAFDoc_Volume.hxx>
 #include <XCAFPrs.hxx>
 #include <XCAFPrs_DataMapIteratorOfDataMapOfStyleShape.hxx>
-#include <XCAFPrs_IndexedDataMapOfShapeStyle.hxx>
+#include <XCAFPrs_DataMapOfShapeStyle.hxx>
 #include <XCAFPrs_DataMapOfStyleShape.hxx>
 #include <XCAFPrs_Style.hxx>
 #include <XSControl_TransferWriter.hxx>
@@ -671,9 +671,9 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
     const Handle(XSControl_TransferWriter) &TW = this->ChangeWriter().WS()->TransferWriter();
     const Handle(Transfer_FinderProcess) &FP = TW->FinderProcess();
 
-    for ( int i = 1; i <= sublabels.Length(); i++ )
+    for ( int i = 1; i <= labels.Length(); i++ )
     {
-      TDF_Label L = sublabels.Value(i);
+      TDF_Label L = labels.Value(i);
 
       for ( TDF_ChildIterator it(L, Standard_True); it.More(); it.Next() )
       {
@@ -1031,7 +1031,7 @@ static Standard_Boolean setDefaultInstanceColor (const Handle(StepVisual_StyledI
 //=======================================================================
 static void MakeSTEPStyles (STEPConstruct_Styles &Styles,
 			    const TopoDS_Shape &S,
-			    const XCAFPrs_IndexedDataMapOfShapeStyle &settings,
+			    const XCAFPrs_DataMapOfShapeStyle &settings,
 			    Handle(StepVisual_StyledItem) &override,
 			    TopTools_MapOfShape &Map,
                             const MoniTool_DataMapOfShapeTransient& myMapCompMDGPR,
@@ -1047,8 +1047,8 @@ static void MakeSTEPStyles (STEPConstruct_Styles &Styles,
   // check if shape has its own style (r inherits from ancestor)
   XCAFPrs_Style style;
   if ( inherit ) style = *inherit;
-  if ( settings.Contains(S) ) {
-    XCAFPrs_Style own = settings.FindFromKey(S);
+  if ( settings.IsBound(S) ) {
+    XCAFPrs_Style own = settings.Find(S);
     if ( !own.IsVisible() ) style.SetVisibility ( Standard_False );
     if ( own.IsSetColorCurv() ) style.SetColorCurv ( own.GetColorCurv() );
     if ( own.IsSetColorSurf() ) style.SetColorSurf ( own.GetColorSurf() );
@@ -1199,7 +1199,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteColors (const Handle(XSControl_Work
         continue;
     
     // collect settings set on that label
-    XCAFPrs_IndexedDataMapOfShapeStyle settings;
+    XCAFPrs_DataMapOfShapeStyle settings;
     TDF_LabelSequence seq;
     seq.Append ( L );
     XCAFDoc_ShapeTool::GetSubShapes ( L, seq );
@@ -1232,11 +1232,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteColors (const Handle(XSControl_Work
       if ( ! style.IsSetColorCurv() && ! style.IsSetColorSurf() && isVisible ) continue;
 
       TopoDS_Shape sub = XCAFDoc_ShapeTool::GetShape ( lab );
-      XCAFPrs_Style* aMapStyle = settings.ChangeSeek (sub);
-      if (aMapStyle == NULL)
-        settings.Add ( sub, style );
-      else
-        *aMapStyle = style;
+      settings.Bind ( sub, style );
     }
     
     if ( settings.Extent() <=0 ) continue;

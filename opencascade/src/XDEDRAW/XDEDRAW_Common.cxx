@@ -47,7 +47,6 @@
 #include <XCAFDoc_Editor.hxx>
 #include <TDF_Tool.hxx>
 #include <TopoDS_Shape.hxx>
-#include <Interface_Static.hxx>
 
 #include <stdio.h>
 //============================================================
@@ -192,11 +191,8 @@ static Standard_Integer ReadIges (Draw_Interpretor& di, Standard_Integer argc, c
   
   DeclareAndCast(IGESControl_Controller,ctl,XSDRAW::Controller());
   if (ctl.IsNull()) XSDRAW::SetNorm("IGES");
- 
 
   IGESCAFControl_Reader reader ( XSDRAW::Session(),Standard_True);
-  Standard_Integer onlyvisible = Interface_Static::IVal("read.iges.onlyvisible");
-  reader.SetReadVisible(onlyvisible == 1);
   
   if (argc == 4) {
     Standard_Boolean mode = Standard_True;
@@ -488,7 +484,7 @@ static Standard_Integer Expand (Draw_Interpretor& di, Standard_Integer argc, con
   if (argc == 3)
   {
     if(!XCAFDoc_Editor::Expand(Doc->Main(), recurs)){
-      di << "No suitable labels to expand\n";
+      di << "The shape is assembly or not compaund\n";
       return 1;
     }
   }
@@ -506,7 +502,7 @@ static Standard_Integer Expand (Draw_Interpretor& di, Standard_Integer argc, con
 
       if (!aLabel.IsNull()){
         if(!XCAFDoc_Editor::Expand(Doc->Main(), aLabel, recurs)){
-          di << "The shape is assembly or not compound\n";
+          di << "The shape is assembly or not compaund\n";
           return 1;
         }
       }
@@ -538,7 +534,7 @@ void XDEDRAW_Common::InitCommands(Draw_Interpretor& di)
   di.Add("XFileSet", "filename: Set the specified file to be the current one",__FILE__, SetCurWS, g);
   di.Add("XFromShape", "shape: do fromshape command for all the files",__FILE__, FromShape, g);
 
-  di.Add("XExpand", "XExpand Doc recursively(0/1) or XExpand Doc recursively(0/1) label1 label2 ..."  
+  di.Add("XExpand", "XExpand Doc recursively(0/1) or XExpand Doc recursively(0/1) label1 abel2 ..."  
           "or XExpand Doc recursively(0/1) shape1 shape2 ...",__FILE__, Expand, g);
 
 }

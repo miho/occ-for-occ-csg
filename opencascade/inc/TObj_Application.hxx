@@ -35,7 +35,7 @@ public:
   Standard_EXPORT static Handle(TObj_Application) GetInstance();
  
   //! Returns reference to associated messenger handle
-  Handle(Message_Messenger) &Messenger() { return myMessenger; }
+  Standard_EXPORT Handle(Message_Messenger) &Messenger() { return myMessenger; }
     
  public:
   /**
@@ -65,7 +65,7 @@ public:
 
   //! Signal error during Load or Save
   //! Default imiplementation invoke previous declaration with 0
-  virtual void ErrorMessage
+  virtual Standard_EXPORT void ErrorMessage
                         (const TCollection_ExtendedString &theMsg)
   { ErrorMessage( theMsg, Message_Alarm ); }
 

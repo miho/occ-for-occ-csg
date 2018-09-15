@@ -336,7 +336,7 @@ PrsMgr_Presentation::~PrsMgr_Presentation()
 //function : SetZLayer
 //purpose  :
 //=======================================================================
-void PrsMgr_Presentation::SetZLayer (Graphic3d_ZLayerId theLayerId)
+void PrsMgr_Presentation::SetZLayer (Standard_Integer theLayerId)
 {
   myStructure->SetZLayer (theLayerId);
 }
@@ -345,7 +345,7 @@ void PrsMgr_Presentation::SetZLayer (Graphic3d_ZLayerId theLayerId)
 //function : GetZLayer
 //purpose  :
 //=======================================================================
-Graphic3d_ZLayerId PrsMgr_Presentation::GetZLayer() const
+Standard_Integer PrsMgr_Presentation::GetZLayer() const
 {
   return myStructure->GetZLayer();
 }

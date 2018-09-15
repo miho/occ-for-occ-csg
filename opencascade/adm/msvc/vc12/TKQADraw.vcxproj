@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{12F5EFDD-0EA7-14E0-04C9-C1C938819821}</ProjectGuid>
+    <ProjectGuid>{0CEA101D-1694-061C-0052-4B0FD2FBD97C}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -89,7 +89,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__QABugs_DLL;__QADNaming_DLL;__QADraw_DLL;__QANCollection_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -105,7 +105,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);__QABugs_DLL;__QADNaming_DLL;__QADraw_DLL;__QANCollection_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKMath.lib;TKernel.lib;TKService.lib;TKG2d.lib;TKDraw.lib;TKV3d.lib;TKGeomBase.lib;TKG3d.lib;TKViewerTest.lib;TKCDF.lib;TKDCAF.lib;TKLCAF.lib;TKFillet.lib;TKTopAlgo.lib;TKHLR.lib;TKBool.lib;TKGeomAlgo.lib;TKPrim.lib;TKBO.lib;TKShHealing.lib;TKOffset.lib;TKFeat.lib;TKCAF.lib;TKVCAF.lib;TKIGES.lib;TKXSBase.lib;TKMesh.lib;TKXCAF.lib;TKSTEP.lib;TKSTEPBase.lib;TKXDESTEP.lib;TKXSDRAW.lib;TKSTL.lib;TKXml.lib;gdi32.lib;advapi32.lib;user32.lib;comdlg32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -134,7 +134,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__QABugs_DLL;__QADNaming_DLL;__QADraw_DLL;__QANCollection_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\..\..\..\win32\vc12\objd\TKQADraw/</AssemblerListingLocation>
@@ -151,7 +151,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);__QABugs_DLL;__QADNaming_DLL;__QADraw_DLL;__QANCollection_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKMath.lib;TKernel.lib;TKService.lib;TKG2d.lib;TKDraw.lib;TKV3d.lib;TKGeomBase.lib;TKG3d.lib;TKViewerTest.lib;TKCDF.lib;TKDCAF.lib;TKLCAF.lib;TKFillet.lib;TKTopAlgo.lib;TKHLR.lib;TKBool.lib;TKGeomAlgo.lib;TKPrim.lib;TKBO.lib;TKShHealing.lib;TKOffset.lib;TKFeat.lib;TKCAF.lib;TKVCAF.lib;TKIGES.lib;TKXSBase.lib;TKMesh.lib;TKXCAF.lib;TKSTEP.lib;TKSTEPBase.lib;TKXDESTEP.lib;TKXSDRAW.lib;TKSTL.lib;TKXml.lib;gdi32.lib;advapi32.lib;user32.lib;comdlg32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -180,7 +180,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__QABugs_DLL;__QADNaming_DLL;__QADraw_DLL;__QANCollection_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -196,7 +196,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);__QABugs_DLL;__QADNaming_DLL;__QADraw_DLL;__QANCollection_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKMath.lib;TKernel.lib;TKService.lib;TKG2d.lib;TKDraw.lib;TKV3d.lib;TKGeomBase.lib;TKG3d.lib;TKViewerTest.lib;TKCDF.lib;TKDCAF.lib;TKLCAF.lib;TKFillet.lib;TKTopAlgo.lib;TKHLR.lib;TKBool.lib;TKGeomAlgo.lib;TKPrim.lib;TKBO.lib;TKShHealing.lib;TKOffset.lib;TKFeat.lib;TKCAF.lib;TKVCAF.lib;TKIGES.lib;TKXSBase.lib;TKMesh.lib;TKXCAF.lib;TKSTEP.lib;TKSTEPBase.lib;TKXDESTEP.lib;TKXSDRAW.lib;TKSTL.lib;TKXml.lib;gdi32.lib;advapi32.lib;user32.lib;comdlg32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -225,7 +225,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__QABugs_DLL;__QADNaming_DLL;__QADraw_DLL;__QANCollection_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\..\..\..\win64\vc12\objd\TKQADraw/</AssemblerListingLocation>
@@ -242,7 +242,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);__QABugs_DLL;__QADNaming_DLL;__QADraw_DLL;__QANCollection_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKBRep.lib;TKMath.lib;TKernel.lib;TKService.lib;TKG2d.lib;TKDraw.lib;TKV3d.lib;TKGeomBase.lib;TKG3d.lib;TKViewerTest.lib;TKCDF.lib;TKDCAF.lib;TKLCAF.lib;TKFillet.lib;TKTopAlgo.lib;TKHLR.lib;TKBool.lib;TKGeomAlgo.lib;TKPrim.lib;TKBO.lib;TKShHealing.lib;TKOffset.lib;TKFeat.lib;TKCAF.lib;TKVCAF.lib;TKIGES.lib;TKXSBase.lib;TKMesh.lib;TKXCAF.lib;TKSTEP.lib;TKSTEPBase.lib;TKXDESTEP.lib;TKXSDRAW.lib;TKSTL.lib;TKXml.lib;gdi32.lib;advapi32.lib;user32.lib;comdlg32.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>

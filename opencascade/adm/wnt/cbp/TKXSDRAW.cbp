@@ -17,6 +17,10 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__XSDRAW_DLL" />
+					<Add option="-D__XSDRAWIGES_DLL" />
+					<Add option="-D__XSDRAWSTEP_DLL" />
+					<Add option="-D__XSDRAWSTLVRML_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKXSDRAW_obj.link" />
@@ -35,6 +39,10 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__XSDRAW_DLL" />
+					<Add option="-D__XSDRAWIGES_DLL" />
+					<Add option="-D__XSDRAWSTEP_DLL" />
+					<Add option="-D__XSDRAWSTLVRML_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKXSDRAW_objd.link" />

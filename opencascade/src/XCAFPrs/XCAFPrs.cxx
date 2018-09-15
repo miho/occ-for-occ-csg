@@ -86,29 +86,16 @@ static Standard_Boolean getShapesOfSHUO (TopLoc_IndexedMapOfLocation& theaPrevLo
 //=======================================================================
 
 void XCAFPrs::CollectStyleSettings (const TDF_Label& theLabel,
-                                    const TopLoc_Location& theLoc,
-                                    XCAFPrs_IndexedDataMapOfShapeStyle& theSettings,
-                                    const Quantity_ColorRGBA& theLayerColor)
+				                            const TopLoc_Location& theLoc,
+				                            XCAFPrs_DataMapOfShapeStyle& theSettings)
 {
   // for references, first collect colors of referred shape
   {
     TDF_Label aLabelRef;
     if (XCAFDoc_ShapeTool::GetReferredShape (theLabel, aLabelRef))
     {
-      Quantity_ColorRGBA aLayerColor = theLayerColor;
-      Handle(XCAFDoc_LayerTool) aLayerTool = XCAFDoc_DocumentTool::LayerTool (theLabel);
-      Handle(TColStd_HSequenceOfExtendedString) aLayerNames = new TColStd_HSequenceOfExtendedString();
-      aLayerTool->GetLayers (theLabel, aLayerNames);
-      if (aLayerNames->Length() == 1)
-      {
-        TDF_Label aLayer = aLayerTool->FindLayer (aLayerNames->First());
-        Handle(XCAFDoc_ColorTool) aColorTool = XCAFDoc_DocumentTool::ColorTool(theLabel);
-        Quantity_ColorRGBA aColor;
-        if (aColorTool->GetColor (aLayer, XCAFDoc_ColorGen, aColor))
-          aLayerColor = aColor;
-      }
       TopLoc_Location aLocSub = theLoc.Multiplied (XCAFDoc_ShapeTool::GetLocation (theLabel));
-      CollectStyleSettings (aLabelRef, aLocSub, theSettings, aLayerColor);
+      CollectStyleSettings (aLabelRef, aLocSub, theSettings);
     }
   }
 
@@ -121,7 +108,7 @@ void XCAFPrs::CollectStyleSettings (const TDF_Label& theLabel,
       for (TDF_LabelSequence::Iterator aComponentIter (aComponentLabSeq); aComponentIter.More(); aComponentIter.Next())
       {
         const TDF_Label& aComponentLab = aComponentIter.Value();
-        CollectStyleSettings (aComponentLab, theLoc, theSettings, theLayerColor);
+        CollectStyleSettings (aComponentLab, theLoc, theSettings);
       }
     }
   }
@@ -162,39 +149,19 @@ void XCAFPrs::CollectStyleSettings (const TDF_Label& theLabel,
     }
     else
     {
-      if (aColorTool->IsColorByLayer(aLabel))
+      Quantity_ColorRGBA aColor;
+      if (aColorTool->GetColor (aLabel, XCAFDoc_ColorGen, aColor))
       {
-        Quantity_ColorRGBA aLayerColor = theLayerColor;
-        Handle(XCAFDoc_LayerTool) aLayerTool = XCAFDoc_DocumentTool::LayerTool (aLabel);
-        Handle(TColStd_HSequenceOfExtendedString) aLayerNames = new TColStd_HSequenceOfExtendedString();
-        aLayerTool->GetLayers (aLabel, aLayerNames);
-        if (aLayerNames->Length() == 1)
-        {
-          TDF_Label aLayer = aLayerTool->FindLayer (aLayerNames->First());
-          Quantity_ColorRGBA aColor;
-          if (aColorTool->GetColor (aLayer, XCAFDoc_ColorGen, aColor))
-            aLayerColor = aColor;
-        }
-
-        aStyle.SetColorCurv (aLayerColor.GetRGB());
-        aStyle.SetColorSurf (aLayerColor);
+        aStyle.SetColorCurv (aColor.GetRGB());
+        aStyle.SetColorSurf (aColor);
       }
-      else
+      if (aColorTool->GetColor (aLabel, XCAFDoc_ColorSurf, aColor))
       {
-        Quantity_ColorRGBA aColor;
-        if (aColorTool->GetColor (aLabel, XCAFDoc_ColorGen, aColor))
-        {
-          aStyle.SetColorCurv (aColor.GetRGB());
-          aStyle.SetColorSurf (aColor);
-        }
-        if (aColorTool->GetColor (aLabel, XCAFDoc_ColorSurf, aColor))
-        {
-          aStyle.SetColorSurf (aColor);
-        }
-        if (aColorTool->GetColor (aLabel, XCAFDoc_ColorCurv, aColor))
-        {
-          aStyle.SetColorCurv (aColor.GetRGB());
-        }
+        aStyle.SetColorSurf (aColor);
+      }
+      if (aColorTool->GetColor (aLabel, XCAFDoc_ColorCurv, aColor))
+      {
+        aStyle.SetColorCurv (aColor.GetRGB());
       }
     }
 
@@ -283,11 +250,7 @@ void XCAFPrs::CollectStyleSettings (const TDF_Label& theLabel,
         for (TopTools_SequenceOfShape::Iterator aShuoShapeIter (aShuoShapeSeq); aShuoShapeIter.More(); aShuoShapeIter.Next())
         {
           const TopoDS_Shape& aShuoShape = aShuoShapeIter.Value();
-          XCAFPrs_Style* aMapStyle = theSettings.ChangeSeek (aShuoShape);
-          if (aMapStyle == NULL)
-            theSettings.Add (aShuoShape, aShuoStyle);
-          else
-            *aMapStyle = aShuoStyle;
+          theSettings.Bind (aShuoShape, aShuoStyle);
         }
         continue;
       }
@@ -310,11 +273,7 @@ void XCAFPrs::CollectStyleSettings (const TDF_Label& theLabel,
       }
     }
     aSubshape.Move (theLoc);
-    XCAFPrs_Style* aMapStyle = theSettings.ChangeSeek (aSubshape);
-    if (aMapStyle == NULL)
-      theSettings.Add (aSubshape, aStyle);
-    else
-      *aMapStyle = aStyle;
+    theSettings.Bind (aSubshape, aStyle);
   }
 }
 

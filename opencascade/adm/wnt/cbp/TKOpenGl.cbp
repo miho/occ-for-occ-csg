@@ -17,6 +17,7 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__OpenGl_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKOpenGl_obj.link" />
@@ -35,6 +36,7 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__OpenGl_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKOpenGl_objd.link" />
@@ -57,9 +59,9 @@
 		</Compiler>
 		<Linker>
 			<Add option="-Wl,--export-all-symbols" />
+			<Add library="opengl32" />
 			<Add library="freetype" />
 			<Add library="gl2ps" />
-			<Add library="opengl32" />
 			<Add library="user32" />
 			<Add library="comdlg32" />
 			<Add library="gdi32" />
@@ -115,12 +117,6 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/OpenGl/OpenGl_FrameBuffer.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/OpenGl/OpenGl_FrameStats.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/OpenGl/OpenGl_FrameStatsPrs.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/OpenGl/OpenGl_GraduatedTrihedron.cxx">

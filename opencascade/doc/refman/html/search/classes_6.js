@@ -38,6 +38,5 @@ var searchData=
   ['fsd_5fbinaryfile',['FSD_BinaryFile',['../class_f_s_d___binary_file.html',1,'']]],
   ['fsd_5fcmpfile',['FSD_CmpFile',['../class_f_s_d___cmp_file.html',1,'']]],
   ['fsd_5ffile',['FSD_File',['../class_f_s_d___file.html',1,'']]],
-  ['fsd_5ffileheader',['FSD_FileHeader',['../struct_f_s_d___file_header.html',1,'']]],
-  ['functorinterface',['FunctorInterface',['../class_o_s_d___parallel_1_1_functor_interface.html',1,'OSD_Parallel']]]
+  ['fsd_5ffileheader',['FSD_FileHeader',['../struct_f_s_d___file_header.html',1,'']]]
 ];

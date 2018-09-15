@@ -17,6 +17,16 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__V3d_DLL" />
+					<Add option="-D__Graphic3d_DLL" />
+					<Add option="-D__Select3D_DLL" />
+					<Add option="-D__Prs3d_DLL" />
+					<Add option="-D__StdPrs_DLL" />
+					<Add option="-D__SelectMgr_DLL" />
+					<Add option="-D__PrsMgr_DLL" />
+					<Add option="-D__AIS_DLL" />
+					<Add option="-D__DsgPrs_DLL" />
+					<Add option="-D__StdSelect_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKV3d_obj.link" />
@@ -35,6 +45,16 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__V3d_DLL" />
+					<Add option="-D__Graphic3d_DLL" />
+					<Add option="-D__Select3D_DLL" />
+					<Add option="-D__Prs3d_DLL" />
+					<Add option="-D__StdPrs_DLL" />
+					<Add option="-D__SelectMgr_DLL" />
+					<Add option="-D__PrsMgr_DLL" />
+					<Add option="-D__AIS_DLL" />
+					<Add option="-D__DsgPrs_DLL" />
+					<Add option="-D__StdSelect_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKV3d_objd.link" />
@@ -85,6 +105,9 @@
 		<Unit filename="../../../src/V3d/V3d_DirectionalLight.cxx">
 			<Option link="0" />
 		</Unit>
+		<Unit filename="../../../src/V3d/V3d_Light.cxx">
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../../src/V3d/V3d_Plane.cxx">
 			<Option link="0" />
 		</Unit>
@@ -118,10 +141,40 @@
 		<Unit filename="../../../src/V3d/V3d_Viewer.cxx">
 			<Option link="0" />
 		</Unit>
+		<Unit filename="../../../src/V3d/V3d_Viewer_3.cxx">
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../../src/V3d/V3d_Viewer_4.cxx">
 			<Option link="0" />
 		</Unit>
+		<Unit filename="../../../src/Graphic3d/Graphic3d_ArrayOfPoints.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Graphic3d/Graphic3d_ArrayOfPolygons.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Graphic3d/Graphic3d_ArrayOfPolylines.cxx">
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../../src/Graphic3d/Graphic3d_ArrayOfPrimitives.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Graphic3d/Graphic3d_ArrayOfQuadrangleStrips.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Graphic3d/Graphic3d_ArrayOfQuadrangles.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Graphic3d/Graphic3d_ArrayOfSegments.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Graphic3d/Graphic3d_ArrayOfTriangleFans.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Graphic3d/Graphic3d_ArrayOfTriangleStrips.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Graphic3d/Graphic3d_ArrayOfTriangles.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Graphic3d/Graphic3d_AspectFillArea3d.cxx">
@@ -137,9 +190,6 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Graphic3d/Graphic3d_BSDF.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/Graphic3d/Graphic3d_CLight.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Graphic3d/Graphic3d_CStructure.cxx">
@@ -164,9 +214,6 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Graphic3d/Graphic3d_HatchStyle.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/Graphic3d/Graphic3d_LightSet.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Graphic3d/Graphic3d_MarkerImage.cxx">
@@ -230,6 +277,9 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Graphic3d/Graphic3d_TransformPers.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/Graphic3d/Graphic3d_Vector.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/Graphic3d/Graphic3d_Vertex.cxx">

@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_AsciiString.hxx>
 #include <TDF_Attribute.hxx>
@@ -31,7 +31,7 @@ IMPLEMENT_DOMSTRING (AttributeIDString, "asciiguid")
 //purpose  : Constructor
 //=======================================================================
 XmlMDataStd_AsciiStringDriver::XmlMDataStd_AsciiStringDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -68,7 +68,7 @@ Standard_Boolean XmlMDataStd_AsciiStringDriver::Paste
   Handle(TDataStd_AsciiString)::DownCast(theTarget)->SetID(aGUID);
   return Standard_True;
   }
-  myMessageDriver->Send("error retrieving AsciiString for type TDataStd_AsciiString", Message_Fail);
+  WriteMessage("error retrieving AsciiString for type TDataStd_AsciiString");
   return Standard_False;
 }
 

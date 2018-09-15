@@ -235,23 +235,6 @@ static inline bool str_starts_with (const char* theStr, const char* theWord, int
   return !strncmp (theStr, theWord, theN);
 }
 
-static bool ReadVertex (const char* theStr, double& theX, double& theY, double& theZ)
-{
-  const char *aStr = theStr;
-
-  // skip 'vertex'
-  while (isspace ((unsigned char)*aStr) || isalpha ((unsigned char)*aStr)) 
-    ++aStr;
-
-  // read values
-  char *aEnd;
-  theX = Strtod (aStr, &aEnd);
-  theY = Strtod (aStr = aEnd, &aEnd);
-  theZ = Strtod (aStr = aEnd, &aEnd);
-
-  return aEnd != aStr;
-}
-
 //==============================================================================
 //function : ReadAscii
 //purpose  :
@@ -267,7 +250,7 @@ Standard_Boolean RWStl_Reader::ReadAscii (Standard_IStream& theStream,
   const int64_t aEndPos = (theUntilPos > 0 ? 1 + GETPOS(theUntilPos) : std::numeric_limits<int64_t>::max());
 
   // skip header "solid ..."
-  theStream.ignore ((std::streamsize)(aEndPos - aStartPos), '\n');
+  theStream.ignore (aEndPos - aStartPos, '\n');
   if (!theStream)
   {
     Message::DefaultMessenger()->Send ("Error: premature end of file", Message_Fail);
@@ -281,7 +264,7 @@ Standard_Boolean RWStl_Reader::ReadAscii (Standard_IStream& theStream,
 
   // report progress every 1 MiB of read data
   const int aStepB = 1024 * 1024;
-  const Standard_Integer aNbSteps = 1 + Standard_Integer((GETPOS(theUntilPos) - aStartPos) / aStepB);
+  const Standard_Integer aNbSteps = 1 + Standard_Integer((theUntilPos - aStartPos) / aStepB);
   Message_ProgressSentry aPSentry (theProgress, "Reading text STL file", 0, aNbSteps, 1);
 
   int64_t aProgressPos = aStartPos + aStepB;
@@ -297,13 +280,13 @@ Standard_Boolean RWStl_Reader::ReadAscii (Standard_IStream& theStream,
     }
 
     char facet[LINELEN], outer[LINELEN];
-    theStream.getline (facet, (std::streamsize)std::min (LINELEN, aEndPos - GETPOS(theStream.tellg()))); // "facet normal nx ny nz"
+    theStream.getline (facet, std::min (LINELEN, aEndPos - GETPOS(theStream.tellg()))); // "facet normal nx ny nz"
     if (str_starts_with (facet, "endsolid", 8))
     {
       // end of STL code
       break;
     }
-    theStream.getline (outer, (std::streamsize)std::min (LINELEN, aEndPos - GETPOS(theStream.tellg()))); // "outer loop"
+    theStream.getline (outer, std::min (LINELEN, aEndPos - GETPOS(theStream.tellg()))); // "outer loop"
     if (!str_starts_with (facet, "facet", 5) || !str_starts_with (outer, "outer", 5))
     {
       TCollection_AsciiString aStr ("Error: unexpected format of facet at line ");
@@ -312,9 +295,9 @@ Standard_Boolean RWStl_Reader::ReadAscii (Standard_IStream& theStream,
       return false;
     }
 
-    theStream.getline (aLine1, (std::streamsize)std::min (LINELEN, aEndPos - GETPOS(theStream.tellg())));
-    theStream.getline (aLine2, (std::streamsize)std::min (LINELEN, aEndPos - GETPOS(theStream.tellg())));
-    theStream.getline (aLine3, (std::streamsize)std::min (LINELEN, aEndPos - GETPOS(theStream.tellg())));
+    theStream.getline (aLine1, std::min (LINELEN, aEndPos - GETPOS(theStream.tellg())));
+    theStream.getline (aLine2, std::min (LINELEN, aEndPos - GETPOS(theStream.tellg())));
+    theStream.getline (aLine3, std::min (LINELEN, aEndPos - GETPOS(theStream.tellg())));
 
     // stop reading if end of file is reached;
     // note that well-formatted file never ends by the vertex line
@@ -331,9 +314,11 @@ Standard_Boolean RWStl_Reader::ReadAscii (Standard_IStream& theStream,
     aNbLine += 5;
 
     Standard_Real x1, y1, z1, x2, y2, z2, x3, y3, z3;
-    if (! ReadVertex (aLine1, x1, y1, z1) ||
-        ! ReadVertex (aLine2, x2, y2, z2) ||
-        ! ReadVertex (aLine3, x3, y3, z3))
+    Standard_Integer aReadCount = // read 3 lines "vertex x y z"
+      sscanf_l (aLine1, aLocale, "%*s %lf %lf %lf", &x1, &y1, &z1) +
+      sscanf_l (aLine2, aLocale, "%*s %lf %lf %lf", &x2, &y2, &z2) +
+      sscanf_l (aLine3, aLocale, "%*s %lf %lf %lf", &x3, &y3, &z3);
+    if (aReadCount != 9)
     {
       TCollection_AsciiString aStr ("Error: cannot read vertex co-ordinates at line ");
       aStr += aNbLine;
@@ -350,8 +335,8 @@ Standard_Boolean RWStl_Reader::ReadAscii (Standard_IStream& theStream,
       AddTriangle (n1, n2, n3);
     }
 
-    theStream.ignore ((std::streamsize)(aEndPos - GETPOS(theStream.tellg())), '\n'); // skip "endloop"
-    theStream.ignore ((std::streamsize)(aEndPos - GETPOS(theStream.tellg())), '\n'); // skip "endfacet"
+    theStream.ignore (aEndPos - GETPOS(theStream.tellg()), '\n'); // skip "endloop"
+    theStream.ignore (aEndPos - GETPOS(theStream.tellg()), '\n'); // skip "endfacet"
 
     aNbLine += 2;
   }

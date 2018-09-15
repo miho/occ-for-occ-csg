@@ -1,7 +1,7 @@
 var searchData=
 [
   ['j_5ffp',['J_fp',['../_adv_app2_var___data__f2c_8hxx.html#a432206078c05579554902d6006d3546e',1,'AdvApp2Var_Data_f2c.hxx']]],
-  ['jacobi',['Jacobi',['../math___recipes_8hxx.html#a9f96daf21c2fc02998f9d6e7f5289225',1,'math_Recipes.hxx']]],
+  ['jacobi',['Jacobi',['../math___recipes_8hxx.html#a528ef0f9441dcc319fe427522d7cd118',1,'math_Recipes.hxx']]],
   ['jacobian',['Jacobian',['../classmath___newton_function_set_root.html#ac5530c4ffe2106dfd41f49388885dd54',1,'math_NewtonFunctionSetRoot']]],
   ['jacobiparameters',['JacobiParameters',['../class_p_lib.html#a6b32c1bf2a45f6c389e75c57e4a272d0',1,'PLib']]],
   ['join',['Join',['../class_b_rep_offset_a_p_i___make_offset_shape.html#a77e819190f918b0d5d3b8b276b1e8bd1',1,'BRepOffsetAPI_MakeOffsetShape::Join()'],['../class_b_rep_offset_a_p_i___make_thick_solid.html#a4f73a5bbbb0d842453b14a081c58580c',1,'BRepOffsetAPI_MakeThickSolid::Join()'],['../class_i_g_e_s_appli___flow.html#a3bfc9445be44c16b42af50120a1e0e05',1,'IGESAppli_Flow::Join()'],['../class_i_g_e_s_appli___piping_flow.html#a1537bcc037a28884f1f55bd5d7ac58ee',1,'IGESAppli_PipingFlow::Join()']]],

@@ -16,15 +16,16 @@ if (MSVC)
   set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   /fp:precise")
 endif()
 
-# add SSE2 option for old MSVC compilers (VS 2005 - 2010, 32 bit only)
+# set compiler short name and choose SSE2 option for appropriate MSVC compilers
+# ONLY for 32-bit
 if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-  if (MSVC AND ((MSVC_VERSION EQUAL 1400) OR (MSVC_VERSION EQUAL 1500) OR (MSVC_VERSION EQUAL 1600)))
+  if (MSVC80 OR MSVC90 OR MSVC10)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
     set (CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   /arch:SSE2")
   endif()
 endif()
 
-if (MSVC)
+if (WIN32)
   add_definitions (-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
 else()
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions -fPIC")
@@ -81,7 +82,7 @@ if (IS_DEBUG_C)
   string (REGEX REPLACE "-DDEBUG" "" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
 endif()
 # enable parallel compilation on MSVC 9 and above
-if (MSVC AND (MSVC_VERSION GREATER 1400))
+if (MSVC AND NOT MSVC70 AND NOT MSVC80)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 endif()
 

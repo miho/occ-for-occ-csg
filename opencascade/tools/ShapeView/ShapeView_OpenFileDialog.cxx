@@ -16,7 +16,6 @@
 #include <inspector/ShapeView_OpenFileDialog.hxx>
 #include <inspector/ShapeView_OpenFileViewModel.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -35,7 +34,6 @@
 #include <QFileSystemModel>
 #include <QPushButton>
 #include <QToolButton>
-#include <Standard_WarningsRestore.hxx>
 
 const int FONT_POINT_SIZE = 18;
 const int ICON_SIZE = 40;

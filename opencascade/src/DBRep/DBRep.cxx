@@ -1140,7 +1140,6 @@ static Standard_Integer normals (Draw_Interpretor& theDI,
   Standard_Boolean toUseMesh = Standard_False;
   Standard_Real    aLength   = 10.0;
   Standard_Integer aNbAlongU = 1, aNbAlongV = 1;
-  Standard_Boolean bPrint = Standard_False;
   for (Standard_Integer anArgIter = 2; anArgIter< theArgNum; ++anArgIter)
   {
     TCollection_AsciiString aParam (theArgs[anArgIter]);
@@ -1205,13 +1204,9 @@ static Standard_Integer normals (Draw_Interpretor& theDI,
         return 1;
       }
     }
-    else if (aParam == "-print")
-    {
-      bPrint = Standard_True;
-    }
     else
     {
-      std::cout << "Syntax error: unknown argument '" << aParam << "'\n";
+      std::cout << "Syntax error: unknwon argument '" << aParam << "'\n";
       return 1;
     }
   }
@@ -1230,29 +1225,12 @@ static Standard_Integer normals (Draw_Interpretor& theDI,
 
   for (NCollection_DataMap<TopoDS_Face, NCollection_Vector<std::pair<gp_Pnt, gp_Pnt> > >::Iterator aFaceIt (aNormals); aFaceIt.More(); aFaceIt.Next())
   {
-    Standard_Boolean bReverse = Standard_False;
-    TopAbs_Orientation aFaceOri = aFaceIt.Key().Orientation();
-    const Draw_Color aColor = DBRep_ColorOrientation (aFaceOri);
-    if (aFaceOri == TopAbs_REVERSED)
-      bReverse = Standard_True;
-
+    const Draw_Color aColor = DBRep_ColorOrientation (aFaceIt.Key().Orientation());
     for (NCollection_Vector<std::pair<gp_Pnt, gp_Pnt> >::Iterator aNormalsIt (aFaceIt.Value()); aNormalsIt.More(); aNormalsIt.Next())
     {
       const std::pair<gp_Pnt, gp_Pnt>& aVec = aNormalsIt.Value();
       Handle(Draw_Segment3D) aSeg = new Draw_Segment3D(aVec.first, aVec.second, aColor);
       dout << aSeg;
-      if (bPrint)
-      {
-        // Make the normal vector from the points
-        gp_Vec aV(aVec.first, aVec.second);
-        if (bReverse)
-          aV.Reverse();
-
-        // Print values of the vector avoiding printing "-0" values
-        theDI << "(" << (aV.X() == 0 ? 0 : aV.X()) << ", "
-                     << (aV.Y() == 0 ? 0 : aV.Y()) << ", "
-                     << (aV.Z() == 0 ? 0 : aV.Z()) << ")\n";
-      }
     }
   }
 
@@ -1417,10 +1395,7 @@ void  DBRep::BasicCommands(Draw_Interpretor& theCommands)
   theCommands.Add("vconn","vconn [name1 ...] , edges are colored by number of faces (see vori)",__FILE__,dispor,g);
   theCommands.Add("discretisation","discretisation [nbpoints]",__FILE__,discretisation,g);
   theCommands.Add("compound","compound [name1 name2 ..] compound",__FILE__,compound,g);
-  theCommands.Add("add",
-                  "add what where"
-                  "\n  adds shape \"what\" to shape \"where\" ",
-                  __FILE__,add,g);
+  theCommands.Add("add","add name1 name2",__FILE__,add,g);
   theCommands.Add("explode","explode name [Cd/C/So/Sh/F/W/E/V]",__FILE__,explode,g);
   theCommands.Add("nexplode","stable numbered explode for vertex, edge and face: nexplode name [V/E/F]",__FILE__,nexplode,g);
   theCommands.Add("exwire","exwire wirename",__FILE__,exwire,g);
@@ -1431,7 +1406,7 @@ void  DBRep::BasicCommands(Draw_Interpretor& theCommands)
   theCommands.Add("treverse","treverse name1 name2 ...",__FILE__,orientation,g);
   theCommands.Add("complement","complement name1 name2 ...",__FILE__,orientation,g);
   theCommands.Add("invert","invert name, reverse subshapes",__FILE__,invert,g);
-  theCommands.Add("normals","normals shape [Length {10}] [-NbAlongU {1}] [-NbAlongV {1}] [-UseMesh] [-print], display normals",__FILE__,normals,g);
+  theCommands.Add("normals","normals shape [Length {10}] [-NbAlongU {1}] [-NbAlongV {1}] [-UseMesh], display normals",__FILE__,normals,g);
   theCommands.Add("nbshapes",
                   "\n nbshapes s - shows the number of sub-shapes in <s>;\n nbshapes s -t - shows the number of sub-shapes in <s> counting the same sub-shapes with different location as different sub-shapes.",
                   __FILE__,nbshapes,g);

@@ -42,7 +42,7 @@
 #include <BinMXCAFDoc_ViewDriver.hxx>
 #include <BinMXCAFDoc_ViewToolDriver.hxx>
 #include <BinMXCAFDoc_VolumeDriver.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <TNaming_NamedShape.hxx>
 
 //=======================================================================
@@ -50,7 +50,7 @@
 //purpose  : 
 //=======================================================================
 void BinMXCAFDoc::AddDrivers(const Handle(BinMDF_ADriverTable)& theDriverTable,
-                             const Handle(Message_Messenger)&   theMsgDrv) 
+			                       const Handle(CDM_MessageDriver)&   theMsgDrv) 
 {
   theDriverTable->AddDriver( new BinMXCAFDoc_AreaDriver     (theMsgDrv));
   theDriverTable->AddDriver( new BinMXCAFDoc_CentroidDriver (theMsgDrv));

@@ -1,8 +1,5 @@
 pload QAcommands
 
-puts "TODO ?OCC29132 Windows: ERROR: performance"
-
-
 set info [QANTestNCollectionIndexedDataMap]
 
 set keys {}

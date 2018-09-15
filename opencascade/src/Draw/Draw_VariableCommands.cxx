@@ -141,12 +141,12 @@ static Standard_Integer save(Draw_Interpretor& di, Standard_Integer n, const cha
 {
   if (n <= 2) return 1;
 
+
   const char* name = a[2];
   ofstream os;
   os.precision(15);
   OSD_OpenStream(os, name, ios::out);
-  if (!os.is_open() || !os.good())
-  {
+  if (!os.rdbuf()->is_open()) {
     di << "Cannot open file for writing "<<name;
     return 1;
   }

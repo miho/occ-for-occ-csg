@@ -142,13 +142,5 @@
 		<Unit filename="../../../src/GeomEvaluator/GeomEvaluator_OffsetSurface.cxx" />
 		<Unit filename="../../../src/GeomEvaluator/GeomEvaluator_SurfaceOfExtrusion.cxx" />
 		<Unit filename="../../../src/GeomEvaluator/GeomEvaluator_SurfaceOfRevolution.cxx" />
-		<Unit filename="../../../src/GProp/GProp.cxx" />
-		<Unit filename="../../../src/GProp/GProp_CelGProps.cxx" />
-		<Unit filename="../../../src/GProp/GProp_GProps.cxx" />
-		<Unit filename="../../../src/GProp/GProp_PEquation.cxx" />
-		<Unit filename="../../../src/GProp/GProp_PGProps.cxx" />
-		<Unit filename="../../../src/GProp/GProp_PrincipalProps.cxx" />
-		<Unit filename="../../../src/GProp/GProp_SelGProps.cxx" />
-		<Unit filename="../../../src/GProp/GProp_VelGProps.cxx" />
 	</Project>
 </CodeBlocks_project_file>

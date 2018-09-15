@@ -33,7 +33,7 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // OCC_App construction
 
-BOOL OCC_App::InitApplication()
+OCC_App::OCC_App() : CWinApp()
 {
   OSD::SetSignal (Standard_True);
   SampleName = "";
@@ -48,8 +48,6 @@ BOOL OCC_App::InitApplication()
     AfxMessageBox (L"Fatal error during graphic initialization", MB_ICONSTOP);
     ExitProcess (1);
   }
-
-  return TRUE;
 }
 
 void OCC_App::SetSamplePath(LPCTSTR aPath)

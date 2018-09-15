@@ -34,8 +34,6 @@
 
 static TopoDS_Shape MakeShape(const Handle(Geom_Surface)& );
 
-Standard_DISABLE_DEPRECATION_WARNINGS
-
 //=======================================================================
 //function : BRepAlgo_Section
 //purpose  : 
@@ -354,5 +352,3 @@ TopoDS_Shape MakeShape(const Handle(Geom_Surface)& S)
   if (c >= GeomAbs_C2) return BRepBuilderAPI_MakeFace(S, Precision::Confusion());
   else return BRepBuilderAPI_MakeShell(S);
 }
-
-Standard_ENABLE_DEPRECATION_WARNINGS

@@ -15,7 +15,7 @@
 
 #include <XmlMDataXtd_PositionDriver.hxx>
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <gp_XYZ.hxx>
 #include <Standard_Type.hxx>
 #include <TDataXtd_Position.hxx>
@@ -32,7 +32,7 @@ IMPLEMENT_STANDARD_RTTIEXT(XmlMDataXtd_PositionDriver,XmlMDF_ADriver)
 //purpose  : Constructor
 //=======================================================================
 XmlMDataXtd_PositionDriver::XmlMDataXtd_PositionDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
 : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -60,7 +60,7 @@ Standard_Boolean XmlMDataXtd_PositionDriver::Paste
   XmlObjMgt_DOMString aPosStr = XmlObjMgt::GetStringValue(theSource.Element());
   if (aPosStr == NULL)
   {
-    myMessageDriver->Send ("Cannot retrieve position string from element", Message_Fail);
+    WriteMessage ("Cannot retrieve position string from element");
     return Standard_False;
   }
 
@@ -75,7 +75,7 @@ Standard_Boolean XmlMDataXtd_PositionDriver::Paste
       TCollection_ExtendedString
         ("Cannot retrieve X coordinate for TDataXtd_Position attribute as \"")
           + aValueStr + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
   aPos.SetX(aValue);
@@ -87,7 +87,7 @@ Standard_Boolean XmlMDataXtd_PositionDriver::Paste
       TCollection_ExtendedString
         ("Cannot retrieve Y coordinate for TDataXtd_Position attribute as \"")
           + aValueStr + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
   aPos.SetY(aValue);
@@ -99,7 +99,7 @@ Standard_Boolean XmlMDataXtd_PositionDriver::Paste
       TCollection_ExtendedString
         ("Cannot retrieve Z coordinate for TDataXtd_Position attribute as \"")
           + aValueStr + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
   aPos.SetZ(aValue);

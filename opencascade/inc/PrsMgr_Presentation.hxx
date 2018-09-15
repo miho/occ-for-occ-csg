@@ -17,7 +17,6 @@
 #ifndef _PrsMgr_Presentation_HeaderFile
 #define _PrsMgr_Presentation_HeaderFile
 
-#include <Graphic3d_ZLayerId.hxx>
 #include <PrsMgr_PresentableObjectPointer.hxx>
 #include <Standard.hxx>
 #include <Standard_Boolean.hxx>
@@ -85,10 +84,10 @@ private:
   Standard_EXPORT void SetDisplayPriority (const Standard_Integer aNewPrior);
   
   //! Set Z layer ID for the presentation
-  Standard_EXPORT void SetZLayer (const Graphic3d_ZLayerId theLayerId);
+  Standard_EXPORT void SetZLayer (const Standard_Integer theLayerId);
   
   //! Get Z layer ID for the presentation
-  Standard_EXPORT Graphic3d_ZLayerId GetZLayer() const;
+  Standard_EXPORT Standard_Integer GetZLayer() const;
   
   //! removes the whole content of the presentation.
   //! Does not remove the other connected presentations.

@@ -80,9 +80,6 @@ public:
   //! @return the number of structures
   Standard_Integer NbStructures() const { return myNbStructures; }
 
-  //! Number of NOT culled structures in the layer.
-  Standard_Integer NbStructuresNotCulled() const { return myNbStructuresNotCulled; }
-
   //! Returns the number of available priority levels
   Standard_Integer NbPriorities() const { return myArray.Length(); }
 
@@ -95,7 +92,7 @@ public:
 
   //! Marks BVH tree for given priority list as dirty and
   //! marks primitive set for rebuild.
-  void InvalidateBVHData();
+  void InvalidateBVHData() const;
 
   //! Marks cached bounding box as obsolete.
   void InvalidateBoundingBox() const
@@ -122,15 +119,6 @@ public:
                                                 const Standard_Integer          theWindowWidth,
                                                 const Standard_Integer          theWindowHeight) const;
 
-  //! Update culling state - should be called before rendering.
-  //! Traverses through BVH tree to determine which structures are in view volume.
-  void UpdateCulling (const Standard_Integer theViewId,
-                      const OpenGl_BVHTreeSelector& theSelector,
-                      const Standard_Boolean theToTraverse);
-
-  //! Returns TRUE if layer is empty or has been discarded entirely by culling test.
-  bool IsCulled() const { return myNbStructuresNotCulled == 0; }
-
   // Render all structures.
   void Render (const Handle(OpenGl_Workspace)&   theWorkspace,
                const OpenGl_GlobalLayerSettings& theDefaultSettings) const;
@@ -141,24 +129,19 @@ public:
     return myBVHPrimitivesTrsfPers.Size();
   }
 
-public:
-
-  //! Returns set of OpenGl_Structures structures for building BVH tree.
-  const OpenGl_BVHClipPrimitiveSet& CullableStructuresBVH() const { return myBVHPrimitives; }
-
-  //! Returns set of transform persistent OpenGl_Structures for building BVH tree.
-  const OpenGl_BVHClipPrimitiveTrsfPersSet& CullableTrsfPersStructuresBVH() const { return myBVHPrimitivesTrsfPers; }
-
-  //! Returns indexed map of always rendered structures.
-  const NCollection_IndexedMap<const OpenGl_Structure*>& NonCullableStructures() const { return myAlwaysRenderedMap; }
-
 protected:
 
   //! Updates BVH trees if their state has been invalidated.
-  Standard_EXPORT void updateBVH() const;
+  void updateBVH() const;
+
+  //! Traverses through BVH tree to determine which structures are in view volume.
+  void traverse (OpenGl_BVHTreeSelector& theSelector) const;
 
   //! Iterates through the hierarchical list of existing structures and renders them all.
-  Standard_EXPORT void renderAll (const Handle(OpenGl_Workspace)& theWorkspace) const;
+  void renderAll (const Handle(OpenGl_Workspace)& theWorkspace) const;
+
+  //! Iterates through the hierarchical list of existing structures and renders only overlapping ones.
+  void renderTraverse (const Handle(OpenGl_Workspace)& theWorkspace) const;
 
 private:
 
@@ -167,9 +150,6 @@ private:
 
   //! Overall number of structures rendered in the layer.
   Standard_Integer myNbStructures;
-
-  //! Number of NOT culled structures in the layer.
-  Standard_Integer myNbStructuresNotCulled;
 
   //! Layer setting flags.
   Graphic3d_ZLayerSettings myLayerSettings;
@@ -184,7 +164,7 @@ private:
   mutable NCollection_IndexedMap<const OpenGl_Structure*> myAlwaysRenderedMap;
 
   //! Is needed for implementation of stochastic order of BVH traverse.
-  Standard_Boolean myBVHIsLeftChildQueuedFirst;
+  mutable Standard_Boolean myBVHIsLeftChildQueuedFirst;
 
   //! Defines if the primitive set for BVH is outdated.
   mutable Standard_Boolean myIsBVHPrimitivesNeedsReset;
@@ -194,6 +174,10 @@ private:
 
   //! Cached layer bounding box.
   mutable Bnd_Box myBoundingBox[2];
+
+public:
+
+  DEFINE_STANDARD_ALLOC
 
 };
 

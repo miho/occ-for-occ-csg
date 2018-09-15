@@ -1,5 +1,3 @@
-puts "TODO OCC27318 MacOS: Error : TEST FAILED"
-
 puts "========"
 puts "OCC27318"
 puts "========"

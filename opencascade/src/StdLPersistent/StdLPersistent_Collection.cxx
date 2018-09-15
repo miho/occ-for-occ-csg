@@ -68,6 +68,18 @@ private:
   Handle(TDF_Data) myDF;
 };
 
+//=======================================================================
+//function : Read
+//purpose  : Read persistent data from a file
+//=======================================================================
+template <class Base>
+void StdLPersistent_Collection::booleanArrayBase<Base>::Read
+  (StdObjMgt_ReadData& theReadData)
+{
+  Base::Read (theReadData);
+  theReadData >> myLower >> myUpper;
+}
+
 template <class Base>
 template <class ArrayHandle, class Converter>
 void StdLPersistent_Collection::booleanArrayBase<Base>::import

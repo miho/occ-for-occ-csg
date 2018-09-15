@@ -2,19 +2,19 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{38F74C1F-144E-0018-071A-C3EB4C8D0908}</UniqueIdentifier>
+      <UniqueIdentifier>{306553A4-18D9-012C-192F-BF323378EF2D}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\QABugs">
-      <UniqueIdentifier>{4C039507-1343-02CF-1655-0928B14EA584}</UniqueIdentifier>
+      <UniqueIdentifier>{9E749FAF-0634-0010-080F-BFC35EB38AA9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\QADNaming">
-      <UniqueIdentifier>{5481E211-06B6-0698-0C3F-856AED2EF697}</UniqueIdentifier>
+      <UniqueIdentifier>{5490E58F-0668-101A-0773-5AE8E670867C}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\QADraw">
-      <UniqueIdentifier>{3F5B9AD9-0CDA-1694-114D-55B1BE086A0C}</UniqueIdentifier>
+      <UniqueIdentifier>{8D56EA94-0E4A-01E9-0713-029E4AE63D01}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\QANCollection">
-      <UniqueIdentifier>{6A6C9F70-142E-0691-0386-D8363CD0D3F1}</UniqueIdentifier>
+      <UniqueIdentifier>{AF1F9404-130C-06BD-099B-ECD9FCDB6BE0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

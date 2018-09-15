@@ -1,8 +1,5 @@
-#include <Standard_WarningsDisable.hxx>
 #include <QDialog>
 #include <QWidget>
-#include <Standard_WarningsRestore.hxx>
-
 #include <AIS_InteractiveContext.hxx>
 
 class DialogTransparency : public QDialog

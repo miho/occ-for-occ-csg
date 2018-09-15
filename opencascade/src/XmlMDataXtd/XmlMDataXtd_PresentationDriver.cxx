@@ -15,7 +15,7 @@
 
 #include <XmlMDataXtd_PresentationDriver.hxx>
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDF_Attribute.hxx>
 #include <XmlObjMgt.hxx>
@@ -40,7 +40,7 @@ IMPLEMENT_DOMSTRING (DisplayedString,   "true")
 //purpose  : Constructor
 //=======================================================================
 XmlMDataXtd_PresentationDriver::XmlMDataXtd_PresentationDriver
-  (const Handle(Message_Messenger)& theMsgDriver)
+  (const Handle(CDM_MessageDriver)& theMsgDriver)
   : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -73,7 +73,7 @@ Standard_Boolean XmlMDataXtd_PresentationDriver::Paste
   aDOMStr = anElem.getAttribute(::GuidString());
   if (aDOMStr == NULL)
   {
-    myMessageDriver->Send("Cannot retrieve guid string from attribute", Message_Fail);
+    WriteMessage("Cannot retrieve guid string from attribute");
     return Standard_False;
   }
   Standard_CString aGuidStr = (Standard_CString) aDOMStr.GetString();
@@ -93,7 +93,7 @@ Standard_Boolean XmlMDataXtd_PresentationDriver::Paste
     {
       aMessageString = TCollection_ExtendedString
         ("Cannot retrieve Integer value from \"") + aDOMStr + "\"";
-      myMessageDriver->Send (aMessageString, Message_Fail);
+      WriteMessage (aMessageString);
       return Standard_False;
     }
     aTPrs->SetColor((Quantity_NameOfColor)anIValue);
@@ -111,7 +111,7 @@ Standard_Boolean XmlMDataXtd_PresentationDriver::Paste
     {
       aMessageString = TCollection_ExtendedString
         ("Cannot retrieve Integer value from \"") + aDOMStr + "\"";
-      myMessageDriver->Send (aMessageString, Message_Fail);
+      WriteMessage (aMessageString);
       return Standard_False;
     }
     aTPrs->SetMaterialIndex(anIValue);
@@ -131,7 +131,7 @@ Standard_Boolean XmlMDataXtd_PresentationDriver::Paste
     {
       aMessageString = TCollection_ExtendedString
         ("Cannot retrieve Real value from \"") + aDOMStr + "\"";
-      myMessageDriver->Send (aMessageString, Message_Fail);
+      WriteMessage (aMessageString);
       return Standard_False;
     }
     aTPrs->SetTransparency(aValue);
@@ -149,7 +149,7 @@ Standard_Boolean XmlMDataXtd_PresentationDriver::Paste
     {
       aMessageString = TCollection_ExtendedString
         ("Cannot retrieve Real value from \"") + aDOMStr + "\"";
-      myMessageDriver->Send (aMessageString, Message_Fail);
+      WriteMessage (aMessageString);
       return Standard_False;
     }
     aTPrs->SetWidth(aValue);
@@ -167,7 +167,7 @@ Standard_Boolean XmlMDataXtd_PresentationDriver::Paste
     {
       aMessageString = TCollection_ExtendedString
         ("Cannot retrieve Integer value from \"") + aDOMStr + "\"";
-      myMessageDriver->Send (aMessageString, Message_Fail);
+      WriteMessage (aMessageString);
       return Standard_False;
     }
     aTPrs->SetMode(anIValue);

@@ -17,6 +17,13 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__TopOpeBRep_DLL" />
+					<Add option="-D__TopOpeBRepDS_DLL" />
+					<Add option="-D__TopOpeBRepBuild_DLL" />
+					<Add option="-D__TopOpeBRepTool_DLL" />
+					<Add option="-D__BRepAlgo_DLL" />
+					<Add option="-D__BRepFill_DLL" />
+					<Add option="-D__BRepProj_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKBool_obj.link" />
@@ -35,6 +42,13 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__TopOpeBRep_DLL" />
+					<Add option="-D__TopOpeBRepDS_DLL" />
+					<Add option="-D__TopOpeBRepBuild_DLL" />
+					<Add option="-D__TopOpeBRepTool_DLL" />
+					<Add option="-D__BRepAlgo_DLL" />
+					<Add option="-D__BRepFill_DLL" />
+					<Add option="-D__BRepProj_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKBool_objd.link" />

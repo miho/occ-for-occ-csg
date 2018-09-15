@@ -41,7 +41,6 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
-#include <Standard_Mutex.hxx>
 
 //! Functor for executing StdPrs_Isolines in parallel threads.
 class StdPrs_WFShape_IsoFunctor

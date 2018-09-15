@@ -3,6 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <AIS_Shape.hxx>
+#include <AIS_LocalContext.hxx>
 #include <TopoDS_Face.hxx>
 #include "OCC_2dDoc.h"
 

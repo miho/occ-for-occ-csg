@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -132,7 +132,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a01947290d2182dc78a4c800de1ab5759"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the status of the view regarding the displayed structures inside Returns True is The View is empty.  <a href="#a01947290d2182dc78a4c800de1ab5759">More...</a><br /></td></tr>
 <tr class="separator:a01947290d2182dc78a4c800de1ab5759"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39a0498fc335aff77b430813b7134395"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a39a0498fc335aff77b430813b7134395">UpdateLights</a> () const</td></tr>
-<tr class="memdesc:a39a0498fc335aff77b430813b7134395"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the lights of the view.  <a href="#a39a0498fc335aff77b430813b7134395">More...</a><br /></td></tr>
+<tr class="memdesc:a39a0498fc335aff77b430813b7134395"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the lights of the view. The view is redrawn.  <a href="#a39a0498fc335aff77b430813b7134395">More...</a><br /></td></tr>
 <tr class="separator:a39a0498fc335aff77b430813b7134395"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98b4e6a06cc84f7817cd98db2b441fd1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a98b4e6a06cc84f7817cd98db2b441fd1">SetAutoZFitMode</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theIsOn, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theScaleFactor=1.0)</td></tr>
 <tr class="memdesc:a98b4e6a06cc84f7817cd98db2b441fd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the automatic z-fit mode and its parameters. The auto z-fit has extra parameters which can controlled from application level to ensure that the size of viewing volume will be sufficiently large to cover the depth of unmanaged objects, for example, transformation persistent ones.  <a href="#a98b4e6a06cc84f7817cd98db2b441fd1">More...</a><br /></td></tr>
@@ -170,28 +170,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9f38496afdc28fe1e8a93f4463e609ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a9f38496afdc28fe1e8a93f4463e609ac">SetAxis</a> (const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> X, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Y, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Z, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Vx, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Vy, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> Vz)</td></tr>
 <tr class="memdesc:a9f38496afdc28fe1e8a93f4463e609ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Definition of an axis from its origin and its orientation . This will be the current axis for rotations and movements. Warning! raises BadValue from <a class="el" href="class_v3d.html" title="This package contains the set of commands and services of the 3D Viewer. It provides a set of high le...">V3d</a> if the vector normal is NULL. .  <a href="#a9f38496afdc28fe1e8a93f4463e609ac">More...</a><br /></td></tr>
 <tr class="separator:a9f38496afdc28fe1e8a93f4463e609ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad69839faaea549313ae29f6718a56cc1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#ad69839faaea549313ae29f6718a56cc1">SetShadingModel</a> (const <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> theShadingModel)</td></tr>
-<tr class="memdesc:ad69839faaea549313ae29f6718a56cc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the shading model for the visualization. Various models are available.  <a href="#ad69839faaea549313ae29f6718a56cc1">More...</a><br /></td></tr>
-<tr class="separator:ad69839faaea549313ae29f6718a56cc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81047c71b3afe8374ceab0cfdc35b0da"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a81047c71b3afe8374ceab0cfdc35b0da">SetShadingModel</a> (const <a class="el" href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2">V3d_TypeOfShadingModel</a> theShadingModel)</td></tr>
+<tr class="memdesc:a81047c71b3afe8374ceab0cfdc35b0da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the shading model for the visualization. Various models are available.  <a href="#a81047c71b3afe8374ceab0cfdc35b0da">More...</a><br /></td></tr>
+<tr class="separator:a81047c71b3afe8374ceab0cfdc35b0da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c514fdf329e45a78c361b3b6ea8dd27"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a0c514fdf329e45a78c361b3b6ea8dd27">SetTextureEnv</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___texture_env.html">Graphic3d_TextureEnv</a> &gt; &amp;theTexture)</td></tr>
 <tr class="memdesc:a0c514fdf329e45a78c361b3b6ea8dd27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the environment texture to use. No environment texture by default.  <a href="#a0c514fdf329e45a78c361b3b6ea8dd27">More...</a><br /></td></tr>
 <tr class="separator:a0c514fdf329e45a78c361b3b6ea8dd27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbd9cd94cc4f84fb0fcc6854ac3804d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#adbd9cd94cc4f84fb0fcc6854ac3804d8">SetVisualization</a> (const <a class="el" href="_v3d___type_of_visualization_8hxx.html#a90da5a510e19ceba66c0086429b99a3b">V3d_TypeOfVisualization</a> theType)</td></tr>
 <tr class="memdesc:adbd9cd94cc4f84fb0fcc6854ac3804d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the visualization type in the view.  <a href="#adbd9cd94cc4f84fb0fcc6854ac3804d8">More...</a><br /></td></tr>
 <tr class="separator:adbd9cd94cc4f84fb0fcc6854ac3804d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a512ea1ae1ef8d7d096c5042e4a8e38a5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a512ea1ae1ef8d7d096c5042e4a8e38a5">SetLightOn</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_v3d___light_8hxx.html#a7cfa9e915b2a5d68b148e34b88f54062">V3d_Light</a> &gt; &amp;theLight)</td></tr>
+<tr class="memitem:a512ea1ae1ef8d7d096c5042e4a8e38a5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a512ea1ae1ef8d7d096c5042e4a8e38a5">SetLightOn</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___light.html">V3d_Light</a> &gt; &amp;theLight)</td></tr>
 <tr class="memdesc:a512ea1ae1ef8d7d096c5042e4a8e38a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Activates theLight in the view.  <a href="#a512ea1ae1ef8d7d096c5042e4a8e38a5">More...</a><br /></td></tr>
 <tr class="separator:a512ea1ae1ef8d7d096c5042e4a8e38a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa95b107365e3936cf61620d6d41e133e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#aa95b107365e3936cf61620d6d41e133e">SetLightOn</a> ()</td></tr>
 <tr class="memdesc:aa95b107365e3936cf61620d6d41e133e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Activates all the lights defined in this view.  <a href="#aa95b107365e3936cf61620d6d41e133e">More...</a><br /></td></tr>
 <tr class="separator:aa95b107365e3936cf61620d6d41e133e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a557579d0067e7240bf5b82df91601780"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a557579d0067e7240bf5b82df91601780">SetLightOff</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_v3d___light_8hxx.html#a7cfa9e915b2a5d68b148e34b88f54062">V3d_Light</a> &gt; &amp;theLight)</td></tr>
+<tr class="memitem:a557579d0067e7240bf5b82df91601780"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a557579d0067e7240bf5b82df91601780">SetLightOff</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___light.html">V3d_Light</a> &gt; &amp;theLight)</td></tr>
 <tr class="memdesc:a557579d0067e7240bf5b82df91601780"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deactivate theLight in this view.  <a href="#a557579d0067e7240bf5b82df91601780">More...</a><br /></td></tr>
 <tr class="separator:a557579d0067e7240bf5b82df91601780"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24c09c8806d710193397daf89e5a616c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a24c09c8806d710193397daf89e5a616c">SetLightOff</a> ()</td></tr>
 <tr class="memdesc:a24c09c8806d710193397daf89e5a616c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deactivate all the Lights defined in this view.  <a href="#a24c09c8806d710193397daf89e5a616c">More...</a><br /></td></tr>
 <tr class="separator:a24c09c8806d710193397daf89e5a616c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4b0aff1266a90a268d0b684000c64c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#af4b0aff1266a90a268d0b684000c64c0">IsActiveLight</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_v3d___light_8hxx.html#a7cfa9e915b2a5d68b148e34b88f54062">V3d_Light</a> &gt; &amp;theLight) const</td></tr>
+<tr class="memitem:af4b0aff1266a90a268d0b684000c64c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#af4b0aff1266a90a268d0b684000c64c0">IsActiveLight</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___light.html">V3d_Light</a> &gt; &amp;theLight) const</td></tr>
 <tr class="memdesc:af4b0aff1266a90a268d0b684000c64c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns TRUE when the light is active in this view.  <a href="#af4b0aff1266a90a268d0b684000c64c0">More...</a><br /></td></tr>
 <tr class="separator:af4b0aff1266a90a268d0b684000c64c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15fe798c8aa98e87dd2cb4bd7ff1dab6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a15fe798c8aa98e87dd2cb4bd7ff1dab6">SetImmediateUpdate</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theImmediateUpdate)</td></tr>
@@ -419,9 +419,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9e09ae73ad3b3566ca787d33508c068d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a9e09ae73ad3b3566ca787d33508c068d">Twist</a> () const</td></tr>
 <tr class="memdesc:a9e09ae73ad3b3566ca787d33508c068d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns in RADIANS the orientation of the view around the visual axis measured from the Y axis of the screen.  <a href="#a9e09ae73ad3b3566ca787d33508c068d">More...</a><br /></td></tr>
 <tr class="separator:a9e09ae73ad3b3566ca787d33508c068d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54c9b0aa875a752312df59fc1816caa7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a54c9b0aa875a752312df59fc1816caa7">ShadingModel</a> () const</td></tr>
-<tr class="memdesc:a54c9b0aa875a752312df59fc1816caa7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current shading model.  <a href="#a54c9b0aa875a752312df59fc1816caa7">More...</a><br /></td></tr>
-<tr class="separator:a54c9b0aa875a752312df59fc1816caa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90e2638c843965adf805df74befad04f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2">V3d_TypeOfShadingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a90e2638c843965adf805df74befad04f">ShadingModel</a> () const</td></tr>
+<tr class="memdesc:a90e2638c843965adf805df74befad04f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the current shading model.  <a href="#a90e2638c843965adf805df74befad04f">More...</a><br /></td></tr>
+<tr class="separator:a90e2638c843965adf805df74befad04f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20aaf158097bff975fb0c7669eef47ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___texture_env.html">Graphic3d_TextureEnv</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a20aaf158097bff975fb0c7669eef47ff">TextureEnv</a> () const</td></tr>
 <tr class="separator:a20aaf158097bff975fb0c7669eef47ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a33f3bd8bc9690f671b30662ee640fc41"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_v3d___type_of_visualization_8hxx.html#a90da5a510e19ceba66c0086429b99a3b">V3d_TypeOfVisualization</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a33f3bd8bc9690f671b30662ee640fc41">Visualization</a> () const</td></tr>
@@ -442,7 +442,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a99c7b2141d32d02a75f16a034bf5217d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a99c7b2141d32d02a75f16a034bf5217d">NextActiveLights</a> ()</td></tr>
 <tr class="memdesc:a99c7b2141d32d02a75f16a034bf5217d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Go to the next active Light (if there is not, ActiveLight will raise an exception)  <a href="#a99c7b2141d32d02a75f16a034bf5217d">More...</a><br /></td></tr>
 <tr class="separator:a99c7b2141d32d02a75f16a034bf5217d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4f20574bcc09cf3f6def8df055074c8"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_v3d___light_8hxx.html#a7cfa9e915b2a5d68b148e34b88f54062">V3d_Light</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#aa4f20574bcc09cf3f6def8df055074c8">ActiveLight</a> () const</td></tr>
+<tr class="memitem:aa4f20574bcc09cf3f6def8df055074c8"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___light.html">V3d_Light</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#aa4f20574bcc09cf3f6def8df055074c8">ActiveLight</a> () const</td></tr>
 <tr class="separator:aa4f20574bcc09cf3f6def8df055074c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e93bb6d268437a29c644985b59ab3df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_v3d___view.html#a6e93bb6d268437a29c644985b59ab3df">LightLimit</a> () const</td></tr>
 <tr class="memdesc:a6e93bb6d268437a29c644985b59ab3df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the MAX number of light associated to the view.  <a href="#a6e93bb6d268437a29c644985b59ab3df">More...</a><br /></td></tr>
@@ -778,7 +778,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_v3d___light_8hxx.html#a7cfa9e915b2a5d68b148e34b88f54062">V3d_Light</a> &gt;&amp; V3d_View::ActiveLight </td>
+          <td class="memname">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___light.html">V3d_Light</a> &gt;&amp; V3d_View::ActiveLight </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -2233,7 +2233,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> V3d_View::IsActiveLight </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_v3d___light_8hxx.html#a7cfa9e915b2a5d68b148e34b88f54062">V3d_Light</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___light.html">V3d_Light</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theLight</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -4047,7 +4047,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void V3d_View::SetLightOff </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_v3d___light_8hxx.html#a7cfa9e915b2a5d68b148e34b88f54062">V3d_Light</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___light.html">V3d_Light</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theLight</em></td><td>)</td>
           <td></td>
         </tr>
@@ -4086,7 +4086,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void V3d_View::SetLightOn </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="_v3d___light_8hxx.html#a7cfa9e915b2a5d68b148e34b88f54062">V3d_Light</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_v3d___light.html">V3d_Light</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>theLight</em></td><td>)</td>
           <td></td>
         </tr>
@@ -4244,8 +4244,8 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="ad69839faaea549313ae29f6718a56cc1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad69839faaea549313ae29f6718a56cc1">&#9670;&nbsp;</a></span>SetShadingModel()</h2>
+<a id="a81047c71b3afe8374ceab0cfdc35b0da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81047c71b3afe8374ceab0cfdc35b0da">&#9670;&nbsp;</a></span>SetShadingModel()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4253,7 +4253,7 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="memname">void V3d_View::SetShadingModel </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td>
+          <td class="paramtype">const <a class="el" href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2">V3d_TypeOfShadingModel</a>&#160;</td>
           <td class="paramname"><em>theShadingModel</em></td><td>)</td>
           <td></td>
         </tr>
@@ -4518,14 +4518,14 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="a54c9b0aa875a752312df59fc1816caa7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54c9b0aa875a752312df59fc1816caa7">&#9670;&nbsp;</a></span>ShadingModel()</h2>
+<a id="a90e2638c843965adf805df74befad04f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90e2638c843965adf805df74befad04f">&#9670;&nbsp;</a></span>ShadingModel()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> V3d_View::ShadingModel </td>
+          <td class="memname"><a class="el" href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2">V3d_TypeOfShadingModel</a> V3d_View::ShadingModel </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -5233,7 +5233,7 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Updates the lights of the view. </p>
+<p>Updates the lights of the view. The view is redrawn. </p>
 
 </div>
 </div>

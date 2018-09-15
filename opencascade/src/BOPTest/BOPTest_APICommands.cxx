@@ -14,6 +14,7 @@
 
 
 #include <BOPAlgo_PaveFiller.hxx>
+#include <BOPCol_ListOfShape.hxx>
 #include <BOPTest.hxx>
 #include <BOPTest_Objects.hxx>
 #include <BRepAlgoAPI_BooleanOperation.hxx>
@@ -23,7 +24,6 @@
 #include <BRepAlgoAPI_Fuse.hxx>
 #include <BRepAlgoAPI_Section.hxx>
 #include <BRepAlgoAPI_Splitter.hxx>
-#include <BRepTest_Objects.hxx>
 #include <DBRep.hxx>
 #include <Draw.hxx>
 #include <TopoDS_Shape.hxx>
@@ -31,6 +31,9 @@
 
 #include <stdio.h>
 #include <string.h>
+static 
+  void ConvertList(const BOPCol_ListOfShape& aLSB,
+                   TopTools_ListOfShape& aLS);
 
 static Standard_Integer bapibuild(Draw_Interpretor&, Standard_Integer, const char**);
 static Standard_Integer bapibop  (Draw_Interpretor&, Standard_Integer, const char**);
@@ -105,8 +108,12 @@ Standard_Integer bapibop(Draw_Interpretor& di,
      break;
   }
   //
-  TopTools_ListOfShape& aLS=BOPTest_Objects::Shapes();
-  TopTools_ListOfShape& aLT=BOPTest_Objects::Tools();
+  BOPCol_ListOfShape& aLSB=BOPTest_Objects::Shapes();
+  BOPCol_ListOfShape& aLTB=BOPTest_Objects::Tools();
+  //
+  TopTools_ListOfShape aLS, aLT;
+  ConvertList(aLSB, aLS);
+  ConvertList(aLTB, aLT);
   //
   bRunParallel=BOPTest_Objects::RunParallel();
   aFuzzyValue=BOPTest_Objects::FuzzyValue();
@@ -126,16 +133,9 @@ Standard_Integer bapibop(Draw_Interpretor& di,
   pBuilder->SetFuzzyValue(aFuzzyValue);
   pBuilder->SetNonDestructive(bNonDestructive);
   pBuilder->SetGlue(aGlue);
-  pBuilder->SetCheckInverted(BOPTest_Objects::CheckInverted());
-  pBuilder->SetUseOBB(BOPTest_Objects::UseOBB());
   //
   pBuilder->Build(); 
-
-  // Store the history for the Objects (overwrites the history in the session)
-  BRepTest_Objects::SetHistory(BOPTest_Objects::Shapes(), *pBuilder);
-  // Add the history for the Tools
-  BRepTest_Objects::AddHistory(BOPTest_Objects::Tools(), *pBuilder);
-
+  //
   if (pBuilder->HasWarnings()) {
     Standard_SStream aSStream;
     pBuilder->DumpWarnings(aSStream);
@@ -176,10 +176,13 @@ Standard_Integer bapibuild(Draw_Interpretor& di,
   Standard_Real aFuzzyValue;
   BRepAlgoAPI_BuilderAlgo aBuilder;
   //
-  TopTools_ListOfShape aLS = BOPTest_Objects::Shapes();
-  TopTools_ListOfShape aLT = BOPTest_Objects::Tools();
+  BOPCol_ListOfShape& aLSB=BOPTest_Objects::Shapes();
+  BOPCol_ListOfShape& aLTB=BOPTest_Objects::Tools();
   //
-  aLS.Append(aLT);
+  TopTools_ListOfShape aLS;
+  ConvertList(aLSB, aLS);
+  ConvertList(aLTB, aLS);
+  //
   bRunParallel=BOPTest_Objects::RunParallel();
   aFuzzyValue=BOPTest_Objects::FuzzyValue();
   bNonDestructive = BOPTest_Objects::NonDestructive();
@@ -190,16 +193,9 @@ Standard_Integer bapibuild(Draw_Interpretor& di,
   aBuilder.SetFuzzyValue(aFuzzyValue);
   aBuilder.SetNonDestructive(bNonDestructive);
   aBuilder.SetGlue(aGlue);
-  aBuilder.SetCheckInverted(BOPTest_Objects::CheckInverted());
-  aBuilder.SetUseOBB(BOPTest_Objects::UseOBB());
   //
   aBuilder.Build(); 
-
-  // Store the history for the Objects (overwrites the history in the session)
-  BRepTest_Objects::SetHistory(BOPTest_Objects::Shapes(), aBuilder);
-  // Add the history for the Tools
-  BRepTest_Objects::AddHistory(BOPTest_Objects::Tools(), aBuilder);
-
+  //
   if (aBuilder.HasWarnings()) {
     Standard_SStream aSStream;
     aBuilder.DumpWarnings(aSStream);
@@ -222,6 +218,21 @@ Standard_Integer bapibuild(Draw_Interpretor& di,
   //
   DBRep::Set(a[1], aR);
   return 0;
+}
+//=======================================================================
+//function : ConvertLists
+//purpose  : 
+//=======================================================================
+void ConvertList(const BOPCol_ListOfShape& aLSB,
+                 TopTools_ListOfShape& aLS)
+{
+  BOPCol_ListIteratorOfListOfShape aItB;
+  //
+  aItB.Initialize(aLSB);
+  for (; aItB.More(); aItB.Next()) {
+    const TopoDS_Shape& aS=aItB.Value();
+    aLS.Append(aS);
+  }
 }
 
 //=======================================================================
@@ -246,17 +257,9 @@ Standard_Integer bapisplit(Draw_Interpretor& di,
   aSplitter.SetFuzzyValue(BOPTest_Objects::FuzzyValue());
   aSplitter.SetNonDestructive(BOPTest_Objects::NonDestructive());
   aSplitter.SetGlue(BOPTest_Objects::Glue());
-  aSplitter.SetCheckInverted(BOPTest_Objects::CheckInverted());
-  aSplitter.SetUseOBB(BOPTest_Objects::UseOBB());
   //
   // performing operation
   aSplitter.Build();
-
-  // Store the history for the Objects (overwrites the history in the session)
-  BRepTest_Objects::SetHistory(BOPTest_Objects::Shapes(), aSplitter);
-  // Add the history for the Tools
-  BRepTest_Objects::AddHistory(BOPTest_Objects::Tools(), aSplitter);
-
   // check warning status
   if (aSplitter.HasWarnings()) {
     Standard_SStream aSStream;

@@ -66,7 +66,7 @@ Standard_Boolean StdStorage_RootData::Read(Storage_BaseDriver& theDriver)
     }
 
     Handle(StdStorage_Root) aRoot = new StdStorage_Root(aRootName, aRef, aTypeName);
-    myObjects.Add(aRootName, aRoot);
+    myObjects.Bind(aRootName, aRoot);
   }
 
   myErrorStatus = theDriver.EndReadRootSection();
@@ -132,7 +132,7 @@ Standard_Integer StdStorage_RootData::NumberOfRoots() const
 
 void StdStorage_RootData::AddRoot(const Handle(StdStorage_Root)& aRoot)
 {
-  myObjects.Add(aRoot->Name(), aRoot);
+  myObjects.Bind(aRoot->Name(), aRoot);
   aRoot->myRef = myObjects.Size();
 }
 
@@ -151,8 +151,9 @@ Handle(StdStorage_HSequenceOfRoots) StdStorage_RootData::Roots() const
 Handle(StdStorage_Root) StdStorage_RootData::Find(const TCollection_AsciiString& aName) const
 {
   Handle(StdStorage_Root) p;
-  if (myObjects.Contains(aName)) {
-    p = myObjects.FindFromKey(aName);
+
+  if (myObjects.IsBound(aName)) {
+    p = myObjects.Find(aName);
   }
 
   return p;
@@ -160,14 +161,14 @@ Handle(StdStorage_Root) StdStorage_RootData::Find(const TCollection_AsciiString&
 
 Standard_Boolean StdStorage_RootData::IsRoot(const TCollection_AsciiString& aName) const
 {
-  return myObjects.Contains(aName);
+  return myObjects.IsBound(aName);
 }
 
 void StdStorage_RootData::RemoveRoot(const TCollection_AsciiString& aName)
 {
-  if (myObjects.Contains(aName)) {
-    myObjects.ChangeFromKey(aName)->myRef = 0;
-    myObjects.RemoveKey(aName);
+  if (myObjects.IsBound(aName)) {
+    myObjects.ChangeFind(aName)->myRef = 0;
+    myObjects.UnBind(aName);
     Standard_Integer aRef = 1;
     for (StdStorage_MapOfRoots::Iterator anIt(myObjects); anIt.More(); anIt.Next(), ++aRef)
       anIt.ChangeValue()->myRef = aRef;

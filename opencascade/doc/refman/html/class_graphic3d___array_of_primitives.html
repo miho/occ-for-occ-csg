@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>This class furnish services to defined and fill an array of primitives which can be passed directly to graphics rendering API.  
+<p>This class furnish services to defined and fill an array of primitives compatible with the use of the OPENGl glDrawArrays() or glDrawElements() functions. NOTE that the main goal of this kind of primitive is to avoid multiple copies of datas between each layer of the software. So the array datas exist only one time and the use of SetXxxxxx() methods enable to change dynamically the aspect of this primitive.  
  <a href="class_graphic3d___array_of_primitives.html#details">More...</a></p>
 
 <p><code>#include &lt;Graphic3d_ArrayOfPrimitives.hxx&gt;</code></p>
@@ -81,10 +81,10 @@ Inheritance diagram for Graphic3d_ArrayOfPrimitives:</div>
 <div class="center"><img src="class_graphic3d___array_of_primitives__inherit__graph.png" border="0" usemap="#_graphic3d___array_of_primitives_inherit__map" alt="Inheritance graph"/></div>
 <map name="_graphic3d___array_of_primitives_inherit__map" id="_graphic3d___array_of_primitives_inherit__map">
 <area shape="rect" id="node3" href="class_graphic3d___array_of_points.html" title="Contains points array definition. " alt="" coords="443,5,612,32"/>
-<area shape="rect" id="node4" href="class_graphic3d___array_of_polygons.html" title="Contains polygons array definition. WARNING! Polygon primitives might be unsupported by graphics libr..." alt="" coords="434,56,621,83"/>
+<area shape="rect" id="node4" href="class_graphic3d___array_of_polygons.html" title="Contains polygons array definition. " alt="" coords="434,56,621,83"/>
 <area shape="rect" id="node5" href="class_graphic3d___array_of_polylines.html" title="Contains polylines array definition. " alt="" coords="435,107,620,133"/>
-<area shape="rect" id="node6" href="class_graphic3d___array_of_quadrangles.html" title="Contains quadrangles array definition. WARNING! Quadrangle primitives might be unsupported by graphic..." alt="" coords="425,157,630,184"/>
-<area shape="rect" id="node7" href="class_graphic3d___array_of_quadrangle_strips.html" title="Contains quadrangles strip array definition. WARNING! Quadrangle primitives might be unsupported by g..." alt="" coords="428,209,627,250"/>
+<area shape="rect" id="node6" href="class_graphic3d___array_of_quadrangles.html" title="Contains quatrangles array definition. " alt="" coords="425,157,630,184"/>
+<area shape="rect" id="node7" href="class_graphic3d___array_of_quadrangle_strips.html" title="Contains quadrangles strip array definition. " alt="" coords="428,209,627,250"/>
 <area shape="rect" id="node8" href="class_graphic3d___array_of_segments.html" title="Contains segments array definition. " alt="" coords="432,275,623,301"/>
 <area shape="rect" id="node9" href="class_graphic3d___array_of_triangle_fans.html" title="Contains triangles fan array definition. " alt="" coords="424,325,631,352"/>
 <area shape="rect" id="node10" href="class_graphic3d___array_of_triangles.html" title="Contains triangles array definition. " alt="" coords="435,376,619,403"/>
@@ -352,19 +352,8 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:a7b7d7949596235d35c1a5b7a4bbd77f2 inherit pub_static_methods_class_standard___transient"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>This class furnish services to defined and fill an array of primitives which can be passed directly to graphics rendering API. </p>
-<p>The basic interface consists of the following parts: 1) Specifying primitive type. WARNING! Particular primitive types might be unsupported by specific hardware/graphics API (like quads and polygons). It is always preferred using one of basic types having maximum compatibility: Point, Triangle (or Triangle strip), <a class="el" href="struct_segment.html">Segment</a> aka Lines (or Polyline aka Line Strip). Primitive strip types can be used to reduce memory usage as alternative to Indexed arrays. 2) Vertex array.</p><ul>
-<li>Specifying the (maximum) number of vertexes within array.</li>
-<li>Specifying the vertex attributes, complementary to mandatory vertex Position (normal, color, UV texture coordinates).</li>
-<li>Defining vertex values by using various versions of <a class="el" href="class_graphic3d___array_of_primitives.html#a0dd84dfa38360bf97668cab0c6437b71" title="Adds a vertice in the array. ">AddVertex()</a> or SetVertex*() methods. 3) Index array (optional).</li>
-<li>Specifying the (maximum) number of indexes (edges).</li>
-<li>Defining index values by using <a class="el" href="class_graphic3d___array_of_primitives.html#a716ca4ff2b2feb774422b13eaedb6023" title="Adds an edge in the range [1,VertexNumber()] in the array. ">AddEdge()</a> method; the index value should be within number of defined Vertexes.</li>
-</ul>
-<p>Indexed array allows sharing vertex data across Primitives and thus reducing memory usage, since index size is much smaller then size of vertex with all its attributes. It is a preferred way for defining primitive array and main alternative to Primitive Strips for optimal memory usage, although it is also possible (but unusual) defining Indexed Primitive Strip. Note that it is NOT possible sharing Vertex Attributes partially (e.g. share Position, but have different Normals); in such cases Vertex should be entirely duplicated with all Attributes. 4) Bounds array (optional).</p><ul>
-<li>Specifying the (maximum) number of bounds.</li>
-<li>Defining bounds using <a class="el" href="class_graphic3d___array_of_primitives.html#a1ad25074d4f2e318b647d318827a9fc3" title="Adds a bound of length theEdgeNumber in the bound array. ">AddBound()</a> methods.</li>
-</ul>
-<p>Bounds allow splitting Primitive Array into sub-groups. This is useful only in two cases - for specifying per-group color and for restarting Primitive Strips. WARNING! Bounds within Primitive Array break rendering batches into parts (additional for loops), affecting rendering performance negatively (increasing CPU load). </p>
+<div class="textblock"><p>This class furnish services to defined and fill an array of primitives compatible with the use of the OPENGl glDrawArrays() or glDrawElements() functions. NOTE that the main goal of this kind of primitive is to avoid multiple copies of datas between each layer of the software. So the array datas exist only one time and the use of SetXxxxxx() methods enable to change dynamically the aspect of this primitive. </p>
+<p>Advantages are : 1) Decrease strongly the loading time. 2) Decrease strongly the display time using optimized Opengl primitives. 3) Enable to change dynamically the components of the primitive (vertice,normal,color,texture coordinates). 4) Add true triangle and quadrangle strips or fans capabilities. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a302c4730bb5699ff51e51a1795dbdc51"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a302c4730bb5699ff51e51a1795dbdc51">&#9670;&nbsp;</a></span>~Graphic3d_ArrayOfPrimitives()</h2>

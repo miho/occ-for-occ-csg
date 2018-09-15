@@ -88,10 +88,6 @@ public:
   void SetLayerSettings (const Graphic3d_ZLayerId        theLayerId,
                          const Graphic3d_ZLayerSettings& theSettings);
 
-  //! Update culling state - should be called before rendering.
-  void UpdateCulling (const Handle(OpenGl_Workspace)& theWorkspace,
-                      const Standard_Boolean theToDrawImmediate);
-
   //! Render this element
   void Render (const Handle(OpenGl_Workspace)& theWorkspace,
                const Standard_Boolean          theToDrawImmediate,

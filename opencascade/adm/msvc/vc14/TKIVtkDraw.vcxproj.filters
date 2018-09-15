@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{3D17E96E-0143-15ED-002C-69E4911D0A93}</UniqueIdentifier>
+      <UniqueIdentifier>{8B969E04-1172-165E-178C-15CC7722C7DC}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\IVtkDraw">
-      <UniqueIdentifier>{A15FEF0A-080D-02A3-1960-CDDE9DD22099}</UniqueIdentifier>
+      <UniqueIdentifier>{6F4A6F17-0D96-01B8-0278-768B9BC778A2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

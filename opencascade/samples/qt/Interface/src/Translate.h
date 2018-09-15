@@ -2,9 +2,7 @@
 #define TRANSLATE_H
 #include "IESample.h"
 
-#include <Standard_WarningsDisable.hxx>
 #include <QObject>
-#include <Standard_WarningsRestore.hxx>
 
 #include <AIS_InteractiveContext.hxx>
 #include <TopTools_HSequenceOfShape.hxx>

@@ -13,7 +13,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0FAE0A2E1295002A180610C8"
+               BlueprintIdentifier = "1941101A0661020816A80116"
                BuildableName = "libTKTopAlgo.dylib"
                BlueprintName = "TKTopAlgo"
                ReferencedContainer = "container:TKTopAlgo.xcodeproj">

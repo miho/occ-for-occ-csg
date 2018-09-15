@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -108,12 +108,12 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aebc46bf784de3e53d75533c967e7c7dc"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_poly___polygon3_d.html">Poly_Polygon3D</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep___tool.html#aebc46bf784de3e53d75533c967e7c7dc">Polygon3D</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;E, <a class="el" href="class_top_loc___location.html">TopLoc_Location</a> &amp;L)</td></tr>
 <tr class="memdesc:aebc46bf784de3e53d75533c967e7c7dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the 3D polygon of the edge. May be a Null handle. Returns in &lt;L&gt; the location for the polygon.  <a href="#aebc46bf784de3e53d75533c967e7c7dc">More...</a><br /></td></tr>
 <tr class="separator:aebc46bf784de3e53d75533c967e7c7dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a388ef940a84967b7199f9ade1a8a8004"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep___tool.html#a388ef940a84967b7199f9ade1a8a8004">CurveOnSurface</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;E, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;F, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;First, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;Last, <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> *theIsStored=NULL)</td></tr>
-<tr class="memdesc:a388ef940a84967b7199f9ade1a8a8004"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the curve associated to the edge in the parametric space of the face. Returns a NULL handle if this curve does not exist. Returns in &lt;First&gt; and &lt;Last&gt; the parameter range. If the surface is a plane the curve can be not stored but created a new each time. The flag pointed by &lt;theIsStored&gt; serves to indicate storage status. It is valued if the pointer is non-null.  <a href="#a388ef940a84967b7199f9ade1a8a8004">More...</a><br /></td></tr>
-<tr class="separator:a388ef940a84967b7199f9ade1a8a8004"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b146e0a4e828457ff61fccffd0b030b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep___tool.html#a0b146e0a4e828457ff61fccffd0b030b">CurveOnSurface</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;E, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom___surface.html">Geom_Surface</a> &gt; &amp;S, const <a class="el" href="class_top_loc___location.html">TopLoc_Location</a> &amp;L, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;First, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;Last, <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> *theIsStored=NULL)</td></tr>
-<tr class="memdesc:a0b146e0a4e828457ff61fccffd0b030b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the curve associated to the edge in the parametric space of the surface. Returns a NULL handle if this curve does not exist. Returns in &lt;First&gt; and &lt;Last&gt; the parameter range. If the surface is a plane the curve can be not stored but created a new each time. The flag pointed by &lt;theIsStored&gt; serves to indicate storage status. It is valued if the pointer is non-null.  <a href="#a0b146e0a4e828457ff61fccffd0b030b">More...</a><br /></td></tr>
-<tr class="separator:a0b146e0a4e828457ff61fccffd0b030b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeaa70c29f0a30d827fd8a36116d74b91"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep___tool.html#aeaa70c29f0a30d827fd8a36116d74b91">CurveOnSurface</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;E, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;F, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;First, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;Last)</td></tr>
+<tr class="memdesc:aeaa70c29f0a30d827fd8a36116d74b91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the curve associated to the edge in the parametric space of the face. Returns a NULL handle if this curve does not exist. Returns in &lt;First&gt; and &lt;Last&gt; the parameter range.  <a href="#aeaa70c29f0a30d827fd8a36116d74b91">More...</a><br /></td></tr>
+<tr class="separator:aeaa70c29f0a30d827fd8a36116d74b91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95b82756662c31ba81a044aed91926a1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep___tool.html#a95b82756662c31ba81a044aed91926a1">CurveOnSurface</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;E, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom___surface.html">Geom_Surface</a> &gt; &amp;S, const <a class="el" href="class_top_loc___location.html">TopLoc_Location</a> &amp;L, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;First, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;Last)</td></tr>
+<tr class="memdesc:a95b82756662c31ba81a044aed91926a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the curve associated to the edge in the parametric space of the surface. Returns a NULL handle if this curve does not exist. Returns in &lt;First&gt; and &lt;Last&gt; the parameter range.  <a href="#a95b82756662c31ba81a044aed91926a1">More...</a><br /></td></tr>
+<tr class="separator:a95b82756662c31ba81a044aed91926a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ddacdd883bab7fa7b9cea386b75410e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep___tool.html#a9ddacdd883bab7fa7b9cea386b75410e">CurveOnPlane</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;E, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom___surface.html">Geom_Surface</a> &gt; &amp;S, const <a class="el" href="class_top_loc___location.html">TopLoc_Location</a> &amp;L, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;First, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;Last)</td></tr>
 <tr class="memdesc:a9ddacdd883bab7fa7b9cea386b75410e"><td class="mdescLeft">&#160;</td><td class="mdescRight">For the planar surface builds the 2d curve for the edge by projection of the edge on plane. Returns a NULL handle if the surface is not planar or the projection failed.  <a href="#a9ddacdd883bab7fa7b9cea386b75410e">More...</a><br /></td></tr>
 <tr class="separator:a9ddacdd883bab7fa7b9cea386b75410e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -476,8 +476,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a388ef940a84967b7199f9ade1a8a8004"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a388ef940a84967b7199f9ade1a8a8004">&#9670;&nbsp;</a></span>CurveOnSurface() <span class="overload">[1/4]</span></h2>
+<a id="aeaa70c29f0a30d827fd8a36116d74b91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeaa70c29f0a30d827fd8a36116d74b91">&#9670;&nbsp;</a></span>CurveOnSurface() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -507,13 +507,7 @@ Static Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;&#160;</td>
-          <td class="paramname"><em>Last</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> *&#160;</td>
-          <td class="paramname"><em>theIsStored</em> = <code>NULL</code>&#160;</td>
+          <td class="paramname"><em>Last</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -528,12 +522,12 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the curve associated to the edge in the parametric space of the face. Returns a NULL handle if this curve does not exist. Returns in &lt;First&gt; and &lt;Last&gt; the parameter range. If the surface is a plane the curve can be not stored but created a new each time. The flag pointed by &lt;theIsStored&gt; serves to indicate storage status. It is valued if the pointer is non-null. </p>
+<p>Returns the curve associated to the edge in the parametric space of the face. Returns a NULL handle if this curve does not exist. Returns in &lt;First&gt; and &lt;Last&gt; the parameter range. </p>
 
 </div>
 </div>
-<a id="a0b146e0a4e828457ff61fccffd0b030b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b146e0a4e828457ff61fccffd0b030b">&#9670;&nbsp;</a></span>CurveOnSurface() <span class="overload">[2/4]</span></h2>
+<a id="a95b82756662c31ba81a044aed91926a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95b82756662c31ba81a044aed91926a1">&#9670;&nbsp;</a></span>CurveOnSurface() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -569,13 +563,7 @@ Static Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;&#160;</td>
-          <td class="paramname"><em>Last</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> *&#160;</td>
-          <td class="paramname"><em>theIsStored</em> = <code>NULL</code>&#160;</td>
+          <td class="paramname"><em>Last</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -590,7 +578,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the curve associated to the edge in the parametric space of the surface. Returns a NULL handle if this curve does not exist. Returns in &lt;First&gt; and &lt;Last&gt; the parameter range. If the surface is a plane the curve can be not stored but created a new each time. The flag pointed by &lt;theIsStored&gt; serves to indicate storage status. It is valued if the pointer is non-null. </p>
+<p>Returns the curve associated to the edge in the parametric space of the surface. Returns a NULL handle if this curve does not exist. Returns in &lt;First&gt; and &lt;Last&gt; the parameter range. </p>
 
 </div>
 </div>

@@ -15,7 +15,7 @@ var searchData=
   ['contap_5fitype',['Contap_IType',['../_contap___i_type_8hxx.html#a92c0b64b105417ef05d2afd18636cf0a',1,'Contap_IType.hxx']]],
   ['contap_5ftfunction',['Contap_TFunction',['../_contap___t_function_8hxx.html#a2605789a1f97c06729c2bd2e687b535e',1,'Contap_TFunction.hxx']]],
   ['convert_5fparameterisationtype',['Convert_ParameterisationType',['../_convert___parameterisation_type_8hxx.html#a65f72249ed263b0bbb63f052cc24e905',1,'Convert_ParameterisationType.hxx']]],
-  ['counter',['Counter',['../class_o_s_d___mem_info.html#a7c41b29e2ca237f4def4aa54635bde0d',1,'OSD_MemInfo::Counter()'],['../class_open_gl___frame_stats.html#a059d03426bfdaf79edab296709753e32',1,'OpenGl_FrameStats::Counter()']]],
+  ['counter',['Counter',['../class_o_s_d___mem_info.html#a7c41b29e2ca237f4def4aa54635bde0d',1,'OSD_MemInfo']]],
   ['cslib_5fderivativestatus',['CSLib_DerivativeStatus',['../_c_s_lib___derivative_status_8hxx.html#ac25c8dfe2d5d06f0f25b9907cfc1f853',1,'CSLib_DerivativeStatus.hxx']]],
   ['cslib_5fnormalstatus',['CSLib_NormalStatus',['../_c_s_lib___normal_status_8hxx.html#a7ea38358d50994511e84e965ee4a0ca5',1,'CSLib_NormalStatus.hxx']]]
 ];

@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataXtd_Geometry.hxx>
 #include <TDF_Attribute.hxx>
@@ -45,7 +45,7 @@ IMPLEMENT_DOMSTRING (GeomCylinderString, "cylinder")
 //purpose  : Constructor
 //=======================================================================
 XmlMDataXtd_GeometryDriver::XmlMDataXtd_GeometryDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -73,8 +73,8 @@ Standard_Boolean XmlMDataXtd_GeometryDriver::Paste
   XmlObjMgt_DOMString aType = theSource.Element().getAttribute(::TypeString());
   TDataXtd_GeometryEnum aTypeEnum;
   if (GeometryTypeEnum (aType, aTypeEnum) == Standard_False) {
-    myMessageDriver->Send ("TDataXtd_GeometryEnum; "
-                  "string value without enum term equivalence", Message_Fail);
+    WriteMessage ("TDataXtd_GeometryEnum; "
+                  "string value without enum term equivalence");
     return Standard_False;
   }
 

@@ -106,9 +106,7 @@ BRepMesh_Delaun::BRepMesh_Delaun(
   myCircles ( theVertices.Length(), theOldMesh->Allocator() )
 {
   if ( theVertices.Length() > 2 )
-  {
     Init( theVertices );
-  }
 }
 
 //=======================================================================
@@ -121,21 +119,16 @@ BRepMesh_Delaun::BRepMesh_Delaun(
 : myMeshData( theOldMesh ),
   myCircles ( theVertexIndices.Length(), theOldMesh->Allocator() )
 {
-  perform( theVertexIndices );
-}
+  if ( theVertexIndices.Length() > 2 )
+  {
+    Bnd_Box2d aBox;
+    Standard_Integer anIndex = theVertexIndices.Lower();
+    Standard_Integer anUpper = theVertexIndices.Upper();
+    for ( ; anIndex <= anUpper; ++anIndex )
+      aBox.Add( gp_Pnt2d( GetVertex( theVertexIndices( anIndex) ).Coord() ) );
 
-//=======================================================================
-//function : BRepMesh_Delaun
-//purpose  : Creates the triangulation with and existent Mesh data structure
-//=======================================================================
-BRepMesh_Delaun::BRepMesh_Delaun (const Handle (BRepMesh_DataStructureOfDelaun)& theOldMesh,
-                                  BRepMesh::Array1OfInteger&                     theVertexIndices,
-                                  const Standard_Integer                         theCellsCountU,
-                                  const Standard_Integer                         theCellsCountV)
-  : myMeshData (theOldMesh),
-  myCircles (theVertexIndices.Length (), theOldMesh->Allocator ())
-{
-  perform (theVertexIndices, theCellsCountU, theCellsCountV);
+    perform( aBox, theVertexIndices );
+  }
 }
 
 //=======================================================================
@@ -144,6 +137,7 @@ BRepMesh_Delaun::BRepMesh_Delaun (const Handle (BRepMesh_DataStructureOfDelaun)&
 //=======================================================================
 void BRepMesh_Delaun::Init(BRepMesh::Array1OfVertexOfDelaun& theVertices)
 {
+  Bnd_Box2d aBox;
   Standard_Integer aLowerIdx  = theVertices.Lower();
   Standard_Integer anUpperIdx = theVertices.Upper();
   BRepMesh::Array1OfInteger aVertexIndexes( aLowerIdx, anUpperIdx );
@@ -151,62 +145,35 @@ void BRepMesh_Delaun::Init(BRepMesh::Array1OfVertexOfDelaun& theVertices)
   Standard_Integer anIndex = aLowerIdx;
   for ( ; anIndex <= anUpperIdx; ++anIndex )
   {
+    aBox.Add( gp_Pnt2d( theVertices( anIndex ).Coord() ) );
     aVertexIndexes( anIndex ) = myMeshData->AddNode( theVertices( anIndex ) );
   }
 
-  perform( aVertexIndexes );
+  perform( aBox, aVertexIndexes );
 }
 
 //=======================================================================
 //function : perform
 //purpose  : Create super mesh and run triangulation procedure
 //=======================================================================
-void BRepMesh_Delaun::perform (BRepMesh::Array1OfInteger& theVertexIndices,
-                               const Standard_Integer     theCellsCountU /* = -1 */,
-                               const Standard_Integer     theCellsCountV /* = -1 */)
+void BRepMesh_Delaun::perform(Bnd_Box2d&                 theBndBox,
+                              BRepMesh::Array1OfInteger& theVertexIndexes)
 {
-  if (theVertexIndices.Length () <= 2)
-  {
-    return;
-  }
-
-  Bnd_Box2d aBox;
-  Standard_Integer anIndex = theVertexIndices.Lower ();
-  Standard_Integer anUpper = theVertexIndices.Upper ();
-  for (; anIndex <= anUpper; ++anIndex)
-  {
-    aBox.Add (gp_Pnt2d (GetVertex (theVertexIndices (anIndex)).Coord ()));
-  }
-
-  aBox.Enlarge (Precision);
-
-  Standard_Integer aScaler = 2;
-  if ( myMeshData->NbNodes() > 100 )
-  {
-    aScaler = 5;
-  }
-  else if( myMeshData->NbNodes() > 1000 )
-  {
-    aScaler = 7;
-  }
-
-  superMesh (aBox, Max (theCellsCountU, aScaler),
-                   Max (theCellsCountV, aScaler));
+  theBndBox.Enlarge( Precision );
+  superMesh( theBndBox );
 
   ComparatorOfIndexedVertexOfDelaun aCmp(myMeshData);
-  std::make_heap(theVertexIndices.begin(), theVertexIndices.end(), aCmp);
-  std::sort_heap(theVertexIndices.begin(), theVertexIndices.end(), aCmp);
+  std::make_heap(theVertexIndexes.begin(), theVertexIndexes.end(), aCmp);
+  std::sort_heap(theVertexIndexes.begin(), theVertexIndexes.end(), aCmp);
 
-  compute( theVertexIndices );
+  compute( theVertexIndexes );
 }
 
 //=======================================================================
 //function : superMesh
 //purpose  : Build the super mesh
 //=======================================================================
-void BRepMesh_Delaun::superMesh (const Bnd_Box2d&       theBox,
-                                 const Standard_Integer theCellsCountU,
-                                 const Standard_Integer theCellsCountV)
+void BRepMesh_Delaun::superMesh( const Bnd_Box2d& theBox )
 {
   Standard_Real aMinX, aMinY, aMaxX, aMaxY;
   theBox.Get( aMinX, aMinY, aMaxX, aMaxY );
@@ -218,7 +185,15 @@ void BRepMesh_Delaun::superMesh (const Bnd_Box2d&       theBox,
   Standard_Real aDelta    = aDeltaX + aDeltaY;
   
   myCircles.SetMinMaxSize( gp_XY( aMinX, aMinY ), gp_XY( aMaxX, aMaxY ) );
-  myCircles.SetCellSize( aDeltaX / theCellsCountU, aDeltaY / theCellsCountV);
+
+  Standard_Integer aScaler = 2;
+  if ( myMeshData->NbNodes() > 100 )
+    aScaler = 5;
+  else if( myMeshData->NbNodes() > 1000 )
+    aScaler = 7;
+
+  myCircles.SetCellSize( aDeltaX / aScaler,
+                         aDeltaY / aScaler );
 
   mySupVert[0] = myMeshData->AddNode(
     BRepMesh_Vertex( ( aMinX + aMaxX ) / 2, aMaxY + aDeltaMax, BRepMesh_Free ) );

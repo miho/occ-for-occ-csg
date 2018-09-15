@@ -20,7 +20,7 @@
 #include <Standard_Handle.hxx>
 
 #include <BOPDS_PDS.hxx>
-#include <TopTools_ListOfShape.hxx>
+#include <BOPCol_ListOfShape.hxx>
 #include <BOPAlgo_PBuilder.hxx>
 #include <Standard_Boolean.hxx>
 #include <Standard_Real.hxx>
@@ -59,9 +59,9 @@ public:
   
   Standard_EXPORT static BOPAlgo_Splitter& Splitter();
   
-  Standard_EXPORT static TopTools_ListOfShape& Shapes();
+  Standard_EXPORT static BOPCol_ListOfShape& Shapes();
   
-  Standard_EXPORT static TopTools_ListOfShape& Tools();
+  Standard_EXPORT static BOPCol_ListOfShape& Tools();
   
   Standard_EXPORT static void SetBuilder (const BOPAlgo_PBuilder& theBuilder);
   
@@ -86,14 +86,6 @@ public:
   Standard_EXPORT static void SetDrawWarnShapes(const Standard_Boolean bDraw);
 
   Standard_EXPORT static Standard_Boolean DrawWarnShapes();
-
-  Standard_EXPORT static void SetCheckInverted(const Standard_Boolean bCheck);
-
-  Standard_EXPORT static Standard_Boolean CheckInverted();
-
-  Standard_EXPORT static void SetUseOBB(const Standard_Boolean bUseOBB);
-
-  Standard_EXPORT static Standard_Boolean UseOBB();
 
 protected:
 

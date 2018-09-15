@@ -19,7 +19,7 @@
 #include <BinObjMgt_Persistent.hxx>
 #include <BinObjMgt_RRelocationTable.hxx>
 #include <BinObjMgt_SRelocationTable.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataXtd_Axis.hxx>
 #include <TDF_Attribute.hxx>
@@ -31,7 +31,7 @@ IMPLEMENT_STANDARD_RTTIEXT(BinMDataXtd_AxisDriver,BinMDF_ADriver)
 //purpose  : 
 //=======================================================================
 BinMDataXtd_AxisDriver::BinMDataXtd_AxisDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
      : BinMDF_ADriver (theMsgDriver, STANDARD_TYPE(TDataXtd_Axis)->Name())
 {
 }

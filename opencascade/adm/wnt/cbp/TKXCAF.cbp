@@ -17,6 +17,11 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__XCAFApp_DLL" />
+					<Add option="-D__XCAFDimTolObjects_DLL" />
+					<Add option="-D__XCAFDoc_DLL" />
+					<Add option="-D__XCAFPrs_DLL" />
+					<Add option="-D__XCAFView_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKXCAF_obj.link" />
@@ -35,6 +40,11 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__XCAFApp_DLL" />
+					<Add option="-D__XCAFDimTolObjects_DLL" />
+					<Add option="-D__XCAFDoc_DLL" />
+					<Add option="-D__XCAFPrs_DLL" />
+					<Add option="-D__XCAFView_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKXCAF_objd.link" />
@@ -81,9 +91,6 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/XCAFDimTolObjects/XCAFDimTolObjects_Tool.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/XCAFNoteObjects/XCAFNoteObjects_NoteObject.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc.cxx">

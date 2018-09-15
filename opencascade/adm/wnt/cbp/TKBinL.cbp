@@ -17,6 +17,12 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__BinMDF_DLL" />
+					<Add option="-D__BinMDataStd_DLL" />
+					<Add option="-D__BinMFunction_DLL" />
+					<Add option="-D__BinMDocStd_DLL" />
+					<Add option="-D__BinObjMgt_DLL" />
+					<Add option="-D__BinLDrivers_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKBinL_obj.link" />
@@ -35,6 +41,12 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__BinMDF_DLL" />
+					<Add option="-D__BinMDataStd_DLL" />
+					<Add option="-D__BinMFunction_DLL" />
+					<Add option="-D__BinMDocStd_DLL" />
+					<Add option="-D__BinObjMgt_DLL" />
+					<Add option="-D__BinLDrivers_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKBinL_objd.link" />
@@ -174,9 +186,6 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BinObjMgt/BinObjMgt_Persistent.cxx">
-			<Option link="0" />
-		</Unit>
-		<Unit filename="../../../src/BinObjMgt/BinObjMgt_RRelocationTable.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/BinLDrivers/BinLDrivers.cxx">

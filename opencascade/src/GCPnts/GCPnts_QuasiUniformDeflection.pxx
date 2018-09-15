@@ -169,8 +169,7 @@ static Standard_Boolean PerformCurve (TColStd_SequenceOfReal& Parameters,
     Parameters.Append (U1);
     Points.Append (Pdeb);
 
-    Standard_Real aDecreasedU2 = U2 - Epsilon(U2) * 10.;
-    D1 (C, aDecreasedU2, Pfin, Dfin);
+    D1 (C, U2, Pfin, Dfin);
     QuasiFleche (C, Deflection * Deflection,
                  U1, Pdeb,
                  Ddeb,

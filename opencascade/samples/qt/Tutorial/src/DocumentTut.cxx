@@ -1,10 +1,8 @@
 #include "DocumentTut.h"
 
-#include <Standard_WarningsDisable.hxx>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QApplication>
-#include <Standard_WarningsRestore.hxx>
 
 #include <TopoDS_Shape.hxx>
 #include <AIS_Shape.hxx>

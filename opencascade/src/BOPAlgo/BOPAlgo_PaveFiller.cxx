@@ -172,7 +172,7 @@ void BOPAlgo_PaveFiller::SetSectionAttribute
 //function : SetArguments
 //purpose  : 
 //=======================================================================
-void BOPAlgo_PaveFiller::SetArguments(const TopTools_ListOfShape& theLS)
+void BOPAlgo_PaveFiller::SetArguments(const BOPCol_ListOfShape& theLS)
 {
   myArguments=theLS;
 }
@@ -180,7 +180,7 @@ void BOPAlgo_PaveFiller::SetArguments(const TopTools_ListOfShape& theLS)
 //function : Arguments
 //purpose  : 
 //=======================================================================
-const TopTools_ListOfShape& BOPAlgo_PaveFiller::Arguments()const
+const BOPCol_ListOfShape& BOPAlgo_PaveFiller::Arguments()const
 {
   return myArguments;
 }
@@ -195,7 +195,7 @@ void BOPAlgo_PaveFiller::Init()
     return;
   }
   //
-  TopTools_ListIteratorOfListOfShape aIt(myArguments);
+  BOPCol_ListIteratorOfListOfShape aIt(myArguments);
   for (; aIt.More(); aIt.Next()) {
     if (aIt.Value().IsNull()) {
       AddError (new BOPAlgo_AlertNullInputShapes);
@@ -211,14 +211,14 @@ void BOPAlgo_PaveFiller::Init()
   myDS->SetArguments(myArguments);
   myDS->Init(myFuzzyValue);
   //
-  // 2 myContext
-  myContext=new IntTools_Context;
-  //
-  // 3.myIterator 
+  // 2.myIterator 
   myIterator=new BOPDS_Iterator(myAllocator);
   myIterator->SetRunParallel(myRunParallel);
   myIterator->SetDS(myDS);
-  myIterator->Prepare(myContext, myUseOBB, myFuzzyValue);
+  myIterator->Prepare();
+  //
+  // 3 myContext
+  myContext=new IntTools_Context;
   //
   // 4 NonDestructive flag
   SetNonDestructive();
@@ -285,10 +285,6 @@ void BOPAlgo_PaveFiller::PerformInternal()
   }
   UpdatePaveBlocksWithSDVertices();
   UpdateInterfsWithSDVertices();
-
-  // Force intersection of edges after increase
-  // of the tolerance values of their vertices
-  ForceInterfEE();
   //
   // 22
   PerformFF();

@@ -14,11 +14,9 @@
 // commercial license or contractual agreement. 
 
 #include <inspector/DFBrowser_HighlightDelegate.hxx>
-#include <inspector/DFBrowserPane_Tools.hxx>
 
-#include <Standard_WarningsDisable.hxx>
+#include <inspector/DFBrowserPane_Tools.hxx>
 #include <QPainter>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : paint

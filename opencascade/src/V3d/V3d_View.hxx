@@ -38,7 +38,7 @@
 #include <Graphic3d_GraduatedTrihedron.hxx>
 #include <Graphic3d_RenderingParams.hxx>
 #include <Graphic3d_SequenceOfHClipPlane.hxx>
-#include <Graphic3d_TypeOfShadingModel.hxx>
+#include <Graphic3d_Vector.hxx>
 #include <Graphic3d_Vertex.hxx>
 
 #include <Image_PixMap.hxx>
@@ -64,6 +64,7 @@
 
 #include <V3d_TypeOfBackfacingModel.hxx>
 #include <V3d_TypeOfOrientation.hxx>
+#include <V3d_TypeOfShadingModel.hxx>
 #include <V3d_TypeOfView.hxx>
 #include <V3d_TypeOfVisualization.hxx>
 #include <V3d_Viewer.hxx>
@@ -71,12 +72,16 @@
 
 class Aspect_Grid;
 class Aspect_Window;
+class Bnd_Box;
 class Graphic3d_Group;
 class Graphic3d_Structure;
 class Graphic3d_TextureEnv;
+class Graphic3d_Vector;
+class Quantity_Color;
 class Standard_MultiplyDefined;
 class Standard_TypeMismatch;
 class V3d_BadValue;
+class V3d_Light;
 class V3d_UnMapped;
 
 class V3d_View;
@@ -164,7 +169,7 @@ public:
   //! Returns True is The View is empty
   Standard_EXPORT Standard_Boolean IsEmpty() const;
 
-  //! Updates the lights of the view.
+  //! Updates the lights of the view. The view is redrawn.
   Standard_EXPORT void UpdateLights() const;
 
   //! Sets the automatic z-fit mode and its parameters.
@@ -230,7 +235,7 @@ public:
                                 const Standard_Real Vx, const Standard_Real Vy, const Standard_Real Vz);
 
   //! Defines the shading model for the visualization. Various models are available.
-  Standard_EXPORT void SetShadingModel (const Graphic3d_TypeOfShadingModel theShadingModel);
+  Standard_EXPORT void SetShadingModel (const V3d_TypeOfShadingModel theShadingModel);
 
   //! Sets the environment texture to use. No environment texture by default.
   Standard_EXPORT void SetTextureEnv (const Handle(Graphic3d_TextureEnv)& theTexture);
@@ -673,7 +678,7 @@ public:
   Standard_EXPORT Standard_Real Twist() const;
 
   //! Returns the current shading model.
-  Standard_EXPORT Graphic3d_TypeOfShadingModel ShadingModel() const;
+  Standard_EXPORT V3d_TypeOfShadingModel ShadingModel() const;
 
   Standard_EXPORT Handle(Graphic3d_TextureEnv) TextureEnv() const;
 
@@ -977,8 +982,7 @@ private:
 
   //! Determines the screen axes in the reference
   //! framework of the view.
-  Standard_EXPORT static Standard_Boolean screenAxis (const gp_Dir& theVpn, const gp_Dir& theVup,
-                                                      gp_Vec& theXaxe, gp_Vec& theYaxe, gp_Vec& theZaxe);
+  Standard_EXPORT static Standard_Boolean ScreenAxis (const gp_Dir& Vpn, const gp_Dir& Vup, Graphic3d_Vector& Xaxe, Graphic3d_Vector& Yaxe, Graphic3d_Vector& Zaxe);
   
   //! Transforms the Vertex V according to the matrice Matrix .
   Standard_EXPORT static gp_XYZ TrsPoint (const Graphic3d_Vertex& V, const TColStd_Array2OfReal& Matrix);
@@ -1016,8 +1020,8 @@ private:
 
   V3d_ViewerPointer MyViewer;
   V3d_ListOfLight myActiveLights;
-  gp_Dir myDefaultViewAxis;
-  gp_Pnt myDefaultViewPoint;
+  Graphic3d_Vector MyDefaultViewAxis;
+  Graphic3d_Vertex MyDefaultViewPoint;
   Handle(Aspect_Window) MyWindow;
   V3d_ListOfLight::Iterator myActiveLightsIterator;
   Standard_Integer sx;
@@ -1038,10 +1042,10 @@ private:
   TColStd_Array2OfReal MyTrsf;
   Handle(Graphic3d_Structure) MyGridEchoStructure;
   Handle(Graphic3d_Group) MyGridEchoGroup;
-  gp_Vec myXscreenAxis;
-  gp_Vec myYscreenAxis;
-  gp_Vec myZscreenAxis;
-  gp_Dir myViewAxis;
+  Graphic3d_Vector myXscreenAxis;
+  Graphic3d_Vector myYscreenAxis;
+  Graphic3d_Vector myZscreenAxis;
+  Graphic3d_Vector myViewAxis;
   Graphic3d_Vertex myGravityReferencePoint;
   Standard_Boolean myAutoZFitIsOn;
   Standard_Real myAutoZFitScaleFactor;

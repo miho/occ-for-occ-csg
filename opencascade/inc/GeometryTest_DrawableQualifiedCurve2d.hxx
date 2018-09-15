@@ -48,7 +48,7 @@ public:
                                                          const Standard_Real theRatioOfRadius = 0.1);
 
   //! \returns position of a solution
-  GccEnt_Position GetPosition() const { return myPosition; }
+  Standard_EXPORT GccEnt_Position GetPosition() const { return myPosition; }
   
   //! Sets position of a solution
   //! \param thePosition the value

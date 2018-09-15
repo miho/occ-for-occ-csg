@@ -3,7 +3,6 @@ var searchData=
   ['pcdm_5freaderstatus',['PCDM_ReaderStatus',['../_p_c_d_m___reader_status_8hxx.html#a307f292c331e63af4e53ce9000e2ac06',1,'PCDM_ReaderStatus.hxx']]],
   ['pcdm_5fstorestatus',['PCDM_StoreStatus',['../_p_c_d_m___store_status_8hxx.html#a661cd721f72adf4bbaacc103b3161e67',1,'PCDM_StoreStatus.hxx']]],
   ['pcdm_5ftypeoffiledriver',['PCDM_TypeOfFileDriver',['../_p_c_d_m___type_of_file_driver_8hxx.html#ae3408b2c87abecece2eea8f70a5c23df',1,'PCDM_TypeOfFileDriver.hxx']]],
-  ['perfcounters',['PerfCounters',['../class_graphic3d___rendering_params.html#af84d3b7756ab194164f3bc7d857b8138',1,'Graphic3d_RenderingParams']]],
   ['projection',['Projection',['../class_graphic3d___camera.html#a597ff48ecfa6addc2aff2c1fcfcbbb3e',1,'Graphic3d_Camera']]],
   ['prs3d_5fdatumattribute',['Prs3d_DatumAttribute',['../_prs3d___datum_attribute_8hxx.html#abc704fbf747130c29dde46507acb5bd0',1,'Prs3d_DatumAttribute.hxx']]],
   ['prs3d_5fdatumaxes',['Prs3d_DatumAxes',['../_prs3d___datum_axes_8hxx.html#ac79d401185734b64231ecb98f00a3362',1,'Prs3d_DatumAxes.hxx']]],

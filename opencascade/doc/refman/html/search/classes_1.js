@@ -152,6 +152,7 @@ var searchData=
   ['approx_5fcurveonsurface',['Approx_CurveOnSurface',['../class_approx___curve_on_surface.html',1,'']]],
   ['approx_5fcurvilinearparameter',['Approx_CurvilinearParameter',['../class_approx___curvilinear_parameter.html',1,'']]],
   ['approx_5fcurvlinfunc',['Approx_CurvlinFunc',['../class_approx___curvlin_func.html',1,'']]],
+  ['approx_5fdata',['Approx_Data',['../struct_approx___data.html',1,'']]],
   ['approx_5ffitanddivide',['Approx_FitAndDivide',['../class_approx___fit_and_divide.html',1,'']]],
   ['approx_5ffitanddivide2d',['Approx_FitAndDivide2d',['../class_approx___fit_and_divide2d.html',1,'']]],
   ['approx_5fmcurvestobspcurve',['Approx_MCurvesToBSpCurve',['../class_approx___m_curves_to_b_sp_curve.html',1,'']]],

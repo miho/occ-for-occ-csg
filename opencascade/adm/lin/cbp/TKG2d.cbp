@@ -99,6 +99,14 @@
 		<Unit filename="../../../src/Geom2dAdaptor/Geom2dAdaptor_Curve.cxx" />
 		<Unit filename="../../../src/Geom2dAdaptor/Geom2dAdaptor_GHCurve_0.cxx" />
 		<Unit filename="../../../src/Geom2dAdaptor/Geom2dAdaptor_HCurve.cxx" />
+		<Unit filename="../../../src/GProp/GProp.cxx" />
+		<Unit filename="../../../src/GProp/GProp_CelGProps.cxx" />
+		<Unit filename="../../../src/GProp/GProp_GProps.cxx" />
+		<Unit filename="../../../src/GProp/GProp_PEquation.cxx" />
+		<Unit filename="../../../src/GProp/GProp_PGProps.cxx" />
+		<Unit filename="../../../src/GProp/GProp_PrincipalProps.cxx" />
+		<Unit filename="../../../src/GProp/GProp_SelGProps.cxx" />
+		<Unit filename="../../../src/GProp/GProp_VelGProps.cxx" />
 		<Unit filename="../../../src/Geom2dEvaluator/Geom2dEvaluator_OffsetCurve.cxx" />
 	</Project>
 </CodeBlocks_project_file>

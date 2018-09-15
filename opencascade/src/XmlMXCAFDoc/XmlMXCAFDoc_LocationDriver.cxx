@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDF_Attribute.hxx>
 #include <TopLoc_Datum3D.hxx>
@@ -41,7 +41,7 @@ IMPLEMENT_DOMSTRING (LocIdString,    "locId")
 //purpose  : Constructor
 //=======================================================================
 XmlMXCAFDoc_LocationDriver::XmlMXCAFDoc_LocationDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, "xcaf", "Location")
       , myLocations(0)
 {}

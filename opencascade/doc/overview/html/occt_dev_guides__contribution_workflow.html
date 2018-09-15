@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="occ_logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -144,7 +144,7 @@ Issue registration</h2>
 <p><b>Profile</b> &ndash; specifies the configuration, on which the problem was detected. For specific configurations it is possible to specify separately platform, OS, and version. These fields can be left empty if the issue is not configuration-specific. Additional details relevant for the environment where the issue is reproduced (such as compiler version, bitness, etc.) can be provided in the <b>Description</b>.</p>
 <p><b>Products Version</b> &ndash; defines the OCCT version, on which the problem has been detected.</p>
 <p>It is preferable to indicate the version of the earliest known official release where the problem can be reproduced. If the issue is reported on the current development version of OCCT, the current development version should be used (for convenience, this version is marked by asterisk in Mantis).</p>
-<dl class="section note"><dt>Note</dt><dd>OCCT version number can be consulted in the file <a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/_standard___version_8hxx.html">Standard_Version.hxx</a> (value of OCC_VERSION_COMPLETE macro).</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>OCCT version number can be consulted in the file <a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/_standard___version_8hxx.html">Standard_Version.hxx</a> (value of OCC_VERSION_COMPLETE macro).</dd></dl>
 <p><b>Assign to</b> &ndash; developer to whom the issue will be assigned. By default, it is set to <b>Maintainer</b> of the OCCT component selected in <b>Category</b> field.</p>
 <p><b>Target Version</b> &ndash; defines the target version for the fix to be provided. By default, it is set to the current version under development.</p>
 <p><b>Summary</b> &ndash; a short, one sentence description of the issue.</p>
@@ -163,7 +163,7 @@ Issue registration</h2>
 <p>For a feature or integration request it is necessary to describe the proposed feature in details (as much as possible at that stage), including the changes required for its implementation and the main features of the new functionality.</p>
 <p>Example:</p>
 <blockquote class="doxtable">
-<p><em>Currently selection does not work correctly for non-zoomable objects (those defined using transform persistence). To provide correct selection for such objects, first-level (object) <a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/namespace_b_v_h.html">BVH</a> structures must be updated on each camera change, and frustum must be rebuilt accordingly.</em> </p>
+<p><em>Currently selection does not work correctly for non-zoomable objects (those defined using transform persistence). To provide correct selection for such objects, first-level (object) <a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/namespace_b_v_h.html">BVH</a> structures must be updated on each camera change, and frustum must be rebuilt accordingly.</em> </p>
 </blockquote>
 <dl class="section note"><dt>Note</dt><dd>In the description and notes to the issues you can refer to another issue by its ID prefixed by number sign (e.g.: #12345), and refer to a note by its ID prefixed by tilde (e.g.: ~20123). These references will be expanded by Mantis into links to the corresponding issue or note. When the number sign or the tilde followed by digits are a part of a normal text, add a space before digits (e.g.: "face # 12345 contains ~ 1000 edges") to avoid this conversion.</dd></dl>
 <p><b>Steps To Reproduce</b> &ndash; allows describing in detail how to reproduce the issue.</p>
@@ -224,8 +224,8 @@ Requirements to the commit message</h3>
 </ul>
 <p>Example:</p>
 <blockquote class="doxtable">
-<p><em>0026330: <a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_offset_a_p_i___thru_sections.html">BRepOffsetAPI_ThruSections</a> creates invalid shape.</em></p>
-<p><em>Methods <a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep___tool.html#a388ef940a84967b7199f9ade1a8a8004">BRep_Tool::CurveOnSurface()</a> and <a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_check___edge.html#adbbe3e0253ab052a8001dd848ddb0f12">BRepCheck_Edge::InContext()</a> now properly handle parametric range on a 3D curve when it is used to generate a p-curve dynamically (on a planar surface) and both the surface and the 3D curve have non-null locations.</em> </p>
+<p><em>0026330: <a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_offset_a_p_i___thru_sections.html">BRepOffsetAPI_ThruSections</a> creates invalid shape.</em></p>
+<p><em>Methods <a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep___tool.html#aeaa70c29f0a30d827fd8a36116d74b91">BRep_Tool::CurveOnSurface()</a> and <a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/class_b_rep_check___edge.html#adbbe3e0253ab052a8001dd848ddb0f12">BRepCheck_Edge::InContext()</a> now properly handle parametric range on a 3D curve when it is used to generate a p-curve dynamically (on a planar surface) and both the surface and the 3D curve have non-null locations.</em> </p>
 </blockquote>
 <p>Provide sufficient context so that potential user of the affected functionality can understand what has been changed and how the algorithm works now. Describe reason and essence of the changes made, but do not go too deep into implementation details &ndash; these should be reflected in comments in the code.</p>
 <h3><a class="anchor" id="occt_contribution_workflow_fix_resolve"></a>
@@ -356,7 +356,7 @@ Category</h2>
 <tr>
 <td align="left">OCCT:Shape Healing </td><td align="left">Shape Healing component (TKShapeHealing) </td></tr>
 <tr>
-<td align="left">OCCT:Mesh </td><td align="left"><a class="elRef" doxygen="C:/builds/CR0-OCCT730_IR-2018-05-25/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/namespace_b_rep_mesh.html">BRepMesh</a> algorithm </td></tr>
+<td align="left">OCCT:Mesh </td><td align="left"><a class="elRef" doxygen="C:/builds/IR-2017-08-29_IR-2017-08-29/Windows-64-VC10-opt/OCCT/doc/refman/OCCT.tag:../../refman/html/" href="../../refman/html/namespace_b_rep_mesh.html">BRepMesh</a> algorithm </td></tr>
 <tr>
 <td align="left">OCCT:Data Exchange </td><td align="left">Data Exchange module </td></tr>
 <tr>
@@ -470,7 +470,7 @@ Resolution</h2>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Sat May 26 2018 14:12:05 for Open CASCADE Technology by
+    <li class="footer">Generated on Wed Aug 30 2017 17:08:51 for Open CASCADE Technology by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

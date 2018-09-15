@@ -1,15 +1,31 @@
 puts "============"
-puts "OCC25723 Calculate the center of rotation taking into account structure visibility"
+puts "OCC25723"
+puts "Calculate the center of rotation taking into account structure visibility"
 puts "============"
 puts ""
+
+set x_start_sel_coord 100
+set y_start_sel_coord 104
+
+set x_end_sel_coord 400
+set y_end_sel_coord 400
+
+set x_mouse_start_coord 100
+set y_mouse_start_coord 100
+
+set x_mouse_move_coord 300
+set y_mouse_move_coord 300
+
+set x_check_coord 220
+set y_check_coord 50
 
 box b1 0 0   0 10 10 10
 box b2 0 0  20 10 10 10
 box b3 0 0 -20 10 10 10
 box b4 0 0  40 10 10 10
 
-vclear
 vinit View1
+vclear
 vaxo
 vsetdispmode 1
 
@@ -18,12 +34,17 @@ vselmode 6 1
 vdisplay b1 b2 b3 b4
 vfit
 
-# select and hide boxes b2 b3 b4
-vselect 100 100 400 410
+# select solid
+vselect ${x_start_sel_coord} ${y_start_sel_coord} ${x_end_sel_coord} ${y_end_sel_coord}
+
+# hide selected solids
 verase
 
 # rotation
-vrotate -mouseStart 100 100 -mouseMove 300 300
-if {"[vreadpixel 220 50 rgb name]" != "GOLDENROD2"} { puts "Error: Rotation is not correct" }
+vrotate -mouseStart ${x_mouse_start_coord} ${y_mouse_start_coord} -mouseMove ${x_mouse_move_coord} ${y_mouse_move_coord}
 
-vdump ${imagedir}/${casename}.png
+if {"[vreadpixel ${x_check_coord} ${y_check_coord} rgb name]" != "GOLDENROD2"} {
+  puts "Error: Rotation is not correct"
+}
+
+checkview -screenshot -3d -path ${imagedir}/${test_image}.png

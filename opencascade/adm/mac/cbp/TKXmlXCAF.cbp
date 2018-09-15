@@ -73,7 +73,6 @@
 		<Unit filename="../../../src/XmlXCAFDrivers/XmlXCAFDrivers_DocumentStorageDriver.cxx" />
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc.cxx" />
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_AreaDriver.cxx" />
-		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_AssemblyItemRefDriver.cxx" />
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_CentroidDriver.cxx" />
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_ClippingPlaneToolDriver.cxx" />
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_ColorDriver.cxx" />
@@ -87,11 +86,6 @@
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_LocationDriver.cxx" />
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_MaterialDriver.cxx" />
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_MaterialToolDriver.cxx" />
-		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_NoteBalloonDriver.cxx" />
-		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_NoteBinDataDriver.cxx" />
-		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_NoteCommentDriver.cxx" />
-		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_NoteDriver.cxx" />
-		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_NotesToolDriver.cxx" />
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_ShapeToolDriver.cxx" />
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_ViewToolDriver.cxx" />
 		<Unit filename="../../../src/XmlMXCAFDoc/XmlMXCAFDoc_VolumeDriver.cxx" />

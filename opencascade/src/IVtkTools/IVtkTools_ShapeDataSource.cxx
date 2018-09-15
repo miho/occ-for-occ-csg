@@ -18,10 +18,7 @@
 #include <IVtkOCC_ShapeMesher.hxx>
 #include <IVtkTools_ShapeObject.hxx>
 
-// prevent disabling some MSVC warning messages by VTK headers 
-#ifdef _MSC_VER
-#pragma warning(push)
-#endif
+// VTK includes
 #include <vtkObjectFactory.h> 
 #include <vtkCellData.h>
 #include <vtkIdTypeArray.h>
@@ -30,9 +27,6 @@
 #include <vtkPolyData.h>
 #include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 vtkStandardNewMacro(IVtkTools_ShapeDataSource)
 
@@ -167,7 +161,7 @@ int IVtkTools_ShapeDataSource::RequestData(vtkInformation        *vtkNotUsed(the
 vtkSmartPointer<vtkIdTypeArray> IVtkTools_ShapeDataSource::SubShapeIDs()
 {
   vtkSmartPointer<vtkDataArray> arr = 
-    GetOutput()->GetCellData()->GetArray(IVtkVTK_ShapeData::ARRNAME_SUBSHAPE_IDS());
+    GetOutput()->GetCellData()->GetArray(IVtkVTK_ShapeData::ARRNAME_SUBSHAPE_IDS);
   return vtkSmartPointer<vtkIdTypeArray>( 
     vtkIdTypeArray::SafeDownCast(arr.GetPointer()) );
 }

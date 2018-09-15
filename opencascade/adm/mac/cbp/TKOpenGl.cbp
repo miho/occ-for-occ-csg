@@ -56,13 +56,13 @@
 		</Compiler>
 		<Linker>
 			<Add option="-framework OpenGL" />
-			<Add option="-framework AppKit" />
+			<Add option="-framework Appkit" />
 			<Add option="-framework IOKit" />
-			<Add library="tbb" />
-			<Add library="tbbmalloc" />
+			<Add library="objc" />
 			<Add library="freetype" />
 			<Add library="gl2ps" />
-			<Add library="objc" />
+			<Add library="tbb" />
+			<Add library="tbbmalloc" />
 			<Add library="TKernel" />
 			<Add library="TKService" />
 			<Add library="TKMath" />
@@ -89,8 +89,6 @@
 		<Unit filename="../../../src/OpenGl/OpenGl_Flipper.cxx" />
 		<Unit filename="../../../src/OpenGl/OpenGl_Font.cxx" />
 		<Unit filename="../../../src/OpenGl/OpenGl_FrameBuffer.cxx" />
-		<Unit filename="../../../src/OpenGl/OpenGl_FrameStats.cxx" />
-		<Unit filename="../../../src/OpenGl/OpenGl_FrameStatsPrs.cxx" />
 		<Unit filename="../../../src/OpenGl/OpenGl_GraduatedTrihedron.cxx" />
 		<Unit filename="../../../src/OpenGl/OpenGl_GraphicDriver.cxx" />
 		<Unit filename="../../../src/OpenGl/OpenGl_Group.cxx" />

@@ -17,6 +17,24 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__IGESData_DLL" />
+					<Add option="-D__IGESFile_DLL" />
+					<Add option="-D__IGESBasic_DLL" />
+					<Add option="-D__IGESGraph_DLL" />
+					<Add option="-D__IGESGeom_DLL" />
+					<Add option="-D__IGESDimen_DLL" />
+					<Add option="-D__IGESDraw_DLL" />
+					<Add option="-D__IGESSolid_DLL" />
+					<Add option="-D__IGESDefs_DLL" />
+					<Add option="-D__IGESAppli_DLL" />
+					<Add option="-D__IGESConvGeom_DLL" />
+					<Add option="-D__IGESSelect_DLL" />
+					<Add option="-D__IGESToBRep_DLL" />
+					<Add option="-D__GeomToIGES_DLL" />
+					<Add option="-D__Geom2dToIGES_DLL" />
+					<Add option="-D__BRepToIGES_DLL" />
+					<Add option="-D__BRepToIGESBRep_DLL" />
+					<Add option="-D__IGESControl_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKIGES_obj.link" />
@@ -35,6 +53,24 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__IGESData_DLL" />
+					<Add option="-D__IGESFile_DLL" />
+					<Add option="-D__IGESBasic_DLL" />
+					<Add option="-D__IGESGraph_DLL" />
+					<Add option="-D__IGESGeom_DLL" />
+					<Add option="-D__IGESDimen_DLL" />
+					<Add option="-D__IGESDraw_DLL" />
+					<Add option="-D__IGESSolid_DLL" />
+					<Add option="-D__IGESDefs_DLL" />
+					<Add option="-D__IGESAppli_DLL" />
+					<Add option="-D__IGESConvGeom_DLL" />
+					<Add option="-D__IGESSelect_DLL" />
+					<Add option="-D__IGESToBRep_DLL" />
+					<Add option="-D__GeomToIGES_DLL" />
+					<Add option="-D__Geom2dToIGES_DLL" />
+					<Add option="-D__BRepToIGES_DLL" />
+					<Add option="-D__BRepToIGESBRep_DLL" />
+					<Add option="-D__IGESControl_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKIGES_objd.link" />

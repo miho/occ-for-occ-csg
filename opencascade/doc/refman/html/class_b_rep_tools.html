@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -123,9 +123,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aa5972d616fa668a9f4571896bbf5a6dc"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_tools.html#aa5972d616fa668a9f4571896bbf5a6dc">Update</a> (const <a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a> &amp;S)</td></tr>
 <tr class="memdesc:aa5972d616fa668a9f4571896bbf5a6dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update a shape, call the corect update.  <a href="#aa5972d616fa668a9f4571896bbf5a6dc">More...</a><br /></td></tr>
 <tr class="separator:aa5972d616fa668a9f4571896bbf5a6dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04e7b427bdf3a1fbfa16ffb1090ce1a4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_tools.html#a04e7b427bdf3a1fbfa16ffb1090ce1a4">UpdateFaceUVPoints</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF)</td></tr>
-<tr class="memdesc:a04e7b427bdf3a1fbfa16ffb1090ce1a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">For each edge of the face &lt;F&gt; reset the UV points to the bounding points of the parametric curve of the edge on the face.  <a href="#a04e7b427bdf3a1fbfa16ffb1090ce1a4">More...</a><br /></td></tr>
-<tr class="separator:a04e7b427bdf3a1fbfa16ffb1090ce1a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac57e448a76dce49aa64d53de2de9fd61"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_tools.html#ac57e448a76dce49aa64d53de2de9fd61">UpdateFaceUVPoints</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;F)</td></tr>
+<tr class="memdesc:ac57e448a76dce49aa64d53de2de9fd61"><td class="mdescLeft">&#160;</td><td class="mdescRight">For all the edges of the face &lt;F&gt; reset the UV points to ensure that connected faces have the same point at there common extremity.  <a href="#ac57e448a76dce49aa64d53de2de9fd61">More...</a><br /></td></tr>
+<tr class="separator:ac57e448a76dce49aa64d53de2de9fd61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad61019006a2983b731503cb373ab8eaf"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_tools.html#ad61019006a2983b731503cb373ab8eaf">Clean</a> (const <a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a> &amp;S)</td></tr>
 <tr class="memdesc:ad61019006a2983b731503cb373ab8eaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all the triangulations of the faces of &lt;S&gt; and removes all polygons on triangulations of the edges.  <a href="#ad61019006a2983b731503cb373ab8eaf">More...</a><br /></td></tr>
 <tr class="separator:ad61019006a2983b731503cb373ab8eaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -150,9 +150,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a374360237be2b650edc52a7b665ca486"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_tools.html#a374360237be2b650edc52a7b665ca486">IsReallyClosed</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;E, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;F)</td></tr>
 <tr class="memdesc:a374360237be2b650edc52a7b665ca486"><td class="mdescLeft">&#160;</td><td class="mdescRight">Verifies that the edge &lt;E&gt; is found two times on the face &lt;F&gt; before calling <a class="el" href="class_b_rep___tool.html#ae7ad9ad62321bb8e7c092014f74526cc" title="If S is Shell, returns True if it has no free boundaries (edges). If S is Wire, returns True if it ha...">BRep_Tool::IsClosed</a>.  <a href="#a374360237be2b650edc52a7b665ca486">More...</a><br /></td></tr>
 <tr class="separator:a374360237be2b650edc52a7b665ca486"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f8d2908ceda22a22b1b7f36593fd38d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_tools.html#a1f8d2908ceda22a22b1b7f36593fd38d">DetectClosedness</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theFace, <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> &amp;theUclosed, <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> &amp;theVclosed)</td></tr>
-<tr class="memdesc:a1f8d2908ceda22a22b1b7f36593fd38d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detect closedness of face in U and V directions.  <a href="#a1f8d2908ceda22a22b1b7f36593fd38d">More...</a><br /></td></tr>
-<tr class="separator:a1f8d2908ceda22a22b1b7f36593fd38d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abead88062fa81d784781dd70b1719735"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_rep_tools.html#abead88062fa81d784781dd70b1719735">Dump</a> (const <a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a> &amp;Sh, <a class="el" href="_standard___o_stream_8hxx.html#aace51db7b9aac68b6cffc3b3325a3585">Standard_OStream</a> &amp;S)</td></tr>
 <tr class="memdesc:abead88062fa81d784781dd70b1719735"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dumps the topological structure and the geometry of &lt;Sh&gt; on the stream &lt;S&gt;.  <a href="#abead88062fa81d784781dd70b1719735">More...</a><br /></td></tr>
 <tr class="separator:abead88062fa81d784781dd70b1719735"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -179,7 +176,7 @@ Static Public Member Functions</h2></td></tr>
 <li>ShapeSet : Tools used for dumping, writing and reading.</li>
 <li>UVBounds : Methods to compute the limits of the boundary of a face, a wire or an edge in the parametric space of a face.</li>
 <li>Update : Methods to call when a topology has been created to compute all missing data.</li>
-<li>UpdateFaceUVPoints: Method to update the UV points stored with the edges on a face.</li>
+<li>UpdateFaceUVPoints : Method to update the UV points stored with the edges on a face. This method ensure that connected edges have the same UV point on their common extremity.</li>
 <li>Compare : Method to compare two vertices.</li>
 <li>Compare : Method to compare two edges.</li>
 <li>OuterWire : A method to find the outer wire of a face.</li>
@@ -414,50 +411,6 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns True if the distance between the two edges is lower than their tolerance. </p>
-
-</div>
-</div>
-<a id="a1f8d2908ceda22a22b1b7f36593fd38d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1f8d2908ceda22a22b1b7f36593fd38d">&#9670;&nbsp;</a></span>DetectClosedness()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void BRepTools::DetectClosedness </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
-          <td class="paramname"><em>theFace</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> &amp;&#160;</td>
-          <td class="paramname"><em>theUclosed</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> &amp;&#160;</td>
-          <td class="paramname"><em>theVclosed</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Detect closedness of face in U and V directions. </p>
 
 </div>
 </div>
@@ -1083,8 +1036,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a04e7b427bdf3a1fbfa16ffb1090ce1a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a04e7b427bdf3a1fbfa16ffb1090ce1a4">&#9670;&nbsp;</a></span>UpdateFaceUVPoints()</h2>
+<a id="ac57e448a76dce49aa64d53de2de9fd61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac57e448a76dce49aa64d53de2de9fd61">&#9670;&nbsp;</a></span>UpdateFaceUVPoints()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1096,7 +1049,7 @@ Static Public Member Functions</h2></td></tr>
           <td class="memname">static void BRepTools::UpdateFaceUVPoints </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
-          <td class="paramname"><em>theF</em></td><td>)</td>
+          <td class="paramname"><em>F</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1107,7 +1060,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>For each edge of the face &lt;F&gt; reset the UV points to the bounding points of the parametric curve of the edge on the face. </p>
+<p>For all the edges of the face &lt;F&gt; reset the UV points to ensure that connected faces have the same point at there common extremity. </p>
 
 </div>
 </div>

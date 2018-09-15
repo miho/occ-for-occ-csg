@@ -13,7 +13,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "119C04A5033B140911520C06"
+               BlueprintIdentifier = "09ED07E702FA03350F0D02C6"
                BuildableName = "libTKMesh.dylib"
                BlueprintName = "TKMesh"
                ReferencedContainer = "container:TKMesh.xcodeproj">

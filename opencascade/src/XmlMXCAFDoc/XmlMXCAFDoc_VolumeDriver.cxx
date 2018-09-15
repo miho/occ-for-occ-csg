@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDF_Attribute.hxx>
 #include <XCAFDoc_Volume.hxx>
@@ -29,7 +29,7 @@ IMPLEMENT_STANDARD_RTTIEXT(XmlMXCAFDoc_VolumeDriver,XmlMDF_ADriver)
 //purpose  : Constructor
 //=======================================================================
 XmlMXCAFDoc_VolumeDriver::XmlMXCAFDoc_VolumeDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, "xcaf", "Volume")
 {}
 
@@ -58,7 +58,7 @@ Standard_Boolean XmlMXCAFDoc_VolumeDriver::Paste
     TCollection_ExtendedString aMessageString =
       TCollection_ExtendedString("Cannot retrieve Volume attribute from \"")
         + aRealStr + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
 

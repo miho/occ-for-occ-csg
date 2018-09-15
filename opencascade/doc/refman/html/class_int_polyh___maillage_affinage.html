@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Low-level algorithm to compute intersection of the surfaces by computing the intersection of their triangulations.  
+<p>Provide the algorythms used in the package.  
  <a href="class_int_polyh___maillage_affinage.html#details">More...</a></p>
 
 <p><code>#include &lt;IntPolyh_MaillageAffinage.hxx&gt;</code></p>
@@ -82,27 +82,18 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a2ba0fbfcba7d279f334de4396436a392"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2126daca5d7d8788d232c9427608cc2d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a2126daca5d7d8788d232c9427608cc2d">IntPolyh_MaillageAffinage</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_surface.html">Adaptor3d_HSurface</a> &gt; &amp;S1, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_adaptor3d___h_surface.html">Adaptor3d_HSurface</a> &gt; &amp;S2, const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> PRINT)</td></tr>
 <tr class="separator:a2126daca5d7d8788d232c9427608cc2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6175447184c4efaa863476425a5c861e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a6175447184c4efaa863476425a5c861e">MakeSampling</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SurfID, <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;theUPars, <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;theVPars)</td></tr>
-<tr class="memdesc:a6175447184c4efaa863476425a5c861e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes the sampling of the surface - Fills the arrays with the parametric values of the sampling points (triangulation nodes).  <a href="#a6175447184c4efaa863476425a5c861e">More...</a><br /></td></tr>
-<tr class="separator:a6175447184c4efaa863476425a5c861e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2424cc0c8632c97472805c51a6a4828a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a2424cc0c8632c97472805c51a6a4828a">FillArrayOfPnt</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SurfID)</td></tr>
-<tr class="memdesc:a2424cc0c8632c97472805c51a6a4828a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes points on one surface and fills an array of points; standard (default) method.  <a href="#a2424cc0c8632c97472805c51a6a4828a">More...</a><br /></td></tr>
+<tr class="memdesc:a2424cc0c8632c97472805c51a6a4828a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute points on one surface and fill an array of points; standard (default) method.  <a href="#a2424cc0c8632c97472805c51a6a4828a">More...</a><br /></td></tr>
 <tr class="separator:a2424cc0c8632c97472805c51a6a4828a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b0f1b705952dcddcbd583ab623ba028"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a8b0f1b705952dcddcbd583ab623ba028">FillArrayOfPnt</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SurfID, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> isShiftFwd)</td></tr>
 <tr class="memdesc:a8b0f1b705952dcddcbd583ab623ba028"><td class="mdescLeft">&#160;</td><td class="mdescRight">isShiftFwd flag is added. The purpose is to define shift of points along normal to the surface in this point. The shift length represents maximal deflection of triangulation. The direction (forward or reversed regarding to normal direction) is defined by isShiftFwd flag. Compute points on one surface and fill an array of points; advanced method  <a href="#a8b0f1b705952dcddcbd583ab623ba028">More...</a><br /></td></tr>
 <tr class="separator:a8b0f1b705952dcddcbd583ab623ba028"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b366b875d01133a9fd6622a96a1dd7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a0b366b875d01133a9fd6622a96a1dd7e">FillArrayOfPnt</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SurfID, const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;Upars, const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;Vpars, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> *theDeflTol=NULL)</td></tr>
-<tr class="memdesc:a0b366b875d01133a9fd6622a96a1dd7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute points on one surface and fill an array of points; If given, &lt;theDeflTol&gt; is the deflection tolerance of the given sampling. standard (default) method.  <a href="#a0b366b875d01133a9fd6622a96a1dd7e">More...</a><br /></td></tr>
-<tr class="separator:a0b366b875d01133a9fd6622a96a1dd7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4329e614756152b89eab31b6cb465e69"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a4329e614756152b89eab31b6cb465e69">FillArrayOfPnt</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SurfID, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> isShiftFwd, const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;Upars, const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;Vpars, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> *theDeflTol=NULL)</td></tr>
-<tr class="memdesc:a4329e614756152b89eab31b6cb465e69"><td class="mdescLeft">&#160;</td><td class="mdescRight">isShiftFwd flag is added. The purpose is to define shift of points along normal to the surface in this point. The shift length represents maximal deflection of triangulation. The direction (forward or reversed regarding to normal direction) is defined by isShiftFwd flag. Compute points on one surface and fill an array of points; If given, &lt;theDeflTol&gt; is the deflection tolerance of the given sampling. advanced method  <a href="#a4329e614756152b89eab31b6cb465e69">More...</a><br /></td></tr>
-<tr class="separator:a4329e614756152b89eab31b6cb465e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0949c14e22bf621e261f2e620921b023"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a0949c14e22bf621e261f2e620921b023">FillArrayOfPnt</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SurfID, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> isShiftFwd, const <a class="el" href="_int_polyh___array_of_point_normal_8hxx.html#ac05b84d69d28615cfd77c75080782ee7">IntPolyh_ArrayOfPointNormal</a> &amp;thePoints, const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;theUPars, const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;theVPars, const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> theDeflTol)</td></tr>
-<tr class="memdesc:a0949c14e22bf621e261f2e620921b023"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the array of points for the surface taking into account the shift.  <a href="#a0949c14e22bf621e261f2e620921b023">More...</a><br /></td></tr>
-<tr class="separator:a0949c14e22bf621e261f2e620921b023"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc9275c8d0ea6dd35fe680c0cc8cd5f1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#acc9275c8d0ea6dd35fe680c0cc8cd5f1">CommonBox</a> ()</td></tr>
-<tr class="memdesc:acc9275c8d0ea6dd35fe680c0cc8cd5f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Looks for the common box of the surfaces and marks the points of the surfaces inside that common box for possible intersection.  <a href="#acc9275c8d0ea6dd35fe680c0cc8cd5f1">More...</a><br /></td></tr>
-<tr class="separator:acc9275c8d0ea6dd35fe680c0cc8cd5f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8891505afac9b817e70cb054a9072778"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a8891505afac9b817e70cb054a9072778">FillArrayOfPnt</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SurfID, const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;Upars, const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;Vpars)</td></tr>
+<tr class="memdesc:a8891505afac9b817e70cb054a9072778"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute points on one surface and fill an array of points; standard (default) method.  <a href="#a8891505afac9b817e70cb054a9072778">More...</a><br /></td></tr>
+<tr class="separator:a8891505afac9b817e70cb054a9072778"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a84830c287a5b3e5d702a36d005becf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a3a84830c287a5b3e5d702a36d005becf">FillArrayOfPnt</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SurfID, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> isShiftFwd, const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;Upars, const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;Vpars)</td></tr>
+<tr class="memdesc:a3a84830c287a5b3e5d702a36d005becf"><td class="mdescLeft">&#160;</td><td class="mdescRight">isShiftFwd flag is added. The purpose is to define shift of points along normal to the surface in this point. The shift length represents maximal deflection of triangulation. The direction (forward or reversed regarding to normal direction) is defined by isShiftFwd flag. Compute points on one surface and fill an array of points; advanced method  <a href="#a3a84830c287a5b3e5d702a36d005becf">More...</a><br /></td></tr>
+<tr class="separator:a3a84830c287a5b3e5d702a36d005becf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d3119027ed8ad670a54e79bf8c0d63b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a4d3119027ed8ad670a54e79bf8c0d63b">CommonBox</a> (const <a class="el" href="class_bnd___box.html">Bnd_Box</a> &amp;B1, const <a class="el" href="class_bnd___box.html">Bnd_Box</a> &amp;B2, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;xMin, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;yMin, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;zMin, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;xMax, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;yMax, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;zMax)</td></tr>
 <tr class="memdesc:a4d3119027ed8ad670a54e79bf8c0d63b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the common box witch is the intersection of the two bounding boxes, and mark the points of the two surfaces that are inside.  <a href="#a4d3119027ed8ad670a54e79bf8c0d63b">More...</a><br /></td></tr>
 <tr class="separator:a4d3119027ed8ad670a54e79bf8c0d63b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -159,8 +150,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aad0a67167f4cbf317f8a3d71a2b63528"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_int_polyh___list_of_couples_8hxx.html#ae15db41f18bad6e2305b1c696e3df15c">IntPolyh_ListOfCouples</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#aad0a67167f4cbf317f8a3d71a2b63528">GetCouples</a> ()</td></tr>
 <tr class="memdesc:aad0a67167f4cbf317f8a3d71a2b63528"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method returns list of couples of contact triangles.  <a href="#aad0a67167f4cbf317f8a3d71a2b63528">More...</a><br /></td></tr>
 <tr class="separator:aad0a67167f4cbf317f8a3d71a2b63528"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa930098da2ebb9c6a50338dbc28d71e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#aa930098da2ebb9c6a50338dbc28d71e1">SetEnlargeZone</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> EnlargeZone)</td></tr>
-<tr class="separator:aa930098da2ebb9c6a50338dbc28d71e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c4cb2bc44df52ccc833717932957e1e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#a9c4cb2bc44df52ccc833717932957e1e">SetEnlargeZone</a> (<a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> &amp;EnlargeZone)</td></tr>
+<tr class="separator:a9c4cb2bc44df52ccc833717932957e1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae27467b3eb22b4023006ed067a98dd0e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#ae27467b3eb22b4023006ed067a98dd0e">GetEnlargeZone</a> () const</td></tr>
 <tr class="separator:ae27467b3eb22b4023006ed067a98dd0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6cdfdf7c8ae4cf58a5cfa9a3e2bb6dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_int_polyh___maillage_affinage.html#ae6cdfdf7c8ae4cf58a5cfa9a3e2bb6dd">GetMinDeflection</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> SurfID) const</td></tr>
@@ -171,7 +162,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:afda19c3abc9b952d6a951681976d400a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Low-level algorithm to compute intersection of the surfaces by computing the intersection of their triangulations. </p>
+<div class="textblock"><p>Provide the algorythms used in the package. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a2ba0fbfcba7d279f334de4396436a392"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2ba0fbfcba7d279f334de4396436a392">&#9670;&nbsp;</a></span>IntPolyh_MaillageAffinage() <span class="overload">[1/2]</span></h2>
@@ -266,27 +257,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="acc9275c8d0ea6dd35fe680c0cc8cd5f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc9275c8d0ea6dd35fe680c0cc8cd5f1">&#9670;&nbsp;</a></span>CommonBox() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void IntPolyh_MaillageAffinage::CommonBox </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Looks for the common box of the surfaces and marks the points of the surfaces inside that common box for possible intersection. </p>
-
-</div>
-</div>
 <a id="a4d3119027ed8ad670a54e79bf8c0d63b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d3119027ed8ad670a54e79bf8c0d63b">&#9670;&nbsp;</a></span>CommonBox() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d3119027ed8ad670a54e79bf8c0d63b">&#9670;&nbsp;</a></span>CommonBox()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -411,7 +383,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a2424cc0c8632c97472805c51a6a4828a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2424cc0c8632c97472805c51a6a4828a">&#9670;&nbsp;</a></span>FillArrayOfPnt() <span class="overload">[1/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2424cc0c8632c97472805c51a6a4828a">&#9670;&nbsp;</a></span>FillArrayOfPnt() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -426,12 +398,12 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Computes points on one surface and fills an array of points; standard (default) method. </p>
+<p>Compute points on one surface and fill an array of points; standard (default) method. </p>
 
 </div>
 </div>
 <a id="a8b0f1b705952dcddcbd583ab623ba028"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8b0f1b705952dcddcbd583ab623ba028">&#9670;&nbsp;</a></span>FillArrayOfPnt() <span class="overload">[2/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b0f1b705952dcddcbd583ab623ba028">&#9670;&nbsp;</a></span>FillArrayOfPnt() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -460,8 +432,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0b366b875d01133a9fd6622a96a1dd7e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b366b875d01133a9fd6622a96a1dd7e">&#9670;&nbsp;</a></span>FillArrayOfPnt() <span class="overload">[3/5]</span></h2>
+<a id="a8891505afac9b817e70cb054a9072778"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8891505afac9b817e70cb054a9072778">&#9670;&nbsp;</a></span>FillArrayOfPnt() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -482,13 +454,7 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;&#160;</td>
-          <td class="paramname"><em>Vpars</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> *&#160;</td>
-          <td class="paramname"><em>theDeflTol</em> = <code>NULL</code>&#160;</td>
+          <td class="paramname"><em>Vpars</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -498,12 +464,12 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Compute points on one surface and fill an array of points; If given, &lt;theDeflTol&gt; is the deflection tolerance of the given sampling. standard (default) method. </p>
+<p>Compute points on one surface and fill an array of points; standard (default) method. </p>
 
 </div>
 </div>
-<a id="a4329e614756152b89eab31b6cb465e69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4329e614756152b89eab31b6cb465e69">&#9670;&nbsp;</a></span>FillArrayOfPnt() <span class="overload">[4/5]</span></h2>
+<a id="a3a84830c287a5b3e5d702a36d005becf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a84830c287a5b3e5d702a36d005becf">&#9670;&nbsp;</a></span>FillArrayOfPnt() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -530,13 +496,7 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;&#160;</td>
-          <td class="paramname"><em>Vpars</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> *&#160;</td>
-          <td class="paramname"><em>theDeflTol</em> = <code>NULL</code>&#160;</td>
+          <td class="paramname"><em>Vpars</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -546,61 +506,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>isShiftFwd flag is added. The purpose is to define shift of points along normal to the surface in this point. The shift length represents maximal deflection of triangulation. The direction (forward or reversed regarding to normal direction) is defined by isShiftFwd flag. Compute points on one surface and fill an array of points; If given, &lt;theDeflTol&gt; is the deflection tolerance of the given sampling. advanced method </p>
-
-</div>
-</div>
-<a id="a0949c14e22bf621e261f2e620921b023"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0949c14e22bf621e261f2e620921b023">&#9670;&nbsp;</a></span>FillArrayOfPnt() <span class="overload">[5/5]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void IntPolyh_MaillageAffinage::FillArrayOfPnt </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>SurfID</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>isShiftFwd</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_int_polyh___array_of_point_normal_8hxx.html#ac05b84d69d28615cfd77c75080782ee7">IntPolyh_ArrayOfPointNormal</a> &amp;&#160;</td>
-          <td class="paramname"><em>thePoints</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;&#160;</td>
-          <td class="paramname"><em>theUPars</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;&#160;</td>
-          <td class="paramname"><em>theVPars</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td>
-          <td class="paramname"><em>theDeflTol</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Fills the array of points for the surface taking into account the shift. </p>
+<p>isShiftFwd flag is added. The purpose is to define shift of points along normal to the surface in this point. The shift length represents maximal deflection of triangulation. The direction (forward or reversed regarding to normal direction) is defined by isShiftFwd flag. Compute points on one surface and fill an array of points; advanced method </p>
 
 </div>
 </div>
@@ -876,42 +782,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a6175447184c4efaa863476425a5c861e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6175447184c4efaa863476425a5c861e">&#9670;&nbsp;</a></span>MakeSampling()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void IntPolyh_MaillageAffinage::MakeSampling </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>SurfID</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;&#160;</td>
-          <td class="paramname"><em>theUPars</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="_t_col_std___array1_of_real_8hxx.html#a43f7331116a19b839d3e9b79a92d2289">TColStd_Array1OfReal</a> &amp;&#160;</td>
-          <td class="paramname"><em>theVPars</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Makes the sampling of the surface - Fills the arrays with the parametric values of the sampling points (triangulation nodes). </p>
-
-</div>
-</div>
 <a id="aa62c5d34224e8aa140b040870ea1bd39"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa62c5d34224e8aa140b040870ea1bd39">&#9670;&nbsp;</a></span>NextStartingPointsResearch()</h2>
 
@@ -954,8 +824,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa930098da2ebb9c6a50338dbc28d71e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa930098da2ebb9c6a50338dbc28d71e1">&#9670;&nbsp;</a></span>SetEnlargeZone()</h2>
+<a id="a9c4cb2bc44df52ccc833717932957e1e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c4cb2bc44df52ccc833717932957e1e">&#9670;&nbsp;</a></span>SetEnlargeZone()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -963,7 +833,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">void IntPolyh_MaillageAffinage::SetEnlargeZone </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> &amp;&#160;</td>
           <td class="paramname"><em>EnlargeZone</em></td><td>)</td>
           <td></td>
         </tr>

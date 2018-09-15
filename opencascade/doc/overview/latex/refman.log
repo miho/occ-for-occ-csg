@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350) (preloaded format=pdflatex 2017.7.25)  26 MAY 2018 14:08
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350) (preloaded format=pdflatex 2017.7.25)  30 AUG 2017 17:04
 entering extended mode
 **./refman.tex
 (refman.tex
@@ -1306,7 +1306,7 @@ Type  H <return>  for immediate help.
  ...                                              
                                                   
 l.124 ... Open C\-A\-S\-C\-A\-D\-E Technology \\\\
-                                                  \Large 7.3.0 }\\
+                                                  \Large 7.2.0 }\\
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
@@ -2030,7 +2030,7 @@ etic/uhvb8a.pfb><d:/3rdpartyproducts/miktex-portable-2.9.6361/texmfs/install/fo
 nts/type1/urw/helvetic/uhvb8ac.pfb><d:/3rdpartyproducts/miktex-portable-2.9.636
 1/texmfs/install/fonts/type1/urw/helvetic/uhvr8a.pfb><d:/3rdpartyproducts/mikte
 x-portable-2.9.6361/texmfs/install/fonts/type1/urw/helvetic/uhvro8a.pfb>
-Output written on refman.pdf (23 pages, 332964 bytes).
+Output written on refman.pdf (23 pages, 332970 bytes).
 PDF statistics:
  296 PDF objects out of 1000 (max. 8388607)
  49 named destinations out of 1000 (max. 500000)

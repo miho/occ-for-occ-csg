@@ -17,6 +17,11 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__TDF_DLL" />
+					<Add option="-D__TDataStd_DLL" />
+					<Add option="-D__TFunction_DLL" />
+					<Add option="-D__TDocStd_DLL" />
+					<Add option="-D__AppStdL_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKLCAF_obj.link" />
@@ -35,6 +40,11 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__TDF_DLL" />
+					<Add option="-D__TDataStd_DLL" />
+					<Add option="-D__TFunction_DLL" />
+					<Add option="-D__TDocStd_DLL" />
+					<Add option="-D__AppStdL_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKLCAF_objd.link" />

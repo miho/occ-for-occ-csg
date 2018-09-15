@@ -22,6 +22,7 @@
 #include <TDocStd_Application.hxx>
 #include <TColStd_SequenceOfExtendedString.hxx>
 #include <Standard_CString.hxx>
+class CDM_MessageDriver;
 
 
 class AppStd_Application;

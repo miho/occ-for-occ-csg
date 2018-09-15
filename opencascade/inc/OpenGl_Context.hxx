@@ -138,7 +138,6 @@ class OpenGl_FrameBuffer;
 class OpenGl_Sampler;
 class OpenGl_ShaderProgram;
 class OpenGl_ShaderManager;
-class OpenGl_FrameStats;
 
 enum OpenGl_FeatureFlag
 {
@@ -200,8 +199,6 @@ class OpenGl_Context : public Standard_Transient
   DEFINE_STANDARD_RTTIEXT(OpenGl_Context, Standard_Transient)
   friend class OpenGl_Window;
 public:
-
-  typedef NCollection_Shared< NCollection_DataMap<TCollection_AsciiString, Handle(OpenGl_Resource)> > OpenGl_ResourcesMap;
 
   //! Function for getting power of to number larger or equal to input number.
   //! @param theNumber    number to 'power of two'
@@ -447,9 +444,6 @@ public:
   //! Clean up the delayed release queue.
   Standard_EXPORT void ReleaseDelayed();
 
-  //! Return map of shared resources.
-  const OpenGl_ResourcesMap& SharedResources() const { return *mySharedResources; }
-
   //! @return tool for management of clippings within this context.
   inline OpenGl_Clipping& ChangeClipping() { return myClippingState; }
 
@@ -543,12 +537,6 @@ public:
   //! @return old type of hatch.
   Standard_EXPORT Standard_Integer SetPolygonHatchStyle (const Handle(Graphic3d_HatchStyle)& theStyle);
 
-  //! Sets and applies current polygon offset.
-  Standard_EXPORT void SetPolygonOffset (const Graphic3d_PolygonOffset& theOffset);
-
-  //! Returns currently applied polygon offset parameters.
-  const Graphic3d_PolygonOffset& PolygonOffset() const { return myPolygonOffset; }
-
   //! Applies matrix stored in ModelWorldState to OpenGl.
   Standard_EXPORT void ApplyModelWorldMatrix();
 
@@ -602,9 +590,6 @@ public:
 
 public: //! @name methods to alter or retrieve current state
 
-  //! Return structure holding frame statistics.
-  const Handle(OpenGl_FrameStats)& FrameStats() const { return myFrameStats; }
-
   //! Return cached viewport definition (x, y, width, height).
   const Standard_Integer* Viewport() const { return myViewport; }
 
@@ -639,18 +624,6 @@ public: //! @name methods to alter or retrieve current state
     SetReadBuffer (theBuffer);
     SetDrawBuffer (theBuffer);
   }
-
-  //! Return cached flag indicating writing into color buffer is enabled or disabled (glColorMask).
-  bool ColorMask() const { return myColorMask; }
-
-  //! Enable/disable writing into color buffer (wrapper for glColorMask).
-  Standard_EXPORT bool SetColorMask (bool theToWriteColor);
-
-  //! Return GL_SAMPLE_ALPHA_TO_COVERAGE state.
-  bool SampleAlphaToCoverage() const { return myAlphaToCoverage; }
-
-  //! Enable/disable GL_SAMPLE_ALPHA_TO_COVERAGE.
-  Standard_EXPORT bool SetSampleAlphaToCoverage (bool theToEnable);
 
   //! Return back face culling state.
   bool ToCullBackFaces() const { return myToCullBackFaces; }
@@ -850,7 +823,6 @@ public: //! @name extensions
   Standard_Boolean       atiMem;             //!< GL_ATI_meminfo
   Standard_Boolean       nvxMem;             //!< GL_NVX_gpu_memory_info
   Standard_Boolean       oesSampleVariables; //!< GL_OES_sample_variables
-  Standard_Boolean       oesStdDerivatives;  //!< GL_OES_standard_derivatives
 
 public: //! @name public properties tracking current state
 
@@ -883,6 +855,7 @@ private: // system-dependent fields
 private: // context info
 
   typedef NCollection_Shared< NCollection_DataMap<TCollection_AsciiString, Standard_Integer> > OpenGl_DelayReleaseMap;
+  typedef NCollection_Shared< NCollection_DataMap<TCollection_AsciiString, Handle(OpenGl_Resource)> > OpenGl_ResourcesMap;
   typedef NCollection_Shared< NCollection_List<Handle(OpenGl_Resource)> > OpenGl_ResourcesStack;
   typedef NCollection_SparseArray<Standard_Integer> OpenGl_DrawBuffers;
 
@@ -918,7 +891,6 @@ private: // context info
 
 private: //! @name fields tracking current state
 
-  Handle(OpenGl_FrameStats)     myFrameStats;      //!< structure accumulating frame statistics
   Handle(OpenGl_ShaderProgram)  myActiveProgram;   //!< currently active GLSL program
   Handle(OpenGl_TextureSet)     myActiveTextures;  //!< currently bound textures
                                                    //!< currently active sampler objects
@@ -929,13 +901,10 @@ private: //! @name fields tracking current state
   Standard_Integer              myPointSpriteOrig; //!< GL_POINT_SPRITE_COORD_ORIGIN state (GL_UPPER_LEFT by default)
   Standard_Integer              myRenderMode;      //!< value for active rendering mode
   Standard_Integer              myPolygonMode;     //!< currently used polygon rasterization mode (glPolygonMode)
-  Graphic3d_PolygonOffset       myPolygonOffset;   //!< currently applied polygon offset
   bool                          myToCullBackFaces; //!< back face culling mode enabled state (glIsEnabled (GL_CULL_FACE))
   Standard_Integer              myReadBuffer;      //!< current read buffer
   OpenGl_DrawBuffers            myDrawBuffers;     //!< current draw buffers
   unsigned int                  myDefaultVao;      //!< default Vertex Array Object
-  Standard_Boolean              myColorMask;       //!< flag indicating writing into color buffer is enabled or disabled (glColorMask)
-  Standard_Boolean              myAlphaToCoverage; //!< flag indicating GL_SAMPLE_ALPHA_TO_COVERAGE state
   Standard_Boolean              myIsGlDebugCtx;    //!< debug context initialization state
   TCollection_AsciiString       myVendor;          //!< Graphics Driver's vendor
   TColStd_PackedMapOfInteger    myFilters[6];      //!< messages suppressing filter (for sources from GL_DEBUG_SOURCE_API_ARB to GL_DEBUG_SOURCE_OTHER_ARB)

@@ -32,7 +32,6 @@ OpenGl_Layer::OpenGl_Layer (const Standard_Integer theNbPriorities,
                             const Handle(Select3D_BVHBuilder3d)& theBuilder)
 : myArray                     (0, theNbPriorities - 1),
   myNbStructures              (0),
-  myNbStructuresNotCulled     (0),
   myBVHPrimitivesTrsfPers     (theBuilder),
   myBVHIsLeftChildQueuedFirst (Standard_True),
   myIsBVHPrimitivesNeedsReset (Standard_False)
@@ -148,7 +147,7 @@ bool OpenGl_Layer::Remove (const OpenGl_Structure* theStruct,
 // function : InvalidateBVHData
 // purpose  :
 // =======================================================================
-void OpenGl_Layer::InvalidateBVHData()
+void OpenGl_Layer::InvalidateBVHData() const
 {
   myIsBVHPrimitivesNeedsReset = Standard_True;
 }
@@ -430,8 +429,12 @@ void OpenGl_Layer::renderAll (const Handle(OpenGl_Workspace)& theWorkspace) cons
     for (OpenGl_IndexedMapOfStructure::Iterator aStructIter (aStructures); aStructIter.More(); aStructIter.Next())
     {
       const OpenGl_Structure* aStruct = aStructIter.Value();
-      if (aStruct->IsCulled()
-      || !aStruct->IsVisible (aViewId))
+      if (!aStruct->IsVisible())
+      {
+        continue;
+      }
+      else if (!aStruct->ViewAffinity.IsNull()
+            && !aStruct->ViewAffinity->IsVisible (aViewId))
       {
         continue;
       }
@@ -480,45 +483,52 @@ void OpenGl_Layer::updateBVH() const
 }
 
 // =======================================================================
-// function : UpdateCulling
+// function : renderTraverse
 // purpose  :
 // =======================================================================
-void OpenGl_Layer::UpdateCulling (const Standard_Integer theViewId,
-                                  const OpenGl_BVHTreeSelector& theSelector,
-                                  const Standard_Boolean theToTraverse)
+void OpenGl_Layer::renderTraverse (const Handle(OpenGl_Workspace)& theWorkspace) const
 {
   updateBVH();
 
-  myNbStructuresNotCulled = myNbStructures;
-  for (OpenGl_IndexedMapOfStructure::Iterator aStructIter (myBVHPrimitives.Structures()); aStructIter.More(); aStructIter.Next())
-  {
-    const OpenGl_Structure* aStruct = aStructIter.Value();
-    aStruct->SetCulled (theToTraverse);
-  }
-  for (OpenGl_IndexedMapOfStructure::Iterator aStructIter (myBVHPrimitivesTrsfPers.Structures()); aStructIter.More(); aStructIter.Next())
-  {
-    const OpenGl_Structure* aStruct = aStructIter.Value();
-    aStruct->SetCulled (theToTraverse);
-  }
+  OpenGl_BVHTreeSelector& aSelector = theWorkspace->View()->BVHTreeSelector();
+  traverse (aSelector);
 
-  if (!theToTraverse)
+  const Standard_Integer aViewId = theWorkspace->View()->Identification();
+  for (OpenGl_ArrayOfIndexedMapOfStructure::Iterator aMapIter (myArray); aMapIter.More(); aMapIter.Next())
   {
-    return;
+    const OpenGl_IndexedMapOfStructure& aStructures = aMapIter.Value();
+    for (OpenGl_IndexedMapOfStructure::Iterator aStructIter (aStructures); aStructIter.More(); aStructIter.Next())
+    {
+      const OpenGl_Structure* aStruct = aStructIter.Value();
+      if (aStruct->IsCulled()
+      || !aStruct->IsVisible (aViewId))
+      {
+        continue;
+      }
+
+      aStruct->Render (theWorkspace);
+      aStruct->ResetCullingStatus();
+    }
   }
+}
+
+// =======================================================================
+// function : traverse
+// purpose  :
+// =======================================================================
+void OpenGl_Layer::traverse (OpenGl_BVHTreeSelector& theSelector) const
+{
+  // handle a case when all objects are infinite
   if (myBVHPrimitives        .Size() == 0
    && myBVHPrimitivesTrsfPers.Size() == 0)
-  {
     return;
-  }
 
-  myNbStructuresNotCulled = myAlwaysRenderedMap.Extent();
-  OpenGl_BVHTreeSelector::CullingContext aCullCtx;
-  theSelector.SetCullingDistance(aCullCtx, myLayerSettings.CullingDistance());
-  theSelector.SetCullingSize    (aCullCtx, myLayerSettings.CullingSize());
+  theSelector.CacheClipPtsProjections();
+
+  opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree;
   for (Standard_Integer aBVHTreeIdx = 0; aBVHTreeIdx < 2; ++aBVHTreeIdx)
   {
     const Standard_Boolean isTrsfPers = aBVHTreeIdx == 1;
-    opencascade::handle<BVH_Tree<Standard_Real, 3> > aBVHTree;
     if (isTrsfPers)
     {
       if (myBVHPrimitivesTrsfPers.Size() == 0)
@@ -540,22 +550,26 @@ void OpenGl_Layer::UpdateCulling (const Standard_Integer theViewId,
       aBVHTree = myBVHPrimitives.BVH();
     }
 
-    if (theSelector.IsCulled (aCullCtx, aBVHTree->MinPoint (0), aBVHTree->MaxPoint (0)))
+    Standard_Integer aNode = 0; // a root node
+
+    if (!theSelector.Intersect (aBVHTree->MinPoint (0),
+                                aBVHTree->MaxPoint (0)))
     {
       continue;
     }
 
     Standard_Integer aStack[BVH_Constants_MaxTreeDepth];
     Standard_Integer aHead = -1;
-    Standard_Integer aNode = 0; // a root node
     for (;;)
     {
       if (!aBVHTree->IsOuter (aNode))
       {
         const Standard_Integer aLeftChildIdx  = aBVHTree->Child<0> (aNode);
         const Standard_Integer aRightChildIdx = aBVHTree->Child<1> (aNode);
-        const Standard_Boolean isLeftChildIn  = !theSelector.IsCulled (aCullCtx, aBVHTree->MinPoint (aLeftChildIdx),  aBVHTree->MaxPoint (aLeftChildIdx));
-        const Standard_Boolean isRightChildIn = !theSelector.IsCulled (aCullCtx, aBVHTree->MinPoint (aRightChildIdx), aBVHTree->MaxPoint (aRightChildIdx));
+        const Standard_Boolean isLeftChildIn  = theSelector.Intersect (aBVHTree->MinPoint (aLeftChildIdx),
+                                                                       aBVHTree->MaxPoint (aLeftChildIdx));
+        const Standard_Boolean isRightChildIn = theSelector.Intersect (aBVHTree->MinPoint (aRightChildIdx),
+                                                                       aBVHTree->MaxPoint (aRightChildIdx));
         if (isLeftChildIn
          && isRightChildIn)
         {
@@ -581,14 +595,10 @@ void OpenGl_Layer::UpdateCulling (const Standard_Integer theViewId,
       else
       {
         Standard_Integer aIdx = aBVHTree->BegPrimitive (aNode);
-        const OpenGl_Structure* aStruct = isTrsfPers
-                                        ? myBVHPrimitivesTrsfPers.GetStructureById (aIdx)
-                                        : myBVHPrimitives.GetStructureById (aIdx);
-        if (aStruct->IsVisible (theViewId))
-        {
-          aStruct->MarkAsNotCulled();
-          ++myNbStructuresNotCulled;
-        }
+        const OpenGl_Structure* aStruct =
+          isTrsfPers ? myBVHPrimitivesTrsfPers.GetStructureById (aIdx)
+                     : myBVHPrimitives.GetStructureById (aIdx);
+        aStruct->MarkAsNotCulled();
         if (aHead < 0)
         {
           break;
@@ -655,8 +665,7 @@ void OpenGl_Layer::SetLayerSettings (const Graphic3d_ZLayerSettings& theSettings
 void OpenGl_Layer::Render (const Handle(OpenGl_Workspace)&   theWorkspace,
                            const OpenGl_GlobalLayerSettings& theDefaultSettings) const
 {
-  const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
-  const Graphic3d_PolygonOffset anAppliedOffsetParams = aCtx->PolygonOffset();
+  const Graphic3d_PolygonOffset anAppliedOffsetParams = theWorkspace->AppliedPolygonOffset();
   // myLayerSettings.ToClearDepth() is handled outside
 
   // handle depth test
@@ -678,23 +687,16 @@ void OpenGl_Layer::Render (const Handle(OpenGl_Workspace)&   theWorkspace,
   }
 
   // handle depth offset
-  aCtx->SetPolygonOffset (myLayerSettings.PolygonOffset());
+  theWorkspace->SetPolygonOffset (myLayerSettings.PolygonOffset());
 
   // handle depth write
   theWorkspace->UseDepthWrite() = myLayerSettings.ToEnableDepthWrite() && theDefaultSettings.DepthMask == GL_TRUE;
   glDepthMask (theWorkspace->UseDepthWrite() ? GL_TRUE : GL_FALSE);
 
   const Standard_Boolean hasLocalCS = !myLayerSettings.OriginTransformation().IsNull();
-  const Handle(OpenGl_ShaderManager)& aManager = aCtx->ShaderManager();
-  Handle(Graphic3d_LightSet) aLightsBack = aManager->LightSourceState().LightSources();
-  const bool hasOwnLights = aCtx->ColorMask() && !myLayerSettings.Lights().IsNull() && myLayerSettings.Lights() != aLightsBack;
-  if (hasOwnLights)
-  {
-    myLayerSettings.Lights()->UpdateRevision();
-    aManager->UpdateLightSourceStateTo (myLayerSettings.Lights());
-  }
-
+  const Handle(OpenGl_Context)&   aCtx         = theWorkspace->GetGlContext();
   const Handle(Graphic3d_Camera)& aWorldCamera = theWorkspace->View()->Camera();
+  Handle(Graphic3d_Camera) aCameraBack;
   if (hasLocalCS)
   {
     // Apply local camera transformation.
@@ -743,12 +745,8 @@ void OpenGl_Layer::Render (const Handle(OpenGl_Workspace)&   theWorkspace,
   }
 
   // render priority list
-  renderAll (theWorkspace);
+  theWorkspace->IsCullingEnabled() ? renderTraverse (theWorkspace) : renderAll (theWorkspace);
 
-  if (hasOwnLights)
-  {
-    aManager->UpdateLightSourceStateTo (aLightsBack);
-  }
   if (hasLocalCS)
   {
     aCtx->ShaderManager()->RevertClippingState();
@@ -759,7 +757,7 @@ void OpenGl_Layer::Render (const Handle(OpenGl_Workspace)&   theWorkspace,
   }
 
   // always restore polygon offset between layers rendering
-  aCtx->SetPolygonOffset (anAppliedOffsetParams);
+  theWorkspace->SetPolygonOffset (anAppliedOffsetParams);
 
   // restore environment texture
   if (!myLayerSettings.UseEnvironmentTexture())

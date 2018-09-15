@@ -49,13 +49,13 @@ public:
   //! @return edge aspect.
   const OpenGl_AspectLine* AspectEdge() const  { return &myAspectEdge; }
 
-  //! Returns Shading Model.
-  Graphic3d_TypeOfShadingModel ShadingModel() const { return myShadingModel; }
+  //! Returns true if lighting should be disabled.
+  bool IsNoLighting() const { return myIsNoLighting; }
 
   //! Set if lighting should be disabled or not.
-  void SetNoLighting() { myShadingModel = Graphic3d_TOSM_UNLIT; }
+  void SetNoLighting (bool theValue) { myIsNoLighting = theValue; }
 
-  //! Returns textures map.
+  //! Returne textures map.
   const Handle(OpenGl_TextureSet)& TextureSet (const Handle(OpenGl_Context)& theCtx) const
   {
     if (!myResources.IsTextureReady())
@@ -138,7 +138,7 @@ protected:
 
   Handle(Graphic3d_AspectFillArea3d) myAspect;
   OpenGl_AspectLine                  myAspectEdge;
-  Graphic3d_TypeOfShadingModel       myShadingModel;
+  bool                               myIsNoLighting;
 
 public:
 

@@ -1,4 +1,3 @@
-#include <d3d9.h>
 #include <windows.h>
 
 // include required OCCT headers
@@ -39,8 +38,6 @@
 //wrapper of pure C++ classes to ref classes
 #include <NCollection_Haft.h>
 
-#include <vcclr.h>
-
 // list of required OCCT libraries
 #pragma comment(lib, "TKernel.lib")
 #pragma comment(lib, "TKMath.lib")
@@ -56,24 +53,6 @@
 #pragma comment(lib, "TKVrml.lib")
 
 #pragma comment(lib, "D3D9.lib")
-
-//! Auxiliary tool for converting C# string into UTF-8 string.
-static TCollection_AsciiString toAsciiString (String^ theString)
-{
-  if (theString == nullptr)
-  {
-    return TCollection_AsciiString();
-  }
-
-  pin_ptr<const wchar_t> aPinChars = PtrToStringChars (theString);
-  const wchar_t* aWCharPtr = aPinChars;
-  if (aWCharPtr == NULL
-  || *aWCharPtr == L'\0')
-  {
-    return TCollection_AsciiString();
-  }
-  return TCollection_AsciiString (aWCharPtr);
-}
 
 /// <summary>
 /// Proxy class encapsulating calls to OCCT C++ classes within
@@ -129,14 +108,14 @@ public:
   /// Make dump of current view to file
   /// </summary>
   /// <param name="theFileName">Name of dump file</param>
-  bool Dump (const TCollection_AsciiString& theFileName)
+  bool Dump (const char* theFileName)
   {
     if (myView().IsNull())
     {
       return false;
     }
     myView()->Redraw();
-    return myView()->Dump (theFileName.ToCString()) != Standard_False;
+    return myView()->Dump (theFileName) != Standard_False;
   }
 
   /// <summary>
@@ -640,7 +619,7 @@ public:
     }
     for (myAISContext()->InitSelected(); myAISContext()->MoreSelected(); myAISContext()->NextSelected())
     {
-      myAISContext()->SetTransparency (myAISContext()->SelectedInteractive(), ((Standard_Real )theTrans) / 10.0, Standard_False);
+      myAISContext()->SetTransparency (myAISContext()->Current(), ((Standard_Real )theTrans) / 10.0, Standard_False);
     }
     myAISContext()->UpdateCurrentViewer();
   }
@@ -729,18 +708,28 @@ public:
   /// <param name="theFileName">Name of import file</param>
   bool ImportBrep (System::String^ theFileName)
   {
-    return ImportBrep (toAsciiString (theFileName));
+    bool  isResult  = false;
+    int   aLength   = theFileName->Length;
+    char* aFilename = new char[aLength + 1];
+    for(int i = 0; i < aLength; ++i)
+    {
+      aFilename[i] = (char )theFileName->ToCharArray()[i];
+    }
+    aFilename[aLength] = '\0';
+    isResult = ImportBrep (aFilename);
+    delete[] aFilename;
+    return isResult;
   }
 
   /// <summary>
   ///Import BRep file
   /// </summary>
   /// <param name="theFileName">Name of import file</param>
-  bool ImportBrep (const TCollection_AsciiString& theFileName)
+  bool ImportBrep (char* theFileName)
   {
     TopoDS_Shape aShape;
     BRep_Builder aBuilder;
-    if (!BRepTools::Read (aShape, theFileName.ToCString(), aBuilder))
+    if (!BRepTools::Read (aShape, theFileName, aBuilder))
     {
       return false;
     }
@@ -756,10 +745,10 @@ public:
   ///Import Step file
   /// </summary>
   /// <param name="theFileName">Name of import file</param>
-  bool ImportStep (const TCollection_AsciiString& theFileName)
+  bool ImportStep (char* theFileName)
   {
     STEPControl_Reader aReader;
-    if (aReader.ReadFile (theFileName.ToCString()) != IFSelect_RetDone)
+    if (aReader.ReadFile (theFileName) != IFSelect_RetDone)
     {
       return false;
     }
@@ -789,10 +778,10 @@ public:
   ///Import Iges file
   /// </summary>
   /// <param name="theFileName">Name of import file</param>
-  bool ImportIges (const TCollection_AsciiString& theFileName)
+  bool ImportIges (char* theFileName)
   {
     IGESControl_Reader aReader;
-    if (aReader.ReadFile (theFileName.ToCString()) != IFSelect_RetDone)
+    if (aReader.ReadFile (theFileName) != IFSelect_RetDone)
     {
       return false;
     }
@@ -808,7 +797,7 @@ public:
   ///Export BRep file
   /// </summary>
   /// <param name="theFileName">Name of export file</param>
-  bool ExportBRep (const TCollection_AsciiString& theFileName)
+  bool ExportBRep (char* theFileName)
   {
     myAISContext()->InitSelected();
     if (!myAISContext()->MoreSelected())
@@ -818,14 +807,14 @@ public:
 
     Handle(AIS_Shape) anIS = Handle(AIS_Shape)::DownCast (myAISContext()->SelectedInteractive());
     return !anIS.IsNull()
-         && BRepTools::Write (anIS->Shape(), theFileName.ToCString());
+         && BRepTools::Write (anIS->Shape(), theFileName);
   }
 
   /// <summary>
   ///Export Step file
   /// </summary>
   /// <param name="theFileName">Name of export file</param>
-  bool ExportStep (const TCollection_AsciiString& theFileName)
+  bool ExportStep (char* theFileName)
   {
     STEPControl_StepModelType aType = STEPControl_AsIs;
     STEPControl_Writer        aWriter;
@@ -843,14 +832,14 @@ public:
         return false;
       }
     }
-    return aWriter.Write (theFileName.ToCString()) == IFSelect_RetDone;
+    return aWriter.Write (theFileName) == IFSelect_RetDone;
   }
 
   /// <summary>
   ///Export Iges file
   /// </summary>
   /// <param name="theFileName">Name of export file</param>
-  bool ExportIges (const TCollection_AsciiString& theFileName)
+  bool ExportIges (char* theFileName)
   {
     IGESControl_Controller::Init();
     IGESControl_Writer aWriter (Interface_Static::CVal ("XSTEP.iges.unit"),
@@ -867,14 +856,14 @@ public:
     }
 
     aWriter.ComputeModel();
-    return aWriter.Write (theFileName.ToCString()) != Standard_False;
+    return aWriter.Write (theFileName) != Standard_False;
   }
 
   /// <summary>
   ///Export Vrml file
   /// </summary>
   /// <param name="theFileName">Name of export file</param>
-  bool ExportVrml (const TCollection_AsciiString& theFileName)
+  bool ExportVrml (char* theFileName)
   {
     TopoDS_Compound aRes;
     BRep_Builder    aBuilder;
@@ -890,7 +879,7 @@ public:
     }
 
     VrmlAPI_Writer aWriter;
-    aWriter.Write (aRes, theFileName.ToCString());
+    aWriter.Write (aRes, theFileName);
     return true;
   }
 
@@ -898,7 +887,7 @@ public:
   ///Export Stl file
   /// </summary>
   /// <param name="theFileName">Name of export file</param>
-  bool ExportStl (const TCollection_AsciiString& theFileName)
+  bool ExportStl (char* theFileName)
   {
     TopoDS_Compound aComp;
     BRep_Builder    aBuilder;
@@ -914,7 +903,7 @@ public:
     }
 
     StlAPI_Writer aWriter;
-    aWriter.Write (aComp, theFileName.ToCString());
+    aWriter.Write (aComp, theFileName);
     return true;
   }
 
@@ -927,7 +916,14 @@ public:
   bool TranslateModel (System::String^ theFileName, int theFormat, bool theIsImport)
   {
     bool  isResult  = false;
-    const TCollection_AsciiString aFilename = toAsciiString (theFileName);
+    int   aLength   = theFileName->Length;
+    char* aFilename = new char[aLength + 1];
+    for (int aCharIter = 0; aCharIter < aLength; ++aCharIter)
+    {
+      aFilename[aCharIter] = (char)theFileName->ToCharArray()[aCharIter];
+    }
+    aFilename[aLength] = '\0';
+
     if (theIsImport)
     {
       switch (theFormat)
@@ -949,6 +945,7 @@ public:
         case 5: isResult = Dump (aFilename);      break;
       }
     }
+    delete[] aFilename;
     return isResult;
   }
 

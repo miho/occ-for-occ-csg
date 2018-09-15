@@ -21,6 +21,7 @@
 #include <Graphic3d_Group.hxx>
 #include <Graphic3d_Structure.hxx>
 #include <Graphic3d_TextureEnv.hxx>
+#include <Graphic3d_Vector.hxx>
 #include <Quantity_Color.hxx>
 #include <Standard_MultiplyDefined.hxx>
 #include <Standard_TypeMismatch.hxx>
@@ -47,9 +48,9 @@ void V3d_View::Move (const Standard_Real Dx,
 
     gp_Dir aReferencePlane (aCamera->Direction().Reversed());
     gp_Dir anUp (aCamera->Up());
-    if (!screenAxis (aReferencePlane, anUp, myXscreenAxis, myYscreenAxis, myZscreenAxis))
+    if (!ScreenAxis (aReferencePlane, anUp, myXscreenAxis, myYscreenAxis, myZscreenAxis))
     {
-      throw V3d_BadValue("V3d_View::Translate, alignment of Eye,At,Up");
+          throw V3d_BadValue("V3d_View::Translate, alignment of Eye,At,Up");
     }
   }
 
@@ -76,15 +77,20 @@ void V3d_View::Move (const Standard_Real Dx,
 //function : Move
 //purpose  :
 //=============================================================================
-void V3d_View::Move (const Standard_Real theLength, const Standard_Boolean theStart)
+void V3d_View::Move (const Standard_Real Length, const Standard_Boolean Start)
 {
   Handle(Graphic3d_Camera) aCamera = Camera();
-  if (theStart)
+
+  if( Start )
   {
     myCamStartOpEye = aCamera->Eye();
   }
   aCamera->SetEye (myCamStartOpEye);
-  aCamera->SetEye (aCamera->Eye().XYZ() + theLength * myDefaultViewAxis.XYZ());
+
+  Standard_Real Vx, Vy, Vz;
+  MyDefaultViewAxis.Coord (Vx, Vy, Vz) ;
+
+  aCamera->SetEye (aCamera->Eye().XYZ() + Length * gp_Pnt (Vx, Vy, Vz).XYZ());
 
   AutoZFit();
 
@@ -128,25 +134,30 @@ void V3d_View::Translate (const Standard_Real Dx,
 
     gp_Dir aReferencePlane (aCamera->Direction().Reversed());
     gp_Dir anUp (aCamera->Up());
-    if (!screenAxis (aReferencePlane, anUp, myXscreenAxis, myYscreenAxis, myZscreenAxis))
-    {
-      throw V3d_BadValue("V3d_View::Translate, alignment of Eye,At,Up");
-    }
+    if (!ScreenAxis (aReferencePlane, anUp,
+		  myXscreenAxis,myYscreenAxis,myZscreenAxis))
+	      throw V3d_BadValue("V3d_View::Translate, alignment of Eye,At,Up");
   }
+
+  Standard_Real XX, XY, XZ, YX, YY, YZ, ZX, ZY, ZZ;
+
+  myXscreenAxis.Coord (XX,XY,XZ);
+  myYscreenAxis.Coord (YX,YY,YZ);
+  myZscreenAxis.Coord (ZX,ZY,ZZ);
 
   aCamera->SetEye (myCamStartOpEye);
   aCamera->SetCenter (myCamStartOpCenter);
 
   aCamera->SetCenter (aCamera->Center().XYZ()
-    - Dx * myXscreenAxis.XYZ()
-    - Dy * myYscreenAxis.XYZ()
-    - Dz * myZscreenAxis.XYZ()
+    - Dx * gp_Pnt (XX, XY, XZ).XYZ()
+    - Dy * gp_Pnt (YX, YY, YZ).XYZ()
+    - Dz * gp_Pnt (ZX, ZY, ZZ).XYZ()
     );
 
   aCamera->SetEye (aCamera->Eye().XYZ()
-    - Dx * myXscreenAxis.XYZ()
-    - Dy * myYscreenAxis.XYZ()
-    - Dz * myZscreenAxis.XYZ()
+    - Dx * gp_Pnt (XX, XY, XZ).XYZ()
+    - Dy * gp_Pnt (YX, YY, YZ).XYZ()
+    - Dz * gp_Pnt (ZX, ZY, ZZ).XYZ()
     );
 
   AutoZFit();
@@ -197,12 +208,14 @@ void V3d_View::Place (const Standard_Integer theXp,
 void V3d_View::Translate (const Standard_Real theLength, const Standard_Boolean theStart)
 {
   Handle(Graphic3d_Camera) aCamera = Camera();
+
+  Standard_Real aVx, aVy, aVz;
   if (theStart) 
   {
     myCamStartOpCenter = aCamera->Center() ;
   }
-
-  gp_Pnt aNewCenter (myCamStartOpCenter.XYZ() - myDefaultViewAxis.XYZ() * theLength);
+  MyDefaultViewAxis.Coord (aVx, aVy, aVz);
+  gp_Pnt aNewCenter (myCamStartOpCenter.XYZ() - gp_Pnt (aVx, aVy, aVz).XYZ() * theLength);
   aCamera->SetCenter (aNewCenter);
 
   AutoZFit();

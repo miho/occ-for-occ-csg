@@ -43,22 +43,6 @@ IMPLEMENT_STANDARD_RTTIEXT(AIS_Manipulator, AIS_InteractiveObject)
 
 IMPLEMENT_HSEQUENCE(AIS_ManipulatorObjectSequence)
 
-namespace
-{
-  //! Return Ax1 for specified direction of Ax2.
-  static gp_Ax1 getAx1FromAx2Dir (const gp_Ax2& theAx2,
-                                  int theIndex)
-  {
-    switch (theIndex)
-    {
-      case 0: return gp_Ax1 (theAx2.Location(), theAx2.XDirection());
-      case 1: return gp_Ax1 (theAx2.Location(), theAx2.YDirection());
-      case 2: return theAx2.Axis();
-    }
-    throw Standard_ProgramError ("AIS_Manipulator - Invalid axis index");
-  }
-}
-
 //=======================================================================
 //function : init
 //purpose  : 
@@ -400,19 +384,22 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation (const Standard_Integer t
   // Initialize start reference data
   if (!myHasStartedTransformation)
   {
-    myStartTrsfs.Clear();
     Handle(AIS_ManipulatorObjectSequence) anObjects = Objects();
-    for (AIS_ManipulatorObjectSequence::Iterator anObjIter (*anObjects); anObjIter.More(); anObjIter.Next())
+    myStartTrsfs.Clear();
+    for (Standard_Integer anIt = anObjects->Lower(); anIt <= anObjects->Upper(); ++anIt)
     {
-      myStartTrsfs.Append (anObjIter.Value()->LocalTransformation());
+      myStartTrsfs.Append (anObjects->Value (anIt)->LocalTransformation());
     }
     myStartPosition = myPosition;
   }
 
   // Get 3d point with projection vector
-  Graphic3d_Vec3d anInputPoint, aProj;
+  Graphic3d_Vec3d anInputPoint;
+  Graphic3d_Vec3d aProj;
   theView->ConvertWithProj (theMaxX, theMaxY, anInputPoint.x(), anInputPoint.y(), anInputPoint.z(), aProj.x(), aProj.y(), aProj.z());
-  const gp_Lin anInputLine (gp_Pnt (anInputPoint.x(), anInputPoint.y(), anInputPoint.z()), gp_Dir (aProj.x(), aProj.y(), aProj.z()));
+  gp_Lin anInputLine (gp_Pnt (anInputPoint.x(), anInputPoint.y(), anInputPoint.z()), gp_Dir (aProj.x(), aProj.y(), aProj.z()));
+  gp_Pnt aNewPosition = gp::Origin();
+
   switch (myCurrentMode)
   {
     case AIS_MM_Translation:
@@ -423,7 +410,7 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation (const Standard_Integer t
       GeomAPI_ExtremaCurveCurve anExtrema (anInputCurve, aCurve);
       gp_Pnt aP1, aP2;
       anExtrema.NearestPoints (aP1, aP2);
-      const gp_Pnt aNewPosition = aP2;
+      aNewPosition = aP2;
 
       if (!myHasStartedTransformation)
       {
@@ -440,28 +427,26 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation (const Standard_Integer t
       gp_Trsf aNewTrsf;
       aNewTrsf.SetTranslation (gp_Vec(myStartPick, aNewPosition));
       theTrsf *= aNewTrsf;
-      return Standard_True;
+      break;
     }
     case AIS_MM_Rotation:
     {
-      const gp_Pnt aPosLoc   = myStartPosition.Location();
-      const gp_Ax1 aCurrAxis = getAx1FromAx2Dir (myStartPosition, myCurrentIndex);
-
       Handle(Geom_Curve) anInputCurve = new Geom_Line (anInputLine);
-      Handle(Geom_Surface) aSurface = new Geom_Plane (aPosLoc, aCurrAxis.Direction());
+      Handle(Geom_Surface) aSurface = new Geom_Plane (myPosition.Location(), myAxes[myCurrentIndex].Position().Direction());
       GeomAPI_IntCS aIntersector (anInputCurve, aSurface);
       if (!aIntersector.IsDone() || aIntersector.NbPoints() < 1)
       {
         return Standard_False;
       }
 
-      const gp_Pnt aNewPosition = aIntersector.Point (1);
+      aNewPosition = aIntersector.Point (1);
+
       if (!myHasStartedTransformation)
       {
         myStartPick = aNewPosition;
         myHasStartedTransformation = Standard_True;
-        gp_Dir aStartAxis = gce_MakeDir (aPosLoc, myStartPick);
-        myPrevState = aStartAxis.AngleWithRef (gce_MakeDir(aPosLoc, aNewPosition), aCurrAxis.Direction());
+        gp_Dir aStartAxis = gce_MakeDir (myPosition.Location(), myStartPick);
+        myPrevState = aStartAxis.AngleWithRef (gce_MakeDir(myPosition.Location(), aNewPosition), myAxes[myCurrentIndex].Position().Direction());
         return Standard_True;
       }
 
@@ -470,17 +455,17 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation (const Standard_Integer t
         return Standard_False;
       }
 
-      gp_Dir aStartAxis = aPosLoc.IsEqual (myStartPick, Precision::Confusion())
-        ? getAx1FromAx2Dir (myStartPosition, (myCurrentIndex + 1) % 3).Direction()
-        : gce_MakeDir (aPosLoc, myStartPick);
+      gp_Dir aStartAxis = myPosition.Location().IsEqual (myStartPick, Precision::Confusion())
+        ? myAxes[(myCurrentIndex + 1) % 3].Position().Direction()
+        : gce_MakeDir (myPosition.Location(), myStartPick);
 
-      gp_Dir aCurrentAxis = gce_MakeDir (aPosLoc, aNewPosition);
-      Standard_Real anAngle = aStartAxis.AngleWithRef (aCurrentAxis, aCurrAxis.Direction());
+      gp_Dir aCurrentAxis = gce_MakeDir (myPosition.Location(), aNewPosition);
+      Standard_Real anAngle = aStartAxis.AngleWithRef (aCurrentAxis, myAxes[myCurrentIndex].Position().Direction());
 
       // Change value of an angle if it should have different sign.
       if (anAngle * myPrevState < 0 && Abs (anAngle) < M_PI_2)
       {
-        Standard_Real aSign = myPrevState > 0 ? -1.0 : 1.0;
+        Standard_ShortReal aSign = myPrevState > 0 ? -1.0f : 1.0f;
         anAngle = aSign * (M_PI * 2 - anAngle);
       }
 
@@ -490,10 +475,10 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation (const Standard_Integer t
       }
 
       gp_Trsf aNewTrsf;
-      aNewTrsf.SetRotation (aCurrAxis, anAngle);
+      aNewTrsf.SetRotation (myAxes[myCurrentIndex].Position(), anAngle);
       theTrsf *= aNewTrsf;
       myPrevState = anAngle;
-      return Standard_True;
+      break;
     }
     case AIS_MM_Scaling:
     {
@@ -501,7 +486,7 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation (const Standard_Integer t
       Handle(Geom_Curve) anInputCurve = new Geom_Line (anInputLine);
       Handle(Geom_Curve) aCurve = new Geom_Line (aLine);
       GeomAPI_ExtremaCurveCurve anExtrema (anInputCurve, aCurve);
-      gp_Pnt aNewPosition, aTmp;
+      gp_Pnt aTmp;
       anExtrema.NearestPoints (aTmp, aNewPosition);
 
       if (!myHasStartedTransformation)
@@ -523,14 +508,13 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation (const Standard_Integer t
       aNewTrsf.SetScale (myPosition.Location(), aCoeff);
 
       theTrsf = aNewTrsf;
-      return Standard_True;
+      break;
     }
     case AIS_MM_None:
-    {
       return Standard_False;
-    }
   }
-  return Standard_False;
+
+  return Standard_True;
 }
 
 //=======================================================================
@@ -560,19 +544,18 @@ void AIS_Manipulator::StopTransform (const Standard_Boolean theToApply)
   }
 
   myHasStartedTransformation = Standard_False;
-  if (theToApply)
-  {
-    return;
-  }
 
-  Handle(AIS_ManipulatorObjectSequence) anObjects = Objects();
-  AIS_ManipulatorObjectSequence::Iterator anObjIter (*anObjects);
-  NCollection_Sequence<gp_Trsf>::Iterator aTrsfIter (myStartTrsfs);
-  for (; anObjIter.More(); anObjIter.Next(), aTrsfIter.Next())
+  if (!theToApply)
   {
-    anObjIter.ChangeValue()->SetLocalTransformation (aTrsfIter.Value());
+    Handle(AIS_ManipulatorObjectSequence) anObjects = Objects();
+
+    for (Standard_Integer anIt = anObjects->Lower(); anIt <= anObjects->Upper(); ++anIt)
+    {
+      anObjects->Value (anIt)->SetLocalTransformation (myStartTrsfs(anIt));
+    }
+
+    SetPosition (myStartPosition);
   }
-  SetPosition (myStartPosition);
 }
 
 //=======================================================================
@@ -586,14 +569,11 @@ void AIS_Manipulator::Transform (const gp_Trsf& theTrsf)
     return;
   }
 
+  Handle(AIS_ManipulatorObjectSequence) anObjects = Objects();
+
+  for (Standard_Integer anIt = anObjects->Lower(); anIt <= anObjects->Upper(); ++anIt)
   {
-    Handle(AIS_ManipulatorObjectSequence) anObjects = Objects();
-    AIS_ManipulatorObjectSequence::Iterator anObjIter (*anObjects);
-    NCollection_Sequence<gp_Trsf>::Iterator aTrsfIter (myStartTrsfs);
-    for (; anObjIter.More(); anObjIter.Next(), aTrsfIter.Next())
-    {
-      anObjIter.ChangeValue()->SetLocalTransformation (theTrsf * aTrsfIter.Value());
-    }
+    anObjects->Value (anIt)->SetLocalTransformation (theTrsf * myStartTrsfs(anIt));
   }
 
   if ((myCurrentMode == AIS_MM_Translation && myBehaviorOnTransform.FollowTranslation)
@@ -633,9 +613,10 @@ void AIS_Manipulator::SetPosition (const gp_Ax2& thePosition)
    || !myPosition.XDirection().IsEqual (thePosition.XDirection(), Precision::Angular()))
   {
     myPosition = thePosition;
-    myAxes[0].SetPosition (getAx1FromAx2Dir (thePosition, 0));
-    myAxes[1].SetPosition (getAx1FromAx2Dir (thePosition, 1));
-    myAxes[2].SetPosition (getAx1FromAx2Dir (thePosition, 2));
+    myAxes[0].SetPosition (gp_Ax1 (myPosition.Location(), myPosition.XDirection()));
+    myAxes[1].SetPosition (gp_Ax1 (myPosition.Location(), myPosition.YDirection()));
+    myAxes[2].SetPosition (gp_Ax1 (myPosition.Location(), myPosition.Direction()));
+
     updateTransformation();
   }
 }
@@ -1178,11 +1159,8 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
     {
       myHighlightTranslator->Clear();
     }
-    {
-      Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (myHighlightTranslator);
-      aGroup->SetGroupPrimitivesAspect (theAspect->Aspect());
-      aGroup->AddPrimitiveArray (myTriangleArray);
-    }
+    Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (myHighlightTranslator);
+    aGroup->AddPrimitiveArray (myTriangleArray);
   }
 
   if (myHasScaling)
@@ -1202,11 +1180,8 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
     {
       myHighlightScaler->Clear();
     }
-    {
-      Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (myHighlightScaler);
-      aGroup->SetGroupPrimitivesAspect (theAspect->Aspect());
-      aGroup->AddPrimitiveArray (myCube.Array());
-    }
+    Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (myHighlightScaler);
+    aGroup->AddPrimitiveArray (myCube.Array());
   }
 
   if (myHasRotation)
@@ -1225,10 +1200,7 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
     {
       myHighlightRotator->Clear();
     }
-    {
-      Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (myHighlightRotator);
-      aGroup->SetGroupPrimitivesAspect (theAspect->Aspect());
-      aGroup->AddPrimitiveArray (myCircle.Array());
-    }
+    Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (myHighlightRotator);
+    Prs3d_Root::CurrentGroup (myHighlightRotator)->AddPrimitiveArray (myCircle.Array());
   }
 }

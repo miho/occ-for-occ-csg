@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -69,30 +69,48 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#enum-members">Enumerations</a>  </div>
   <div class="headertitle">
 <div class="title">V3d_TypeOfShadingModel.hxx File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="_graphic3d___type_of_shading_model_8hxx.html">Graphic3d_TypeOfShadingModel.hxx</a>&gt;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:afcfdbb6c4f7555a1217585990ed01dd0"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_v3d___type_of_shading_model_8hxx.html#afcfdbb6c4f7555a1217585990ed01dd0">V3d_TypeOfShadingModel</a></td></tr>
-<tr class="separator:afcfdbb6c4f7555a1217585990ed01dd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:acbe5599c67fc58a1f9567f284dca49c2"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2">V3d_TypeOfShadingModel</a> { <a class="el" href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2ad7adcde5e4cfc7a386c8fcad448a96a7">V3d_COLOR</a>, 
+<a class="el" href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2a905d0cf2859af47ee536aa679575af2a">V3d_FLAT</a>, 
+<a class="el" href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2ac6ffa4d76122bfb698eaa8e58244a767">V3d_GOURAUD</a>, 
+<a class="el" href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2af42c53386c453976838b92ef747bdbe1">V3d_PHONG</a>
+ }<tr class="memdesc:acbe5599c67fc58a1f9567f284dca49c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines the type of shading for the graphic object:  <a href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2">More...</a><br /></td></tr>
+</td></tr>
+<tr class="separator:acbe5599c67fc58a1f9567f284dca49c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a id="afcfdbb6c4f7555a1217585990ed01dd0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afcfdbb6c4f7555a1217585990ed01dd0">&#9670;&nbsp;</a></span>V3d_TypeOfShadingModel</h2>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="acbe5599c67fc58a1f9567f284dca49c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acbe5599c67fc58a1f9567f284dca49c2">&#9670;&nbsp;</a></span>V3d_TypeOfShadingModel</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">Graphic3d_TypeOfShadingModel</a> <a class="el" href="_graphic3d___type_of_shading_model_8hxx.html#a6bacb600a515bd6ace804dbc3bc03d3b">V3d_TypeOfShadingModel</a></td>
+          <td class="memname">enum <a class="el" href="_v3d___type_of_shading_model_8hxx.html#acbe5599c67fc58a1f9567f284dca49c2">V3d_TypeOfShadingModel</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Defines the type of shading for the graphic object: </p>
+<ul>
+<li>V3d_COLOR: simple surface color (Graphic3d_TOM_NONE),</li>
+<li>V3d_FLAT: flat shading (Graphic3d_TOM_FACET),</li>
+<li>V3d_GOURAUD: Gouraud shading (Graphic3d_TOM_VERTEX),</li>
+<li>V3d_PHONG: Phong shading (Graphic3d_TOM_FRAGMENT). </li>
+</ul>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="acbe5599c67fc58a1f9567f284dca49c2ad7adcde5e4cfc7a386c8fcad448a96a7"></a>V3d_COLOR&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="acbe5599c67fc58a1f9567f284dca49c2a905d0cf2859af47ee536aa679575af2a"></a>V3d_FLAT&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="acbe5599c67fc58a1f9567f284dca49c2ac6ffa4d76122bfb698eaa8e58244a767"></a>V3d_GOURAUD&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="acbe5599c67fc58a1f9567f284dca49c2af42c53386c453976838b92ef747bdbe1"></a>V3d_PHONG&#160;</td><td class="fielddoc"></td></tr>
+</table>
 
 </div>
 </div>

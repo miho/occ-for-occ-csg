@@ -15,7 +15,7 @@
 
 //AGV 150202: Changed prototype XmlObjMgt::SetStringValue()
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_Real.hxx>
 #include <TDF_Attribute.hxx>
@@ -31,7 +31,7 @@ IMPLEMENT_DOMSTRING (AttributeIDString, "realattguid")
 //purpose  : Constructor
 //=======================================================================
 XmlMDataStd_RealDriver::XmlMDataStd_RealDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -53,6 +53,20 @@ Standard_Boolean XmlMDataStd_RealDriver::Paste
                                          const Handle(TDF_Attribute)& theTarget,
                                          XmlObjMgt_RRelocationTable&  ) const
 {
+  Standard_Real aValue;
+  XmlObjMgt_DOMString aRealStr= XmlObjMgt::GetStringValue (theSource);
+
+  if (XmlObjMgt::GetReal(aRealStr, aValue) == Standard_False) {
+    TCollection_ExtendedString aMessageString =
+      TCollection_ExtendedString("Cannot retrieve Real attribute from \"")
+        + aRealStr + "\"";
+    WriteMessage (aMessageString);
+    return Standard_False;
+  }
+
+  Handle(TDataStd_Real) anAtt = Handle(TDataStd_Real)::DownCast(theTarget);
+  anAtt->Set(aValue);
+
   // attribute id
   Standard_GUID aGUID;
   const XmlObjMgt_Element& anElement = theSource;
@@ -63,18 +77,6 @@ Standard_Boolean XmlMDataStd_RealDriver::Paste
     aGUID = Standard_GUID(Standard_CString(aGUIDStr.GetString())); // user defined case
 
   Handle(TDataStd_Real)::DownCast(theTarget)->SetID(aGUID);
-
-  Standard_Real aValue(0.);
-  const XmlObjMgt_DOMString& aRealStr= XmlObjMgt::GetStringValue (theSource);
-  Standard_CString aValueStr = Standard_CString (aRealStr.GetString());
-  if(XmlObjMgt::GetReal(aRealStr, aValue) == Standard_False) {
-    TCollection_ExtendedString aMessageString =
-      TCollection_ExtendedString("Cannot retrieve Real attribute from \"")
-      + aValueStr + "\"";
-    myMessageDriver->Send (aMessageString, Message_Warning);
-  }
-  Handle(TDataStd_Real) anAtt = Handle(TDataStd_Real)::DownCast(theTarget);
-  anAtt->Set(aValue);
 
   return Standard_True;
 }

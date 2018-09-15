@@ -159,7 +159,6 @@
 		<Unit filename="../../../src/Bnd/Bnd_BoundSortBox2d.cxx" />
 		<Unit filename="../../../src/Bnd/Bnd_Box.cxx" />
 		<Unit filename="../../../src/Bnd/Bnd_Box2d.cxx" />
-		<Unit filename="../../../src/Bnd/Bnd_OBB.cxx" />
 		<Unit filename="../../../src/Bnd/Bnd_Range.cxx" />
 		<Unit filename="../../../src/Bnd/Bnd_Sphere.cxx" />
 		<Unit filename="../../../src/BVH/BVH.cxx" />

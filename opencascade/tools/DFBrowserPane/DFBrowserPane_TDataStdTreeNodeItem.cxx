@@ -27,10 +27,8 @@
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QIcon>
 #include <QObject>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : Init

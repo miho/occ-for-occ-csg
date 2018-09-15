@@ -38,8 +38,6 @@ void Sample2D_Image::SetContext(const Handle(AIS_InteractiveContext)& theContext
   MakeShape();
   this->Set(TopoDS_Shape(myFace));
   myDrawer->SetShadingAspect (new Prs3d_ShadingAspect());
-  Handle(Graphic3d_Texture2Dmanual) aTexture = new Graphic3d_Texture2Dmanual (myFilename);
-  aTexture->DisableModulate();
-  myDrawer->ShadingAspect()->Aspect()->SetTextureMap (aTexture);
+  myDrawer->ShadingAspect()->Aspect()->SetTextureMap (new Graphic3d_Texture2Dmanual (myFilename));
   myDrawer->ShadingAspect()->Aspect()->SetTextureMapOn();
 }

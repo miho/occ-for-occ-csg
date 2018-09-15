@@ -28,6 +28,5 @@ var searchData=
   ['intsurf_5fsituation',['IntSurf_Situation',['../_int_surf___situation_8hxx.html#a5d59b811d432b63cba3aa84b0a610d6f',1,'IntSurf_Situation.hxx']]],
   ['intsurf_5ftypetrans',['IntSurf_TypeTrans',['../_int_surf___type_trans_8hxx.html#ac93d71e6bd9bc2ec97f7a91fb578615f',1,'IntSurf_TypeTrans.hxx']]],
   ['intwalk_5fstatusdeflection',['IntWalk_StatusDeflection',['../_int_walk___status_deflection_8hxx.html#a8056b23dea3857fbb02a5ff185e497b8',1,'IntWalk_StatusDeflection.hxx']]],
-  ['iodtype',['IODType',['../class_graphic3d___camera.html#a529ffced6a9679cd12b020b1edeead37',1,'Graphic3d_Camera']]],
-  ['iterationfilter',['IterationFilter',['../class_graphic3d___light_set.html#ada6828d0e84a25b20dca476d402bd757',1,'Graphic3d_LightSet']]]
+  ['iodtype',['IODType',['../class_graphic3d___camera.html#a529ffced6a9679cd12b020b1edeead37',1,'Graphic3d_Camera']]]
 ];

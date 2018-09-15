@@ -27,7 +27,7 @@ class BinTObjDrivers_ModelDriver : public BinMDF_ADriver
  public:
 
   Standard_EXPORT BinTObjDrivers_ModelDriver
-                         (const Handle(Message_Messenger)& theMessageDriver);
+                         (const Handle(CDM_MessageDriver)& theMessageDriver);
   // constructor
 
   Standard_EXPORT Handle(TDF_Attribute) NewEmpty() const Standard_OVERRIDE;

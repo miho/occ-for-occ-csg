@@ -20,6 +20,7 @@
 #include <Approx_FitAndDivide.hxx>
 #include <BiTgte_Blend.hxx>
 #include <BiTgte_CurveOnEdge.hxx>
+#include <BiTgte_DataMapOfShapeBox.hxx>
 #include <Bnd_Box.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
@@ -1490,7 +1491,7 @@ void BiTgte_Blend::ComputeCenters()
   if (myRadius < 0.) Side = TopAbs_OUT;
   BRepOffset_Inter3d Inter(myAsDes,Side,myTol);
 
-  TopTools_DataMapOfShapeBox         MapSBox;
+  BiTgte_DataMapOfShapeBox         MapSBox;
   TopTools_MapOfShape              Done;
   //TopTools_MapIteratorOfMapOfShape it;
 
@@ -2573,7 +2574,7 @@ void BiTgte_Blend::ComputeShape()
 Standard_Boolean BiTgte_Blend::Intersect
 (const TopoDS_Shape&             Init,
  const TopoDS_Face&              Face,
- const TopTools_DataMapOfShapeBox& MapSBox,
+ const BiTgte_DataMapOfShapeBox& MapSBox,
  const BRepOffset_Offset&        OF1,
        BRepOffset_Inter3d&       Inter) 
 {

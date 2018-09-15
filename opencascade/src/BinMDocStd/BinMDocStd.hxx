@@ -21,7 +21,7 @@
 #include <Standard_Handle.hxx>
 
 class BinMDF_ADriverTable;
-class Message_Messenger;
+class CDM_MessageDriver;
 class BinMDocStd_XLinkDriver;
 
 
@@ -34,7 +34,7 @@ public:
 
   
   //! Adds the attribute drivers to <theDriverTable>.
-  Standard_EXPORT static void AddDrivers (const Handle(BinMDF_ADriverTable)& theDriverTable, const Handle(Message_Messenger)& aMsgDrv);
+  Standard_EXPORT static void AddDrivers (const Handle(BinMDF_ADriverTable)& theDriverTable, const Handle(CDM_MessageDriver)& aMsgDrv);
 
 
 

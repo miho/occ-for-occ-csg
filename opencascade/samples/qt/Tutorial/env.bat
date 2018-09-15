@@ -9,3 +9,4 @@ set "CSF_ResourcesDefaults=%RES_DIR%"
 set "CSF_TutorialResourcesDefaults=%RES_DIR%"
 
 set "PATH=%QTDIR%/bin;%PATH%"
+set "QT_QPA_PLATFORM_PLUGIN_PATH=%QTDIR%\plugins\platforms"

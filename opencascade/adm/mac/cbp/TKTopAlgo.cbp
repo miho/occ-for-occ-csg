@@ -84,6 +84,7 @@
 		<Unit filename="../../../src/MAT2d/MAT2d_CutCurve.cxx" />
 		<Unit filename="../../../src/MAT2d/MAT2d_Mat2d.cxx" />
 		<Unit filename="../../../src/MAT2d/MAT2d_MiniPath.cxx" />
+		<Unit filename="../../../src/MAT2d/MAT2d_SketchExplorer.cxx" />
 		<Unit filename="../../../src/MAT2d/MAT2d_Tool2d.cxx" />
 		<Unit filename="../../../src/Bisector/Bisector.cxx" />
 		<Unit filename="../../../src/Bisector/Bisector_Bisec.cxx" />
@@ -109,7 +110,6 @@
 		<Unit filename="../../../src/BRepCheck/BRepCheck_Vertex.cxx" />
 		<Unit filename="../../../src/BRepCheck/BRepCheck_Wire.cxx" />
 		<Unit filename="../../../src/BRepBndLib/BRepBndLib.cxx" />
-		<Unit filename="../../../src/BRepBndLib/BRepBndLib_1.cxx" />
 		<Unit filename="../../../src/BRepExtrema/BRepExtrema_DistShapeShape.cxx" />
 		<Unit filename="../../../src/BRepExtrema/BRepExtrema_DistanceSS.cxx" />
 		<Unit filename="../../../src/BRepExtrema/BRepExtrema_ExtCC.cxx" />
@@ -211,6 +211,7 @@
 		<Unit filename="../../../src/BRepApprox/BRepApprox_TheImpPrmSvSurfacesOfApprox_0.cxx" />
 		<Unit filename="../../../src/BRepApprox/BRepApprox_TheInt2SOfThePrmPrmSvSurfacesOfApprox_0.cxx" />
 		<Unit filename="../../../src/BRepApprox/BRepApprox_TheMultiLineOfApprox_0.cxx" />
+		<Unit filename="../../../src/BRepApprox/BRepApprox_TheMultiLineToolOfApprox_0.cxx" />
 		<Unit filename="../../../src/BRepApprox/BRepApprox_ThePrmPrmSvSurfacesOfApprox_0.cxx" />
 		<Unit filename="../../../src/BRepApprox/BRepApprox_TheZerImpFuncOfTheImpPrmSvSurfacesOfApprox_0.cxx" />
 	</Project>

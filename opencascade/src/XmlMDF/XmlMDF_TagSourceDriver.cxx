@@ -15,7 +15,7 @@
 
 //AGV 150202: Changed prototype XmlObjMgt::SetStringValue()
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDF_Attribute.hxx>
 #include <TDF_TagSource.hxx>
@@ -30,7 +30,7 @@ IMPLEMENT_STANDARD_RTTIEXT(XmlMDF_TagSourceDriver,XmlMDF_ADriver)
 //purpose  : Constructor
 //=======================================================================
 XmlMDF_TagSourceDriver::XmlMDF_TagSourceDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -59,7 +59,7 @@ Standard_Boolean XmlMDF_TagSourceDriver::Paste
     TCollection_ExtendedString aMessageString =
       TCollection_ExtendedString ("Cannot retrieve TagSource attribute from \"")
         + aTagStr + "\"";
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
 
@@ -67,7 +67,7 @@ Standard_Boolean XmlMDF_TagSourceDriver::Paste
     TCollection_ExtendedString aMessageString =
       TCollection_ExtendedString ("Invalid value of TagSource retrieved: ")
         + aTag;
-    myMessageDriver->Send (aMessageString, Message_Fail);
+    WriteMessage (aMessageString);
     return Standard_False;
   }
 

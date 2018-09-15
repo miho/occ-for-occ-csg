@@ -17,8 +17,9 @@
 
 
 #include <BOPAlgo_PaveFiller.hxx>
-#include <BOPAlgo_Alerts.hxx>
 #include <BOPAlgo_Tools.hxx>
+#include <BOPCol_NCVector.hxx>
+#include <BOPCol_Parallel.hxx>
 #include <BOPDS_DS.hxx>
 #include <BOPDS_Interf.hxx>
 #include <BOPDS_Iterator.hxx>
@@ -26,12 +27,9 @@
 #include <BOPDS_PaveBlock.hxx>
 #include <BOPDS_VectorOfInterfVE.hxx>
 #include <BOPTools_AlgoTools.hxx>
-#include <BOPTools_Parallel.hxx>
-#include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <gp_Pnt.hxx>
 #include <IntTools_Context.hxx>
-#include <NCollection_Vector.hxx>
 #include <Precision.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
@@ -112,16 +110,7 @@ class BOPAlgo_VertexEdge : public BOPAlgo_Algo {
   //
   virtual void Perform() {
     BOPAlgo_Algo::UserBreak();
-    try
-    {
-      OCC_CATCH_SIGNALS
-
-      myFlag=myContext->ComputeVE (myV, myE, myT, myTolVNew, myFuzzyValue);
-    }
-    catch (Standard_Failure)
-    {
-      AddError(new BOPAlgo_AlertIntersectionFailed);
-    }
+    myFlag=myContext->ComputeVE (myV, myE, myT, myTolVNew, myFuzzyValue);
   };
   //
  protected:
@@ -136,16 +125,16 @@ class BOPAlgo_VertexEdge : public BOPAlgo_Algo {
   Handle(BOPDS_PaveBlock) myPB;
 };
 //=======================================================================
-typedef NCollection_Vector
+typedef BOPCol_NCVector
   <BOPAlgo_VertexEdge> BOPAlgo_VectorOfVertexEdge; 
 //
-typedef BOPTools_ContextFunctor 
+typedef BOPCol_ContextFunctor 
   <BOPAlgo_VertexEdge,
   BOPAlgo_VectorOfVertexEdge,
   Handle(IntTools_Context), 
   IntTools_Context> BOPAlgo_VertexEdgeFunctor;
 //
-typedef BOPTools_ContextCnt 
+typedef BOPCol_ContextCnt 
   <BOPAlgo_VertexEdgeFunctor,
   BOPAlgo_VectorOfVertexEdge,
   Handle(IntTools_Context)> BOPAlgo_VertexEdgeCnt;
@@ -194,9 +183,9 @@ void BOPAlgo_PaveFiller::PerformVE()
       continue;
     }
     //
-    TColStd_ListOfInteger* pLV = aMVEPairs.ChangeSeek(aPB);
+    BOPCol_ListOfInteger* pLV = aMVEPairs.ChangeSeek(aPB);
     if (!pLV)
-      pLV = &aMVEPairs(aMVEPairs.Add(aPB, TColStd_ListOfInteger()));
+      pLV = &aMVEPairs(aMVEPairs.Add(aPB, BOPCol_ListOfInteger()));
     pLV->Append(nV);
   }
   //
@@ -227,14 +216,14 @@ void BOPAlgo_PaveFiller::IntersectVE
   // for all vertices having the same SD vertex.
   // It will also be used as a Fence map to avoid repeated
   // intersection of the same SD vertex with edge
-  NCollection_DataMap<BOPDS_Pair, TColStd_ListOfInteger, BOPDS_PairMapHasher> aDMVSD;
+  NCollection_DataMap<BOPDS_Pair, BOPCol_ListOfInteger, BOPDS_PairMapHasher> aDMVSD;
   //
   for (i = 1; i <= aNbVE; ++i) {
     const Handle(BOPDS_PaveBlock)& aPB = theVEPairs.FindKey(i);
     Standard_Integer nE = aPB->OriginalEdge();
     //
-    const TColStd_ListOfInteger& aLV = theVEPairs(i);
-    TColStd_ListIteratorOfListOfInteger aItLV(aLV);
+    const BOPCol_ListOfInteger& aLV = theVEPairs(i);
+    BOPCol_ListIteratorOfListOfInteger aItLV(aLV);
     for (; aItLV.More(); aItLV.Next()) {
       Standard_Integer nV = aItLV.Value();
       //
@@ -242,20 +231,20 @@ void BOPAlgo_PaveFiller::IntersectVE
       myDS->HasShapeSD(nV, nVSD);
       //
       BOPDS_Pair aPair(nVSD, nE);
-      TColStd_ListOfInteger* pLI = aDMVSD.ChangeSeek(aPair);
+      BOPCol_ListOfInteger* pLI = aDMVSD.ChangeSeek(aPair);
       if (pLI) {
         // Already added
         pLI->Append(nV);
         continue;
       }
       // New pair
-      pLI = aDMVSD.Bound(aPair, TColStd_ListOfInteger());
+      pLI = aDMVSD.Bound(aPair, BOPCol_ListOfInteger());
       pLI->Append(nV);
       //
       const TopoDS_Vertex& aV = TopoDS::Vertex(myDS->Shape(nVSD));
       const TopoDS_Edge& aE = TopoDS::Edge(myDS->Shape(nE));
       //
-      BOPAlgo_VertexEdge& aVESolver = aVVE.Appended();
+      BOPAlgo_VertexEdge& aVESolver = aVVE.Append1();
       aVESolver.SetIndices(nVSD, nE);
       aVESolver.SetVertex(aV);
       aVESolver.SetEdge(aE);
@@ -271,18 +260,13 @@ void BOPAlgo_PaveFiller::IntersectVE
   //=============================================================
   //
   // Keep the modified edges for further update
-  TColStd_MapOfInteger aMEdges;
+  BOPCol_MapOfInteger aMEdges;
   //
   // Analyze intersections
-  aNbVE = aVVE.Length();
+  aNbVE = aVVE.Extent();
   for (i = 0; i < aNbVE; ++i) {
     const BOPAlgo_VertexEdge& aVESolver = aVVE(i);
     if (aVESolver.Flag() != 0) {
-      if (aVESolver.HasErrors())
-      {
-        // Warn about failed intersection of sub-shapes
-        AddIntersectionFailedWarning(aVESolver.Vertex(), aVESolver.Edge());
-      }
       continue;
     }
     //
@@ -305,12 +289,12 @@ void BOPAlgo_PaveFiller::IntersectVE
     if (theAddInterfs) {
       // Add interferences into DS
       BOPDS_Pair aPair(nV, nE);
-      const TColStd_ListOfInteger& aLI = aDMVSD.Find(aPair);
-      TColStd_ListIteratorOfListOfInteger aItLI(aLI);
+      const BOPCol_ListOfInteger& aLI = aDMVSD.Find(aPair);
+      BOPCol_ListIteratorOfListOfInteger aItLI(aLI);
       for (; aItLI.More(); aItLI.Next()) {
         const Standard_Integer nVOld = aItLI.Value();
         // 3. Create interference V/E
-        BOPDS_InterfVE& aVE = aVEs.Appended();
+        BOPDS_InterfVE& aVE = aVEs.Append1();
         aVE.SetIndices(nVOld, nE);
         aVE.SetParameter(aT);
         // 2. Add a pair in the whole table of interferences
@@ -336,7 +320,7 @@ void BOPAlgo_PaveFiller::IntersectVE
 //=======================================================================
 static
   void MakeNewCommonBlock(const BOPDS_ListOfPaveBlock& theLPB,
-                          const TColStd_ListOfInteger& theLFaces,
+                          const BOPCol_ListOfInteger& theLFaces,
                           BOPDS_PDS& theDS)
 {
   // Make Common Block from the pave blocks in the list
@@ -354,7 +338,7 @@ static
 // function: SplitPaveBlocks
 // purpose: 
 //=======================================================================
-void BOPAlgo_PaveFiller::SplitPaveBlocks(const TColStd_MapOfInteger& theMEdges,
+void BOPAlgo_PaveFiller::SplitPaveBlocks(const BOPCol_MapOfInteger& theMEdges,
                                          const Standard_Boolean theAddInterfs)
 {
   // Fence map to avoid unification of the same vertices twice
@@ -364,7 +348,7 @@ void BOPAlgo_PaveFiller::SplitPaveBlocks(const TColStd_MapOfInteger& theMEdges,
                              BOPDS_ListOfPaveBlock,
                              TColStd_MapTransientHasher> aMCBNewPB;
   //
-  TColStd_MapIteratorOfMapOfInteger aItM(theMEdges);
+  BOPCol_MapIteratorOfMapOfInteger aItM(theMEdges);
   for (; aItM.More(); aItM.Next()) {
     Standard_Integer nE = aItM.Value();
     BOPDS_ListOfPaveBlock& aLPB = myDS->ChangePaveBlocks(nE);
@@ -392,42 +376,21 @@ void BOPAlgo_PaveFiller::SplitPaveBlocks(const TColStd_MapOfInteger& theMEdges,
         myDS->UpdatePaveBlockWithSDVertices(aPBN);
         FillShrunkData(aPBN);
         //
-        Standard_Boolean bHasValidRange = aPBN->HasShrunkData();
-        // Take into account that the edge could have really small valid range,
-        // so that the Pave Block cannot be further split. In this case, check if
-        // the vertices of the Pave Block do not interfere. And if they are, unify them.
-        Standard_Boolean bCheckDist = (bHasValidRange && !aPBN->IsSplittable());
-        if (!bHasValidRange || bCheckDist)
-        {
+        if (!aPBN->HasShrunkData()) {
+          // No valid range, unify vertices
           Standard_Integer nV1, nV2;
           aPBN->Indices(nV1, nV2);
-          if (nV1 == nV2)
-            // Same vertices -> no valid range, no need to unify vertices
-            continue;
-
-          // Decide whether to unify vertices or not
-          if (bCheckDist)
-          {
-            const TopoDS_Vertex& aV1 = TopoDS::Vertex(myDS->Shape(nV1));
-            const TopoDS_Vertex& aV2 = TopoDS::Vertex(myDS->Shape(nV2));
-            if (BOPTools_AlgoTools::ComputeVV(aV1, aV2, myFuzzyValue) == 0)
-              // vertices are interfering -> no valid range, unify vertices
-              bHasValidRange = Standard_False;
-          }
-
-          if (!bHasValidRange)
-          {
+          if (nV1 != nV2) {
             BOPDS_Pair aPair;
             aPair.SetIndices(nV1, nV2);
-            if (aMPairs.Add(aPair))
-            {
-              TColStd_ListOfInteger aLV;
+            if (aMPairs.Add(aPair)) {
+              BOPCol_ListOfInteger aLV;
               aLV.Append(nV1);
               aLV.Append(nV2);
               MakeSDVertices(aLV, theAddInterfs);
             }
-            continue;
           }
+          continue;
         }
         //
         // Update the list with new pave block
@@ -527,20 +490,4 @@ void BOPAlgo_PaveFiller::SplitPaveBlocks(const TColStd_MapOfInteger& theMEdges,
       }
     }
   }
-}
-
-//=======================================================================
-// function: AddIntersectionFailedWarning
-// purpose: 
-//=======================================================================
-void BOPAlgo_PaveFiller::AddIntersectionFailedWarning(const TopoDS_Shape& theS1,
-                                                      const TopoDS_Shape& theS2)
-{
-  // Create the warn shape
-  TopoDS_Compound aWC;
-  BRep_Builder().MakeCompound(aWC);
-  BRep_Builder().Add(aWC, theS1);
-  BRep_Builder().Add(aWC, theS2);
-  // Add the warning
-  AddWarning(new BOPAlgo_AlertIntersectionOfPairOfShapesFailed(aWC));
 }

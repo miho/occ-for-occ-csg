@@ -197,10 +197,6 @@ protected:
 private:
 
   Handle(AIS_InteractiveContext) getAISContext() const;
-
-  //! Activates selection mode of the interactive object.
-  //! It is called internally on change of selection mode and AISUpdate().
-  void ActivateSelectionMode();
   
   //! Updates AIS_InteractiveObject stored in the attribute
   //! and applies the visualization settings

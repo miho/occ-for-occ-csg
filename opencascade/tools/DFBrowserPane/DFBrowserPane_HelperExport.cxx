@@ -18,10 +18,8 @@
 #include <BRepTools.hxx>
 #include <TCollection_AsciiString.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QApplication>
 #include <QFileDialog>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : AddShape

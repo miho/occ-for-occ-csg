@@ -971,27 +971,14 @@ void GeomLib::SameRange(const Standard_Real         Tolerance,
 
     if(aCCheck->IsPeriodic())
     {
-      if(Abs(LastOnCurve - FirstOnCurve) > Precision::PConfusion())
-      {
-        TC = new Geom2d_TrimmedCurve( CurvePtr, FirstOnCurve, LastOnCurve );
-      }
-      else
-      {
-        TC = new Geom2d_TrimmedCurve( CurvePtr, CurvePtr->FirstParameter(), CurvePtr->LastParameter() );
-      }
+      TC = new Geom2d_TrimmedCurve( CurvePtr, FirstOnCurve, LastOnCurve );
     }
     else
     {
       const Standard_Real Udeb = Max(CurvePtr->FirstParameter(), FirstOnCurve);
       const Standard_Real Ufin = Min(CurvePtr->LastParameter(), LastOnCurve);
-      if(Abs(Ufin - Udeb) > Precision::PConfusion())
-      {
-        TC = new Geom2d_TrimmedCurve( CurvePtr, Udeb, Ufin );
-      }
-      else
-      {
-        TC = new Geom2d_TrimmedCurve( CurvePtr, CurvePtr->FirstParameter(), CurvePtr->LastParameter());
-      }
+
+      TC = new Geom2d_TrimmedCurve( CurvePtr, Udeb, Ufin );
     }
 
     //
@@ -2508,7 +2495,6 @@ void GeomLib::IsClosed (const Handle(Geom_Surface)& S,
         return;
       }
     }
-    Standard_FALLTHROUGH
     case GeomAbs_Cylinder:
     {
       if(Precision::IsInfinite(v1))

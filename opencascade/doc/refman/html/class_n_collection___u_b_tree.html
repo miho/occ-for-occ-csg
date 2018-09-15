@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -93,10 +93,8 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7b3794e3ed056ebe74fdb1ec19c781e0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_collection___u_b_tree.html#a7b3794e3ed056ebe74fdb1ec19c781e0">NCollection_UBTree</a> ()</td></tr>
-<tr class="separator:a7b3794e3ed056ebe74fdb1ec19c781e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a915f0c153cb86c84e51ca2de0a96edf5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_collection___u_b_tree.html#a915f0c153cb86c84e51ca2de0a96edf5">NCollection_UBTree</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_n_collection___base_allocator.html">NCollection_BaseAllocator</a> &gt; &amp;theAllocator)</td></tr>
-<tr class="separator:a915f0c153cb86c84e51ca2de0a96edf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ac2122546ea6406f9cc8eb81d5bfa3e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_collection___u_b_tree.html#a3ac2122546ea6406f9cc8eb81d5bfa3e">NCollection_UBTree</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_n_collection___base_allocator.html">NCollection_BaseAllocator</a> &gt; &amp;theAllocator=0L)</td></tr>
+<tr class="separator:a3ac2122546ea6406f9cc8eb81d5bfa3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9edc82d08a189fb043cdc4aede041d74"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_collection___u_b_tree.html#a9edc82d08a189fb043cdc4aede041d74">Add</a> (const TheObjType &amp;theObj, const TheBndType &amp;theBnd)</td></tr>
 <tr class="separator:a9edc82d08a189fb043cdc4aede041d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf37f74b35c1683f4f0ffacf762841c8"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_collection___u_b_tree.html#aaf37f74b35c1683f4f0ffacf762841c8">Select</a> (<a class="el" href="class_n_collection___u_b_tree_1_1_selector.html">Selector</a> &amp;theSelector) const</td></tr>
@@ -129,36 +127,8 @@ class NCollection_UBTree&lt; TheObjType, TheBndType &gt;</h3>
 <p>Defining various classes inheriting <a class="el" href="class_n_collection___u_b_tree_1_1_selector.html" title="Memory allocation. ">NCollection_UBTree::Selector</a> we can perform various kinds of selection over the same b-tree object</p>
 <p>The object may be of any type allowing copying. Among the best suitable solutions there can be a pointer to an object, handled object or integer index of object inside some collection. The bounding object may have any dimension and geometry. The minimal interface of TheBndType (besides public empty and copy constructor and operator =) used in UBTree algorithm is as the following: </p><div class="fragment"><div class="line"><span class="keyword">class </span>MyBndType</div><div class="line">{</div><div class="line"> <span class="keyword">public</span>:</div><div class="line">  <span class="keyword">inline</span> <span class="keywordtype">void</span>                   <a class="code" href="class_n_collection___u_b_tree.html#a9edc82d08a189fb043cdc4aede041d74">Add</a> (<span class="keyword">const</span> MyBndType&amp; other);</div><div class="line">  <span class="comment">// Updates me with other bounding</span></div><div class="line"></div><div class="line">  <span class="keyword">inline</span> <a class="code" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>       IsOut (<span class="keyword">const</span> MyBndType&amp; other) <span class="keyword">const</span>;</div><div class="line">  <span class="comment">// Classifies other bounding relatively me</span></div><div class="line"></div><div class="line">  <span class="keyword">inline</span> <a class="code" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>          SquareExtent() <span class="keyword">const</span>;</div><div class="line">  <span class="comment">// Computes the squared maximal linear extent of me.</span></div><div class="line">  <span class="comment">// (For box it is the squared diagonal of box)</span></div><div class="line">};</div></div><!-- fragment --><p> To select objects you need to define a class derived from UBTree::Selector that should redefine the necessary virtual methods to maintain the selection condition. The object of this class is also used to retrieve selected objects after search. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a7b3794e3ed056ebe74fdb1ec19c781e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7b3794e3ed056ebe74fdb1ec19c781e0">&#9670;&nbsp;</a></span>NCollection_UBTree() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;class TheObjType, class TheBndType&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_n_collection___u_b_tree.html">NCollection_UBTree</a>&lt; TheObjType, TheBndType &gt;::<a class="el" href="class_n_collection___u_b_tree.html">NCollection_UBTree</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Empty constructor. </p>
-
-</div>
-</div>
-<a id="a915f0c153cb86c84e51ca2de0a96edf5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a915f0c153cb86c84e51ca2de0a96edf5">&#9670;&nbsp;</a></span>NCollection_UBTree() <span class="overload">[2/2]</span></h2>
+<a id="a3ac2122546ea6406f9cc8eb81d5bfa3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ac2122546ea6406f9cc8eb81d5bfa3e">&#9670;&nbsp;</a></span>NCollection_UBTree()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -172,13 +142,13 @@ template&lt;class TheObjType, class TheBndType&gt; </div>
           <td class="memname"><a class="el" href="class_n_collection___u_b_tree.html">NCollection_UBTree</a>&lt; TheObjType, TheBndType &gt;::<a class="el" href="class_n_collection___u_b_tree.html">NCollection_UBTree</a> </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_n_collection___base_allocator.html">NCollection_BaseAllocator</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>theAllocator</em></td><td>)</td>
+          <td class="paramname"><em>theAllocator</em> = <code>0L</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -259,7 +229,7 @@ template&lt;class TheObjType, class TheBndType&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>always True </dd></dl>
 
-<p>Reimplemented in <a class="el" href="class_n_collection___e_b_tree.html#a6a0eccecaa68753dd5683b27dfdf87a4">NCollection_EBTree&lt; TheObjType, TheBndType &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="class_n_collection___e_b_tree.html#a8b4965264768e4cd5b32232396557730">NCollection_EBTree&lt; TheObjType, TheBndType &gt;</a>.</p>
 
 </div>
 </div>
@@ -351,7 +321,7 @@ template&lt;class TheObjType, class TheBndType&gt; </div>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="class_n_collection___e_b_tree.html#a9fd0480d15faa8799f2a115c198fb47d">NCollection_EBTree&lt; TheObjType, TheBndType &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="class_n_collection___e_b_tree.html#a43873186109a45c6eb914c62ddab290f">NCollection_EBTree&lt; TheObjType, TheBndType &gt;</a>.</p>
 
 </div>
 </div>

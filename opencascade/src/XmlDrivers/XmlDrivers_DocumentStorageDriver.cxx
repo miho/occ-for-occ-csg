@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TCollection_ExtendedString.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -41,7 +41,7 @@ XmlDrivers_DocumentStorageDriver::XmlDrivers_DocumentStorageDriver
 //purpose  : 
 //=======================================================================
 Handle(XmlMDF_ADriverTable) XmlDrivers_DocumentStorageDriver::AttributeDrivers
-       (const Handle(Message_Messenger)& theMessageDriver) 
+       (const Handle(CDM_MessageDriver)& theMessageDriver) 
 {
   return XmlDrivers::AttributeDrivers (theMessageDriver);
 }

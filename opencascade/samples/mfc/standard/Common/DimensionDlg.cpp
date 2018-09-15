@@ -13,6 +13,7 @@
 #include <Standard_Macro.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <TColStd_ListOfInteger.hxx>
+#include <AIS_LocalContext.hxx>
 #include <Quantity_Color.hxx>
 
 BEGIN_MESSAGE_MAP(CDimensionDlg, CDialog)

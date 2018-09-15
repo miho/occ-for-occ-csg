@@ -21,10 +21,8 @@
 #include <TDataStd_ReferenceList.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QVariant>
 #include <QWidget>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : GetValues

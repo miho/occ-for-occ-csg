@@ -9,6 +9,7 @@ set "PRODUCTS_PATH=%~dp0.."
 
 rem Optional 3rd-parties switches
 set HAVE_FREEIMAGE=true
+set HAVE_GL2PS=true
 set HAVE_TBB=true
 set HAVE_VTK=true
 set HAVE_D3D=true

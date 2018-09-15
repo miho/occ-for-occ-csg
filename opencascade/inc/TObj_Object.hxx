@@ -97,13 +97,15 @@ class TObj_Object : public Standard_Transient
   //! If the flag theSetName is true (default) the object is assign the default name
   //! that is generated using the father partition object if any.
   Standard_EXPORT TObj_Object (const TDF_Label& theLabel,
-                               const Standard_Boolean theSetName = Standard_True);
+                                   const Standard_Boolean theSetName = Standard_True);
 
   //! The special constructor intended for implementation of persistence
   //! mechanism. See class TObj_Persistence for more details.
   //! The first argument is used only to avoid confusion with
   //! other constructors.
-  TObj_Object (const TObj_Persistence *, const TDF_Label& theLabel) : myLabel(theLabel) {}
+  Standard_EXPORT TObj_Object (const TObj_Persistence *,
+                                   const TDF_Label& theLabel)
+    : myLabel(theLabel) {}
 
   //! This method is called from persistence to initialize the object fields,
   //! so successors that have transient fields must initialize them in initFields(),

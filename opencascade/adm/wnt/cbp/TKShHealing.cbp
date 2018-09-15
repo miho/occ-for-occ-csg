@@ -17,6 +17,16 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__ShapeBuild_DLL" />
+					<Add option="-D__ShapeExtend_DLL" />
+					<Add option="-D__ShapeConstruct_DLL" />
+					<Add option="-D__ShapeCustom_DLL" />
+					<Add option="-D__ShapeAnalysis_DLL" />
+					<Add option="-D__ShapeFix_DLL" />
+					<Add option="-D__ShapeUpgrade_DLL" />
+					<Add option="-D__ShapeAlgo_DLL" />
+					<Add option="-D__ShapeProcess_DLL" />
+					<Add option="-D__ShapeProcessAPI_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKShHealing_obj.link" />
@@ -35,6 +45,16 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__ShapeBuild_DLL" />
+					<Add option="-D__ShapeExtend_DLL" />
+					<Add option="-D__ShapeConstruct_DLL" />
+					<Add option="-D__ShapeCustom_DLL" />
+					<Add option="-D__ShapeAnalysis_DLL" />
+					<Add option="-D__ShapeFix_DLL" />
+					<Add option="-D__ShapeUpgrade_DLL" />
+					<Add option="-D__ShapeAlgo_DLL" />
+					<Add option="-D__ShapeProcess_DLL" />
+					<Add option="-D__ShapeProcessAPI_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKShHealing_objd.link" />

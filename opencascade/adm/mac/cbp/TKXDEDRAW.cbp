@@ -87,7 +87,6 @@
 		<Unit filename="../../../src/XDEDRAW/XDEDRAW_Common.cxx" />
 		<Unit filename="../../../src/XDEDRAW/XDEDRAW_GDTs.cxx" />
 		<Unit filename="../../../src/XDEDRAW/XDEDRAW_Layers.cxx" />
-		<Unit filename="../../../src/XDEDRAW/XDEDRAW_Notes.cxx" />
 		<Unit filename="../../../src/XDEDRAW/XDEDRAW_Props.cxx" />
 		<Unit filename="../../../src/XDEDRAW/XDEDRAW_Shapes.cxx" />
 		<Unit filename="../../../src/XDEDRAW/XDEDRAW_Views.cxx" />

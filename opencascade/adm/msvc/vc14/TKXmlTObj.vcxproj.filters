@@ -2,10 +2,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{470DB2FD-0380-0EBE-03D8-27370A8E79CE}</UniqueIdentifier>
+      <UniqueIdentifier>{F07EAF40-1946-0C03-03D3-CBC35284796C}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\XmlTObjDrivers">
-      <UniqueIdentifier>{DF044B79-0C93-13DD-0713-928693C13652}</UniqueIdentifier>
+      <UniqueIdentifier>{3FBFFAE5-0138-021D-0B81-74FEE0092669}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

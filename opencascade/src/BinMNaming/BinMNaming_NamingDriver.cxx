@@ -20,7 +20,7 @@
 #include <BinObjMgt_Persistent.hxx>
 #include <BinObjMgt_RRelocationTable.hxx>
 #include <BinObjMgt_SRelocationTable.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
@@ -123,7 +123,7 @@ static TopAbs_ShapeEnum CharToShapeType(const Standard_Character theCharType)
 //=======================================================================
 
 BinMNaming_NamingDriver::BinMNaming_NamingDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
      : BinMDF_ADriver (theMsgDriver, STANDARD_TYPE(TNaming_Naming)->Name())
 {
 }
@@ -222,19 +222,19 @@ Standard_Boolean BinMNaming_NamingDriver::Paste
           else {
             aMsg = TCollection_ExtendedString("BinMNaming_NamingDriver: "
                                               "Cannot retrieve Index of Name");
-            myMessageDriver->Send (aMsg, Message_Warning); 
+            WriteMessage (aMsg); 
           }
         } else {
           aMsg = TCollection_ExtendedString("BinMNaming_NamingDriver: "
                                             "Cannot retrieve reference on "
                                             "StopNamedShape");
-          myMessageDriver->Send (aMsg, Message_Warning); 
+          WriteMessage (aMsg); 
         }
       } else {
         aMsg = TCollection_ExtendedString("BinMNaming_NamingDriver: "
                                           "Cannot retrieve reference on "
                                           "Arguments of Name");
-	myMessageDriver->Send (aMsg, Message_Warning);
+	WriteMessage (aMsg);
 	  }
 
     if(BinMNaming::DocumentVersion() > 3) {
@@ -285,7 +285,7 @@ Standard_Boolean BinMNaming_NamingDriver::Paste
 	  } else {
           aMsg = TCollection_ExtendedString("BinMNaming_NamingDriver: "
                                             "Cannot retrieve Name Orientation ");
-	  myMessageDriver->Send (aMsg, Message_Warning);
+	  WriteMessage (aMsg);
 	  }
 	}
 	}

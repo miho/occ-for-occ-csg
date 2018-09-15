@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -395,6 +395,9 @@ $(function() {
 <li>UnifyFaces()
 : <a class="el" href="class_shape_upgrade___unify_same_domain.html#ab31924ae38246d77ca2ea7cd43af6fcf">ShapeUpgrade_UnifySameDomain</a>
 </li>
+<li>UnifyFacesAndEdges()
+: <a class="el" href="class_shape_upgrade___unify_same_domain.html#aaded4c7f46080bf3ab3b03f9892d151e">ShapeUpgrade_UnifySameDomain</a>
+</li>
 <li>Union()
 : <a class="el" href="class_bnd___range.html#a725abe65f6cb18178714c1a2608c5ad5">Bnd_Range</a>
 , <a class="el" href="class_n_collection___map.html#a51d0359206d85f8d32d39483dac0372d">NCollection_Map&lt; TheKeyType, Hasher &gt;</a>
@@ -513,9 +516,6 @@ $(function() {
 : <a class="el" href="class_i_g_e_s_data___global_section.html#ae7cfaf7a9b301029a02273d2d410faec">IGESData_GlobalSection</a>
 , <a class="el" href="class_i_g_e_s_defs___units_data.html#a796bc13cc56f1de556a0457e07d0b3ab">IGESDefs_UnitsData</a>
 , <a class="el" href="class_i_g_e_s_graph___drawing_units.html#a9f90a23cf8d570a72a6cf6ca5b25a9a6">IGESGraph_DrawingUnits</a>
-</li>
-<li>UniversalIterator()
-: <a class="el" href="class_o_s_d___parallel_1_1_universal_iterator.html#af07b5f604a21d89a578668605468fce8">OSD_Parallel::UniversalIterator</a>
 </li>
 <li>UnknownEntities()
 : <a class="el" href="class_interface___check_tool.html#a6beb3ca35c9c373eed278218f1e916db">Interface_CheckTool</a>
@@ -907,7 +907,7 @@ $(function() {
 , <a class="el" href="class_b_rep___curve_on_closed_surface.html#a863790d2cb9d12c6eeb6274301521e09">BRep_CurveOnClosedSurface</a>
 , <a class="el" href="class_b_rep___curve_on_surface.html#acf708070d3bf758727ac47420feb5c2b">BRep_CurveOnSurface</a>
 , <a class="el" href="class_b_rep___g_curve.html#aa85c00ab6a6783ad9b94219ef9c58dbb">BRep_GCurve</a>
-, <a class="el" href="class_b_rep_tools.html#adfd0e338f252d1c472911169bb5483ed">BRepTools</a>
+, <a class="el" href="class_b_rep_tools.html#ade65c6c5ad3909ed9dd375e486e8d57c">BRepTools</a>
 , <a class="el" href="class_b_v_h___geometry.html#a5220b8868e74e06961ba39facf92f70e">BVH_Geometry&lt; T, N &gt;</a>
 , <a class="el" href="class_b_v_h___primitive_set.html#a85f504a3d7eed658a35e52ed6513696f">BVH_PrimitiveSet&lt; T, N &gt;</a>
 , <a class="el" href="class_c_d_m___document.html#af341e1db6b06658aaf772c4544c1a86a">CDM_Document</a>
@@ -928,19 +928,18 @@ $(function() {
 , <a class="el" href="class_interface___static.html#a33ea1a6abff7988305e98cd5e171568e">Interface_Static</a>
 , <a class="el" href="class_open_gl___capping_plane_resource.html#acb93a151e0a359b4f0e212932e318720">OpenGl_CappingPlaneResource</a>
 , <a class="el" href="class_open_gl___clipping_state.html#a664465e15e6132c4c10487a933a4045c">OpenGl_ClippingState</a>
-, <a class="el" href="class_open_gl___frame_stats_prs.html#a50c3cc8b4f4245031175662be5745700">OpenGl_FrameStatsPrs</a>
 , <a class="el" href="class_open_gl___state_interface.html#ab0e70587a55aab4c308d367992b46240">OpenGl_StateInterface</a>
 , <a class="el" href="class_o_s_d___mem_info.html#aaf2c046e8262d2a427c37faa1e7bcf8c">OSD_MemInfo</a>
 , <a class="el" href="class_prs_mgr___presentable_object.html#a409c5069f61f4a5a28cc2a83f763b662">PrsMgr_PresentableObject</a>
 , <a class="el" href="class_prs_mgr___presentation_manager.html#aa42550bc8f9f2df9498587631e112354">PrsMgr_PresentationManager</a>
-, <a class="el" href="class_select_mgr___selection_manager.html#a093dbb137d49f6381b720d9c4faa07b2">SelectMgr_SelectionManager</a>
+, <a class="el" href="class_select_mgr___selection_manager.html#a6f71c609c38178760c736f397b87fdd7">SelectMgr_SelectionManager</a>
 , <a class="el" href="class_t_doc_std___document.html#a8f2c79c7a040c41aa269a7b1b7a8447c">TDocStd_Document</a>
 , <a class="el" href="class_t_doc_std___x_link.html#a2aa3cb9c0fb6284e4c8a6fa6ca775365">TDocStd_XLink</a>
 , <a class="el" href="class_t_naming.html#afca6a3003dbf7391f6bcaa693589b04f">TNaming</a>
 , <a class="el" href="class_t_obj___model.html#aad90ff2a236cbe835a1e4305f681ae18">TObj_Model</a>
 , <a class="el" href="class_t_obj___partition.html#a1f53f5bcdec6760743d44e49b882f758">TObj_Partition</a>
 , <a class="el" href="class_t_prs_std___a_i_s_presentation.html#a4b2acfe8eed0a33d2780bdbbbea4f296">TPrsStd_AISPresentation</a>
-, <a class="el" href="class_t_prs_std___a_i_s_viewer.html#a18dfcd8b71cc5560de50c96d4f41dade">TPrsStd_AISViewer</a>
+, <a class="el" href="class_t_prs_std___a_i_s_viewer.html#a870bb3da7373a328cba198119bd4ef88">TPrsStd_AISViewer</a>
 , <a class="el" href="class_t_prs_std___axis_driver.html#a5a7ced0886ef789a3143230bea447af8">TPrsStd_AxisDriver</a>
 , <a class="el" href="class_t_prs_std___constraint_driver.html#a7a757e265a552b21989680042ca120d6">TPrsStd_ConstraintDriver</a>
 , <a class="el" href="class_t_prs_std___driver.html#afe07fc88cd679e1ac2fd1633c416f8a8">TPrsStd_Driver</a>
@@ -1002,10 +1001,6 @@ $(function() {
 <li>UpdateCommonBlockWithSDVertices()
 : <a class="el" href="class_b_o_p_d_s___d_s.html#abc10d9c0ad3e64f4b3fd3f217f681659">BOPDS_DS</a>
 </li>
-<li>UpdateCulling()
-: <a class="el" href="class_open_gl___layer.html#a2767a7d0e0a57a476874c317ff4b6bf8">OpenGl_Layer</a>
-, <a class="el" href="class_open_gl___layer_list.html#a1a258f7e18e11a9dbb24edb439b20f75">OpenGl_LayerList</a>
-</li>
 <li>UpdateCurrentViewer()
 : <a class="el" href="class_a_i_s___interactive_context.html#a7c49959707b7b670023d13d8cfe65d9a">AIS_InteractiveContext</a>
 </li>
@@ -1021,7 +1016,7 @@ $(function() {
 : <a class="el" href="class_b_v_h___builder.html#aecd1a8788770d1bbebf806d1ccb324e6">BVH_Builder&lt; T, N &gt;</a>
 </li>
 <li>UpdateDescendants()
-: <a class="el" href="class_b_rep_feat___form.html#af6b275e297943a168d7f558d28a526ef">BRepFeat_Form</a>
+: <a class="el" href="class_b_rep_feat___form.html#abad261134d575fc0701a51e559d91102">BRepFeat_Form</a>
 , <a class="el" href="class_b_rep_feat___rib_slot.html#ae933b763dadd1015de30db50e1a7738b">BRepFeat_RibSlot</a>
 </li>
 <li>UpdateDisplay()
@@ -1033,7 +1028,7 @@ $(function() {
 : <a class="el" href="class_interface___static.html#a97a8fc05e5af8c1990b5f6be34b7a713">Interface_Static</a>
 </li>
 <li>UpdateEdge()
-: <a class="el" href="class_b_rep___builder.html#ae54d7cdeea1aa77ea698727e7ec025a7">BRep_Builder</a>
+: <a class="el" href="class_b_rep___builder.html#a958aa192c734917975106db17da0cb08">BRep_Builder</a>
 , <a class="el" href="class_b_rep_mesh___shape_tool.html#a0f22a50825d2d0d5f9474ee867b46996">BRepMesh_ShapeTool</a>
 , <a class="el" href="class_t_naming___translate_tool.html#a748ec87d5e451e4d78c16414ed33aed5">TNaming_TranslateTool</a>
 , <a class="el" href="class_top_ope_b_rep_d_s___build_tool.html#a06d190b9ca4d5d079833f73ec59021f6">TopOpeBRepDS_BuildTool</a>
@@ -1069,7 +1064,7 @@ $(function() {
 , <a class="el" href="class_t_naming___translate_tool.html#aadc26147d578ea807e59fcd165c846e9">TNaming_TranslateTool</a>
 </li>
 <li>UpdateFaceInfo()
-: <a class="el" href="class_b_o_p_algo___pave_filler.html#a917728e9a18fdad5f36cfafb966bb39d">BOPAlgo_PaveFiller</a>
+: <a class="el" href="class_b_o_p_algo___pave_filler.html#abad7eaf6724ed7f5e11bfcabb8fab6f8">BOPAlgo_PaveFiller</a>
 </li>
 <li>UpdateFaceInfoIn()
 : <a class="el" href="class_b_o_p_d_s___d_s.html#a162d42c25e081ba1adf91c604f1cad95">BOPDS_DS</a>
@@ -1078,7 +1073,7 @@ $(function() {
 : <a class="el" href="class_b_o_p_d_s___d_s.html#ab4cb0f880e72b87a13623ed4c3918145">BOPDS_DS</a>
 </li>
 <li>UpdateFaceUVPoints()
-: <a class="el" href="class_b_rep_tools.html#a04e7b427bdf3a1fbfa16ffb1090ce1a4">BRepTools</a>
+: <a class="el" href="class_b_rep_tools.html#ac57e448a76dce49aa64d53de2de9fd61">BRepTools</a>
 </li>
 <li>UpdateFromDocuments()
 : <a class="el" href="class_c_d_m___document.html#a762c56323c06c61b69f90e9985b49bf2">CDM_Document</a>
@@ -1098,17 +1093,11 @@ $(function() {
 , <a class="el" href="class_select_mgr___entity_owner.html#a444e327af16bae6566ed99c235f9e54b">SelectMgr_EntityOwner</a>
 , <a class="el" href="class_std_select___b_rep_owner.html#a3a4cf44cd96dcbc2e37fe0d1cd08ed49">StdSelect_BRepOwner</a>
 </li>
-<li>UpdateHistory()
-: <a class="el" href="class_b_o_p_algo___remove_features.html#aa6d30a0fcaa58f00d557580eff72ed44">BOPAlgo_RemoveFeatures</a>
-</li>
 <li>UpdateInnerTolerances()
 : <a class="el" href="class_b_rep_lib.html#ac12816705c7b864ab0a58b890a4cbc08">BRepLib</a>
 </li>
 <li>UpdateInterfsWithSDVertices()
 : <a class="el" href="class_b_o_p_algo___pave_filler.html#ae8a8827ca8149f98cc2aa578d33ce215">BOPAlgo_PaveFiller</a>
-</li>
-<li>UpdateInterval()
-: <a class="el" href="class_open_gl___frame_stats.html#a805dc4bd9f762ef5afae7f5c49e3ec6f">OpenGl_FrameStats</a>
 </li>
 <li>UpdateInU()
 : <a class="el" href="class_adv_app2_var___framework.html#aaf83dca3d4567032f516f4d949b53e53">AdvApp2Var_Framework</a>
@@ -1132,7 +1121,7 @@ $(function() {
 : <a class="el" href="class_open_gl___shader_manager.html#a0239eb71f03a3e0657fdca53011b859c">OpenGl_ShaderManager</a>
 </li>
 <li>UpdateLightSourceStateTo()
-: <a class="el" href="class_open_gl___shader_manager.html#a37cd4fe5eaf90e3c0a3b7ffb9c78ff94">OpenGl_ShaderManager</a>
+: <a class="el" href="class_open_gl___shader_manager.html#a5b734ccd663ef1fc4c859fffe56c6f0a">OpenGl_ShaderManager</a>
 </li>
 <li>UpdateLink()
 : <a class="el" href="class_t_doc_std___x_link_tool.html#a77fb43e736bcfa088e6a9cd3464ee8cc">TDocStd_XLinkTool</a>
@@ -1147,7 +1136,7 @@ $(function() {
 : <a class="el" href="class_open_gl___shader_manager.html#a0a55774142071dbf12759217f1125d73">OpenGl_ShaderManager</a>
 </li>
 <li>UpdateMaterialStateTo()
-: <a class="el" href="class_open_gl___shader_manager.html#a84be12ce2d015c47cbd50bfd250f08be">OpenGl_ShaderManager</a>
+: <a class="el" href="class_open_gl___shader_manager.html#ae4d32663ec64af4efe5eb83223c4ac82">OpenGl_ShaderManager</a>
 </li>
 <li>UpdateMinMax()
 : <a class="el" href="class_h_l_r_algo.html#a1a9bb04dddd999074729d00c8a467e14">HLRAlgo</a>
@@ -1179,7 +1168,7 @@ $(function() {
 : <a class="el" href="class_b_o_p_d_s___d_s.html#a76b80e60c6f266e3e66824b5fc8e6cf8">BOPDS_DS</a>
 </li>
 <li>UpdatePaveBlocks()
-: <a class="el" href="class_b_o_p_algo___pave_filler.html#a3df72051678127e90e0fdddb9f9eb73b">BOPAlgo_PaveFiller</a>
+: <a class="el" href="class_b_o_p_algo___pave_filler.html#aa006a74555e2fda4a19c49c19f97b5f9">BOPAlgo_PaveFiller</a>
 , <a class="el" href="class_b_o_p_d_s___d_s.html#a62996fff4328247a6b928f31705bf9df">BOPDS_DS</a>
 </li>
 <li>UpdatePaveBlocksWithSDVertices()
@@ -1223,8 +1212,7 @@ $(function() {
 : <a class="el" href="class_t_doc_std___document.html#a0ff829bd1bdebfc7399d6a41a62ec19f">TDocStd_Document</a>
 </li>
 <li>UpdateRevision()
-: <a class="el" href="class_graphic3d___light_set.html#a4ebaa9ae51b228834338cc57a019e962">Graphic3d_LightSet</a>
-, <a class="el" href="class_graphic3d___texture_root.html#af563c4de3f641b527c0590b41e17f738">Graphic3d_TextureRoot</a>
+: <a class="el" href="class_graphic3d___texture_root.html#af563c4de3f641b527c0590b41e17f738">Graphic3d_TextureRoot</a>
 </li>
 <li>UpdateRoot()
 : <a class="el" href="class_storage___root_data.html#a205da3254b99b35b37256210f05dc3f0">Storage_RootData</a>
@@ -1236,14 +1224,12 @@ $(function() {
 : <a class="el" href="class_a_i_s___interactive_context.html#abca4e87f24c5813a3e641d5327757460">AIS_InteractiveContext</a>
 , <a class="el" href="class_a_i_s___local_context.html#a04ba38dfcd7f63872fc9f82eebe62735">AIS_LocalContext</a>
 </li>
-<li>UpdateSelection()
-: <a class="el" href="class_select_mgr___selectable_object.html#a0b969e15800f5eea5474519ac3f4843d">SelectMgr_SelectableObject</a>
-</li>
 <li>updateSelection()
 : <a class="el" href="class_select_mgr___selectable_object.html#a6d8a932eb18070829d84c22d1fff22b2">SelectMgr_SelectableObject</a>
 </li>
 <li>UpdateSelection()
-: <a class="el" href="class_select_mgr___selection_manager.html#acb66dc231ff147abf385b163aa9b3417">SelectMgr_SelectionManager</a>
+: <a class="el" href="class_select_mgr___selectable_object.html#a0b969e15800f5eea5474519ac3f4843d">SelectMgr_SelectableObject</a>
+, <a class="el" href="class_select_mgr___selection_manager.html#acb66dc231ff147abf385b163aa9b3417">SelectMgr_SelectionManager</a>
 </li>
 <li>UpdateShaderRediness()
 : <a class="el" href="struct_open_gl___aspect_marker_1_1_resources.html#af1298cd59eddf088b8c129b159ef16c8">OpenGl_AspectMarker::Resources</a>
@@ -1263,11 +1249,8 @@ $(function() {
 <li>UpdateStatus()
 : <a class="el" href="class_select_mgr___selection.html#a0c009dcc6e8705455639c54c4573a7bb">SelectMgr_Selection</a>
 </li>
-<li>updateStructures()
-: <a class="el" href="class_open_gl___frame_stats.html#af794fce6b87527f5ae81bf5014ad1802">OpenGl_FrameStats</a>
-</li>
 <li>UpdateSurface()
-: <a class="el" href="class_top_ope_b_rep_d_s___build_tool.html#a0f55cd27d0c7922b8f48c9edef5635ef">TopOpeBRepDS_BuildTool</a>
+: <a class="el" href="class_top_ope_b_rep_d_s___build_tool.html#a6f2541bd14ce7686d8730f8f310e1ebc">TopOpeBRepDS_BuildTool</a>
 </li>
 <li>UpdateTextureHandles()
 : <a class="el" href="class_open_gl___raytrace_geometry.html#af3e8547ecb163027d0d341b279dd3f58">OpenGl_RaytraceGeometry</a>
@@ -1284,7 +1267,7 @@ $(function() {
 , <a class="el" href="class_b_rep___t_vertex.html#a28a3749ff82aa27a1cc6eb6bc3a28dc3">BRep_TVertex</a>
 </li>
 <li>UpdateTolerances()
-: <a class="el" href="class_b_rep_lib.html#a6368525f5d59f15910662f4d56834610">BRepLib</a>
+: <a class="el" href="class_b_rep_lib.html#a70dda83e4f99a82f09b8da04109807d6">BRepLib</a>
 </li>
 <li>UpdateTotalDuration()
 : <a class="el" href="class_a_i_s___animation.html#a6587e369562d295a367cfb3489499e58">AIS_Animation</a>
@@ -1293,7 +1276,7 @@ $(function() {
 : <a class="el" href="class_a_i_s___manipulator.html#a4006377c12181a77931bf317fb08b302">AIS_Manipulator</a>
 </li>
 <li>UpdateTransformation()
-: <a class="el" href="class_prs_mgr___presentable_object.html#adf344e73e6fc3bbdfec64fea7d6ecc37">PrsMgr_PresentableObject</a>
+: <a class="el" href="class_prs_mgr___presentable_object.html#a49e982a5942727fb5e2617ce0f29a4c1">PrsMgr_PresentableObject</a>
 , <a class="el" href="class_select_mgr___selectable_object.html#ac938c19b813a006bd4a3df5e9bcb444a">SelectMgr_SelectableObject</a>
 </li>
 <li>UpdateTransformations()
@@ -1302,7 +1285,7 @@ $(function() {
 <li>UpdateVertex()
 : <a class="el" href="class_b_o_p_algo___pave_filler.html#a4d2f9d23b71751a2fcc664148f519a0c">BOPAlgo_PaveFiller</a>
 , <a class="el" href="class_b_o_p_tools___algo_tools.html#a1076d182687554a17565f16e72b3ea62">BOPTools_AlgoTools</a>
-, <a class="el" href="class_b_rep___builder.html#ad7a80d468c671f4ba71c5b936043c204">BRep_Builder</a>
+, <a class="el" href="class_b_rep___builder.html#a95ff6f9ccd0dd3c217162f0d078971d0">BRep_Builder</a>
 , <a class="el" href="class_t_naming___translate_tool.html#aa0a6640be0adaa28e24755b2bfd029e5">TNaming_TranslateTool</a>
 </li>
 <li>UpdateWire()
@@ -1345,7 +1328,6 @@ $(function() {
 </li>
 <li>Upper()
 : <a class="el" href="class_aspect___gen_id.html#a60fdb1261a1ba01282d734811a63cc34">Aspect_GenId</a>
-, <a class="el" href="class_graphic3d___light_set.html#ac342d0aba36c5daf13543cdcfa8aa21f">Graphic3d_LightSet</a>
 , <a class="el" href="class_graphic3d___texture_set.html#ae610a896595e19e7a701b4c6ccc58da4">Graphic3d_TextureSet</a>
 , <a class="el" href="class_i_f_select___select_any_list.html#a0deffbc6028d8981d46ffb76ed4166db">IFSelect_SelectAnyList</a>
 , <a class="el" href="class_i_f_select___select_range.html#a4276660e032aed51d5622d6237f3b717">IFSelect_SelectRange</a>
@@ -1486,14 +1468,14 @@ $(function() {
 : <a class="el" href="class_step_basic___product_definition_effectivity.html#a378e63cd92e216de11d78b0d0385ccd2">StepBasic_ProductDefinitionEffectivity</a>
 </li>
 <li>Use()
-: <a class="el" href="class_expr_intrp___analysis.html#a0b3c9d1a26e27933cc7639306d56c79a">ExprIntrp_Analysis</a>
+: <a class="el" href="class_expr_intrp___analysis.html#a8b3fb2a4dce43d57c4a679d1485067f3">ExprIntrp_Analysis</a>
 , <a class="el" href="class_expr_intrp___generator.html#ac45c865f360864c87f8d921a6bed1720">ExprIntrp_Generator</a>
 </li>
 <li>USE()
 : <a class="el" href="class_vrml___instancing.html#a635df8f5a2c9dcc53420a25b054ef87a">Vrml_Instancing</a>
 </li>
 <li>Used()
-: <a class="el" href="class_h_l_r_b_rep___edge_data.html#a790da1c8a065d849f82d8e300a6d0bfa">HLRBRep_EdgeData</a>
+: <a class="el" href="class_h_l_r_b_rep___edge_data.html#ab087b23ee420cf63278322e25431d019">HLRBRep_EdgeData</a>
 </li>
 <li>UseDefaultCallBack()
 : <a class="el" href="class_storage___schema.html#aba1b1017da8af1a63910419b5ef5b986">Storage_Schema</a>
@@ -1540,13 +1522,9 @@ $(function() {
 <li>USense()
 : <a class="el" href="class_step_geom___surface_patch.html#afe28df9eb36a717456f5cc62cc1a11d9">StepGeom_SurfacePatch</a>
 </li>
-<li>UseOBB()
-: <a class="el" href="class_b_o_p_algo___options.html#afd51b450fe432c02edcf7f67b12aa4e5">BOPAlgo_Options</a>
-, <a class="el" href="class_b_o_p_test___objects.html#a4705ca254b4ffe927b79d8d21a79d55c">BOPTest_Objects</a>
-</li>
 <li>UseQuickCoincidenceCheck()
 : <a class="el" href="class_int_tools___edge_edge.html#a4c5e23ba44cca4aaa073d6214908fcb1">IntTools_EdgeEdge</a>
-, <a class="el" href="class_int_tools___edge_face.html#a7873b474fd2064e8e121167dcd0cff87">IntTools_EdgeFace</a>
+, <a class="el" href="class_int_tools___edge_face.html#a33ee2b4b149904db0b41db640a9a4c4d">IntTools_EdgeFace</a>
 </li>
 <li>User()
 : <a class="el" href="class_o_s_d___protection.html#a66777f1d63bb5435fc0b0da06442cf79">OSD_Protection</a>
@@ -1571,9 +1549,6 @@ $(function() {
 </li>
 <li>Users()
 : <a class="el" href="class_a_i_s___identic_relation.html#a9c410a1d46c902bd6ce17adf66c0d965">AIS_IdenticRelation</a>
-</li>
-<li>UserTimeCPU()
-: <a class="el" href="class_o_s_d___chronometer.html#ad5fe3c63329c73f47aa1c652d2d49cbd">OSD_Chronometer</a>
 </li>
 <li>UsesAppliedModifier()
 : <a class="el" href="class_i_f_select___work_session.html#ad0fb13d6a70191778ef5cf4e8473d9a7">IFSelect_WorkSession</a>

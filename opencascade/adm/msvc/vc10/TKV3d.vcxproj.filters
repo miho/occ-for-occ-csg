@@ -2,37 +2,37 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{214C7BC2-145F-184A-0A1D-00BBD32B313D}</UniqueIdentifier>
+      <UniqueIdentifier>{FDCE81A0-0C17-14A9-0F17-69265B5525B3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\V3d">
-      <UniqueIdentifier>{ADB58666-054B-0D9C-0DAA-168C334E9573}</UniqueIdentifier>
+      <UniqueIdentifier>{1E4B0DCD-042E-13E3-05AF-43384D2587FD}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Graphic3d">
-      <UniqueIdentifier>{35C9CBE5-12AB-0942-0C6D-EE76C9B8AB03}</UniqueIdentifier>
+      <UniqueIdentifier>{032C0D14-007C-09E9-173D-63D92344A958}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Select3D">
-      <UniqueIdentifier>{E38FE04F-1450-1481-1755-6704C068DA7B}</UniqueIdentifier>
+      <UniqueIdentifier>{C9EB3707-09B0-0A11-0FA0-5B0E590B2F33}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Prs3d">
-      <UniqueIdentifier>{DFDEAF29-18EB-12E1-0E26-6B70EDC2FA2F}</UniqueIdentifier>
+      <UniqueIdentifier>{47C602E1-0D79-1791-06AE-DBA9D36A60B3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\StdPrs">
-      <UniqueIdentifier>{B745E714-0A70-0E76-0AAF-17B4B2583380}</UniqueIdentifier>
+      <UniqueIdentifier>{F2A2A769-11F9-0EEB-0878-200D925B2436}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\SelectMgr">
-      <UniqueIdentifier>{9D57C3BE-01AC-186C-14E2-C5223949F182}</UniqueIdentifier>
+      <UniqueIdentifier>{A67FFB01-0461-0190-1750-8EACDBF665D7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\PrsMgr">
-      <UniqueIdentifier>{8E9107CD-0FE9-0664-0ACC-D9E49B2F9EEA}</UniqueIdentifier>
+      <UniqueIdentifier>{98377956-0C65-05B3-0524-45AFD119E6E5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\AIS">
-      <UniqueIdentifier>{6A200725-046F-168A-09F6-DF05BAF11381}</UniqueIdentifier>
+      <UniqueIdentifier>{85DD0EE7-0364-0122-10FE-C1A2D8AA24BB}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\DsgPrs">
-      <UniqueIdentifier>{3797DF0D-0B7C-0653-179B-A8ED6278D3D6}</UniqueIdentifier>
+      <UniqueIdentifier>{519D7073-0191-0F4E-0FE5-8FCC3BA974DD}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\StdSelect">
-      <UniqueIdentifier>{9B89EBC7-0FAE-00AA-0503-388240EF626F}</UniqueIdentifier>
+      <UniqueIdentifier>{376861CA-0E15-0384-11BD-9426DC836BAA}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +46,9 @@
       <Filter>Source files\V3d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\V3d\V3d_DirectionalLight.cxx">
+      <Filter>Source files\V3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\V3d\V3d_Light.cxx">
       <Filter>Source files\V3d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\V3d\V3d_Plane.cxx">
@@ -81,10 +84,40 @@
     <ClCompile Include="..\..\..\src\V3d\V3d_Viewer.cxx">
       <Filter>Source files\V3d</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\V3d\V3d_Viewer_3.cxx">
+      <Filter>Source files\V3d</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\V3d\V3d_Viewer_4.cxx">
       <Filter>Source files\V3d</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfPoints.cxx">
+      <Filter>Source files\Graphic3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfPolygons.cxx">
+      <Filter>Source files\Graphic3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfPolylines.cxx">
+      <Filter>Source files\Graphic3d</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfPrimitives.cxx">
+      <Filter>Source files\Graphic3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfQuadrangleStrips.cxx">
+      <Filter>Source files\Graphic3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfQuadrangles.cxx">
+      <Filter>Source files\Graphic3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfSegments.cxx">
+      <Filter>Source files\Graphic3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfTriangleFans.cxx">
+      <Filter>Source files\Graphic3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfTriangleStrips.cxx">
+      <Filter>Source files\Graphic3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_ArrayOfTriangles.cxx">
       <Filter>Source files\Graphic3d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_AspectFillArea3d.cxx">
@@ -100,9 +133,6 @@
       <Filter>Source files\Graphic3d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_BSDF.cxx">
-      <Filter>Source files\Graphic3d</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_CLight.cxx">
       <Filter>Source files\Graphic3d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_CStructure.cxx">
@@ -127,9 +157,6 @@
       <Filter>Source files\Graphic3d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_HatchStyle.cxx">
-      <Filter>Source files\Graphic3d</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_LightSet.cxx">
       <Filter>Source files\Graphic3d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_MarkerImage.cxx">
@@ -193,6 +220,9 @@
       <Filter>Source files\Graphic3d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_TransformPers.cxx">
+      <Filter>Source files\Graphic3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_Vector.cxx">
       <Filter>Source files\Graphic3d</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\Graphic3d\Graphic3d_Vertex.cxx">

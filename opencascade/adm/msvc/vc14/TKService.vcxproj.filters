@@ -2,22 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{15373FDD-0CD0-0E52-1072-70BADAFB4ABF}</UniqueIdentifier>
+      <UniqueIdentifier>{FD09E7C9-18D4-088C-0207-2032A6DD42D1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Aspect">
-      <UniqueIdentifier>{E84A4EC6-0F36-0E5F-1083-2AEC5F04876D}</UniqueIdentifier>
+      <UniqueIdentifier>{4DC71214-0F23-0EB6-022F-33E402BE5D28}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\SelectBasics">
-      <UniqueIdentifier>{5719A185-191E-0D10-0771-2DC164F3AD26}</UniqueIdentifier>
+      <UniqueIdentifier>{D5FFF099-07E9-12B0-0C98-08735ACD4E8E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Image">
-      <UniqueIdentifier>{ECD95D7B-1224-14BC-151C-D992D937FA06}</UniqueIdentifier>
+      <UniqueIdentifier>{E07BB80D-116C-162E-0CC7-B81EA8E4A7F6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\WNT">
-      <UniqueIdentifier>{FFA5AB0D-0517-076E-071D-3D492D8F657D}</UniqueIdentifier>
+      <UniqueIdentifier>{CF242504-1348-184F-0121-ABB72E8750BE}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Font">
-      <UniqueIdentifier>{4FF6F59D-01DD-0CE8-1774-B1AAA039259C}</UniqueIdentifier>
+      <UniqueIdentifier>{C5F05F02-060A-01B6-0C1F-AB25DB42675D}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

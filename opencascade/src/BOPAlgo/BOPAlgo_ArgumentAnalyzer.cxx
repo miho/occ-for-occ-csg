@@ -16,8 +16,13 @@
 #include <BOPAlgo_BuilderFace.hxx>
 #include <BOPAlgo_CheckerSI.hxx>
 #include <BOPAlgo_Operation.hxx>
+#include <BOPCol_ListOfShape.hxx>
+#include <BOPCol_MapOfShape.hxx>
+#include <BOPCol_IndexedMapOfShape.hxx>
+#include <BOPCol_SequenceOfShape.hxx>
 #include <BOPDS_DS.hxx>
 #include <BOPDS_MapOfPair.hxx>
+#include <BOPTools.hxx>
 #include <BOPTools_AlgoTools.hxx>
 #include <BOPTools_AlgoTools3D.hxx>
 #include <BRep_Builder.hxx>
@@ -45,11 +50,6 @@
 #include <TopoDS_Solid.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_Wire.hxx>
-#include <TopTools_IndexedMapOfShape.hxx>
-#include <TopTools_ListOfShape.hxx>
-#include <TopTools_MapOfShape.hxx>
-#include <TopTools_SequenceOfShape.hxx>
-
 // ================================================================================
 // function: Constructor
 // purpose:
@@ -353,7 +353,7 @@ void BOPAlgo_ArgumentAnalyzer::TestSelfInterferences()
     //
     Standard_Integer n1, n2;
     BOPDS_MapIteratorOfMapOfPair aItMPK;
-    TopTools_ListOfShape anArgs;
+    BOPCol_ListOfShape anArgs;
     BOPAlgo_CheckerSI aChecker;
     //
     anArgs.Append(aS);
@@ -535,7 +535,7 @@ void BOPAlgo_ArgumentAnalyzer::TestRebuildFace()
       continue;
 
     TopExp_Explorer anExp(aS, TopAbs_FACE);
-    TopTools_ListOfShape aLS;
+    BOPCol_ListOfShape aLS;
 
     for(; anExp.More(); anExp.Next()) {
       const TopoDS_Face& aFace = *(TopoDS_Face*)&(anExp.Current());
@@ -566,7 +566,7 @@ void BOPAlgo_ArgumentAnalyzer::TestRebuildFace()
       aBF.SetFace(aFace);
       aBF.SetShapes(aLS);
       aBF.Perform();
-      const TopTools_ListOfShape& aLF = aBF.Areas();
+      const BOPCol_ListOfShape& aLF = aBF.Areas();
       Standard_Boolean bBadFace = Standard_False;
 
       if(aLF.Extent() != 1) {
@@ -647,8 +647,8 @@ void BOPAlgo_ArgumentAnalyzer::TestTangent()
   }
   TopExp_Explorer anExp1(myShape1, theType);
   TopExp_Explorer anExp2(myShape2, theType);
-  TopTools_SequenceOfShape aSeq1, aSeq2;
-  TopTools_MapOfShape aMap1, aMap2;
+  BOPCol_SequenceOfShape aSeq1, aSeq2;
+  BOPCol_MapOfShape aMap1, aMap2;
 
   for(; anExp1.More(); anExp1.Next()) {
     const TopoDS_Shape& aS1 = anExp1.Current();
@@ -675,7 +675,7 @@ void BOPAlgo_ArgumentAnalyzer::TestTangent()
 
   for(i = 1; i <= aSeq1.Length(); i++) {
     const TopoDS_Shape& aS1 = aSeq1.Value(i);
-    TopTools_ListOfShape aListOfS2;
+    BOPCol_ListOfShape aListOfS2;
     Standard_Integer nbs = 0;
 
     for(j = 1; j <= aSeq2.Length(); j++) {
@@ -731,7 +731,7 @@ void BOPAlgo_ArgumentAnalyzer::TestTangent()
       aResult.SetShape1(myShape1);
       aResult.SetShape2(myShape2);
       aResult.AddFaultyShape1(aS1);
-      TopTools_ListIteratorOfListOfShape anIt(aListOfS2);
+      BOPCol_ListIteratorOfListOfShape anIt(aListOfS2);
 
       for(; anIt.More(); anIt.Next()) {
         aResult.AddFaultyShape2(anIt.Value());
@@ -748,7 +748,7 @@ void BOPAlgo_ArgumentAnalyzer::TestTangent()
 
   for(i = 1; i <= aSeq2.Length(); i++) {
     const TopoDS_Shape& aS2 = aSeq2.Value(i);
-    TopTools_ListOfShape aListOfS1;
+    BOPCol_ListOfShape aListOfS1;
     Standard_Integer nbs = 0;
 
     for(j = 1; j <= aSeq1.Length(); j++) {
@@ -765,7 +765,7 @@ void BOPAlgo_ArgumentAnalyzer::TestTangent()
 
       aResult.SetShape1(myShape1);
       aResult.SetShape2(myShape2);
-      TopTools_ListIteratorOfListOfShape anIt(aListOfS1);
+      BOPCol_ListIteratorOfListOfShape anIt(aListOfS1);
 
       for(; anIt.More(); anIt.Next()) {
         aResult.AddFaultyShape1(anIt.Value());
@@ -816,7 +816,7 @@ void BOPAlgo_ArgumentAnalyzer::TestContinuity()
       continue;
     }
     //
-    TopTools_IndexedMapOfShape aMS;
+    BOPCol_IndexedMapOfShape aMS;
     //Edges
     aExp.Init(aS, TopAbs_EDGE);
     for (; aExp.More(); aExp.Next()) {

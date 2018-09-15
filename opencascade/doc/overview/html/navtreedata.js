@@ -52,14 +52,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "dev_guides.html",
-"occt_dev_guides__tests.html#testmanual_4",
-"occt_user_guides__boolean_operations.html#occt_algorithms_5_6",
-"occt_user_guides__iges.html#occt_iges_4_2",
-"occt_user_guides__ocaf.html#occt_ocaf_4_4_1",
-"occt_user_guides__test_harness.html#occt_draw_1_3",
-"occt_user_guides__test_harness.html#occt_draw_5_7_5",
-"occt_user_guides__test_harness.html#occt_draw_8_9",
-"technical_overview.html#OCCT_TOVW_SECTION_8"
+"occt_dev_guides__tests.html#testmanual_4_1",
+"occt_user_guides__boolean_operations.html#occt_algorithms_7_4_1",
+"occt_user_guides__inspector.html#occt_inspector_2_4",
+"occt_user_guides__shape_healing.html#occt_shg_1_1",
+"occt_user_guides__test_harness.html#occt_draw_4",
+"occt_user_guides__test_harness.html#occt_draw_6_3_6",
+"occt_user_guides__tobj.html#occt_tobj_2_6"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

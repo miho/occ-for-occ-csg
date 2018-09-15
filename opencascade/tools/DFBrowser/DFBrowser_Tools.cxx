@@ -28,12 +28,10 @@
 #include <TDataStd_Real.hxx>
 #include <TDataStd_Name.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QColor>
 #include <QDir>
 #include <QPalette>
 #include <QWidget>
-#include <Standard_WarningsRestore.hxx>
 
 namespace DFBrowser_Tools
 {

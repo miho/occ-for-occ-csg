@@ -20,11 +20,8 @@
 
 #include <TDF_Reference.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QVariant>
 #include <QTableView>
-#include <Standard_WarningsRestore.hxx>
-
 // =======================================================================
 // function : GetValues
 // purpose :

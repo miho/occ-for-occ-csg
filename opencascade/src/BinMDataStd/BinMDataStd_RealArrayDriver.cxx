@@ -17,7 +17,7 @@
 #include <BinMDataStd.hxx>
 #include <BinMDataStd_RealArrayDriver.hxx>
 #include <BinObjMgt_Persistent.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TColStd_HArray1OfReal.hxx>
 #include <TDataStd_RealArray.hxx>
@@ -30,7 +30,7 @@ IMPLEMENT_STANDARD_RTTIEXT(BinMDataStd_RealArrayDriver,BinMDF_ADriver)
 //purpose  : Constructor
 //=======================================================================
 BinMDataStd_RealArrayDriver::BinMDataStd_RealArrayDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
      : BinMDF_ADriver (theMsgDriver, STANDARD_TYPE(TDataStd_RealArray)->Name())
 {
 }

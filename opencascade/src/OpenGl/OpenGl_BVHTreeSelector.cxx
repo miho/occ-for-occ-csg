@@ -24,9 +24,7 @@
 // purpose  :
 // =======================================================================
 OpenGl_BVHTreeSelector::OpenGl_BVHTreeSelector()
-: myIsProjectionParallel (Standard_True),
-  myCamScale (1.0),
-  myPixelSize (1.0)
+: myIsProjectionParallel (Standard_True)
 {
   //
 }
@@ -41,17 +39,11 @@ void OpenGl_BVHTreeSelector::SetViewVolume (const Handle(Graphic3d_Camera)& theC
     return;
 
   myIsProjectionParallel = theCamera->IsOrthographic();
-  const gp_Dir aCamDir = theCamera->Direction();
 
   myCamera             = theCamera;
   myProjectionMat      = theCamera->ProjectionMatrix();
   myWorldViewMat       = theCamera->OrientationMatrix();
   myWorldViewProjState = theCamera->WorldViewProjState();
-  myCamEye.SetValues (theCamera->Eye().X(), theCamera->Eye().Y(), theCamera->Eye().Z());
-  myCamDir.SetValues (aCamDir.X(), aCamDir.Y(), aCamDir.Z());
-  myCamScale = theCamera->IsOrthographic()
-             ? theCamera->Scale()
-             : 2.0 * Tan (theCamera->FOVy() * M_PI / 360.0); // same as theCamera->Scale()/theCamera->Distance()
 
   Standard_Real nLeft = 0.0, nRight = 0.0, nTop = 0.0, nBottom = 0.0;
   Standard_Real fLeft = 0.0, fRight = 0.0, fTop = 0.0, fBottom = 0.0;
@@ -132,14 +124,11 @@ void OpenGl_BVHTreeSelector::SetViewVolume (const Handle(Graphic3d_Camera)& theC
 // function : SetViewportSize
 // purpose  :
 // =======================================================================
-void OpenGl_BVHTreeSelector::SetViewportSize (Standard_Integer theViewportWidth,
-                                              Standard_Integer theViewportHeight,
-                                              Standard_Real theResolutionRatio)
+void OpenGl_BVHTreeSelector::SetViewportSize (const Standard_Integer theViewportWidth,
+                                              const Standard_Integer theViewportHeight)
 {
   myViewportHeight = theViewportHeight;
-  myViewportWidth  = theViewportWidth;
-  myPixelSize = Max (theResolutionRatio / theViewportHeight,
-                     theResolutionRatio / theViewportWidth);
+  myViewportWidth = theViewportWidth;
 }
 
 // =======================================================================
@@ -165,40 +154,9 @@ Standard_Real OpenGl_BVHTreeSelector::SignedPlanePointDistance (const OpenGl_Vec
 }
 
 // =======================================================================
-// function : SetCullingDistance
-// purpose  :
-// =======================================================================
-void OpenGl_BVHTreeSelector::SetCullingDistance (CullingContext& theCtx,
-                                                 Standard_Real theDistance) const
-{
-  theCtx.DistCull = -1.0;
-  if (!myIsProjectionParallel)
-  {
-    theCtx.DistCull = theDistance > 0.0 && !Precision::IsInfinite (theDistance)
-                    ? theDistance
-                    : -1.0;
-  }
-}
-
-// =======================================================================
-// function : SetCullingSize
-// purpose  :
-// =======================================================================
-void OpenGl_BVHTreeSelector::SetCullingSize (CullingContext& theCtx,
-                                             Standard_Real theSize) const
-{
-  theCtx.SizeCull2 = -1.0;
-  if (theSize > 0.0 && !Precision::IsInfinite (theSize))
-  {
-    theCtx.SizeCull2 = myPixelSize * theSize;
-    theCtx.SizeCull2 *= myCamScale;
-    theCtx.SizeCull2 *= theCtx.SizeCull2;
-  }
-}
-
-// =======================================================================
 // function : CacheClipPtsProjections
-// purpose  :
+// purpose  : Caches view volume's vertices projections along its normals and AABBs dimensions
+//            Must be called at the beginning of each BVH tree traverse loop
 // =======================================================================
 void OpenGl_BVHTreeSelector::CacheClipPtsProjections()
 {
@@ -237,4 +195,64 @@ void OpenGl_BVHTreeSelector::CacheClipPtsProjections()
     myMaxOrthoProjectionPts[aDim] = aMaxProj;
     myMinOrthoProjectionPts[aDim] = aMinProj;
   }
+}
+
+// =======================================================================
+// function : Intersect
+// purpose  : Detects if AABB overlaps view volume using separating axis theorem (SAT)
+// =======================================================================
+Standard_Boolean OpenGl_BVHTreeSelector::Intersect (const OpenGl_Vec3d& theMinPt,
+                                                    const OpenGl_Vec3d& theMaxPt) const
+{
+  //     E1
+  //    |_ E0
+  //   /
+  //    E2
+
+  // E0 test
+  if (theMinPt.x() > myMaxOrthoProjectionPts[0]
+   || theMaxPt.x() < myMinOrthoProjectionPts[0])
+  {
+    return Standard_False;
+  }
+
+  // E1 test
+  if (theMinPt.y() > myMaxOrthoProjectionPts[1]
+   || theMaxPt.y() < myMinOrthoProjectionPts[1])
+  {
+    return Standard_False;
+  }
+
+  // E2 test
+  if (theMinPt.z() > myMaxOrthoProjectionPts[2]
+   || theMaxPt.z() < myMinOrthoProjectionPts[2])
+  {
+    return Standard_False;
+  }
+
+  Standard_Real aBoxProjMax = 0.0, aBoxProjMin = 0.0;
+  const Standard_Integer anIncFactor = myIsProjectionParallel ? 2 : 1;
+  for (Standard_Integer aPlaneIter = 0; aPlaneIter < 5; aPlaneIter += anIncFactor)
+  {
+    OpenGl_Vec4d aPlane = myClipPlanes[aPlaneIter];
+    aBoxProjMax = (aPlane.x() > 0.0 ? (aPlane.x() * theMaxPt.x()) : aPlane.x() * theMinPt.x())
+                + (aPlane.y() > 0.0 ? (aPlane.y() * theMaxPt.y()) : aPlane.y() * theMinPt.y())
+                + (aPlane.z() > 0.0 ? (aPlane.z() * theMaxPt.z()) : aPlane.z() * theMinPt.z());
+    if (aBoxProjMax > myMinClipProjectionPts[aPlaneIter]
+     && aBoxProjMax < myMaxClipProjectionPts[aPlaneIter])
+    {
+      continue;
+    }
+
+    aBoxProjMin = (aPlane.x() < 0.0 ? aPlane.x() * theMaxPt.x() : aPlane.x() * theMinPt.x())
+                + (aPlane.y() < 0.0 ? aPlane.y() * theMaxPt.y() : aPlane.y() * theMinPt.y())
+                + (aPlane.z() < 0.0 ? aPlane.z() * theMaxPt.z() : aPlane.z() * theMinPt.z());
+    if (aBoxProjMin > myMaxClipProjectionPts[aPlaneIter]
+     || aBoxProjMax < myMinClipProjectionPts[aPlaneIter])
+    {
+      return Standard_False;
+    }
+  }
+
+  return Standard_True;
 }

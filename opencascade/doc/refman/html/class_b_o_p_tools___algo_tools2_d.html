@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -129,6 +129,14 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a11e6e3ce1fee251d8e0eb3a9cde368f4"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools2_d.html#a11e6e3ce1fee251d8e0eb3a9cde368f4">IntermediatePoint</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;anE)</td></tr>
 <tr class="memdesc:a11e6e3ce1fee251d8e0eb3a9cde368f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute intermediate value of parameter for the edge &lt;anE&gt;.  <a href="#a11e6e3ce1fee251d8e0eb3a9cde368f4">More...</a><br /></td></tr>
 <tr class="separator:a11e6e3ce1fee251d8e0eb3a9cde368f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7031bcbb5ba8ae4ac791b19d58ac07f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools2_d.html#aa7031bcbb5ba8ae4ac791b19d58ac07f">BuildPCurveForEdgeOnPlane</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF)</td></tr>
+<tr class="memdesc:aa7031bcbb5ba8ae4ac791b19d58ac07f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build pcurve of edge on face if the surface is plane, and update the edge.  <a href="#aa7031bcbb5ba8ae4ac791b19d58ac07f">More...</a><br /></td></tr>
+<tr class="separator:aa7031bcbb5ba8ae4ac791b19d58ac07f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fd9400f694689dd9d714b10d11cf128"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools2_d.html#a4fd9400f694689dd9d714b10d11cf128">BuildPCurveForEdgeOnPlane</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;theE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt; &amp;aC2D, <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> &amp;bToUpdate)</td></tr>
+<tr class="memdesc:a4fd9400f694689dd9d714b10d11cf128"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build pcurve of edge on face if the surface is plane, but do not update the edge. The output are the pcurve and the flag telling that pcurve was built.  <a href="#a4fd9400f694689dd9d714b10d11cf128">More...</a><br /></td></tr>
+<tr class="separator:a4fd9400f694689dd9d714b10d11cf128"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd1c932dac206de1369a35f02d9d697f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools2_d.html#afd1c932dac206de1369a35f02d9d697f">BuildPCurveForEdgesOnPlane</a> (const <a class="el" href="_b_o_p_col___list_of_shape_8hxx.html#abc7bb33a1481c67fad780cd732bd5eb2">BOPCol_ListOfShape</a> &amp;theLE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theF)</td></tr>
+<tr class="separator:afd1c932dac206de1369a35f02d9d697f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd4097042063fac65b625a4960e44bb6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_tools___algo_tools2_d.html#afd4097042063fac65b625a4960e44bb6">Make2D</a> (const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;aE, const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;aF, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt; &amp;aC, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;aFirst, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;aLast, <a class="el" href="_standard___type_def_8hxx.html#aef96be6ca3bae9762e592db2b356bc4c">Standard_Real</a> &amp;aToler, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt; &amp;theContext=<a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_int_tools___context.html">IntTools_Context</a> &gt;())</td></tr>
 <tr class="memdesc:afd4097042063fac65b625a4960e44bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make P-Curve &lt;aC&gt; for the edge &lt;aE&gt; on surface &lt;aF&gt; .<br />
  [aFirst, aLast] - range of the P-Curve<br />
@@ -429,6 +437,130 @@ Static Public Member Functions</h2></td></tr>
 <p>Compute P-Curve for the edge &lt;aE&gt; on the face &lt;aF&gt;.<br />
  Raises exception Standard_ConstructionError if projection algorithm fails.<br />
  &lt;theContext&gt; - storage for caching the geometrical tools. </p>
+
+</div>
+</div>
+<a id="aa7031bcbb5ba8ae4ac791b19d58ac07f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7031bcbb5ba8ae4ac791b19d58ac07f">&#9670;&nbsp;</a></span>BuildPCurveForEdgeOnPlane() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void BOPTools_AlgoTools2D::BuildPCurveForEdgeOnPlane </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;&#160;</td>
+          <td class="paramname"><em>theE</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
+          <td class="paramname"><em>theF</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Build pcurve of edge on face if the surface is plane, and update the edge. </p>
+
+</div>
+</div>
+<a id="a4fd9400f694689dd9d714b10d11cf128"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fd9400f694689dd9d714b10d11cf128">&#9670;&nbsp;</a></span>BuildPCurveForEdgeOnPlane() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void BOPTools_AlgoTools2D::BuildPCurveForEdgeOnPlane </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_topo_d_s___edge.html">TopoDS_Edge</a> &amp;&#160;</td>
+          <td class="paramname"><em>theE</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
+          <td class="paramname"><em>theF</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>aC2D</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> &amp;&#160;</td>
+          <td class="paramname"><em>bToUpdate</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Build pcurve of edge on face if the surface is plane, but do not update the edge. The output are the pcurve and the flag telling that pcurve was built. </p>
+
+</div>
+</div>
+<a id="afd1c932dac206de1369a35f02d9d697f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd1c932dac206de1369a35f02d9d697f">&#9670;&nbsp;</a></span>BuildPCurveForEdgesOnPlane()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void BOPTools_AlgoTools2D::BuildPCurveForEdgesOnPlane </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="_b_o_p_col___list_of_shape_8hxx.html#abc7bb33a1481c67fad780cd732bd5eb2">BOPCol_ListOfShape</a> &amp;&#160;</td>
+          <td class="paramname"><em>theLE</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
+          <td class="paramname"><em>theF</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>

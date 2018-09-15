@@ -28,11 +28,7 @@
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QAbstractItemModel>
-#include <Standard_WarningsRestore.hxx>
-
-const int COLUMN_NAME_WIDTH = 300;
 
 // =======================================================================
 // function : Constructor
@@ -41,19 +37,9 @@ const int COLUMN_NAME_WIDTH = 300;
 DFBrowser_TreeModel::DFBrowser_TreeModel (QObject* theParent, DFBrowser_Module* theModule)
 : TreeModel_ModelBase (theParent)
 {
-  SetHeaderItem (0, TreeModel_HeaderSection ("Name", COLUMN_NAME_WIDTH));
-
+  m_pRootItem = DFBrowser_ItemApplication::CreateItem (TreeModel_ItemBasePtr());
   DFBrowser_ItemApplicationPtr aRootItem = itemDynamicCast<DFBrowser_ItemApplication> (m_pRootItem);
   aRootItem->SetModule (theModule);
-}
-
-// =======================================================================
-// function : createRootItem
-// purpose :
-// =======================================================================
-void DFBrowser_TreeModel::createRootItem (const int)
-{
-  m_pRootItem = DFBrowser_ItemApplication::CreateItem (TreeModel_ItemBasePtr());
 }
 
 // =======================================================================

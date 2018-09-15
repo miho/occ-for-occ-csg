@@ -15,10 +15,7 @@
 
 #include <Aspect_Grid.hxx>
 #include <Aspect_IdentDefinitionError.hxx>
-#include <Graphic3d_ArrayOfSegments.hxx>
-#include <Graphic3d_AspectLine3d.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
-#include <Graphic3d_AspectText3d.hxx>
 #include <Graphic3d_GraphicDriver.hxx>
 #include <Graphic3d_Group.hxx>
 #include <Graphic3d_Structure.hxx>
@@ -46,7 +43,7 @@ V3d_Viewer::V3d_Viewer (const Handle(Graphic3d_GraphicDriver)& theDriver)
   myViewSize (1000.0),
   myViewProj (V3d_XposYnegZpos),
   myVisualization (V3d_ZBUFFER),
-  myShadingModel (Graphic3d_TOSM_VERTEX),
+  myShadingModel (V3d_GOURAUD),
   myDefaultTypeOfView (V3d_ORTHOGRAPHIC),
   myComputedMode (Standard_True),
   myDefaultComputedMode (Standard_False),
@@ -68,13 +65,13 @@ V3d_Viewer::V3d_Viewer (const Handle(Graphic3d_GraphicDriver)& theDriver)
 V3d_Viewer::V3d_Viewer (const Handle(Graphic3d_GraphicDriver)& theDriver,
                         const Standard_ExtString ,
                         const Standard_CString ,
-                        const Standard_Real                theViewSize,
-                        const V3d_TypeOfOrientation        theViewProj,
-                        const Quantity_Color&              theViewBackground,
-                        const V3d_TypeOfVisualization      theVisualization,
-                        const Graphic3d_TypeOfShadingModel theShadingModel,
-                        const Standard_Boolean             theComputedMode,
-                        const Standard_Boolean             theDefaultComputedMode)
+                        const Standard_Real           theViewSize,
+                        const V3d_TypeOfOrientation   theViewProj,
+                        const Quantity_Color&         theViewBackground,
+                        const V3d_TypeOfVisualization theVisualization,
+                        const V3d_TypeOfShadingModel  theShadingModel,
+                        const Standard_Boolean        theComputedMode,
+                        const Standard_Boolean        theDefaultComputedMode)
 : myDriver (theDriver),
   myStructureManager (new Graphic3d_StructureManager (theDriver)),
   myZLayerGenId (1, IntegerLast()),
@@ -274,7 +271,7 @@ void V3d_Viewer::DelView (const Handle(V3d_View)& theView)
 //function : AddZLayer
 //purpose  :
 //=======================================================================
-Standard_Boolean V3d_Viewer::AddZLayer (Graphic3d_ZLayerId& theLayerId)
+Standard_Boolean V3d_Viewer::AddZLayer (Standard_Integer& theLayerId)
 {
   try
   {
@@ -297,7 +294,7 @@ Standard_Boolean V3d_Viewer::AddZLayer (Graphic3d_ZLayerId& theLayerId)
 //function : RemoveZLayer
 //purpose  : 
 //=======================================================================
-Standard_Boolean V3d_Viewer::RemoveZLayer (const Graphic3d_ZLayerId theLayerId)
+Standard_Boolean V3d_Viewer::RemoveZLayer (const Standard_Integer theLayerId)
 {
   if (!myLayerIds.Contains (theLayerId)
     || theLayerId < myZLayerGenId.Lower()
@@ -326,7 +323,7 @@ void V3d_Viewer::GetAllZLayers (TColStd_SequenceOfInteger& theLayerSeq) const
 //function : SetZLayerSettings
 //purpose  :
 //=======================================================================
-void V3d_Viewer::SetZLayerSettings (const Graphic3d_ZLayerId theLayerId, const Graphic3d_ZLayerSettings& theSettings)
+void V3d_Viewer::SetZLayerSettings (const Standard_Integer theLayerId, const Graphic3d_ZLayerSettings& theSettings)
 {
   myDriver->SetZLayerSettings (theLayerId, theSettings);
 }
@@ -335,7 +332,7 @@ void V3d_Viewer::SetZLayerSettings (const Graphic3d_ZLayerId theLayerId, const G
 //function : ZLayerSettings
 //purpose  :
 //=======================================================================
-Graphic3d_ZLayerSettings V3d_Viewer::ZLayerSettings (const Graphic3d_ZLayerId theLayerId)
+Graphic3d_ZLayerSettings V3d_Viewer::ZLayerSettings (const Standard_Integer theLayerId)
 {
   return myDriver->ZLayerSettings (theLayerId);
 }
@@ -460,91 +457,6 @@ void V3d_Viewer::SetDefaultLights()
     DelLight (aLight);
   }
 
-  Handle(V3d_DirectionalLight) aDirLight  = new V3d_DirectionalLight (V3d_Zneg, Quantity_NOC_WHITE, Standard_True);
-  Handle(V3d_AmbientLight)     anAmbLight = new V3d_AmbientLight (Quantity_NOC_WHITE);
-  AddLight (aDirLight);
-  AddLight (anAmbLight);
-  SetLightOn (aDirLight);
-  SetLightOn (anAmbLight);
-}
-
-//=======================================================================
-//function : SetPrivilegedPlane
-//purpose  :
-//=======================================================================
-void V3d_Viewer::SetPrivilegedPlane (const gp_Ax3& thePlane)
-{
-  myPrivilegedPlane = thePlane;
-  Grid()->SetDrawMode(Grid()->DrawMode());
-  for (V3d_ListOfView::Iterator anActiveViewIter (myActiveViews); anActiveViewIter.More(); anActiveViewIter.Next())
-  {
-    anActiveViewIter.Value()->SetGrid (myPrivilegedPlane, Grid());
-  }
-
-  if (myDisplayPlane)
-  {
-    DisplayPrivilegedPlane (Standard_True, myDisplayPlaneLength);
-  }
-}
-
-//=======================================================================
-//function : DisplayPrivilegedPlane
-//purpose  :
-//=======================================================================
-void V3d_Viewer::DisplayPrivilegedPlane (const Standard_Boolean theOnOff, const Standard_Real theSize)
-{
-  myDisplayPlane = theOnOff;
-  myDisplayPlaneLength = theSize;
-
-  if (!myDisplayPlane)
-  {
-    if (!myPlaneStructure.IsNull())
-	{
-      myPlaneStructure->Erase();
-    }
-    return;
-  }
-
-  if (myPlaneStructure.IsNull())
-  {
-    myPlaneStructure = new Graphic3d_Structure (StructureManager());
-    myPlaneStructure->SetInfiniteState (Standard_True);
-    myPlaneStructure->Display();
-  }
-  else
-  {
-    myPlaneStructure->Clear();
-  }
-
-  Handle(Graphic3d_Group) aGroup = myPlaneStructure->NewGroup();
-
-  Handle(Graphic3d_AspectLine3d) aLineAttrib = new Graphic3d_AspectLine3d (Quantity_NOC_GRAY60, Aspect_TOL_SOLID, 1.0);
-  aGroup->SetGroupPrimitivesAspect (aLineAttrib);
-
-  Handle(Graphic3d_AspectText3d) aTextAttrib = new Graphic3d_AspectText3d();
-  aTextAttrib->SetColor (Quantity_Color (Quantity_NOC_ROYALBLUE1));
-  aGroup->SetGroupPrimitivesAspect (aTextAttrib);
-
-  Handle(Graphic3d_ArrayOfSegments) aPrims = new Graphic3d_ArrayOfSegments (6);
-
-  const gp_Pnt& p0 = myPrivilegedPlane.Location();
-
-  const gp_Pnt pX (p0.XYZ() + myDisplayPlaneLength * myPrivilegedPlane.XDirection().XYZ());
-  aPrims->AddVertex (p0);
-  aPrims->AddVertex (pX);
-  aGroup->Text ("X", Graphic3d_Vertex (pX.X(), pX.Y(), pX.Z()), 1.0 / 81.0);
-
-  const gp_Pnt pY (p0.XYZ() + myDisplayPlaneLength * myPrivilegedPlane.YDirection().XYZ());
-  aPrims->AddVertex (p0);
-  aPrims->AddVertex (pY);
-  aGroup->Text ("Y", Graphic3d_Vertex (pY.X(), pY.Y(), pY.Z()), 1.0 / 81.0);
-
-  const gp_Pnt pZ (p0.XYZ() + myDisplayPlaneLength * myPrivilegedPlane.Direction().XYZ());
-  aPrims->AddVertex (p0);
-  aPrims->AddVertex (pZ);
-  aGroup->Text ("Z", Graphic3d_Vertex (pZ.X(), pZ.Y(), pZ.Z()), 1.0 / 81.0);
-
-  aGroup->AddPrimitiveArray (aPrims);
-
-  myPlaneStructure->Display();
+  SetLightOn (new V3d_DirectionalLight (this, V3d_Zneg, Quantity_NOC_WHITE, Standard_True));
+  SetLightOn (new V3d_AmbientLight (this));
 }

@@ -47,11 +47,7 @@ class StdLPersistent_Collection
   {
   public:
     //! Read persistent data from a file.
-    virtual void Read (StdObjMgt_ReadData& theReadData)
-    {
-      Base::Read (theReadData);
-      theReadData >> myLower >> myUpper;
-    }
+    Standard_EXPORT virtual void Read (StdObjMgt_ReadData& theReadData);
 
   protected:
     template <class ArrayHandle, class Converter>

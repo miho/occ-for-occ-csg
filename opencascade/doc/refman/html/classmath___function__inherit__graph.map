@@ -1,11 +1,11 @@
 <map id="math_Function" name="math_Function">
-<area shape="rect" id="node2" href="$class_b_rep_g_prop___t_function.html" title="This class represents the integrand function for the outer integral computation. The returned value r..." alt="" coords="179,472,333,499"/>
-<area shape="rect" id="node3" href="$class_b_rep_g_prop___u_function.html" title="This class represents the integrand function for computation of an inner integral. The returned value depends on the value type and the flag IsByPoint. " alt="" coords="177,523,335,549"/>
-<area shape="rect" id="node4" href="$class_c_pnts___my_gauss_function.html" title="for implementation, compute values for Gauss " alt="" coords="171,573,341,600"/>
-<area shape="rect" id="node5" href="$class_fair_curve___batten_law.html" title="This class compute the Heigth of an batten. " alt="" coords="184,624,328,651"/>
-<area shape="rect" id="node6" href="$class_g_c_pnts___dist_function.html" title="Class to define function, which calculates square distance between point on curve C(u)..." alt="" coords="182,675,330,701"/>
-<area shape="rect" id="node7" href="$class_g_c_pnts___dist_function2d.html" title="Class to define function, which calculates square distance between point on curve C(u)..." alt="" coords="175,725,337,752"/>
-<area shape="rect" id="node8" href="$classmath___function_with_derivative.html" title="This abstract class describes the virtual functions associated with a function of a single variable f..." alt="" coords="161,776,351,803"/>
+<area shape="rect" id="node2" href="$class_b_rep_g_prop___t_function.html" title="This class represents the integrand function for the outer integral computation. The returned value r..." alt="" coords="179,447,333,473"/>
+<area shape="rect" id="node3" href="$class_b_rep_g_prop___u_function.html" title="This class represents the integrand function for computation of an inner integral. The returned value depends on the value type and the flag IsByPoint. " alt="" coords="177,497,335,524"/>
+<area shape="rect" id="node4" href="$class_c_pnts___my_gauss_function.html" title="for implementation, compute values for Gauss " alt="" coords="171,548,341,575"/>
+<area shape="rect" id="node5" href="$class_fair_curve___batten_law.html" title="This class compute the Heigth of an batten. " alt="" coords="184,599,328,625"/>
+<area shape="rect" id="node6" href="$class_g_c_pnts___dist_function.html" title="Class to define function, which calculates square distance between point on curve C(u)..." alt="" coords="182,649,330,676"/>
+<area shape="rect" id="node7" href="$class_g_c_pnts___dist_function2d.html" title="Class to define function, which calculates square distance between point on curve C(u)..." alt="" coords="175,700,337,727"/>
+<area shape="rect" id="node8" href="$classmath___function_with_derivative.html" title="This abstract class describes the virtual functions associated with a function of a single variable f..." alt="" coords="161,751,351,777"/>
 <area shape="rect" id="node9" href="$class_adaptor3d___inter_func.html" title="Used to find the points U(t) = U0 or V(t) = V0 in order to determine the Cn discontinuities of an Adp..." alt="" coords="436,5,579,32"/>
 <area shape="rect" id="node10" href="$class_bisector___function_h.html" title="H(v) = (T1 .P2(v) &#45; P1) * ||T(v)|| &#45; 2 2 (T(v).P2(v) &#45; P1) * ||T1||. " alt="" coords="439,56,575,83"/>
 <area shape="rect" id="node11" href="$class_bisector___function_inter.html" title="2 2 F(u) = (PC(u) &#45; PBis1(u)) + (PC(u) &#45; PBis2(u)) " alt="" coords="431,107,583,133"/>
@@ -34,5 +34,4 @@
 <area shape="rect" id="node34" href="$class_int_curve___my_imp_par_tool_of_int_imp_conic_par_conic.html" title="IntCurve_MyImpParToolOfInt\lImpConicParConic" alt="" coords="415,1438,600,1479"/>
 <area shape="rect" id="node35" href="$class_int_curve_surface___the_quad_curv_func_of_the_quad_curv_exact_h_inter.html" title="IntCurveSurface_TheQuadCurv\lFuncOfTheQuadCurvExactHInter" alt="" coords="403,1503,612,1545"/>
 <area shape="rect" id="node36" href="$class_int_patch___arc_function.html" title="IntPatch_ArcFunction" alt="" coords="434,1569,581,1596"/>
-<area shape="rect" id="node37" href="$classmath___trigonometric_equation_function.html" title="This is function, which corresponds trigonometric equation a*Cos(x)*Cos(x) + 2*b*Cos(x)*Sin(x) + c*Co..." alt="" coords="414,1621,601,1662"/>
 </map>

@@ -40,9 +40,9 @@
 #include <OpenGl_BVHTreeSelector.hxx>
 #include <OpenGl_Context.hxx>
 #include <OpenGl_FrameBuffer.hxx>
-#include <OpenGl_FrameStatsPrs.hxx>
 #include <OpenGl_GraduatedTrihedron.hxx>
 #include <OpenGl_LayerList.hxx>
+#include <OpenGl_Light.hxx>
 #include <OpenGl_LineAttributes.hxx>
 #include <OpenGl_SceneGeometry.hxx>
 #include <OpenGl_Structure.hxx>
@@ -157,7 +157,7 @@ public:
                                                    const Graphic3d_SortType theSortType = Graphic3d_ST_BSP_Tree) Standard_OVERRIDE;
 
   //! Marks BVH tree and the set of BVH primitives of correspondent priority list with id theLayerId as outdated.
-  Standard_EXPORT virtual void InvalidateBVHData (const Graphic3d_ZLayerId theLayerId) Standard_OVERRIDE;
+  Standard_EXPORT virtual void InvalidateBVHData (const Standard_Integer theLayerId) Standard_OVERRIDE;
 
   //! Insert a new top-level z layer with the given ID.
   Standard_EXPORT virtual void AddZLayer (const Graphic3d_ZLayerId theLayerId) Standard_OVERRIDE;
@@ -232,7 +232,7 @@ public:
   Standard_EXPORT virtual void SetGradientBackground (const Aspect_GradientBackground& theBackground) Standard_OVERRIDE;
 
   //! Returns background image texture file path.
-  virtual TCollection_AsciiString BackgroundImage() Standard_OVERRIDE { return myBackgroundImagePath; }
+  Standard_EXPORT virtual TCollection_AsciiString BackgroundImage() Standard_OVERRIDE { return myBackgroundImagePath; }
 
   //! Sets background image texture file path.
   Standard_EXPORT virtual void SetBackgroundImage (const TCollection_AsciiString& theFilePath) Standard_OVERRIDE;
@@ -244,7 +244,7 @@ public:
   Standard_EXPORT virtual void SetBackgroundImageStyle (const Aspect_FillMethod theFillStyle) Standard_OVERRIDE;
 
   //! Returns environment texture set for the view.
-  virtual Handle(Graphic3d_TextureEnv) TextureEnv() const Standard_OVERRIDE { return myTextureEnvData; }
+  Standard_EXPORT virtual Handle(Graphic3d_TextureEnv) TextureEnv() const Standard_OVERRIDE { return myTextureEnvData; }
 
   //! Sets environment texture for the view.
   Standard_EXPORT virtual void SetTextureEnv (const Handle(Graphic3d_TextureEnv)& theTextureEnv) Standard_OVERRIDE;
@@ -254,6 +254,12 @@ public:
 
   //! Enables or disables frustum culling optimization.
   virtual void SetCullingEnabled (const Standard_Boolean theIsEnabled) Standard_OVERRIDE { myCulling = theIsEnabled; }
+
+  //! Returns shading model of the view.
+  virtual Graphic3d_TypeOfShadingModel ShadingModel() const Standard_OVERRIDE { return myShadingModel; }
+
+  //! Sets shading model of the view.
+  virtual void SetShadingModel (const Graphic3d_TypeOfShadingModel theModel) Standard_OVERRIDE { myShadingModel = theModel; }
 
   //! Return backfacing model used for the view.
   virtual Graphic3d_TypeOfBackfacingModel BackfacingModel() const Standard_OVERRIDE { return myBackfacing; }
@@ -274,10 +280,10 @@ public:
   Standard_EXPORT virtual void SetCamera (const Handle(Graphic3d_Camera)& theCamera) Standard_OVERRIDE;
 
   //! Returns list of lights of the view.
-  virtual const Handle(Graphic3d_LightSet)& Lights() const Standard_OVERRIDE { return myLights; }
+  virtual const Graphic3d_ListOfCLight& Lights() const Standard_OVERRIDE { return myLights; }
 
   //! Sets list of lights for the view.
-  virtual void SetLights (const Handle(Graphic3d_LightSet)& theLights) Standard_OVERRIDE
+  virtual void SetLights (const Graphic3d_ListOfCLight& theLights) Standard_OVERRIDE
   {
     myLights = theLights;
     myCurrLightSourceState = myStateCounter->Increment();
@@ -319,6 +325,9 @@ public:
   //! Returns list of OpenGL Z-layers.
   const OpenGl_LayerList& LayerList() const { return myZLayers; }
 
+  //! Returns list of openGL light sources.
+  const OpenGl_ListOfLight& LightList() const { return myLights; }
+
   //! Returns OpenGL window implementation.
   const Handle(OpenGl_Window) GlWindow() const { return myWindow; }
 
@@ -327,7 +336,7 @@ public:
 
   //! Returns selector for BVH tree, providing a possibility to store information
   //! about current view volume and to detect which objects are overlapping it.
-  const OpenGl_BVHTreeSelector& BVHTreeSelector() const { return myBVHSelector; }
+  OpenGl_BVHTreeSelector& BVHTreeSelector() { return myBVHSelector; }
 
   //! Returns true if there are immediate structures to display
   bool HasImmediateStructures() const
@@ -411,9 +420,6 @@ protected: //! @name Rendering of GL graphics (with prepared drawing buffer).
   //! Renders trihedron.
   void renderTrihedron (const Handle(OpenGl_Workspace) &theWorkspace);
 
-  //! Renders frame statistics.
-  void renderFrameStats();
-
 private:
 
   //! Adds the structure to display lists of the view.
@@ -466,6 +472,7 @@ protected:
   Standard_Boolean         myWasRedrawnGL;
 
   Standard_Boolean                myCulling;
+  Graphic3d_TypeOfShadingModel    myShadingModel;
   Graphic3d_TypeOfBackfacingModel myBackfacing;
   Quantity_ColorRGBA              myBgColor;
   Handle(Graphic3d_SequenceOfHClipPlane) myClipPlanes;
@@ -477,14 +484,13 @@ protected:
   Handle(Graphic3d_TextureEnv)    myTextureEnvData;
   Graphic3d_GraduatedTrihedron    myGTrihedronData;
 
-  Handle(Graphic3d_LightSet)      myNoShadingLight;
-  Handle(Graphic3d_LightSet)      myLights;
+  OpenGl_ListOfLight              myNoShadingLight;
+  OpenGl_ListOfLight              myLights;
   OpenGl_LayerList                myZLayers; //!< main list of displayed structure, sorted by layers
 
   Graphic3d_WorldViewProjState    myWorldViewProjState; //!< camera modification state
   OpenGl_StateCounter*            myStateCounter;
   Standard_Size                   myCurrLightSourceState;
-  Standard_Size                   myLightsRevision;
 
   typedef std::pair<Standard_Size, Standard_Size> StateInfo;
 
@@ -496,7 +502,6 @@ protected:
   OpenGl_BVHTreeSelector myBVHSelector;
 
   OpenGl_GraduatedTrihedron myGraduatedTrihedron;
-  OpenGl_FrameStatsPrs      myFrameStatsPrs;
 
   Handle(OpenGl_TextureSet) myTextureEnv;
 
@@ -1085,7 +1090,6 @@ public:
   friend class OpenGl_GraphicDriver;
   friend class OpenGl_Workspace;
   friend class OpenGl_LayerList;
-  friend class OpenGl_FrameStats;
 };
 
 #endif // _OpenGl_View_Header

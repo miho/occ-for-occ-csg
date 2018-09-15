@@ -16,7 +16,7 @@
 
 #include <BinMDataStd_NameDriver.hxx>
 #include <BinObjMgt_Persistent.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDF_Attribute.hxx>
@@ -29,7 +29,7 @@ IMPLEMENT_STANDARD_RTTIEXT(BinMDataStd_NameDriver,BinMDF_ADriver)
 //purpose  :
 //=======================================================================
 BinMDataStd_NameDriver::BinMDataStd_NameDriver
-                         (const Handle(Message_Messenger)& theMessageDriver)
+                         (const Handle(CDM_MessageDriver)& theMessageDriver)
      : BinMDF_ADriver (theMessageDriver, STANDARD_TYPE(TDataStd_Name)->Name())
 {
 }

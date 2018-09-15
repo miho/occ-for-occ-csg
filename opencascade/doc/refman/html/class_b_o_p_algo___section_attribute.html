@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -71,94 +71,61 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Class is a container of the flags used by intersection algorithm.  
+<p>Class is a container of three flags used by intersection algorithm.  
  <a href="class_b_o_p_algo___section_attribute.html#details">More...</a></p>
 
 <p><code>#include &lt;BOPAlgo_SectionAttribute.hxx&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a64be1abe39c2c300e48ad9bbe34907ab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#a64be1abe39c2c300e48ad9bbe34907ab">BOPAlgo_SectionAttribute</a> ()</td></tr>
-<tr class="memdesc:a64be1abe39c2c300e48ad9bbe34907ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor.  <a href="#a64be1abe39c2c300e48ad9bbe34907ab">More...</a><br /></td></tr>
-<tr class="separator:a64be1abe39c2c300e48ad9bbe34907ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7643b7cdd207b2043aeb0002acea4c19"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#a7643b7cdd207b2043aeb0002acea4c19">BOPAlgo_SectionAttribute</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theAproximation, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> thePCurveOnS1, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> thePCurveOnS2)</td></tr>
-<tr class="memdesc:a7643b7cdd207b2043aeb0002acea4c19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a7643b7cdd207b2043aeb0002acea4c19">More...</a><br /></td></tr>
-<tr class="separator:a7643b7cdd207b2043aeb0002acea4c19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28b9b19c31720dc9b69f828dbb70a682"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#a28b9b19c31720dc9b69f828dbb70a682">Approximation</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theApprox)</td></tr>
-<tr class="memdesc:a28b9b19c31720dc9b69f828dbb70a682"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the Approximation flag.  <a href="#a28b9b19c31720dc9b69f828dbb70a682">More...</a><br /></td></tr>
-<tr class="separator:a28b9b19c31720dc9b69f828dbb70a682"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a5f0849a174fbe39e0f6da3a1012bae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#a2a5f0849a174fbe39e0f6da3a1012bae">PCurveOnS1</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> thePCurveOnS1)</td></tr>
-<tr class="memdesc:a2a5f0849a174fbe39e0f6da3a1012bae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the PCurveOnS1 flag.  <a href="#a2a5f0849a174fbe39e0f6da3a1012bae">More...</a><br /></td></tr>
-<tr class="separator:a2a5f0849a174fbe39e0f6da3a1012bae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57a7c9807e35127ab8374018da7f79b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#a57a7c9807e35127ab8374018da7f79b7">PCurveOnS2</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> thePCurveOnS2)</td></tr>
-<tr class="memdesc:a57a7c9807e35127ab8374018da7f79b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the PCurveOnS2 flag.  <a href="#a57a7c9807e35127ab8374018da7f79b7">More...</a><br /></td></tr>
-<tr class="separator:a57a7c9807e35127ab8374018da7f79b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a389f704459ebb9c12948fbba07350b8a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#a389f704459ebb9c12948fbba07350b8a">BOPAlgo_SectionAttribute</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> Aproximation=<a class="el" href="_standard___type_def_8hxx.html#adaca7d05402b898f825597e547a03d00">Standard_True</a>, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_b_o_p_algo___section_attribute.html#ab24d558f1fef9f514f780b2acdd817b9">PCurveOnS1</a>=<a class="el" href="_standard___type_def_8hxx.html#adaca7d05402b898f825597e547a03d00">Standard_True</a>, const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> <a class="el" href="class_b_o_p_algo___section_attribute.html#acd4aca71c217d95925025701b8706d26">PCurveOnS2</a>=<a class="el" href="_standard___type_def_8hxx.html#adaca7d05402b898f825597e547a03d00">Standard_True</a>)</td></tr>
+<tr class="memdesc:a389f704459ebb9c12948fbba07350b8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes me by flags.  <a href="#a389f704459ebb9c12948fbba07350b8a">More...</a><br /></td></tr>
+<tr class="separator:a389f704459ebb9c12948fbba07350b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bd7e595c761ecb03fedc6b4425f4a86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#a2bd7e595c761ecb03fedc6b4425f4a86">Approximation</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theFlag)</td></tr>
+<tr class="memdesc:a2bd7e595c761ecb03fedc6b4425f4a86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modifier.  <a href="#a2bd7e595c761ecb03fedc6b4425f4a86">More...</a><br /></td></tr>
+<tr class="separator:a2bd7e595c761ecb03fedc6b4425f4a86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab24d558f1fef9f514f780b2acdd817b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#ab24d558f1fef9f514f780b2acdd817b9">PCurveOnS1</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theFlag)</td></tr>
+<tr class="memdesc:ab24d558f1fef9f514f780b2acdd817b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modifier.  <a href="#ab24d558f1fef9f514f780b2acdd817b9">More...</a><br /></td></tr>
+<tr class="separator:ab24d558f1fef9f514f780b2acdd817b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd4aca71c217d95925025701b8706d26"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#acd4aca71c217d95925025701b8706d26">PCurveOnS2</a> (const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theFlag)</td></tr>
+<tr class="memdesc:acd4aca71c217d95925025701b8706d26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modifier.  <a href="#acd4aca71c217d95925025701b8706d26">More...</a><br /></td></tr>
+<tr class="separator:acd4aca71c217d95925025701b8706d26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8032448503464c1e67b91f115e8ec03c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#a8032448503464c1e67b91f115e8ec03c">Approximation</a> () const</td></tr>
-<tr class="memdesc:a8032448503464c1e67b91f115e8ec03c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Approximation flag.  <a href="#a8032448503464c1e67b91f115e8ec03c">More...</a><br /></td></tr>
+<tr class="memdesc:a8032448503464c1e67b91f115e8ec03c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Selector.  <a href="#a8032448503464c1e67b91f115e8ec03c">More...</a><br /></td></tr>
 <tr class="separator:a8032448503464c1e67b91f115e8ec03c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a965aa50084f605e102ba835531c34216"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#a965aa50084f605e102ba835531c34216">PCurveOnS1</a> () const</td></tr>
-<tr class="memdesc:a965aa50084f605e102ba835531c34216"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the PCurveOnS1 flag.  <a href="#a965aa50084f605e102ba835531c34216">More...</a><br /></td></tr>
+<tr class="memdesc:a965aa50084f605e102ba835531c34216"><td class="mdescLeft">&#160;</td><td class="mdescRight">Selector.  <a href="#a965aa50084f605e102ba835531c34216">More...</a><br /></td></tr>
 <tr class="separator:a965aa50084f605e102ba835531c34216"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f79de5617d8ac106213388c19415aae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_o_p_algo___section_attribute.html#a6f79de5617d8ac106213388c19415aae">PCurveOnS2</a> () const</td></tr>
-<tr class="memdesc:a6f79de5617d8ac106213388c19415aae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the PCurveOnS2 flag.  <a href="#a6f79de5617d8ac106213388c19415aae">More...</a><br /></td></tr>
+<tr class="memdesc:a6f79de5617d8ac106213388c19415aae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Selector.  <a href="#a6f79de5617d8ac106213388c19415aae">More...</a><br /></td></tr>
 <tr class="separator:a6f79de5617d8ac106213388c19415aae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Class is a container of the flags used by intersection algorithm. </p>
+<div class="textblock"><p>Class is a container of three flags used by intersection algorithm. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a64be1abe39c2c300e48ad9bbe34907ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a64be1abe39c2c300e48ad9bbe34907ab">&#9670;&nbsp;</a></span>BOPAlgo_SectionAttribute() <span class="overload">[1/2]</span></h2>
+<a id="a389f704459ebb9c12948fbba07350b8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a389f704459ebb9c12948fbba07350b8a">&#9670;&nbsp;</a></span>BOPAlgo_SectionAttribute()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">BOPAlgo_SectionAttribute::BOPAlgo_SectionAttribute </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Default constructor. </p>
-
-</div>
-</div>
-<a id="a7643b7cdd207b2043aeb0002acea4c19"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7643b7cdd207b2043aeb0002acea4c19">&#9670;&nbsp;</a></span>BOPAlgo_SectionAttribute() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">BOPAlgo_SectionAttribute::BOPAlgo_SectionAttribute </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theAproximation</em>, </td>
+          <td class="paramname"><em>Aproximation</em> = <code><a class="el" href="_standard___type_def_8hxx.html#adaca7d05402b898f825597e547a03d00">Standard_True</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>thePCurveOnS1</em>, </td>
+          <td class="paramname"><em>PCurveOnS1</em> = <code><a class="el" href="_standard___type_def_8hxx.html#adaca7d05402b898f825597e547a03d00">Standard_True</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>thePCurveOnS2</em>&#160;</td>
+          <td class="paramname"><em>PCurveOnS2</em> = <code><a class="el" href="_standard___type_def_8hxx.html#adaca7d05402b898f825597e547a03d00">Standard_True</a></code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -166,43 +133,30 @@ Public Member Functions</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Constructor. </p>
+<p>Initializes me by flags. </p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a28b9b19c31720dc9b69f828dbb70a682"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a28b9b19c31720dc9b69f828dbb70a682">&#9670;&nbsp;</a></span>Approximation() <span class="overload">[1/2]</span></h2>
+<a id="a2bd7e595c761ecb03fedc6b4425f4a86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bd7e595c761ecb03fedc6b4425f4a86">&#9670;&nbsp;</a></span>Approximation() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void BOPAlgo_SectionAttribute::Approximation </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theApprox</em></td><td>)</td>
+          <td class="paramname"><em>theFlag</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Sets the Approximation flag. </p>
+<p>Modifier. </p>
 
 </div>
 </div>
@@ -211,9 +165,6 @@ Public Member Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> BOPAlgo_SectionAttribute::Approximation </td>
@@ -222,42 +173,29 @@ Public Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Returns the Approximation flag. </p>
+<p>Selector. </p>
 
 </div>
 </div>
-<a id="a2a5f0849a174fbe39e0f6da3a1012bae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a5f0849a174fbe39e0f6da3a1012bae">&#9670;&nbsp;</a></span>PCurveOnS1() <span class="overload">[1/2]</span></h2>
+<a id="ab24d558f1fef9f514f780b2acdd817b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab24d558f1fef9f514f780b2acdd817b9">&#9670;&nbsp;</a></span>PCurveOnS1() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void BOPAlgo_SectionAttribute::PCurveOnS1 </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>thePCurveOnS1</em></td><td>)</td>
+          <td class="paramname"><em>theFlag</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Sets the PCurveOnS1 flag. </p>
+<p>Modifier. </p>
 
 </div>
 </div>
@@ -266,9 +204,6 @@ Public Member Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> BOPAlgo_SectionAttribute::PCurveOnS1 </td>
@@ -277,42 +212,29 @@ Public Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Returns the PCurveOnS1 flag. </p>
+<p>Selector. </p>
 
 </div>
 </div>
-<a id="a57a7c9807e35127ab8374018da7f79b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a57a7c9807e35127ab8374018da7f79b7">&#9670;&nbsp;</a></span>PCurveOnS2() <span class="overload">[1/2]</span></h2>
+<a id="acd4aca71c217d95925025701b8706d26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd4aca71c217d95925025701b8706d26">&#9670;&nbsp;</a></span>PCurveOnS2() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void BOPAlgo_SectionAttribute::PCurveOnS2 </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>thePCurveOnS2</em></td><td>)</td>
+          <td class="paramname"><em>theFlag</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Sets the PCurveOnS2 flag. </p>
+<p>Modifier. </p>
 
 </div>
 </div>
@@ -321,9 +243,6 @@ Public Member Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> BOPAlgo_SectionAttribute::PCurveOnS2 </td>
@@ -332,14 +251,9 @@ Public Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Returns the PCurveOnS2 flag. </p>
+<p>Selector. </p>
 
 </div>
 </div>

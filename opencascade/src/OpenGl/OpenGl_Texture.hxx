@@ -289,11 +289,6 @@ public:
   //! Helpful constants
   static const GLuint NO_TEXTURE = 0;
 
-  //! Return pixel size of pixel format in bytes.
-  //! Note that this method considers that OpenGL natively supports this pixel format,
-  //! which might be not the case - in the latter case, actual pixel size might differ!
-  Standard_EXPORT static Standard_Size PixelSizeOfPixelFormat (Standard_Integer theInternalFormat);
-
 public:
 
   //! Create uninitialized texture.
@@ -450,9 +445,6 @@ public:
                                              GLenum&                       thePixelFormat,
                                              GLenum&                       theDataType);
 
-  //! Returns estimated GPU memory usage for holding data without considering overheads and allocation alignment rules.
-  Standard_EXPORT virtual Standard_Size EstimatedDataSize() const Standard_OVERRIDE;
-
 protected:
 
   //! Apply default sampler parameters after texture creation.
@@ -468,8 +460,6 @@ protected:
   GLsizei          mySizeY;      //!< texture height
   GLsizei          mySizeZ;      //!< texture depth
   GLenum           myTextFormat; //!< texture format - GL_RGB, GL_RGBA,...
-  GLint            mySizedFormat;//!< internal (sized) texture format
-  Standard_Integer myNbSamples;  //!< number of MSAA samples
   Standard_Boolean myHasMipmaps; //!< flag indicates that texture was uploaded with mipmaps
   bool             myIsAlpha;    //!< indicates alpha format
 

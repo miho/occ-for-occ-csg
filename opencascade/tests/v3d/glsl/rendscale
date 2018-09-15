@@ -15,7 +15,6 @@ if { "$aFontFile" != "" } {
 
 box b 1 2 3
 vclear
-vclose ALL
 vinit View1
 vdisplay b
 vfit

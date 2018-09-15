@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -65,9 +65,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-types">Protected Types</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">DBRep_IsoBuilder Class Reference</div>  </div>
 </div><!--header-->
@@ -210,16 +208,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a9ec521593af5f797ba0d29bfcce75d82 inherit pub_methods_class_geom2d_hatch___hatcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dump the hatcher.  <a href="class_geom2d_hatch___hatcher.html#a9ec521593af5f797ba0d29bfcce75d82">More...</a><br /></td></tr>
 <tr class="separator:a9ec521593af5f797ba0d29bfcce75d82 inherit pub_methods_class_geom2d_hatch___hatcher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
-Protected Types</h2></td></tr>
-<tr class="memitem:aba869c5c85ff993e40b4f3606b1f0471"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_n_collection___indexed_data_map.html">NCollection_IndexedDataMap</a>&lt; <a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a>, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt;, <a class="el" href="class_top_tools___oriented_shape_map_hasher.html">TopTools_OrientedShapeMapHasher</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_b_rep___iso_builder.html#aba869c5c85ff993e40b4f3606b1f0471">DataMapOfEdgePCurve</a></td></tr>
-<tr class="separator:aba869c5c85ff993e40b4f3606b1f0471"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:aefb1b8bec6690b13ae17f7ed90d90b72"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_d_b_rep___iso_builder.html#aefb1b8bec6690b13ae17f7ed90d90b72">FillGaps</a> (const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;theFace, <a class="el" href="class_d_b_rep___iso_builder.html#aba869c5c85ff993e40b4f3606b1f0471">DataMapOfEdgePCurve</a> &amp;theEdgePCurveMap)</td></tr>
-<tr class="memdesc:aefb1b8bec6690b13ae17f7ed90d90b72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds to the hatcher the 2D segments connecting the p-curves of the neighboring edges to close the 2D gaps which are closed in 3D by the tolerance of vertices shared between edges. It will allow trimming correctly the iso-lines passing through such gaps. The method also trims the intersecting 2D curves of the face, forbidding the iso-lines beyond the face boundaries.  <a href="#aefb1b8bec6690b13ae17f7ed90d90b72">More...</a><br /></td></tr>
-<tr class="separator:aefb1b8bec6690b13ae17f7ed90d90b72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_methods_class_geom2d_hatch___hatcher"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_class_geom2d_hatch___hatcher')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="class_geom2d_hatch___hatcher.html">Geom2dHatch_Hatcher</a></td></tr>
 <tr class="memitem:a713c2fb02f8a4cf9393662671ca4b9cc inherit pro_methods_class_geom2d_hatch___hatcher"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_geom2d_hatch___element.html">Geom2dHatch_Element</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_geom2d_hatch___hatcher.html#a713c2fb02f8a4cf9393662671ca4b9cc">Element</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> IndE)</td></tr>
 <tr class="memdesc:a713c2fb02f8a4cf9393662671ca4b9cc inherit pro_methods_class_geom2d_hatch___hatcher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the IndE-th element.  <a href="class_geom2d_hatch___hatcher.html#a713c2fb02f8a4cf9393662671ca4b9cc">More...</a><br /></td></tr>
@@ -230,30 +220,7 @@ Protected Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Creation of isoparametric curves. </p>
-</div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="aba869c5c85ff993e40b4f3606b1f0471"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba869c5c85ff993e40b4f3606b1f0471">&#9670;&nbsp;</a></span>DataMapOfEdgePCurve</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef <a class="el" href="class_n_collection___indexed_data_map.html">NCollection_IndexedDataMap</a>&lt;<a class="el" href="class_topo_d_s___shape.html">TopoDS_Shape</a>, <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_geom2d___curve.html">Geom2d_Curve</a> &gt;, <a class="el" href="class_top_tools___oriented_shape_map_hasher.html">TopTools_OrientedShapeMapHasher</a>&gt; <a class="el" href="class_d_b_rep___iso_builder.html#aba869c5c85ff993e40b4f3606b1f0471">DBRep_IsoBuilder::DataMapOfEdgePCurve</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac095eb953b3990f58f45fdd65bb63cbf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac095eb953b3990f58f45fdd65bb63cbf">&#9670;&nbsp;</a></span>DBRep_IsoBuilder()</h2>
 
@@ -291,44 +258,6 @@ Protected Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aefb1b8bec6690b13ae17f7ed90d90b72"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aefb1b8bec6690b13ae17f7ed90d90b72">&#9670;&nbsp;</a></span>FillGaps()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void DBRep_IsoBuilder::FillGaps </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_topo_d_s___face.html">TopoDS_Face</a> &amp;&#160;</td>
-          <td class="paramname"><em>theFace</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_d_b_rep___iso_builder.html#aba869c5c85ff993e40b4f3606b1f0471">DataMapOfEdgePCurve</a> &amp;&#160;</td>
-          <td class="paramname"><em>theEdgePCurveMap</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Adds to the hatcher the 2D segments connecting the p-curves of the neighboring edges to close the 2D gaps which are closed in 3D by the tolerance of vertices shared between edges. It will allow trimming correctly the iso-lines passing through such gaps. The method also trims the intersecting 2D curves of the face, forbidding the iso-lines beyond the face boundaries. </p>
-
-</div>
-</div>
 <a id="acdf13569098bca6b3a1ad869764938ae"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acdf13569098bca6b3a1ad869764938ae">&#9670;&nbsp;</a></span>LoadIsos()</h2>
 
@@ -354,9 +283,6 @@ Protected Member Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> DBRep_IsoBuilder::NbDomains </td>
@@ -365,11 +291,6 @@ Protected Member Functions</h2></td></tr>
           <td> const</td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Returns the total number of domains. </p>

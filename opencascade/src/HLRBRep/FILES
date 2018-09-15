@@ -86,6 +86,7 @@ HLRBRep_ShapeToHLR.cxx
 HLRBRep_ShapeToHLR.hxx
 HLRBRep_SLProps.hxx
 HLRBRep_SLProps_0.cxx
+HLRBRep_SLPropsATool.cxx
 HLRBRep_SLPropsATool.hxx
 HLRBRep_SLPropsATool.lxx
 HLRBRep_Surface.cxx

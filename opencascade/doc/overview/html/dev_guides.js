@@ -304,22 +304,6 @@ var dev_guides =
         [ "Change in algorithm ShapeUpgrade_UnifySameDomain", "occt_dev_guides__upgrade.html#upgrade_720_UnifySameDomain", null ],
         [ "Changes in STL Reader / Writer", "occt_dev_guides__upgrade.html#upgrade_720_Change_In_RWStl", null ],
         [ "Refactoring of the Error/Warning reporting system in Boolean Component", "occt_dev_guides__upgrade.html#upgrade_720_New_Error_Warning_system_in_BOA", null ]
-      ] ],
-      [ "Upgrade to OCCT 7.2.1", "occt_dev_guides__upgrade.html#upgrade_occt721", [
-        [ "Changes in ShapeUpgrade_UnifySameDomain", "occt_dev_guides__upgrade.html#upgrade_721_Changes_In_USD", null ],
-        [ "Moving BuildPCurveForEdgeOnPlane from BOPTools_AlgoTools2D to BRepLib", "occt_dev_guides__upgrade.html#upgrade_721_Move_BuildPCurveForEdgeOnPlane", null ],
-        [ "Removed features", "occt_dev_guides__upgrade.html#upgrade_721_removed", null ]
-      ] ],
-      [ "Upgrade to OCCT 7.3.0", "occt_dev_guides__upgrade.html#upgrade_occt730", [
-        [ "Light sources", "occt_dev_guides__upgrade.html#upgrade_730_lights", null ],
-        [ "Shading Models", "occt_dev_guides__upgrade.html#upgrade_730_shadingmodels", null ],
-        [ "Custom low-level OpenGL elements", "occt_dev_guides__upgrade.html#upgrade_730_tkopengl", null ],
-        [ "Changes in BOPAlgo_Section", "occt_dev_guides__upgrade.html#upgrade_730_BOPAlgo_Section", null ],
-        [ "Changes in BRepAdaptor_CompCurve", "occt_dev_guides__upgrade.html#upgrade_730_BRepAdaptor_CompCurve", null ],
-        [ "Removed features", "occt_dev_guides__upgrade.html#upgrade_730_removed", null ],
-        [ "Boolean Operations - Solid Builder algorithm", "occt_dev_guides__upgrade.html#upgrade_730_BuilderSolid", null ],
-        [ "Boolean Operation classes in BRepAlgo are deprecated", "occt_dev_guides__upgrade.html#upgrade_730_BRepAlgoBO", null ],
-        [ "Unification of the Error/Warning reporting system of Application Framework", "occt_dev_guides__upgrade.html#upgrade_730_replace_CDM_MessageDriver_interface_by_Message_Messenger", null ]
       ] ]
     ] ]
 ];

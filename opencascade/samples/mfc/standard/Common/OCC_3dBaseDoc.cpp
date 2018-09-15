@@ -11,6 +11,7 @@
 #include <res\OCC_Resource.h>
 #include "ImportExport/ImportExport.h"
 #include "AISDialogs.h"
+#include <AIS_LocalContext.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
@@ -292,7 +293,8 @@ void OCC_3dBaseDoc::OnUpdateObjectColor(CCmdUI* pCmdUI)
 
 void OCC_3dBaseDoc::OnObjectErase() 
 {
-  myAISContext->EraseSelected (Standard_True);
+  myAISContext->EraseSelected (Standard_False);
+  myAISContext->ClearSelected (Standard_True);
 }
 void OCC_3dBaseDoc::OnUpdateObjectErase(CCmdUI* pCmdUI) 
 {
@@ -405,17 +407,17 @@ void OCC_3dBaseDoc::OnObjectDisplayall()
 
 void OCC_3dBaseDoc::OnUpdateObjectDisplayall(CCmdUI* pCmdUI) 
 {
-  AIS_ListOfInteractive aList;
-  myAISContext->ObjectsInside (aList);
-  for (AIS_ListIteratorOfListOfInteractive aLI (aList);aLI.More();aLI.Next())
-  {
-    if (!myAISContext->IsDisplayed (aLI.Value()))
-    {
-      pCmdUI->Enable (true);
-      return;
-    }
-  }
-  pCmdUI->Enable (false);
+	
+	AIS_ListOfInteractive aList;
+	myAISContext->ObjectsInside(aList,AIS_KOI_Shape);
+	AIS_ListIteratorOfListOfInteractive aLI;
+	Standard_Boolean IS_ANY_OBJECT_ERASED=FALSE;
+	for (aLI.Initialize(aList);aLI.More();aLI.Next()){
+		if(!myAISContext->IsDisplayed(aLI.Value()))
+		IS_ANY_OBJECT_ERASED=TRUE;
+	}
+	pCmdUI->Enable (IS_ANY_OBJECT_ERASED);
+
 }
 
 void OCC_3dBaseDoc::OnObjectRemove() 

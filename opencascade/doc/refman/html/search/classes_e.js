@@ -1,7 +1,7 @@
 var searchData=
 [
   ['objbnd',['ObjBnd',['../struct_n_collection___u_b_tree_filler_1_1_obj_bnd.html',1,'NCollection_UBTreeFiller']]],
-  ['objectsentry',['ObjectSentry',['../class_std_obj_mgt___read_data_1_1_object_sentry.html',1,'StdObjMgt_ReadData::ObjectSentry'],['../class_std_obj_mgt___write_data_1_1_object_sentry.html',1,'StdObjMgt_WriteData::ObjectSentry']]],
+  ['object',['Object',['../class_std_obj_mgt___write_data_1_1_object.html',1,'StdObjMgt_WriteData::Object'],['../class_std_obj_mgt___read_data_1_1_object.html',1,'StdObjMgt_ReadData::Object']]],
   ['olist',['olist',['../structolist.html',1,'']]],
   ['opengl_5farbdbg',['OpenGl_ArbDbg',['../struct_open_gl___arb_dbg.html',1,'']]],
   ['opengl_5farbfbo',['OpenGl_ArbFBO',['../struct_open_gl___arb_f_b_o.html',1,'']]],
@@ -32,8 +32,6 @@ var searchData=
   ['opengl_5fflipper',['OpenGl_Flipper',['../class_open_gl___flipper.html',1,'']]],
   ['opengl_5ffont',['OpenGl_Font',['../class_open_gl___font.html',1,'']]],
   ['opengl_5fframebuffer',['OpenGl_FrameBuffer',['../class_open_gl___frame_buffer.html',1,'']]],
-  ['opengl_5fframestats',['OpenGl_FrameStats',['../class_open_gl___frame_stats.html',1,'']]],
-  ['opengl_5fframestatsprs',['OpenGl_FrameStatsPrs',['../class_open_gl___frame_stats_prs.html',1,'']]],
   ['opengl_5fglcore11',['OpenGl_GlCore11',['../struct_open_gl___gl_core11.html',1,'']]],
   ['opengl_5fglcore11fwd',['OpenGl_GlCore11Fwd',['../struct_open_gl___gl_core11_fwd.html',1,'']]],
   ['opengl_5fglcore13',['OpenGl_GlCore13',['../struct_open_gl___gl_core13.html',1,'']]],

@@ -15,8 +15,11 @@ mksurface s f
 extrema c s
 
 if { [isdraw ext_1] } {
-   set len [lindex [length ext_1] end]
-   checkreal "Extrema min distance" $len 1.88322e-11 1.e-7 1.e-7
+   mkedge result ext_1
+   checkprops result -l 1.88322e-11
+   checksection result
 } else {
    puts "Error: invalid result"
 }
+
+checkview -display result -2d -path ${imagedir}/${test_image}.png

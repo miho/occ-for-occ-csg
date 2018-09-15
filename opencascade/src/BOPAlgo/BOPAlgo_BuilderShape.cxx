@@ -122,7 +122,6 @@
 {
   myHistShapes.Clear();
   myMapShape.Clear();
-  myImagesResult.Clear();
   myHasDeleted=Standard_False;
   myHasGenerated=Standard_False;
   myHasModified=Standard_False;
@@ -133,7 +132,7 @@
 //function : ImagesResult
 //purpose  : 
 //=======================================================================
-  const TopTools_IndexedDataMapOfShapeListOfShape& 
+  const BOPCol_IndexedDataMapOfShapeListOfShape& 
     BOPAlgo_BuilderShape::ImagesResult()const
 {
   return myImagesResult;

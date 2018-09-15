@@ -16,7 +16,6 @@
 #ifndef _OpenGl_SetOfShaderPrograms_HeaderFile
 #define _OpenGl_SetOfShaderPrograms_HeaderFile
 
-#include <Graphic3d_TypeOfShadingModel.hxx>
 #include <NCollection_DataMap.hxx>
 #include <OpenGl_ShaderProgram.hxx>
 
@@ -32,29 +31,30 @@ enum OpenGl_ProgramOptions
   OpenGl_PO_ClipPlanes1 = 0x040, //!< handle 1 clipping plane
   OpenGl_PO_ClipPlanes2 = 0x080, //!< handle 2 clipping planes
   OpenGl_PO_ClipPlanesN = 0x100, //!< handle N clipping planes
-  OpenGl_PO_AlphaTest   = 0x200, //!< discard fragment by alpha test (defined by cutoff value)
-  OpenGl_PO_WriteOit    = 0x400, //!< write coverage buffer for Blended Order-Independent Transparency
-  OpenGl_PO_NB          = 0x800  //!< overall number of combinations
+  OpenGl_PO_WriteOit    = 0x200, //!< write coverage buffer for Blended Order-Independent Transparency
+  OpenGl_PO_NB          = 0x400  //!< overall number of combinations
 };
 
 //! Alias to programs array of predefined length
 class OpenGl_SetOfShaderPrograms : public Standard_Transient
 {
-  DEFINE_STANDARD_RTTI_INLINE(OpenGl_SetOfShaderPrograms, Standard_Transient)
+
 public:
 
   //! Empty constructor
   OpenGl_SetOfShaderPrograms() {}
 
   //! Access program by index
-  Handle(OpenGl_ShaderProgram)& ChangeValue (Graphic3d_TypeOfShadingModel theShadingModel,
-                                             Standard_Integer theProgramBits)
-  {
-    return myPrograms[theShadingModel][theProgramBits];
-  }
+  Handle(OpenGl_ShaderProgram)& ChangeValue (const Standard_Integer theIndex) { return myPrograms[theIndex]; }
 
 protected:
-  Handle(OpenGl_ShaderProgram) myPrograms[Graphic3d_TypeOfShadingModel_NB][OpenGl_PO_NB]; //!< programs array
+
+  Handle(OpenGl_ShaderProgram) myPrograms[OpenGl_PO_NB]; //!< programs array
+
+public:
+
+  DEFINE_STANDARD_RTTI_INLINE(OpenGl_SetOfShaderPrograms,Standard_Transient)
+
 };
 
 DEFINE_STANDARD_HANDLE(OpenGl_SetOfShaderPrograms, Standard_Transient)

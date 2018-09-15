@@ -2,14 +2,9 @@
 
 #include "Translate.h"
 
-#include <Standard_WarningsDisable.hxx>
 #include <QMessageBox>
-#include <QMdiSubWindow>
-#include <Standard_WarningsRestore.hxx>
-
-#include <OSD_Environment.hxx>
-
 #include <stdlib.h>
+#include <QMdiSubWindow>
 
 ApplicationWindow::ApplicationWindow()
     : ApplicationCommonWindow( ),
@@ -203,22 +198,20 @@ void ApplicationWindow::onSelectionChanged()
   QMdiArea* ws = getWorkspace();
   DocumentCommon* doc = qobject_cast<MDIWindow*>( ws->activeSubWindow()->widget() )->getDocument();
   Handle(AIS_InteractiveContext) context = doc->getContext();
-  bool anEnabled = (context->NbSelected() > 0);
+  int numSel = context->NbSelected();
 
-  myCasCadeTranslateActions.at( FileExportBREPId )->setEnabled( anEnabled );
-  myCasCadeTranslateActions.at( FileExportIGESId )->setEnabled( anEnabled );
-  myCasCadeTranslateActions.at( FileExportSTEPId )->setEnabled( anEnabled );
-  myCasCadeTranslateActions.at( FileExportSTLId )->setEnabled( anEnabled );
-  myCasCadeTranslateActions.at( FileExportVRMLId )->setEnabled( anEnabled );
+  myCasCadeTranslateActions.at( FileExportBREPId )->setEnabled( numSel );
+  myCasCadeTranslateActions.at( FileExportIGESId )->setEnabled( numSel );
+  myCasCadeTranslateActions.at( FileExportSTEPId )->setEnabled( numSel );
+  myCasCadeTranslateActions.at( FileExportSTLId )->setEnabled( numSel );
+  myCasCadeTranslateActions.at( FileExportVRMLId )->setEnabled( numSel );
 }
 
 QString ApplicationWindow::getIEResourceDir()
 {
   static QString aResourceDir =
-    QString (OSD_Environment ("CSF_IEResourcesDefaults").Value().ToCString());
-  if (aResourceDir.isEmpty())
-    aResourceDir = QString (OSD_Environment ("CSF_OCCTResourcePath").Value().ToCString()) + "/samples";
-
+    QString::fromUtf8 (qgetenv ("CSF_IEResourcesDefaults").constData());
+  
   return aResourceDir;
 }
 

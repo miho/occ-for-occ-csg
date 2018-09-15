@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDF_Attribute.hxx>
 #include <TDF_Label.hxx>
@@ -32,7 +32,7 @@ IMPLEMENT_DOMSTRING (DocEntryString, "documentEntry")
 //purpose  : Constructor
 //=======================================================================
 XmlMDocStd_XLinkDriver::XmlMDocStd_XLinkDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -58,7 +58,7 @@ Standard_Boolean XmlMDocStd_XLinkDriver::Paste
 
   if (anXPath == NULL)
   {
-    myMessageDriver->Send ("XLink: Cannot retrieve reference string from element", Message_Fail);
+    WriteMessage ("XLink: Cannot retrieve reference string from element");
     return Standard_False;
   }
 
@@ -68,7 +68,7 @@ Standard_Boolean XmlMDocStd_XLinkDriver::Paste
     TCollection_ExtendedString aMessage =
       TCollection_ExtendedString ("Cannot retrieve XLink reference from \"")
         + anXPath + '\"';
-    myMessageDriver->Send (aMessage, Message_Fail);
+    WriteMessage (aMessage);
     return Standard_False;
   }
 

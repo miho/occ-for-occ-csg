@@ -40,8 +40,7 @@ const Standard_GUID& TDataStd_ByteArray::GetID()
 //function : TDataStd_ByteArray
 //purpose  : Empty Constructor
 //=======================================================================
-TDataStd_ByteArray::TDataStd_ByteArray() : myIsDelta(Standard_False),
-  myID(GetID())
+TDataStd_ByteArray::TDataStd_ByteArray() : myIsDelta(Standard_False)
 {}
 
 //=======================================================================

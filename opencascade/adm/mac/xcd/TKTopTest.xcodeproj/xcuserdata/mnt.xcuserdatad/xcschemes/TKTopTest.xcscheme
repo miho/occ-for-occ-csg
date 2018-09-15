@@ -13,7 +13,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "02D916E3016402C706FE1708"
+               BlueprintIdentifier = "122707D5168415F00D730CB2"
                BuildableName = "libTKTopTest.dylib"
                BlueprintName = "TKTopTest"
                ReferencedContainer = "container:TKTopTest.xcodeproj">

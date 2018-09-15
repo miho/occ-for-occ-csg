@@ -317,6 +317,8 @@ namespace
 {
   class qaclass50_50ANON : public qaclass49_50
   {
+  public:
+    qaclass50_50ANON() {}
   };
 }
 
@@ -433,7 +435,7 @@ static Standard_Integer QAHandleInc (Draw_Interpretor& theDI,
   }
 
   Handle(Standard_Transient) aHandle  = new Standard_Transient();
-  opencascade::std::shared_ptr<Standard_Transient> aSharePtr (new Standard_Transient());
+  std::shared_ptr<Standard_Transient> aSharePtr (new Standard_Transient());
   theDI << "Time of creating and destroying " << aNbIters << " smart pointers to the same object, per item, ns:";
   {
     {
@@ -449,7 +451,7 @@ static Standard_Integer QAHandleInc (Draw_Interpretor& theDI,
     {
       QATimer aTimer (theDI, "\nC++ shared_ptr: ", QATimer::ns, aNbIters);
       {
-        std::vector< opencascade::std::shared_ptr<Standard_Transient> > aSharePointers (aNbIters);
+        std::vector< std::shared_ptr<Standard_Transient> > aSharePointers (aNbIters);
         for (Standard_Integer anIter = 0; anIter < aNbIters; ++anIter)
         {
           aSharePointers[anIter] = aSharePtr;

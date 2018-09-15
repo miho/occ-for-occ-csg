@@ -39,7 +39,7 @@ void SelectMgr_RectangularFrustum::segmentSegmentDistance (const gp_Pnt& theSegP
   Standard_Real aSn = aCoef;
   Standard_Real aTc, aTn, aTd = aCoef;
 
-  if (aCoef < gp::Resolution())
+  if (aCoef < Precision::Confusion())
   {
     aTn = anE;
     aTd = aC;
@@ -68,7 +68,7 @@ void SelectMgr_RectangularFrustum::segmentSegmentDistance (const gp_Pnt& theSegP
   {
     aTn = aTd;
   }
-  aTc = (Abs (aTd) < gp::Resolution() ? 0.0 : aTn / aTd);
+  aTc = (Abs (aTn) < Precision::Confusion() ? 0.0 : aTn / aTd);
 
   gp_Pnt aClosestPnt = myNearPickedPnt.XYZ() + myViewRayDir.XYZ() * aTc;
   theDepth = myNearPickedPnt.Distance (aClosestPnt) * myScale;
@@ -637,7 +637,7 @@ Standard_Real SelectMgr_RectangularFrustum::DistToGeometryCenter (const gp_Pnt& 
 // =======================================================================
 gp_Pnt SelectMgr_RectangularFrustum::DetectedPoint (const Standard_Real theDepth) const
 {
-  return myNearPickedPnt.XYZ() + myViewRayDir.Normalized().XYZ() * theDepth / myScale;
+  return myNearPickedPnt.XYZ() + myViewRayDir.Normalized().XYZ() * theDepth;
 }
 
 // =======================================================================
@@ -675,14 +675,17 @@ void SelectMgr_RectangularFrustum::computeClippingRange (const Graphic3d_Sequenc
     }
 
     // compute distance to point of pick line intersection with the plane
-    const Standard_Real aParam = aDistance / aDotProduct;
-    const gp_Pnt anIntersectionPt = myNearPickedPnt.XYZ() + myViewRayDir.XYZ() * aParam;
-    Standard_Real aDistToPln = anIntersectionPt.Distance (myNearPickedPnt);
+    Standard_Real aParam = aDistance / aDotProduct;
+
+    // check if ray intersects the plane, in case aIntDist < 0
+    // the plane is "behind" the ray
     if (aParam < 0.0)
     {
-      // the plane is "behind" the ray
-      aDistToPln = -aDistToPln;
+      continue;
     }
+
+    const gp_Pnt anIntersectionPt = myNearPickedPnt.XYZ() + myViewRayDir.XYZ() * aParam;
+    const Standard_Real aDistToPln = anIntersectionPt.Distance (myNearPickedPnt);
 
     // change depth limits for case of opposite and directed planes
     if (aDotProduct < 0.0)

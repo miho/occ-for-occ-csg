@@ -17,13 +17,10 @@
 
 #include <AIS_ListOfInteractive.hxx>
 #include <SelectMgr_EntityOwner.hxx>
-#include <inspector/VInspector_ItemFolderObject.hxx>
 #include <inspector/VInspector_ItemPresentableObject.hxx>
 #include <inspector/VInspector_Tools.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QStringList>
-#include <Standard_WarningsRestore.hxx>
 
 //#define DEBUG_FREE_OWNERS
 
@@ -36,48 +33,53 @@ int VInspector_ItemContext::initRowCount() const
   if (Column() != 0)
     return 0;
 
-  int aNbProperties = 1; // item to visualize Filters/Drawer information of context
-
   int aNbPresentations = 0;
-  Handle(AIS_InteractiveContext) aContext = GetContext();
-  if (aContext.IsNull())
-    return 0;
-
-  AIS_ListOfInteractive aListOfIO;
-  aContext->DisplayedObjects (aListOfIO);
-  aContext->ErasedObjects(aListOfIO);
-  aNbPresentations = aListOfIO.Extent();
-
+  if (!GetContext().IsNull())
+  {
+    AIS_ListOfInteractive aListOfIO;
+    GetContext()->DisplayedObjects (aListOfIO);
+    GetContext()->ErasedObjects(aListOfIO);
+    aNbPresentations = aListOfIO.Extent();
+  }
   // owners without Presentation
 #ifdef DEBUG_FREE_OWNERS
   int aRows = 0;
   // only local context is processed: TODO for global context
-  NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
-  aContext->MainSelector()->ActiveOwners(anActiveOwners);
+  Handle(AIS_InteractiveContext) aContext = GetContext();
+  if (!aContext.IsNull()) {
+    NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
+    aContext->MainSelector()->ActiveOwners(anActiveOwners);
 
-  Handle(SelectMgr_EntityOwner) anOwner;
-  for (NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt(anActiveOwners);
-       anOwnersIt.More(); anOwnersIt.Next())
-  {
-    anOwner = Handle(SelectMgr_EntityOwner)::DownCast(anOwnersIt.Value());
-    if (anOwner.IsNull())
-      continue;
-    Handle(AIS_InteractiveObject) anAISObj = Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
-    if (anAISObj.IsNull())
-      aRows++;
+    Handle(SelectMgr_EntityOwner) anOwner;
+    for (NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt(anActiveOwners);
+      anOwnersIt.More(); anOwnersIt.Next())
+    {
+      anOwner = Handle(SelectMgr_EntityOwner)::DownCast(anOwnersIt.Value());
+      if (anOwner.IsNull())
+        continue;
+      Handle(AIS_InteractiveObject) anAISObj = Handle(AIS_InteractiveObject)::DownCast(anOwner->Selectable());
+      if (anAISObj.IsNull())
+        aRows++;
+    }
   }
+
   // owners in Global Context
-  NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
-  aContext->MainSelector()->ActiveOwners(anActiveOwners);
+  if (!aContext.IsNull())
+  {
+    NCollection_List<Handle(SelectBasics_EntityOwner)> anActiveOwners;
+    aContext->MainSelector()->ActiveOwners(anActiveOwners);
+  }
   if (aRows > 0)
     aNbPresentations += aRows;
+#endif
+#ifdef DEBUG_FREE_OWNERS
   NCollection_List<Handle(SelectBasics_EntityOwner)> anEmptySelectableOwners;
   NCollection_List<Handle(SelectBasics_EntityOwner)> anOwners =
-    VInspector_Tools::ActiveOwners (aContext, anEmptySelectableOwners);
+    VInspector_Tools::ActiveOwners (GetContext(), anEmptySelectableOwners);
   if (anEmptySelectableOwners.Size() > 0)
     aNbPresentations += 1;
 #endif
-  return aNbProperties + aNbPresentations;
+  return aNbPresentations;
 }
 
 // =======================================================================
@@ -89,20 +91,42 @@ QVariant VInspector_ItemContext::initValue (const int theItemRole) const
   if (theItemRole != Qt::DisplayRole && theItemRole != Qt::EditRole && theItemRole != Qt::ToolTipRole)
     return QVariant();
 
-  if (GetContext().IsNull())
-    return Column() == 0 ? "Empty context" : "";
-
   switch (Column())
   {
     case 0: return GetContext()->DynamicType()->Name();
     case 1: return rowCount();
     case 4:
     {
-      Handle(AIS_InteractiveObject) anEmptyIO;
-      int aSelectedCount = VInspector_Tools::SelectedOwners (GetContext(), anEmptyIO, false);
-      return aSelectedCount > 0 ? QString::number (aSelectedCount) : "";
+      if (theItemRole == Qt::ToolTipRole)
+        return "Selected Owners";
+      else
+      {
+        Handle(AIS_InteractiveObject) anEmptyIO;
+        int aSelectedCount = VInspector_Tools::SelectedOwners (GetContext(), anEmptyIO, false);
+        return aSelectedCount > 0 ? QString::number (aSelectedCount) : "";
+      }
     }
-    case 6: return GetContext()->DeviationCoefficient();
+    case 7:
+    {
+      if (theItemRole == Qt::ToolTipRole)
+        return QString ("All Owners/Active Owners");
+      else
+      {
+        NCollection_List<Handle(SelectBasics_EntityOwner)> anEmptySelectableOwners;
+        NCollection_List<Handle(SelectBasics_EntityOwner)> anOwners =
+                 VInspector_Tools::ActiveOwners (GetContext(), anEmptySelectableOwners);
+        int anActiveOwners = anOwners.Size();
+        anOwners = VInspector_Tools::ContextOwners (GetContext());
+        return QString ("%1 / %2").arg (anOwners.Size()).arg (anActiveOwners);
+      }
+    }
+    case 8:
+    {
+      if (theItemRole == Qt::ToolTipRole)
+        return QString ("DeviationCoefficient");
+      else
+        return GetContext()->DeviationCoefficient();
+    }
     default:
       break;
   }
@@ -115,8 +139,5 @@ QVariant VInspector_ItemContext::initValue (const int theItemRole) const
 // =======================================================================
 TreeModel_ItemBasePtr VInspector_ItemContext::createChild (int theRow, int theColumn)
 {
-  if (theRow == 0)
-    return VInspector_ItemFolderObject::CreateItem (currentItem(), theRow, theColumn);
-  else
-    return VInspector_ItemPresentableObject::CreateItem (currentItem(), theRow, theColumn);
+  return VInspector_ItemPresentableObject::CreateItem (currentItem(), theRow, theColumn);
 }

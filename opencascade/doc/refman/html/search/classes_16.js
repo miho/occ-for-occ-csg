@@ -36,7 +36,6 @@ var searchData=
   ['xcafdoc_5fview',['XCAFDoc_View',['../class_x_c_a_f_doc___view.html',1,'']]],
   ['xcafdoc_5fviewtool',['XCAFDoc_ViewTool',['../class_x_c_a_f_doc___view_tool.html',1,'']]],
   ['xcafdoc_5fvolume',['XCAFDoc_Volume',['../class_x_c_a_f_doc___volume.html',1,'']]],
-  ['xcafnoteobjects_5fnoteobject',['XCAFNoteObjects_NoteObject',['../class_x_c_a_f_note_objects___note_object.html',1,'']]],
   ['xcafprs',['XCAFPrs',['../class_x_c_a_f_prs.html',1,'']]],
   ['xcafprs_5faisobject',['XCAFPrs_AISObject',['../class_x_c_a_f_prs___a_i_s_object.html',1,'']]],
   ['xcafprs_5fdriver',['XCAFPrs_Driver',['../class_x_c_a_f_prs___driver.html',1,'']]],

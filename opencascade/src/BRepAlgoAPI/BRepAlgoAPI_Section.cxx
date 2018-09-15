@@ -17,22 +17,24 @@
 // modified by Michael KLOKOV  Wed Mar  6 15:01:25 2002
 // modified by  Eugeny MALTCHIKOV Wed Jul 04 11:13:01 2012 
 
-#include <BRepAlgoAPI_Section.hxx>
-
+#include <BOPAlgo_BOP.hxx>
 #include <BOPAlgo_PaveFiller.hxx>
-
+#include <BOPAlgo_Section.hxx>
 #include <BOPDS_DS.hxx>
-
+#include <BRep_Tool.hxx>
+#include <BRepAlgoAPI_Section.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
 #include <BRepBuilderAPI_MakeShell.hxx>
-
+#include <Geom2d_TrimmedCurve.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_Surface.hxx>
-
 #include <gp_Pln.hxx>
-
+#include <TopExp.hxx>
+#include <TopoDS.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
+#include <TopTools_IndexedMapOfShape.hxx>
+#include <TopTools_MapOfShape.hxx>
 
 //
 static 
@@ -174,9 +176,11 @@ BRepAlgoAPI_Section::~BRepAlgoAPI_Section()
 void BRepAlgoAPI_Section::Init(const Standard_Boolean bFlag) 
 {
   myOperation=BOPAlgo_SECTION;
+  myParametersChanged = Standard_False;
   myApprox = Standard_False;
   myComputePCurve1 = Standard_False;
   myComputePCurve2 = Standard_False;
+  myParametersChanged = Standard_True;
   // 
   if (bFlag) {
     Build();
@@ -190,6 +194,7 @@ void BRepAlgoAPI_Section::Init1(const TopoDS_Shape& S1)
 {
   myArguments.Clear();
   myArguments.Append(S1);
+  myParametersChanged = Standard_True;
 }
 //=======================================================================
 //function : Init1
@@ -215,6 +220,7 @@ void BRepAlgoAPI_Section::Init2(const TopoDS_Shape& S2)
 {
   myTools.Clear();
   myTools.Append(S2);
+  myParametersChanged = Standard_True;
 }
 //=======================================================================
 //function : Init2
@@ -238,7 +244,10 @@ void BRepAlgoAPI_Section::Init2(const Handle(Geom_Surface)& Sf)
 //=======================================================================
 void BRepAlgoAPI_Section::Approximation(const Standard_Boolean B) 
 {
-  myApprox = B;
+  if(myApprox != B) {
+    myApprox = B;
+    myParametersChanged = Standard_True;
+  }
 }
 //=======================================================================
 //function : ComputePCurveOn1
@@ -246,7 +255,10 @@ void BRepAlgoAPI_Section::Approximation(const Standard_Boolean B)
 //=======================================================================
 void BRepAlgoAPI_Section::ComputePCurveOn1(const Standard_Boolean B) 
 {
-  myComputePCurve1 = B;
+  if(myComputePCurve1 != B) {
+    myComputePCurve1 = B;
+    myParametersChanged = Standard_True;
+  }
 }
 //=======================================================================
 //function : ComputePCurveOn2
@@ -254,7 +266,10 @@ void BRepAlgoAPI_Section::ComputePCurveOn1(const Standard_Boolean B)
 //=======================================================================
 void BRepAlgoAPI_Section::ComputePCurveOn2(const Standard_Boolean B) 
 {
-  myComputePCurve2 = B;
+  if(myComputePCurve2 != B) {
+    myComputePCurve2 = B;
+    myParametersChanged = Standard_True;
+  }
 }
 //=======================================================================
 //function : SetAttributes
@@ -262,9 +277,9 @@ void BRepAlgoAPI_Section::ComputePCurveOn2(const Standard_Boolean B)
 //=======================================================================
 void BRepAlgoAPI_Section::SetAttributes()
 {
-  BOPAlgo_SectionAttribute theSecAttr(myApprox,
-                                      myComputePCurve1,
-                                      myComputePCurve2);
+  BOPAlgo_SectionAttribute theSecAttr(myApprox, 
+          myComputePCurve1, 
+          myComputePCurve2);
   myDSFiller->SetSectionAttribute(theSecAttr);
 }
 //=======================================================================
@@ -348,13 +363,13 @@ Standard_Boolean HasAncestorFaces (const BOPAlgo_PPaveFiller& pPF,
   BOPDS_VectorOfInterfFF& aFFs=pDS->InterfFF();
   //
   //section edges
-  aNbFF=aFFs.Length();
+  aNbFF=aFFs.Extent();
   for (i = 0; i<aNbFF; ++i) {
     BOPDS_InterfFF& aFFi=aFFs(i);
     aFFi.Indices(nF1, nF2);
     //
     const BOPDS_VectorOfCurve& aVC=aFFi.Curves();
-    aNbVC=aVC.Length();
+    aNbVC=aVC.Extent();
     for (j=0; j<aNbVC; j++) {
       const BOPDS_Curve& aBC=aVC(j);
       //

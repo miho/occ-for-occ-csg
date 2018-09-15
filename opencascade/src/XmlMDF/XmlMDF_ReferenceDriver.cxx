@@ -15,7 +15,7 @@
 
 //AGV 150202: Changed prototype XmlObjMgt::SetStringValue()
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TDF_Attribute.hxx>
 #include <TDF_Reference.hxx>
@@ -31,7 +31,7 @@ IMPLEMENT_STANDARD_RTTIEXT(XmlMDF_ReferenceDriver,XmlMDF_ADriver)
 //purpose  : Constructor
 //=======================================================================
 XmlMDF_ReferenceDriver::XmlMDF_ReferenceDriver
-                        (const Handle(Message_Messenger)& theMsgDriver)
+                        (const Handle(CDM_MessageDriver)& theMsgDriver)
       : XmlMDF_ADriver (theMsgDriver, NULL)
 {}
 
@@ -57,7 +57,7 @@ Standard_Boolean XmlMDF_ReferenceDriver::Paste
 
   if (anXPath == NULL)
   {
-    myMessageDriver->Send ("Cannot retrieve reference string from element", Message_Fail);
+    WriteMessage ("Cannot retrieve reference string from element");
     return Standard_False;
   }
 
@@ -67,7 +67,7 @@ Standard_Boolean XmlMDF_ReferenceDriver::Paste
     TCollection_ExtendedString aMessage =
       TCollection_ExtendedString ("Cannot retrieve reference from \"")
         + anXPath + '\"';
-    myMessageDriver->Send (aMessage, Message_Fail);
+    WriteMessage (aMessage);
     return Standard_False;
   }
 

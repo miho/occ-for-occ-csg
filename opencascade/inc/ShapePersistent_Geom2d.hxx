@@ -57,35 +57,31 @@ public:
 // Geometry
 //=======================================================================
 template<>
-inline Standard_CString ShapePersistent_Geom::geometryBase<Geom2d_Geometry>
-  ::PName() const { return "PGeom2d_Geometry"; }
+Standard_CString ShapePersistent_Geom::geometryBase<Geom2d_Geometry>
+  ::PName() const;
 
 //=======================================================================
 // Point
 //=======================================================================
 template<>
-inline Standard_CString ShapePersistent_Geom::subBase_empty<ShapePersistent_Geom2d::geometryBase<Geom2d_Geometry> >
-  ::PName() const { return "PGeom2d_Point"; }
+Standard_CString ShapePersistent_Geom::subBase_empty<
+  ShapePersistent_Geom2d::geometryBase<Geom2d_Geometry> >
+  ::PName() const;
 
 //=======================================================================
 // CartesianPoint
 //=======================================================================
 template<>
-inline Standard_CString ShapePersistent_Geom::instance<ShapePersistent_Geom2d::Point,
+Standard_CString ShapePersistent_Geom::instance<ShapePersistent_Geom2d::Point,
                                                   Geom2d_CartesianPoint,
                                                   gp_Pnt2d>
-  ::PName() const { return "PGeom2d_CartesianPoint"; }
+  ::PName() const;
 
 template<>
-inline void ShapePersistent_Geom::instance<ShapePersistent_Geom2d::Point,
+void ShapePersistent_Geom::instance<ShapePersistent_Geom2d::Point,
                                       Geom2d_CartesianPoint,
                                       gp_Pnt2d>
-  ::Write(StdObjMgt_WriteData& theWriteData) const
-{
-  Handle(Geom2d_CartesianPoint) aMyGeom =
-    Handle(Geom2d_CartesianPoint)::DownCast(myTransient);
-  theWriteData << aMyGeom->Pnt2d();
-}
+  ::Write(StdObjMgt_WriteData& theWriteData) const;
 
 //=======================================================================
 // Direction
@@ -157,7 +153,7 @@ void ShapePersistent_Geom::instance<ShapePersistent_Geom2d::Transformation,
 // Curve
 //=======================================================================
 template<>
-inline Standard_CString ShapePersistent_Geom::geometryBase<Geom2d_Curve>
-  ::PName() const { return "PGeom2d_Curve"; }
+Standard_CString ShapePersistent_Geom2d::geometryBase<Geom2d_Curve>
+  ::PName() const;
 
 #endif

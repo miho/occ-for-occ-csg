@@ -15,13 +15,9 @@
 
 #include <inspector/DFBrowserPane_ItemDelegateButton.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QAbstractItemModel>
 #include <QEvent>
 #include <QPainter>
-#include <Standard_WarningsRestore.hxx>
-
-const int ICON_SIZE = 20;
 
 // =======================================================================
 // function : Constructor
@@ -40,14 +36,8 @@ DFBrowserPane_ItemDelegateButton::DFBrowserPane_ItemDelegateButton (QObject* the
 void DFBrowserPane_ItemDelegateButton::paint (QPainter* thePainter, const QStyleOptionViewItem& theOption,
                                               const QModelIndex& theIndex) const
 {
-  if (myFreeRows.contains (theIndex.row()))
-    return;
-
-  int aWidth = std::min (theOption.rect.width(), ICON_SIZE);
-  int aHeight = std::min (theOption.rect.height(), ICON_SIZE);
-  QPoint aTopLeft = theOption.rect.topLeft();
-  thePainter->drawPixmap (QRect (theOption.rect.topLeft(), QPoint (aTopLeft.x() + aWidth, aTopLeft.y() + aHeight)),
-                          myIcon.pixmap (ICON_SIZE, ICON_SIZE));
+  if (!myFreeRows.contains (theIndex.row()))
+    thePainter->drawPixmap (theOption.rect, myIcon.pixmap (20,20));
 }
 
 // =======================================================================

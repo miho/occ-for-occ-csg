@@ -17,6 +17,10 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__VrmlConverter_DLL" />
+					<Add option="-D__VrmlAPI_DLL" />
+					<Add option="-D__Vrml_DLL" />
+					<Add option="-D__VrmlData_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKVRML_obj.link" />
@@ -35,6 +39,10 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__VrmlConverter_DLL" />
+					<Add option="-D__VrmlAPI_DLL" />
+					<Add option="-D__Vrml_DLL" />
+					<Add option="-D__VrmlData_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKVRML_objd.link" />

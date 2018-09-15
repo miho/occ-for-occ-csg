@@ -19,14 +19,12 @@ var index =
         [ "MFC", "index.html#OCCT_OVW_SECTION_7_3_1", null ],
         [ "Qt", "index.html#OCCT_OVW_SECTION_7_3_2", null ],
         [ "C#", "index.html#OCCT_OVW_SECTION_7_3_3", null ],
-        [ "Android", "index.html#OCCT_OVW_SECTION_7_3_4", null ],
-        [ "iOS", "index.html#OCCT_OVW_SECTION_7_3_5", null ]
+        [ "Android", "index.html#OCCT_OVW_SECTION_7_3_4", null ]
       ] ]
     ] ],
     [ "MFC samples", "samples_mfc_standard.html", null ],
     [ "OCCT CSharp sample", "samples_csharp_occt.html", null ],
     [ "Direct3D CSharp sample", "samples_csharp_direct3d.html", null ],
     [ "OCCT JniViewer sample for Android", "samples_java_android_occt.html", null ],
-    [ "OCCT AndroidQt sample for Android", "samples_qml_android_occt.html", null ],
-    [ "OCCT sample for iOS", "occt_samples_ios_uikit.html", null ]
+    [ "OCCT AndroidQt sample for Android", "samples_qml_android_occt.html", null ]
 ];

@@ -52,19 +52,19 @@ public:
   
   //! Establishes the connection between the Connected
   //! Interactive Object, anotherIobj, and its reference.
-  void Connect (const Handle(AIS_InteractiveObject)& theAnotherObj) { connect (theAnotherObj, Handle(Geom_Transformation)()); }
+  Standard_EXPORT void Connect (const Handle(AIS_InteractiveObject)& theAnotherObj) { connect (theAnotherObj, Handle(Geom_Transformation)()); }
 
   //! Establishes the connection between the Connected
   //! Interactive Object, anotherIobj, and its reference.
   //! Locates instance in aLocation.
-  void Connect (const Handle(AIS_InteractiveObject)& theAnotherObj,
+  Standard_EXPORT void Connect (const Handle(AIS_InteractiveObject)& theAnotherObj,
                                 const gp_Trsf& theLocation)  { connect (theAnotherObj, new Geom_Transformation (theLocation)); }
 
   //! Establishes the connection between the Connected
   //! Interactive Object, anotherIobj, and its reference.
   //! Locates instance in aLocation.
-  void Connect (const Handle(AIS_InteractiveObject)& theAnotherObj,
-                const Handle(Geom_Transformation)& theLocation) { connect (theAnotherObj, theLocation); }
+  Standard_EXPORT void Connect (const Handle(AIS_InteractiveObject)& theAnotherObj,
+                                const Handle(Geom_Transformation)& theLocation) { connect (theAnotherObj, theLocation); }
 
   //! Returns true if there is a connection established
   //! between the presentation and its source reference.

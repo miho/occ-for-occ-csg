@@ -7,8 +7,8 @@ ttranslate c2 5 0 20
 
 bfuse f c1 c2
 
-explode c1 e
+explode f E
 
-blend result f 1 c1_3
+blend result f 1 f_1
 
 checkprops result -s 2485.86

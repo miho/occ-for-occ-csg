@@ -11,7 +11,7 @@
 
 #include "OCC_BaseChildFrame.h"
 
-class Standard_EXPORT OCC_2dChildFrame : public OCC_BaseChildFrame  
+class AFX_EXT_CLASS OCC_2dChildFrame : public OCC_BaseChildFrame  
 {
 	DECLARE_DYNCREATE(OCC_2dChildFrame)
 public:

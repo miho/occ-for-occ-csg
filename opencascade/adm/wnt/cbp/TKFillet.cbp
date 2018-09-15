@@ -17,6 +17,15 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__ChFiDS_DLL" />
+					<Add option="-D__ChFi2d_DLL" />
+					<Add option="-D__ChFi3d_DLL" />
+					<Add option="-D__ChFiKPart_DLL" />
+					<Add option="-D__Blend_DLL" />
+					<Add option="-D__BRepBlend_DLL" />
+					<Add option="-D__BlendFunc_DLL" />
+					<Add option="-D__BRepFilletAPI_DLL" />
+					<Add option="-D__FilletSurf_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKFillet_obj.link" />
@@ -35,6 +44,15 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__ChFiDS_DLL" />
+					<Add option="-D__ChFi2d_DLL" />
+					<Add option="-D__ChFi3d_DLL" />
+					<Add option="-D__ChFiKPart_DLL" />
+					<Add option="-D__Blend_DLL" />
+					<Add option="-D__BRepBlend_DLL" />
+					<Add option="-D__BlendFunc_DLL" />
+					<Add option="-D__BRepFilletAPI_DLL" />
+					<Add option="-D__FilletSurf_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKFillet_objd.link" />

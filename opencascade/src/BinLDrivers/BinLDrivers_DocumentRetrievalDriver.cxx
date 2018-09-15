@@ -24,7 +24,7 @@
 #include <BinObjMgt_Persistent.hxx>
 #include <CDM_Application.hxx>
 #include <CDM_Document.hxx>
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <FSD_BinaryFile.hxx>
 #include <FSD_FileHeader.hxx>
 #include <OSD_OpenFile.hxx>
@@ -120,7 +120,7 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
     Handle(TDocStd_Document)::DownCast(theDoc);
   if (aDoc.IsNull()) {
 #ifdef OCCT_DEBUG
-    myMsgDriver->Send (aMethStr + "error: null document", Message_Fail);
+    WriteMessage (aMethStr + "error: null document");
 #endif
     myReaderStatus = PCDM_RS_NoDocument;
     return;
@@ -154,7 +154,7 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
   // 1.a Version of writer
   if (!aHeaderData->StorageVersion().IsIntegerValue()) {
     // file has no format version
-    myMsgDriver->Send (aMethStr + "error: file has no format version", Message_Fail);
+    WriteMessage (aMethStr + "error: file has no format version");
     myReaderStatus = PCDM_RS_FormatFailure;
     return;
   }
@@ -164,9 +164,9 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
   if (!CheckDocumentVersion(aFileVer, aCurrVer)) {
     myReaderStatus = PCDM_RS_NoVersion;
     // file was written with another version
-    myMsgDriver->Send (aMethStr + "error: wrong file version: " +
-                 aHeaderData->StorageVersion() + " while current is " +
-                 BinLDrivers::StorageVersion(), Message_Fail);
+    WriteMessage (aMethStr + "error: wrong file version: " +
+		  aHeaderData->StorageVersion() + " while current is " +
+		  BinLDrivers::StorageVersion());
     return;
   }
 
@@ -185,14 +185,14 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
     else if (begin) {
       if ( aFileVer < 8 ) {
 #ifdef DATATYPE_MIGRATION
-        TCollection_AsciiString  newName;	
-        if(Storage_Schema::CheckTypeMigration(aStr, newName)) {
+	TCollection_AsciiString  newName;	
+	if(Storage_Schema::CheckTypeMigration(aStr, newName)) {
 #ifdef OCCT_DEBUG
-          cout << "CheckTypeMigration:OldType = " <<aStr << " Len = "<<aStr.Length()<<endl;
-          cout << "CheckTypeMigration:NewType = " <<newName  << " Len = "<< newName.Length()<<endl;
+	  cout << "CheckTypeMigration:OldType = " <<aStr << " Len = "<<aStr.Length()<<endl;
+	  cout << "CheckTypeMigration:NewType = " <<newName  << " Len = "<< newName.Length()<<endl;
 #endif
-          aStr = newName;
-        }
+	  aStr = newName;
+	}
 #endif  
       } 
       aTypeNames.Append (aStr);    
@@ -208,11 +208,11 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
     if (myDrivers->GetDriver(i).IsNull()) 
       myMapUnsupported.Add(i);
   if (!myMapUnsupported.IsEmpty()) {
-    myMsgDriver->Send (aMethStr + "warning: "
-                  "the following attributes have no driver:", Message_Warning);
+    WriteMessage (aMethStr + "warning: "
+                  "the following attributes have no driver:");
     for (i=1; i <= aTypeNames.Length(); i++)
       if (myMapUnsupported.Contains(i))
-        myMsgDriver->Send (aTypeNames(i), Message_Warning);
+	WriteMessage (aTypeNames(i));
   }
 
   // propagate the opened document version to data drivers
@@ -222,7 +222,6 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
 
   // 2a. Retrieve data from the stream:
   myRelocTable.Clear();
-  myRelocTable.SetHeaderData(aHeaderData);
   mySections.Clear();
   myPAtt.Init();
   Handle(TDF_Data) aData = new TDF_Data();
@@ -238,7 +237,7 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
 
     if (theIStream.eof()) {
       // There is no shape section in the file.
-      myMsgDriver->Send (aMethStr + "error: shape section is not found", Message_Fail);
+      WriteMessage (aMethStr + "error: shape section is not found");
       myReaderStatus = PCDM_RS_ReaderException;
       return;
     }
@@ -269,7 +268,7 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
     if (aShapeLabel.Length() > 0) {
       // version 2+(with shapes) and higher goes here
       if(aShapeLabel.Length() <= 0 || aShapeLabel != SHAPESECTION_POS) {
-        myMsgDriver->Send (aMethStr + "error: Format failure", Message_Fail);
+        WriteMessage (aMethStr + "error: Format failure");
         myReaderStatus = PCDM_RS_FormatFailure;
         return;
       }
@@ -285,13 +284,13 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
       cout <<"aShapeSectionPos = " <<aShapeSectionPos <<endl;
 #endif
       if(aShapeSectionPos) { 
-        aDocumentPos = theIStream.tellg();
-        theIStream.seekg((streampos) aShapeSectionPos);
+	aDocumentPos = theIStream.tellg();
+	theIStream.seekg((streampos) aShapeSectionPos);
 
-        CheckShapeSection(aShapeSectionPos, theIStream);
-        // Read Shapes
-        BinLDrivers_DocumentSection aCurSection;
-        ReadShapeSection (aCurSection, theIStream, Standard_False);
+	CheckShapeSection(aShapeSectionPos, theIStream);
+	// Read Shapes
+	BinLDrivers_DocumentSection aCurSection;
+	ReadShapeSection (aCurSection, theIStream, Standard_False);
       }
     }
   } // end of reading Sections or shape section
@@ -321,8 +320,8 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
     for (; aSectIter.More(); aSectIter.Next()) {
       BinLDrivers_DocumentSection& aCurSection = aSectIter.ChangeValue();
       if (aCurSection.IsPostRead()) {
-        theIStream.seekg ((streampos) aCurSection.Offset());
-        ReadSection (aCurSection, theDoc, theIStream); 
+	theIStream.seekg ((streampos) aCurSection.Offset());
+	ReadSection (aCurSection, theDoc, theIStream); 
       }
     }
   }
@@ -358,48 +357,32 @@ Standard_Integer BinLDrivers_DocumentRetrievalDriver::ReadSubTree
         tAtt = Handle(TDF_Attribute)::DownCast(myRelocTable.Find(anID));
       else
         tAtt = aDriver->NewEmpty();
-
       if (tAtt->Label().IsNull())
-      {
-        try
-        {
-          theLabel.AddAttribute (tAtt);
-        }
-        catch (const Standard_DomainError&)
-        {
-          // For attributes that can have arbitrary GUID (e.g. TDataStd_Integer), exception
-          // will be raised in valid case if attribute of that type with default GUID is already
-          // present  on the same label; the reason is that actual GUID will be read later.
-          // To avoid this, set invalid (null) GUID to the newly added attribute (see #29669)
-          static const Standard_GUID fbidGuid;
-          tAtt->SetID (fbidGuid);
-          theLabel.AddAttribute (tAtt);
-        }
-      }
+	theLabel.AddAttribute (tAtt);
       else
-        myMsgDriver->Send (aMethStr +
-                     "warning: attempt to attach attribute " +
-                     aDriver->TypeName() + " to a second label", Message_Warning);
+	WriteMessage (aMethStr +
+		      "warning: attempt to attach attribute " +
+		      aDriver->TypeName() + " to a second label");
 
       Standard_Boolean ok = aDriver->Paste (myPAtt, tAtt, myRelocTable);
       if (!ok) {
         // error converting persistent to transient
-        myMsgDriver->Send (aMethStr + "warning: failure reading attribute " +
-                      aDriver->TypeName(), Message_Warning);
+        WriteMessage (aMethStr + "warning: failure reading attribute " +
+                      aDriver->TypeName());
       }
       else if (!isBound)
         myRelocTable.Bind (anID, tAtt);
     }
     else if (!myMapUnsupported.Contains(myPAtt.TypeId()))
-      myMsgDriver->Send (aMethStr + "warning: type ID not registered in header: "
-                    + myPAtt.TypeId(), Message_Warning);
+      WriteMessage (aMethStr + "warning: type ID not registered in header: "
+                    + myPAtt.TypeId());
 
     // read next attribute
     theIS >> myPAtt;
   }
   if (!theIS || myPAtt.TypeId() != BinLDrivers_ENDATTRLIST) {
     // unexpected EOF or garbage data
-    myMsgDriver->Send (aMethStr + "error: unexpected EOF or garbage data", Message_Fail);
+    WriteMessage (aMethStr + "error: unexpected EOF or garbage data");
     myReaderStatus = PCDM_RS_UnrecognizedFileFormat;
     return -1;
   }
@@ -430,7 +413,7 @@ Standard_Integer BinLDrivers_DocumentRetrievalDriver::ReadSubTree
   }
   if (aTag != BinLDrivers_ENDLABEL) {
     // invalid end label marker
-    myMsgDriver->Send (aMethStr + "error: invalid end label marker", Message_Fail);
+    WriteMessage (aMethStr + "error: invalid end label marker");
     myReaderStatus = PCDM_RS_UnrecognizedFileFormat;
     return -1;
   }
@@ -444,9 +427,23 @@ Standard_Integer BinLDrivers_DocumentRetrievalDriver::ReadSubTree
 //=======================================================================
 
 Handle(BinMDF_ADriverTable) BinLDrivers_DocumentRetrievalDriver::AttributeDrivers
-       (const Handle(Message_Messenger)& theMessageDriver)
+       (const Handle(CDM_MessageDriver)& theMessageDriver)
 {
   return BinLDrivers::AttributeDrivers (theMessageDriver);
+}
+
+
+//=======================================================================
+//function : WriteMessage
+//purpose  : write   theMessage   to   the   MessageDriver   of
+//           theApplication
+//=======================================================================
+
+void BinLDrivers_DocumentRetrievalDriver::WriteMessage
+                         (const TCollection_ExtendedString& theMsg)
+{
+  if (!myMsgDriver.IsNull())
+    myMsgDriver->Write (theMsg.ToExtString());
 }
 
 //=======================================================================
@@ -469,13 +466,13 @@ void BinLDrivers_DocumentRetrievalDriver::ReadSection
 
 void BinLDrivers_DocumentRetrievalDriver::ReadShapeSection
                               (BinLDrivers_DocumentSection& theSection,
-                              Standard_IStream&            /*theIS*/,
-                              const Standard_Boolean isMess)
+                               Standard_IStream&            /*theIS*/,
+			       const Standard_Boolean isMess)
 
 {
   if(isMess && theSection.Length()) {
     const TCollection_ExtendedString aMethStr ("BinLDrivers_DocumentRetrievalDriver: ");
-    myMsgDriver->Send (aMethStr + "warning: Geometry is not supported by Lite schema. ", Message_Warning);
+    WriteMessage (aMethStr + "warning: Geometry is not supported by Lite schema. ");
   }
 }
 
@@ -484,8 +481,8 @@ void BinLDrivers_DocumentRetrievalDriver::ReadShapeSection
 //purpose  : 
 //=======================================================================
 void BinLDrivers_DocumentRetrievalDriver::CheckShapeSection(
-                                          const Storage_Position& ShapeSectionPos, 
-                                          Standard_IStream& IS)
+				  const Storage_Position& ShapeSectionPos, 
+						    Standard_IStream& IS)
 {
   if (!IS.eof())
   {
@@ -495,7 +492,7 @@ void BinLDrivers_DocumentRetrievalDriver::CheckShapeSection(
 #endif
     if(ShapeSectionPos != endPos) {
       const TCollection_ExtendedString aMethStr ("BinLDrivers_DocumentRetrievalDriver: ");
-      myMsgDriver->Send (aMethStr + "warning: Geometry is not supported by Lite schema. ", Message_Warning);
+      WriteMessage (aMethStr + "warning: Geometry is not supported by Lite schema. ");
     }
   }
 }
@@ -534,3 +531,4 @@ Standard_Boolean BinLDrivers_DocumentRetrievalDriver::CheckDocumentVersion(
   }
   return Standard_True;
 }
+

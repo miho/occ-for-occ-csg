@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2AD3F96C-0FC1-1089-15E3-CB6E1BA9E97E}</ProjectGuid>
+    <ProjectGuid>{1E64F187-0444-1588-06F6-13EB2BB47DA2}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -89,7 +89,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__IntCurvesFace_DLL;__MAT_DLL;__MAT2d_DLL;__Bisector_DLL;__BRepMAT2d_DLL;__BRepCheck_DLL;__BRepBndLib_DLL;__BRepExtrema_DLL;__BRepClass_DLL;__BRepClass3d_DLL;__BRepLib_DLL;__BRepGProp_DLL;__BRepIntCurveSurface_DLL;__BRepTopAdaptor_DLL;__BRepBuilderAPI_DLL;__BRepApprox_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -106,7 +106,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);__IntCurvesFace_DLL;__MAT_DLL;__MAT2d_DLL;__Bisector_DLL;__BRepMAT2d_DLL;__BRepCheck_DLL;__BRepBndLib_DLL;__BRepExtrema_DLL;__BRepClass_DLL;__BRepClass3d_DLL;__BRepLib_DLL;__BRepGProp_DLL;__BRepIntCurveSurface_DLL;__BRepTopAdaptor_DLL;__BRepBuilderAPI_DLL;__BRepApprox_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKMath.lib;TKernel.lib;TKG2d.lib;TKG3d.lib;TKGeomBase.lib;TKBRep.lib;TKGeomAlgo.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -135,7 +135,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__IntCurvesFace_DLL;__MAT_DLL;__MAT2d_DLL;__Bisector_DLL;__BRepMAT2d_DLL;__BRepCheck_DLL;__BRepBndLib_DLL;__BRepExtrema_DLL;__BRepClass_DLL;__BRepClass3d_DLL;__BRepLib_DLL;__BRepGProp_DLL;__BRepIntCurveSurface_DLL;__BRepTopAdaptor_DLL;__BRepBuilderAPI_DLL;__BRepApprox_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\..\..\..\win32\vc10\objd\TKTopAlgo/</AssemblerListingLocation>
@@ -153,7 +153,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);__IntCurvesFace_DLL;__MAT_DLL;__MAT2d_DLL;__Bisector_DLL;__BRepMAT2d_DLL;__BRepCheck_DLL;__BRepBndLib_DLL;__BRepExtrema_DLL;__BRepClass_DLL;__BRepClass3d_DLL;__BRepLib_DLL;__BRepGProp_DLL;__BRepIntCurveSurface_DLL;__BRepTopAdaptor_DLL;__BRepBuilderAPI_DLL;__BRepApprox_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKMath.lib;TKernel.lib;TKG2d.lib;TKG3d.lib;TKGeomBase.lib;TKBRep.lib;TKGeomAlgo.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -182,7 +182,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__IntCurvesFace_DLL;__MAT_DLL;__MAT2d_DLL;__Bisector_DLL;__BRepMAT2d_DLL;__BRepCheck_DLL;__BRepBndLib_DLL;__BRepExtrema_DLL;__BRepClass_DLL;__BRepClass3d_DLL;__BRepLib_DLL;__BRepGProp_DLL;__BRepIntCurveSurface_DLL;__BRepTopAdaptor_DLL;__BRepBuilderAPI_DLL;__BRepApprox_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -198,7 +198,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;No_Exception;$(CSF_DEFINES);__IntCurvesFace_DLL;__MAT_DLL;__MAT2d_DLL;__Bisector_DLL;__BRepMAT2d_DLL;__BRepCheck_DLL;__BRepBndLib_DLL;__BRepExtrema_DLL;__BRepClass_DLL;__BRepClass3d_DLL;__BRepLib_DLL;__BRepGProp_DLL;__BRepIntCurveSurface_DLL;__BRepTopAdaptor_DLL;__BRepBuilderAPI_DLL;__BRepApprox_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKMath.lib;TKernel.lib;TKG2d.lib;TKG3d.lib;TKGeomBase.lib;TKBRep.lib;TKGeomAlgo.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -227,7 +227,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Disabled</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;$(CSF_DEFINES);__IntCurvesFace_DLL;__MAT_DLL;__MAT2d_DLL;__Bisector_DLL;__BRepMAT2d_DLL;__BRepCheck_DLL;__BRepBndLib_DLL;__BRepExtrema_DLL;__BRepClass_DLL;__BRepClass3d_DLL;__BRepLib_DLL;__BRepGProp_DLL;__BRepIntCurveSurface_DLL;__BRepTopAdaptor_DLL;__BRepBuilderAPI_DLL;__BRepApprox_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AssemblerListingLocation>.\..\..\..\win64\vc10\objd\TKTopAlgo/</AssemblerListingLocation>
@@ -244,7 +244,7 @@
     </ClCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\inc;$(CSF_OPT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;$(CSF_DEFINES);__IntCurvesFace_DLL;__MAT_DLL;__MAT2d_DLL;__Bisector_DLL;__BRepMAT2d_DLL;__BRepCheck_DLL;__BRepBndLib_DLL;__BRepExtrema_DLL;__BRepClass_DLL;__BRepClass3d_DLL;__BRepLib_DLL;__BRepGProp_DLL;__BRepIntCurveSurface_DLL;__BRepTopAdaptor_DLL;__BRepBuilderAPI_DLL;__BRepApprox_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>TKMath.lib;TKernel.lib;TKG2d.lib;TKG3d.lib;TKGeomBase.lib;TKBRep.lib;TKGeomAlgo.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -296,6 +296,8 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\MAT2d\MAT2d_MiniPath.cxx">
     </ClCompile>
+    <ClCompile Include="..\..\..\src\MAT2d\MAT2d_SketchExplorer.cxx">
+    </ClCompile>
     <ClCompile Include="..\..\..\src\MAT2d\MAT2d_Tool2d.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\Bisector\Bisector.cxx">
@@ -345,8 +347,6 @@
     <ClCompile Include="..\..\..\src\BRepCheck\BRepCheck_Wire.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\BRepBndLib\BRepBndLib.cxx">
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\BRepBndLib\BRepBndLib_1.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\BRepExtrema\BRepExtrema_DistShapeShape.cxx">
     </ClCompile>
@@ -549,6 +549,8 @@
     <ClCompile Include="..\..\..\src\BRepApprox\BRepApprox_TheInt2SOfThePrmPrmSvSurfacesOfApprox_0.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\BRepApprox\BRepApprox_TheMultiLineOfApprox_0.cxx">
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\BRepApprox\BRepApprox_TheMultiLineToolOfApprox_0.cxx">
     </ClCompile>
     <ClCompile Include="..\..\..\src\BRepApprox\BRepApprox_ThePrmPrmSvSurfacesOfApprox_0.cxx">
     </ClCompile>

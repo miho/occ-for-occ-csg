@@ -75,7 +75,6 @@
 		<Unit filename="../../../src/XCAFDimTolObjects/XCAFDimTolObjects_DimensionObject.cxx" />
 		<Unit filename="../../../src/XCAFDimTolObjects/XCAFDimTolObjects_GeomToleranceObject.cxx" />
 		<Unit filename="../../../src/XCAFDimTolObjects/XCAFDimTolObjects_Tool.cxx" />
-		<Unit filename="../../../src/XCAFNoteObjects/XCAFNoteObjects_NoteObject.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_Area.cxx" />
 		<Unit filename="../../../src/XCAFDoc/XCAFDoc_AssemblyItemId.cxx" />

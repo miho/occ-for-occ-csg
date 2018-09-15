@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Standard_Type.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <XmlDrivers.hxx>
@@ -41,7 +41,7 @@ XmlDrivers_DocumentRetrievalDriver::XmlDrivers_DocumentRetrievalDriver()
 //purpose  : 
 //=======================================================================
 Handle(XmlMDF_ADriverTable) XmlDrivers_DocumentRetrievalDriver::AttributeDrivers
-       (const Handle(Message_Messenger)& theMessageDriver) 
+       (const Handle(CDM_MessageDriver)& theMessageDriver) 
 {
   return XmlDrivers::AttributeDrivers (theMessageDriver);
 }
@@ -63,7 +63,7 @@ void XmlDrivers_DocumentRetrievalDriver::PropagateDocumentVersion(
 //=======================================================================
 Handle(XmlMDF_ADriver) XmlDrivers_DocumentRetrievalDriver::ReadShapeSection(
                                const XmlObjMgt_Element&       theElement,
-                               const Handle(Message_Messenger)& theMsgDriver)
+                               const Handle(CDM_MessageDriver)& theMsgDriver)
 {
   if (myDrivers.IsNull()) myDrivers = AttributeDrivers (theMsgDriver);
   Handle(XmlMDF_ADriver) aDriver;

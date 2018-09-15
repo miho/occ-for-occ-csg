@@ -24,13 +24,13 @@ void StdLPersistent_HArray1::base::Read (StdObjMgt_ReadData& theReadData)
   theReadData >> aLowerBound >> anUpperBound;
   createArray (aLowerBound, anUpperBound);
 
-  StdObjMgt_ReadData::ObjectSentry aSentry (theReadData);
+  StdObjMgt_ReadData::Object anObjectData (theReadData);
 
   Standard_Integer aSize;
-  theReadData >> aSize;
+  anObjectData >> aSize;
 
   for (Standard_Integer i = aLowerBound; i <= anUpperBound; i++)
-    readValue (theReadData, i);
+    readValue (anObjectData, i);
 }
 
 //=======================================================================
@@ -42,10 +42,10 @@ void StdLPersistent_HArray1::base::Write (StdObjMgt_WriteData& theWriteData) con
   Standard_Integer aLowerBound = lowerBound(), anUpperBound = upperBound();
   theWriteData << aLowerBound << anUpperBound;
 
-  StdObjMgt_WriteData::ObjectSentry aSentry (theWriteData);
+  StdObjMgt_WriteData::Object anObjectData(theWriteData);
 
   Standard_Integer aSize = anUpperBound - aLowerBound + 1;
-  theWriteData << aSize;
+  anObjectData << aSize;
 
   for (Standard_Integer i = aLowerBound; i <= anUpperBound; i++)
     writeValue(theWriteData, i);

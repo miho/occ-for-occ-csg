@@ -34,14 +34,6 @@ IMPLEMENT_STANDARD_RTTIEXT(Cocoa_Window,Aspect_Window)
 #if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
   //
 #else
-
-#if !defined(MAC_OS_X_VERSION_10_12) || (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
-  // replacements for macOS versions before 10.12
-  #define NSWindowStyleMaskResizable NSResizableWindowMask
-  #define NSWindowStyleMaskClosable  NSClosableWindowMask
-  #define NSWindowStyleMaskTitled    NSTitledWindowMask
-#endif
-
 static Standard_Integer getScreenBottom()
 {
   Cocoa_LocalPool aLocalPool;
@@ -103,7 +95,7 @@ Cocoa_Window::Cocoa_Window (const Standard_CString theTitle,
   myYBottom = myYTop + thePxHeight;
 
   Cocoa_LocalPool aLocalPool;
-  NSUInteger aWinStyle = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable;
+  NSUInteger aWinStyle = NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask;
   NSRect aRectNs = NSMakeRect (float(myXLeft), float(myYTop), float(thePxWidth), float(thePxHeight));
   myHWindow = [[NSWindow alloc] initWithContentRect: aRectNs
                                           styleMask: aWinStyle

@@ -216,121 +216,27 @@ Standard_Integer AIS_InteractiveContext::HighestIndex() const
 
 }
 
+
 //=======================================================================
-//function : SetSelectionModeActive
-//purpose  :
+//function : Activate
+//purpose  : 
 //=======================================================================
-void AIS_InteractiveContext::SetSelectionModeActive (const Handle(AIS_InteractiveObject)& theObj,
-                                                     const Standard_Integer theMode,
-                                                     const Standard_Boolean theIsActive,
-                                                     const AIS_SelectionModesConcurrency theActiveFilter,
-                                                     const Standard_Boolean theIsForce)
+
+void AIS_InteractiveContext::
+Activate(const Handle(AIS_InteractiveObject)& anIObj, 
+         const Standard_Integer aMode,
+         const Standard_Boolean theIsForce)
 {
-  if (theObj.IsNull())
-  {
-    return;
+  if(!HasOpenedContext()){
+    if(!myObjects.IsBound(anIObj)) return;
+    const Handle(AIS_GlobalStatus)& STAT = myObjects(anIObj);
+    if(STAT->GraphicStatus()==AIS_DS_Displayed || theIsForce)
+      mgrSelector->Activate(anIObj,aMode,myMainSel);
+    STAT ->AddSelectionMode(aMode);
   }
-  else if (HasOpenedContext())
-  {
-    myLocalContexts (myCurLocalIndex)->SetSelectionModeActive (theObj, theMode, theIsActive, theActiveFilter);
-    return;
+  else{
+   myLocalContexts(myCurLocalIndex)->ActivateMode(anIObj,aMode);
   }
-
-  const Handle(AIS_GlobalStatus)* aStat = myObjects.Seek (theObj);
-  if (aStat == NULL)
-  {
-    return;
-  }
-
-  if (!theIsActive
-   || (theMode == -1
-    && theActiveFilter == AIS_SelectionModesConcurrency_Single))
-  {
-    if ((*aStat)->GraphicStatus() == AIS_DS_Displayed
-     || theIsForce)
-    {
-      if (theMode == -1)
-      {
-        for (TColStd_ListIteratorOfListOfInteger aModeIter ((*aStat)->SelectionModes()); aModeIter.More(); aModeIter.Next())
-        {
-          mgrSelector->Deactivate (theObj, aModeIter.Value(), myMainSel);
-        }
-      }
-      else
-      {
-        mgrSelector->Deactivate (theObj, theMode, myMainSel);
-      }
-    }
-
-    if (theMode == -1)
-    {
-      (*aStat)->ClearSelectionModes();
-    }
-    else
-    {
-      (*aStat)->RemoveSelectionMode (theMode);
-    }
-    return;
-  }
-  else if (theMode == -1)
-  {
-    return;
-  }
-
-  if ((*aStat)->SelectionModes().Size() == 1
-   && (*aStat)->SelectionModes().First() == theMode)
-  {
-    return;
-  }
-
-  if ((*aStat)->GraphicStatus() == AIS_DS_Displayed
-    || theIsForce)
-  {
-    switch (theActiveFilter)
-    {
-      case AIS_SelectionModesConcurrency_Single:
-      {
-        for (TColStd_ListIteratorOfListOfInteger aModeIter ((*aStat)->SelectionModes()); aModeIter.More(); aModeIter.Next())
-        {
-          mgrSelector->Deactivate (theObj, aModeIter.Value(), myMainSel);
-        }
-        (*aStat)->ClearSelectionModes();
-        break;
-      }
-      case AIS_SelectionModesConcurrency_GlobalOrLocal:
-      {
-        const Standard_Integer aGlobSelMode = theObj->GlobalSelectionMode();
-        TColStd_ListOfInteger aRemovedModes;
-        for (TColStd_ListIteratorOfListOfInteger aModeIter ((*aStat)->SelectionModes()); aModeIter.More(); aModeIter.Next())
-        {
-          if ((theMode == aGlobSelMode && aModeIter.Value() != aGlobSelMode)
-           || (theMode != aGlobSelMode && aModeIter.Value() == aGlobSelMode))
-          {
-            mgrSelector->Deactivate (theObj, aModeIter.Value(), myMainSel);
-            aRemovedModes.Append (aModeIter.Value());
-          }
-        }
-        if (aRemovedModes.Size() == (*aStat)->SelectionModes().Size())
-        {
-          (*aStat)->ClearSelectionModes();
-        }
-        else
-        {
-          for (TColStd_ListIteratorOfListOfInteger aModeIter (aRemovedModes); aModeIter.More(); aModeIter.Next())
-          {
-            (*aStat)->RemoveSelectionMode (aModeIter.Value());
-          }
-        }
-        break;
-      }
-      case AIS_SelectionModesConcurrency_Multiple:
-      {
-        break;
-      }
-    }
-    mgrSelector->Activate (theObj, theMode, myMainSel);
-  }
-  (*aStat)->AddSelectionMode (theMode);
 }
 
 // ============================================================================
@@ -361,6 +267,52 @@ Handle( StdSelect_ViewerSelector3d ) AIS_InteractiveContext::LocalSelector() con
       return Handle( StdSelect_ViewerSelector3d )();
   else
       return myLocalContexts( myCurLocalIndex )->MainSelector();
+}
+
+
+//=======================================================================
+//function : DeActivate
+//purpose  : 
+//=======================================================================
+void AIS_InteractiveContext::
+Deactivate(const Handle(AIS_InteractiveObject)& anIObj)
+{
+  if(!HasOpenedContext()){
+    if(!myObjects.IsBound(anIObj)) return;
+    TColStd_ListIteratorOfListOfInteger ItL;
+    for(ItL.Initialize(myObjects(anIObj)->SelectionModes());
+        ItL.More();
+        ItL.Next()){
+      if(myObjects(anIObj)->GraphicStatus() == AIS_DS_Displayed)
+        mgrSelector->Deactivate(anIObj,ItL.Value(),myMainSel);
+    }
+    myObjects(anIObj)->ClearSelectionModes();
+  }
+  else{
+    const Handle(AIS_LocalContext)& LC = myLocalContexts(myCurLocalIndex);
+    LC->Deactivate(anIObj);
+  }
+}
+
+//=======================================================================
+//function : Deactivate
+//purpose  : 
+//=======================================================================
+
+void AIS_InteractiveContext::Deactivate(const Handle(AIS_InteractiveObject)& anIObj, 
+           const Standard_Integer aMode)
+{
+  if(!HasOpenedContext()){
+    if(!myObjects.IsBound(anIObj)) return;
+    const Handle(AIS_GlobalStatus)& STAT = myObjects(anIObj);
+
+    if(STAT->GraphicStatus() == AIS_DS_Displayed)
+      mgrSelector->Deactivate(anIObj,aMode,myMainSel);
+    STAT->RemoveSelectionMode(aMode);
+  }
+  else{
+   myLocalContexts(myCurLocalIndex)->DeactivateMode(anIObj,aMode);
+  }
 }
 
 // ============================================================================
@@ -781,11 +733,8 @@ Standard_Integer AIS_InteractiveContext::PurgeViewer(const Handle(V3d_Viewer)& V
 
 Standard_Boolean AIS_InteractiveContext::IsImmediateModeOn()  const 
 {
-  if (HasOpenedContext())
-  {
-    return myLocalContexts(myCurLocalIndex)->IsImmediateModeOn();
-  }
-  return myMainPM->IsImmediateModeOn();
+  if(!HasOpenedContext()) return Standard_False;
+  return myLocalContexts(myCurLocalIndex)->IsImmediateModeOn();
 }
 
 //=======================================================================
@@ -795,17 +744,8 @@ Standard_Boolean AIS_InteractiveContext::IsImmediateModeOn()  const
 
 Standard_Boolean AIS_InteractiveContext::BeginImmediateDraw()
 {
-  if (HasOpenedContext())
-  {
-    return myLocalContexts(myCurLocalIndex)->BeginImmediateDraw();
-  }
-
-  if (myMainPM->IsImmediateModeOn())
-  {
-    myMainPM->BeginImmediateDraw();
-    return Standard_True;
-  }
-  return Standard_False;
+  return HasOpenedContext()
+      && myLocalContexts (myCurLocalIndex)->BeginImmediateDraw();
 }
 
 //=======================================================================
@@ -816,18 +756,8 @@ Standard_Boolean AIS_InteractiveContext::BeginImmediateDraw()
 Standard_Boolean AIS_InteractiveContext::ImmediateAdd (const Handle(AIS_InteractiveObject)& theObj,
                                                        const Standard_Integer               theMode)
 {
-  if (HasOpenedContext())
-  {
-    return myLocalContexts(myCurLocalIndex)->ImmediateAdd (theObj, theMode);
-  }
-
-  if (!myMainPM->IsImmediateModeOn())
-  {
-    return Standard_False;
-  }
-
-  myMainPM->AddToImmediateList (myMainPM->Presentation (theObj, theMode)->Presentation());
-  return Standard_True;
+  return HasOpenedContext()
+      && myLocalContexts (myCurLocalIndex)->ImmediateAdd (theObj, theMode);
 }
 
 //=======================================================================
@@ -837,18 +767,8 @@ Standard_Boolean AIS_InteractiveContext::ImmediateAdd (const Handle(AIS_Interact
 
 Standard_Boolean AIS_InteractiveContext::EndImmediateDraw (const Handle(V3d_View)& theView)
 {
-  if (HasOpenedContext())
-  {
-    return myLocalContexts(myCurLocalIndex)->EndImmediateDraw (theView->Viewer());
-  }
-
-  if (!myMainPM->IsImmediateModeOn())
-  {
-    return Standard_False;
-  }
-
-  myMainPM->EndImmediateDraw (theView->Viewer());
-  return Standard_True;
+  return HasOpenedContext()
+      && myLocalContexts (myCurLocalIndex)->EndImmediateDraw (theView->Viewer());
 }
 
 //=======================================================================
@@ -858,18 +778,12 @@ Standard_Boolean AIS_InteractiveContext::EndImmediateDraw (const Handle(V3d_View
 
 Standard_Boolean AIS_InteractiveContext::EndImmediateDraw()
 {
-  if (HasOpenedContext())
-  {
-    return myLocalContexts(myCurLocalIndex)->EndImmediateDraw (myMainVwr);
-  }
-
-  if (!myMainPM->IsImmediateModeOn())
+  if (!HasOpenedContext())
   {
     return Standard_False;
   }
 
-  myMainPM->EndImmediateDraw (myMainVwr);
-  return Standard_True;
+  return myLocalContexts (myCurLocalIndex)->EndImmediateDraw (myMainVwr);
 }
 
 

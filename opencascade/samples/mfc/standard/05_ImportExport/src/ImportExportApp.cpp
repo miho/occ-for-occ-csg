@@ -22,18 +22,6 @@ END_MESSAGE_MAP()
 
 CImportExportApp::CImportExportApp() : OCC_App()
 {
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// The one and only CImportExportApp object
-
-CImportExportApp theApp;
-
-/////////////////////////////////////////////////////////////////////////////
-// CImportExportApp initialization
-
-BOOL CImportExportApp::InitInstance()
-{
   // Set the local system units
   try
   {
@@ -46,8 +34,19 @@ BOOL CImportExportApp::InitInstance()
 
   SampleName = "ImportExport"; //for about dialog
   SetSamplePath (L"..\\..\\05_ImportExport");
+}
 
-  AfxEnableControlContainer();
+/////////////////////////////////////////////////////////////////////////////
+// The one and only CImportExportApp object
+
+CImportExportApp theApp;
+
+/////////////////////////////////////////////////////////////////////////////
+// CImportExportApp initialization
+
+BOOL CImportExportApp::InitInstance()
+{
+	AfxEnableControlContainer();
 
 	// Standard initialization
 	// If you are not using these features and wish to reduce the size

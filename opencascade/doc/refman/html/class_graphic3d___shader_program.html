@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -66,8 +66,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#pub-static-attribs">Static Public Attributes</a>  </div>
+<a href="#pub-static-methods">Static Public Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">Graphic3d_ShaderProgram Class Reference</div>  </div>
 </div><!--header-->
@@ -106,21 +105,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac9df21023956c8682a3516923fa61396"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#ac9df21023956c8682a3516923fa61396">SetHeader</a> (const <a class="el" href="class_t_collection___ascii_string.html">TCollection_AsciiString</a> &amp;theHeader)</td></tr>
 <tr class="memdesc:ac9df21023956c8682a3516923fa61396"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setup GLSL header containing language version code and used extensions. Will be prepended to the very beginning of the source code. Example:  <a href="#ac9df21023956c8682a3516923fa61396">More...</a><br /></td></tr>
 <tr class="separator:ac9df21023956c8682a3516923fa61396"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15b16b62bb7d2c1ba5034cabad1a4616"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#a15b16b62bb7d2c1ba5034cabad1a4616">AppendToHeader</a> (const <a class="el" href="class_t_collection___ascii_string.html">TCollection_AsciiString</a> &amp;theHeaderLine)</td></tr>
-<tr class="memdesc:a15b16b62bb7d2c1ba5034cabad1a4616"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append line to GLSL header.  <a href="#a15b16b62bb7d2c1ba5034cabad1a4616">More...</a><br /></td></tr>
-<tr class="separator:a15b16b62bb7d2c1ba5034cabad1a4616"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf096e138531890ff2974b204dceb7f4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#acf096e138531890ff2974b204dceb7f4">NbLightsMax</a> () const</td></tr>
-<tr class="memdesc:acf096e138531890ff2974b204dceb7f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the length of array of light sources (THE_MAX_LIGHTS), to be used for initialization occLightSources. Default value is THE_MAX_LIGHTS_DEFAULT.  <a href="#acf096e138531890ff2974b204dceb7f4">More...</a><br /></td></tr>
-<tr class="separator:acf096e138531890ff2974b204dceb7f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb4f24c48b2c68fa35f00a7999250d15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#aeb4f24c48b2c68fa35f00a7999250d15">SetNbLightsMax</a> (<a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theNbLights)</td></tr>
-<tr class="memdesc:aeb4f24c48b2c68fa35f00a7999250d15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specify the length of array of light sources (THE_MAX_LIGHTS).  <a href="#aeb4f24c48b2c68fa35f00a7999250d15">More...</a><br /></td></tr>
-<tr class="separator:aeb4f24c48b2c68fa35f00a7999250d15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1ea73295517772f0909b4565ea55a8d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#ad1ea73295517772f0909b4565ea55a8d">NbClipPlanesMax</a> () const</td></tr>
-<tr class="memdesc:ad1ea73295517772f0909b4565ea55a8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the length of array of clipping planes (THE_MAX_CLIP_PLANES), to be used for initialization occClipPlaneEquations. Default value is THE_MAX_CLIP_PLANES_DEFAULT.  <a href="#ad1ea73295517772f0909b4565ea55a8d">More...</a><br /></td></tr>
-<tr class="separator:ad1ea73295517772f0909b4565ea55a8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a765e29df69384b0eda31f65d018fd0b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#a765e29df69384b0eda31f65d018fd0b6">SetNbClipPlanesMax</a> (<a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theNbPlanes)</td></tr>
-<tr class="memdesc:a765e29df69384b0eda31f65d018fd0b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specify the length of array of clipping planes (THE_MAX_CLIP_PLANES).  <a href="#a765e29df69384b0eda31f65d018fd0b6">More...</a><br /></td></tr>
-<tr class="separator:a765e29df69384b0eda31f65d018fd0b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac9f1ee24a19f6edb42e01cf7250d43f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#aac9f1ee24a19f6edb42e01cf7250d43f">AttachShader</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___shader_object.html">Graphic3d_ShaderObject</a> &gt; &amp;theShader)</td></tr>
 <tr class="memdesc:aac9f1ee24a19f6edb42e01cf7250d43f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attaches shader object to the program object.  <a href="#aac9f1ee24a19f6edb42e01cf7250d43f">More...</a><br /></td></tr>
 <tr class="separator:aac9f1ee24a19f6edb42e01cf7250d43f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -139,24 +123,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1b7bbbdf2f9c67fb5a957378e4c51729"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#a1b7bbbdf2f9c67fb5a957378e4c51729">SetVertexAttributes</a> (const <a class="el" href="_graphic3d___shader_program_8hxx.html#a01376113772efccfa79aa9ec3025235a">Graphic3d_ShaderAttributeList</a> &amp;theAttributes)</td></tr>
 <tr class="memdesc:a1b7bbbdf2f9c67fb5a957378e4c51729"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign the list of custom vertex attributes. Should be done before GLSL program initialization.  <a href="#a1b7bbbdf2f9c67fb5a957378e4c51729">More...</a><br /></td></tr>
 <tr class="separator:a1b7bbbdf2f9c67fb5a957378e4c51729"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2551a29337c83e02b75d02b46fd0cc36"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#a2551a29337c83e02b75d02b46fd0cc36">NbFragmentOutputs</a> () const</td></tr>
-<tr class="memdesc:a2551a29337c83e02b75d02b46fd0cc36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number (1+) of Fragment Shader outputs to be written to (more than 1 can be in case of multiple draw buffers); 1 by default.  <a href="#a2551a29337c83e02b75d02b46fd0cc36">More...</a><br /></td></tr>
-<tr class="separator:a2551a29337c83e02b75d02b46fd0cc36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a19a7242db28ba462eebc7109edb22c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#a5a19a7242db28ba462eebc7109edb22c">SetNbFragmentOutputs</a> (const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> theNbOutputs)</td></tr>
-<tr class="memdesc:a5a19a7242db28ba462eebc7109edb22c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the number of Fragment Shader outputs to be written to. Should be done before GLSL program initialization.  <a href="#a5a19a7242db28ba462eebc7109edb22c">More...</a><br /></td></tr>
-<tr class="separator:a5a19a7242db28ba462eebc7109edb22c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1a1305e910eeec26f1ca2f18e253d8c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#af1a1305e910eeec26f1ca2f18e253d8c">HasAlphaTest</a> () const</td></tr>
-<tr class="memdesc:af1a1305e910eeec26f1ca2f18e253d8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if Fragment Shader should perform alpha test; FALSE by default.  <a href="#af1a1305e910eeec26f1ca2f18e253d8c">More...</a><br /></td></tr>
-<tr class="separator:af1a1305e910eeec26f1ca2f18e253d8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bde321f6f754684fd5fa1792e1efa4a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#a6bde321f6f754684fd5fa1792e1efa4a">SetAlphaTest</a> (<a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theAlphaTest)</td></tr>
-<tr class="memdesc:a6bde321f6f754684fd5fa1792e1efa4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set if Fragment Shader should perform alpha test. Note that this flag is designed for usage with - custom shader program may discard fragment regardless this flag.  <a href="#a6bde321f6f754684fd5fa1792e1efa4a">More...</a><br /></td></tr>
-<tr class="separator:a6bde321f6f754684fd5fa1792e1efa4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a919dad2603aaea7fc46a842b970d9ce4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#a919dad2603aaea7fc46a842b970d9ce4">HasWeightOitOutput</a> () const</td></tr>
-<tr class="memdesc:a919dad2603aaea7fc46a842b970d9ce4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if Fragment Shader color should output the weighted OIT coverage; FALSE by default.  <a href="#a919dad2603aaea7fc46a842b970d9ce4">More...</a><br /></td></tr>
-<tr class="separator:a919dad2603aaea7fc46a842b970d9ce4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2db4bae341c015ad652cbf53d75cf08"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#ac2db4bae341c015ad652cbf53d75cf08">SetWeightOitOutput</a> (<a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> theOutput)</td></tr>
-<tr class="memdesc:ac2db4bae341c015ad652cbf53d75cf08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set if Fragment Shader color should output the weighted OIT coverage. Note that weighted OIT also requires at least 2 Fragment Outputs (color + coverage).  <a href="#ac2db4bae341c015ad652cbf53d75cf08">More...</a><br /></td></tr>
-<tr class="separator:ac2db4bae341c015ad652cbf53d75cf08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a597d040ae2e5882b410867ff80b3e66e"><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
 <tr class="memitem:a597d040ae2e5882b410867ff80b3e66e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#a597d040ae2e5882b410867ff80b3e66e">PushVariable</a> (const <a class="el" href="class_t_collection___ascii_string.html">TCollection_AsciiString</a> &amp;theName, const T &amp;theValue)</td></tr>
 <tr class="memdesc:a597d040ae2e5882b410867ff80b3e66e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pushes custom uniform variable to the program. The list of pushed variables is automatically cleared after applying to GLSL program. Thus after program recreation even unchanged uniforms should be pushed anew.  <a href="#a597d040ae2e5882b410867ff80b3e66e">More...</a><br /></td></tr>
@@ -245,18 +211,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a7b7d7949596235d35c1a5b7a4bbd77f2 inherit pub_static_methods_class_standard___transient"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns type descriptor of <a class="el" href="class_standard___transient.html" title="Abstract class which forms the root of the entire Transient class hierarchy. ">Standard_Transient</a> class.  <a href="class_standard___transient.html#a7b7d7949596235d35c1a5b7a4bbd77f2">More...</a><br /></td></tr>
 <tr class="separator:a7b7d7949596235d35c1a5b7a4bbd77f2 inherit pub_static_methods_class_standard___transient"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
-Static Public Attributes</h2></td></tr>
-<tr class="memitem:a1af7296dd57a4b567be971c6592caad6"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#a1af7296dd57a4b567be971c6592caad6">THE_MAX_LIGHTS_DEFAULT</a> = 8</td></tr>
-<tr class="memdesc:a1af7296dd57a4b567be971c6592caad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default value of THE_MAX_LIGHTS macros within GLSL program (see Declarations.glsl).  <a href="#a1af7296dd57a4b567be971c6592caad6">More...</a><br /></td></tr>
-<tr class="separator:a1af7296dd57a4b567be971c6592caad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab834a7a747e8d20a45e1461cd15de144"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#ab834a7a747e8d20a45e1461cd15de144">THE_MAX_CLIP_PLANES_DEFAULT</a> = 8</td></tr>
-<tr class="memdesc:ab834a7a747e8d20a45e1461cd15de144"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default value of THE_MAX_CLIP_PLANES macros within GLSL program (see Declarations.glsl).  <a href="#ab834a7a747e8d20a45e1461cd15de144">More...</a><br /></td></tr>
-<tr class="separator:ab834a7a747e8d20a45e1461cd15de144"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac1b10a72750e6ade7fab5c20c4d0fdc"><td class="memItemLeft" align="right" valign="top">static const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___shader_program.html#aac1b10a72750e6ade7fab5c20c4d0fdc">THE_NB_FRAG_OUTPUTS</a> = 1</td></tr>
-<tr class="memdesc:aac1b10a72750e6ade7fab5c20c4d0fdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default value of THE_NB_FRAG_OUTPUTS macros within GLSL program (see Declarations.glsl).  <a href="#aac1b10a72750e6ade7fab5c20c4d0fdc">More...</a><br /></td></tr>
-<tr class="separator:aac1b10a72750e6ade7fab5c20c4d0fdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pub_types_class_standard___transient"><td colspan="2" onclick="javascript:toggleInherit('pub_types_class_standard___transient')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="class_standard___transient.html">Standard_Transient</a></td></tr>
@@ -314,34 +268,6 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a15b16b62bb7d2c1ba5034cabad1a4616"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a15b16b62bb7d2c1ba5034cabad1a4616">&#9670;&nbsp;</a></span>AppendToHeader()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Graphic3d_ShaderProgram::AppendToHeader </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_t_collection___ascii_string.html">TCollection_AsciiString</a> &amp;&#160;</td>
-          <td class="paramname"><em>theHeaderLine</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Append line to GLSL header. </p>
-
-</div>
-</div>
 <a id="aac9f1ee24a19f6edb42e01cf7250d43f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aac9f1ee24a19f6edb42e01cf7250d43f">&#9670;&nbsp;</a></span>AttachShader()</h2>
 
@@ -428,60 +354,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="af1a1305e910eeec26f1ca2f18e253d8c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af1a1305e910eeec26f1ca2f18e253d8c">&#9670;&nbsp;</a></span>HasAlphaTest()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> Graphic3d_ShaderProgram::HasAlphaTest </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return true if Fragment Shader should perform alpha test; FALSE by default. </p>
-
-</div>
-</div>
-<a id="a919dad2603aaea7fc46a842b970d9ce4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a919dad2603aaea7fc46a842b970d9ce4">&#9670;&nbsp;</a></span>HasWeightOitOutput()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> Graphic3d_ShaderProgram::HasWeightOitOutput </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return true if Fragment Shader color should output the weighted OIT coverage; FALSE by default. </p>
-
-</div>
-</div>
 <a id="a8e773e22304864dc530ac47613265788"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8e773e22304864dc530ac47613265788">&#9670;&nbsp;</a></span>Header()</h2>
 
@@ -533,87 +405,6 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Checks if the program object is valid or not. </p>
-
-</div>
-</div>
-<a id="ad1ea73295517772f0909b4565ea55a8d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1ea73295517772f0909b4565ea55a8d">&#9670;&nbsp;</a></span>NbClipPlanesMax()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> Graphic3d_ShaderProgram::NbClipPlanesMax </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return the length of array of clipping planes (THE_MAX_CLIP_PLANES), to be used for initialization occClipPlaneEquations. Default value is THE_MAX_CLIP_PLANES_DEFAULT. </p>
-
-</div>
-</div>
-<a id="a2551a29337c83e02b75d02b46fd0cc36"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2551a29337c83e02b75d02b46fd0cc36">&#9670;&nbsp;</a></span>NbFragmentOutputs()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> Graphic3d_ShaderProgram::NbFragmentOutputs </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns the number (1+) of Fragment Shader outputs to be written to (more than 1 can be in case of multiple draw buffers); 1 by default. </p>
-
-</div>
-</div>
-<a id="acf096e138531890ff2974b204dceb7f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acf096e138531890ff2974b204dceb7f4">&#9670;&nbsp;</a></span>NbLightsMax()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> Graphic3d_ShaderProgram::NbLightsMax </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return the length of array of light sources (THE_MAX_LIGHTS), to be used for initialization occLightSources. Default value is THE_MAX_LIGHTS_DEFAULT. </p>
 
 </div>
 </div>
@@ -961,34 +752,6 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
-<a id="a6bde321f6f754684fd5fa1792e1efa4a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6bde321f6f754684fd5fa1792e1efa4a">&#9670;&nbsp;</a></span>SetAlphaTest()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Graphic3d_ShaderProgram::SetAlphaTest </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theAlphaTest</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set if Fragment Shader should perform alpha test. Note that this flag is designed for usage with - custom shader program may discard fragment regardless this flag. </p>
-
-</div>
-</div>
 <a id="ac9df21023956c8682a3516923fa61396"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac9df21023956c8682a3516923fa61396">&#9670;&nbsp;</a></span>SetHeader()</h2>
 
@@ -1017,90 +780,6 @@ template&lt;class T &gt; </div>
 <div class="fragment"><div class="line"><span class="preprocessor">#version 300 es</span></div><div class="line"><span class="preprocessor">#extension GL_ARB_bindless_texture : require</span></div></div><!-- fragment --> 
 </div>
 </div>
-<a id="a765e29df69384b0eda31f65d018fd0b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a765e29df69384b0eda31f65d018fd0b6">&#9670;&nbsp;</a></span>SetNbClipPlanesMax()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Graphic3d_ShaderProgram::SetNbClipPlanesMax </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>theNbPlanes</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Specify the length of array of clipping planes (THE_MAX_CLIP_PLANES). </p>
-
-</div>
-</div>
-<a id="a5a19a7242db28ba462eebc7109edb22c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a19a7242db28ba462eebc7109edb22c">&#9670;&nbsp;</a></span>SetNbFragmentOutputs()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Graphic3d_ShaderProgram::SetNbFragmentOutputs </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>theNbOutputs</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sets the number of Fragment Shader outputs to be written to. Should be done before GLSL program initialization. </p>
-
-</div>
-</div>
-<a id="aeb4f24c48b2c68fa35f00a7999250d15"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb4f24c48b2c68fa35f00a7999250d15">&#9670;&nbsp;</a></span>SetNbLightsMax()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Graphic3d_ShaderProgram::SetNbLightsMax </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td>
-          <td class="paramname"><em>theNbLights</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Specify the length of array of light sources (THE_MAX_LIGHTS). </p>
-
-</div>
-</div>
 <a id="a1b7bbbdf2f9c67fb5a957378e4c51729"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1b7bbbdf2f9c67fb5a957378e4c51729">&#9670;&nbsp;</a></span>SetVertexAttributes()</h2>
 
@@ -1118,34 +797,6 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Assign the list of custom vertex attributes. Should be done before GLSL program initialization. </p>
-
-</div>
-</div>
-<a id="ac2db4bae341c015ad652cbf53d75cf08"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2db4bae341c015ad652cbf53d75cf08">&#9670;&nbsp;</a></span>SetWeightOitOutput()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Graphic3d_ShaderProgram::SetWeightOitOutput </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td>
-          <td class="paramname"><em>theOutput</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set if Fragment Shader color should output the weighted OIT coverage. Note that weighted OIT also requires at least 2 Fragment Outputs (color + coverage). </p>
 
 </div>
 </div>
@@ -1255,79 +906,6 @@ template&lt;class T &gt; </div>
 </div><div class="memdoc">
 
 <p>Return the list of custom vertex attributes. </p>
-
-</div>
-</div>
-<h2 class="groupheader">Field Documentation</h2>
-<a id="ab834a7a747e8d20a45e1461cd15de144"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab834a7a747e8d20a45e1461cd15de144">&#9670;&nbsp;</a></span>THE_MAX_CLIP_PLANES_DEFAULT</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> Graphic3d_ShaderProgram::THE_MAX_CLIP_PLANES_DEFAULT = 8</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Default value of THE_MAX_CLIP_PLANES macros within GLSL program (see Declarations.glsl). </p>
-
-</div>
-</div>
-<a id="a1af7296dd57a4b567be971c6592caad6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1af7296dd57a4b567be971c6592caad6">&#9670;&nbsp;</a></span>THE_MAX_LIGHTS_DEFAULT</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> Graphic3d_ShaderProgram::THE_MAX_LIGHTS_DEFAULT = 8</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Default value of THE_MAX_LIGHTS macros within GLSL program (see Declarations.glsl). </p>
-
-</div>
-</div>
-<a id="aac1b10a72750e6ade7fab5c20c4d0fdc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac1b10a72750e6ade7fab5c20c4d0fdc">&#9670;&nbsp;</a></span>THE_NB_FRAG_OUTPUTS</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> Graphic3d_ShaderProgram::THE_NB_FRAG_OUTPUTS = 1</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Default value of THE_NB_FRAG_OUTPUTS macros within GLSL program (see Declarations.glsl). </p>
 
 </div>
 </div>

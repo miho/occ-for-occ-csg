@@ -1,14 +1,11 @@
 var searchData=
 [
   ['v3d_5fcoordinate',['V3d_Coordinate',['../_v3d___coordinate_8hxx.html#a04a22e876b58104860099584aa37d809',1,'V3d_Coordinate.hxx']]],
-  ['v3d_5flight',['V3d_Light',['../_v3d___light_8hxx.html#a7cfa9e915b2a5d68b148e34b88f54062',1,'V3d_Light.hxx']]],
-  ['v3d_5flistoflight',['V3d_ListOfLight',['../_v3d___list_of_light_8hxx.html#a01777a99c63417ca6e55394af47720a6',1,'V3d_ListOfLight.hxx']]],
+  ['v3d_5flistoflight',['V3d_ListOfLight',['../_v3d___list_of_light_8hxx.html#a6b2f50395c6e7724ee8dfd24454062e9',1,'V3d_ListOfLight.hxx']]],
   ['v3d_5flistoflightiterator',['V3d_ListOfLightIterator',['../_v3d___list_of_light_8hxx.html#aec64d2b4e5b5e7558c4fa8532d186742',1,'V3d_ListOfLight.hxx']]],
   ['v3d_5flistofview',['V3d_ListOfView',['../_v3d___list_of_view_8hxx.html#ac2491f0c1f59dd0e1a2d3f4d3ba4281e',1,'V3d_ListOfView.hxx']]],
   ['v3d_5flistofviewiterator',['V3d_ListOfViewIterator',['../_v3d___list_of_view_8hxx.html#ae565a431e52107ef1136041e375331aa',1,'V3d_ListOfView.hxx']]],
   ['v3d_5fparameter',['V3d_Parameter',['../_v3d___parameter_8hxx.html#aeda45e2f58df59ea1415ca5e5ccaee74',1,'V3d_Parameter.hxx']]],
-  ['v3d_5ftypeoflight',['V3d_TypeOfLight',['../_v3d___type_of_light_8hxx.html#af5e277f39b86af14ba4f97d6c7273485',1,'V3d_TypeOfLight.hxx']]],
-  ['v3d_5ftypeofshadingmodel',['V3d_TypeOfShadingModel',['../_v3d___type_of_shading_model_8hxx.html#afcfdbb6c4f7555a1217585990ed01dd0',1,'V3d_TypeOfShadingModel.hxx']]],
   ['v3d_5fviewerpointer',['V3d_ViewerPointer',['../_v3d___viewer_pointer_8hxx.html#aef4e533b6d32c2b8c756b8a4341cda69',1,'V3d_ViewerPointer.hxx']]],
   ['v3d_5fviewpointer',['V3d_ViewPointer',['../_v3d___view_pointer_8hxx.html#a30d0674b897138bfb39c31a5536ab20f',1,'V3d_ViewPointer.hxx']]],
   ['value_5ftype',['value_type',['../class_n_collection___array1.html#a6a27f1c97dc021cecfba699a9018f65c',1,'NCollection_Array1::value_type()'],['../class_n_collection___array2.html#a529b1ec846c7b79ffdfba291ea04cf6c',1,'NCollection_Array2::value_type()'],['../class_n_collection___data_map.html#a6fddb56013b9fe8598c288f6741adc53',1,'NCollection_DataMap::value_type()'],['../class_n_collection___indexed_data_map.html#a2ba13cfc97874bf69347fe6d068ce6cf',1,'NCollection_IndexedDataMap::value_type()'],['../class_n_collection___list.html#a907a81dca823ad668fbc9bf7e88156ca',1,'NCollection_List::value_type()'],['../class_n_collection___sequence.html#ab30d54888e5c2f58754290cf106b3de4',1,'NCollection_Sequence::value_type()'],['../class_n_collection___std_allocator.html#a574470f1641438fe89a18c349b6f6e52',1,'NCollection_StdAllocator::value_type()'],['../class_n_collection___std_allocator_3_01void_01_4.html#aacec4b78ca2058dded59bc674a570fff',1,'NCollection_StdAllocator&lt; void &gt;::value_type()'],['../class_n_collection___vector.html#a7d47c6d9f4180fc36b854cc812146a25',1,'NCollection_Vector::value_type()']]],

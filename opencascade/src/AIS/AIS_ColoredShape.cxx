@@ -345,7 +345,7 @@ void AIS_ColoredShape::SetMaterial (const Graphic3d_MaterialAspect& theMaterial)
 //function : Compute
 //purpose  :
 //=======================================================================
-void AIS_ColoredShape::Compute (const Handle(PrsMgr_PresentationManager3d)& thePrsMgr,
+void AIS_ColoredShape::Compute (const Handle(PrsMgr_PresentationManager3d)& ,
                                 const Handle(Prs3d_Presentation)&           thePrs,
                                 const Standard_Integer                      theMode)
 {
@@ -359,45 +359,31 @@ void AIS_ColoredShape::Compute (const Handle(PrsMgr_PresentationManager3d)& theP
     thePrs->SetInfiniteState (Standard_True);
   }
 
-  switch (theMode)
+  if (theMode == AIS_Shaded)
   {
-    case AIS_WireFrame:
+    if (myDrawer->IsAutoTriangulation())
     {
+      // compute mesh for entire shape beforehand to ensure consistency and optimizations (parallelization)
       StdPrs_ToolTriangulatedShape::ClearOnOwnDeflectionChange (myshape, myDrawer, Standard_True);
 
       // After this call if type of deflection is relative
       // computed deflection coefficient is stored as absolute.
-      Prs3d::GetDeflection (myshape, myDrawer);
-      break;
-    }
-    case AIS_Shaded:
-    {
-      if (myDrawer->IsAutoTriangulation())
+      Standard_Boolean wasRecomputed = StdPrs_ToolTriangulatedShape::Tessellate (myshape, myDrawer);
+
+      // Set to update wireframe presentation on triangulation.
+      if (myDrawer->IsoOnTriangulation() && wasRecomputed)
       {
-        // compute mesh for entire shape beforehand to ensure consistency and optimizations (parallelization)
-        StdPrs_ToolTriangulatedShape::ClearOnOwnDeflectionChange (myshape, myDrawer, Standard_True);
-
-        // After this call if type of deflection is relative
-        // computed deflection coefficient is stored as absolute.
-        Standard_Boolean wasRecomputed = StdPrs_ToolTriangulatedShape::Tessellate (myshape, myDrawer);
-
-        // Set to update wireframe presentation on triangulation.
-        if (myDrawer->IsoOnTriangulation() && wasRecomputed)
-        {
-          SetToUpdate (AIS_WireFrame);
-        }
+        SetToUpdate (AIS_WireFrame);
       }
-      break;
     }
-    case 2:
-    {
-      AIS_Shape::Compute (thePrsMgr, thePrs, theMode);
-      return;
-    }
-    default:
-    {
-      return;
-    }
+  }
+  else // WireFrame mode
+  {
+    StdPrs_ToolTriangulatedShape::ClearOnOwnDeflectionChange (myshape, myDrawer, Standard_True);
+
+    // After this call if type of deflection is relative
+    // computed deflection coefficient is stored as absolute.
+    Prs3d::GetDeflection (myshape, myDrawer);
   }
 
   // Extract myShapeColors map (KeyshapeColored -> Color) to subshapes map (Subshape -> Color).
@@ -509,9 +495,9 @@ void AIS_ColoredShape::ComputeSelection (const Handle(SelectMgr_Selection)& theS
                             aTypOfSel, aPriority, aDeflection, aDeviationAngle);
 
   Handle(SelectMgr_SelectableObject) aThis (this);
-  for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (theSelection->Entities()); aSelEntIter.More(); aSelEntIter.Next())
+  for (theSelection->Init(); theSelection->More(); theSelection->Next())
   {
-    Handle(SelectMgr_EntityOwner) anOwner = Handle(SelectMgr_EntityOwner)::DownCast (aSelEntIter.Value()->BaseSensitive()->OwnerId());
+    Handle(SelectMgr_EntityOwner) anOwner = Handle(SelectMgr_EntityOwner)::DownCast (theSelection->Sensitive()->BaseSensitive()->OwnerId());
     anOwner->Set (aThis);
   }
 

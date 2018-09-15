@@ -17,6 +17,9 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__TDataXtd_DLL" />
+					<Add option="-D__TNaming_DLL" />
+					<Add option="-D__AppStd_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKCAF_obj.link" />
@@ -35,6 +38,9 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__TDataXtd_DLL" />
+					<Add option="-D__TNaming_DLL" />
+					<Add option="-D__AppStd_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKCAF_objd.link" />
@@ -133,6 +139,9 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/TNaming/TNaming_NamingTool.cxx">
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../../src/TNaming/TNaming_SameShapeIterator.cxx">
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../../../src/TNaming/TNaming_Scope.cxx">

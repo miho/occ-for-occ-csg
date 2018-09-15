@@ -679,8 +679,6 @@ Handle(TransferBRep_ShapeBinder) STEPControl_ActorRead::TransferEntity(const Han
       if (RR.IsNull()) continue;
       SRRReversed = STEPConstruct_Assembly::CheckSRRReversesNAUO ( graph, CDSR );
       Handle(StepRepr_Representation) rep = ( SRRReversed ? RR->Rep2() : RR->Rep1() );
-      if(rep.IsNull())
-        continue;
       iatrsf = ComputeSRRWT ( RR, TP, Trsf );
       // find real ProductDefinition used rep
       Interface_EntityIterator subs3 = TP->Graph().Sharings(rep);

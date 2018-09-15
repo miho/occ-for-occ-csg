@@ -41,7 +41,6 @@ void AIS_Selection::Clear()
 {
   myresult.Clear();
   myResultMap.Clear();
-  myIterator = AIS_NListOfEntityOwner::Iterator();
 }
 
 //=======================================================================

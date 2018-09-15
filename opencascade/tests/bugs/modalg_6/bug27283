@@ -18,12 +18,10 @@ bbuild result0
 
 checkshape result0
 
-savehistory gf_hist
-
 # extract the parts of result corresponding to object
 shape result C
 foreach s [explode a_1 So] {
-  modified r_$s gf_hist $s
+  bmodified r_$s $s
   add r_$s result
 }
 

@@ -1,3 +1,5 @@
+puts "TODO OCC28984 ALL: Error: Too big intersection tolerance"
+
 puts "======="
 puts "0028984"
 puts "======="
@@ -18,6 +20,6 @@ if {$nb_curves != 2} {
   puts "Error: Invalid number of curves"
 }
 
-if {$tol_reached > 0.01} {
+if {$tol_reached > 0.1} {
   puts "Error: Too big intersection tolerance"
 }

@@ -30,7 +30,6 @@
 #include <Standard_Integer.hxx>
 #include <TColStd_SequenceOfInteger.hxx>
 #include <AIS_SequenceOfInteractive.hxx>
-#include <AIS_SelectionModesConcurrency.hxx>
 #include <Standard_Transient.hxx>
 #include <AIS_ClearMode.hxx>
 #include <TopAbs_ShapeEnum.hxx>
@@ -92,8 +91,8 @@ public:
     Standard_Boolean AcceptErase() const;
   
   Standard_EXPORT void SetContext (const Handle(AIS_InteractiveContext)& aCtx);
-
-  const Handle(AIS_Selection)& Selection() const { return mySelection; }
+  
+    const Handle(AIS_Selection) Selection() const;
   
   Standard_EXPORT void Terminate (const Standard_Boolean updateviewer = Standard_True);
   
@@ -121,26 +120,12 @@ public:
   //! the selector (filters, modeof activation, objects...)
   Standard_EXPORT void Clear (const AIS_ClearMode atype = AIS_CM_All);
   
-  Standard_EXPORT void SetSelectionModeActive (const Handle(AIS_InteractiveObject)& theObj,
-                                               const Standard_Integer theMode,
-                                               const Standard_Boolean theIsActive,
-                                               const AIS_SelectionModesConcurrency theActiveFilter);
-
   //! optional : activation of a mode which is not 0 for a selectable...
-  void ActivateMode (const Handle(AIS_InteractiveObject)& theObj, const Standard_Integer theMode)
-  {
-    SetSelectionModeActive (theObj, theMode, Standard_True, AIS_SelectionModesConcurrency_GlobalOrLocal);
-  }
-
-  void DeactivateMode (const Handle(AIS_InteractiveObject)& theObj, const Standard_Integer theMode)
-  {
-    SetSelectionModeActive (theObj, theMode, Standard_False, AIS_SelectionModesConcurrency_GlobalOrLocal);
-  }
-
-  void Deactivate (const Handle(AIS_InteractiveObject)& theObj)
-  {
-    SetSelectionModeActive (theObj, -1, Standard_False, AIS_SelectionModesConcurrency_Single);
-  }
+  Standard_EXPORT void ActivateMode (const Handle(AIS_InteractiveObject)& aSelectable, const Standard_Integer aMode);
+  
+  Standard_EXPORT void DeactivateMode (const Handle(AIS_InteractiveObject)& aSelectable, const Standard_Integer aMode);
+  
+  Standard_EXPORT void Deactivate (const Handle(AIS_InteractiveObject)& aSelectable);
   
   //! decomposition of shapes into <aType>
   Standard_EXPORT void ActivateStandardMode (const TopAbs_ShapeEnum aType);

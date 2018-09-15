@@ -18,8 +18,6 @@ enum View3D_CurrentAction {
   CurAction3d_DynamicRotation
 };
 
-class AIS_RubberBand;
-
 class COCCDemoView : public CView
 {
 protected: // create from serialization only
@@ -121,13 +119,14 @@ private:
   Standard_Real        myCurZoom;
 
 private:
-  Handle(AIS_RubberBand) myRect; //!< Rubber rectangle for selection
+  enum LineStyle { Solid, Dot, ShortDash, LongDash, Default };
+  CPen*  m_Pen;
   virtual void DrawRectangle (const Standard_Integer  MinX  ,
                               const Standard_Integer  MinY  ,
                               const Standard_Integer  MaxX  ,
                               const Standard_Integer  MaxY  ,
                               const Standard_Boolean  Draw  ,
-                              Aspect_TypeOfLine theLineType = Aspect_TOL_SOLID);
+                              const LineStyle aLineStyle = Default  );
 
 };
 

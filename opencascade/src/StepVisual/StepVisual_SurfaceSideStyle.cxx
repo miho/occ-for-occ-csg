@@ -58,5 +58,5 @@ StepVisual_SurfaceStyleElementSelect StepVisual_SurfaceSideStyle::StylesValue(co
 
 Standard_Integer StepVisual_SurfaceSideStyle::NbStyles () const
 {
-  return (styles.IsNull()) ? 0 : styles->Length();
+	return styles->Length();
 }

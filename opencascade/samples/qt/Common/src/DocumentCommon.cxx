@@ -4,20 +4,15 @@
 #include "Transparency.h"
 #include "Material.h"
 
-#include <Standard_WarningsDisable.hxx>
 #include <QStatusBar>
 #include <QApplication>
 #include <QColor>
 #include <QColorDialog>
-#include <Standard_WarningsRestore.hxx>
 
 #include <Aspect_DisplayConnection.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <Graphic3d_NameOfMaterial.hxx>
 #include <OpenGl_GraphicDriver.hxx>
-#if !defined(_WIN32) && !defined(__WIN32__) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX))
-#include <OSD_Environment.hxx>
-#endif
 #include <TCollection_AsciiString.hxx>
 
 // =======================================================================
@@ -37,7 +32,7 @@ Handle(V3d_Viewer) DocumentCommon::Viewer (const Standard_ExtString ,
   {
     Handle(Aspect_DisplayConnection) aDisplayConnection;
 #if !defined(_WIN32) && !defined(__WIN32__) && (!defined(__APPLE__) || defined(MACOSX_USE_GLX))
-    aDisplayConnection = new Aspect_DisplayConnection (OSD_Environment ("DISPLAY").Value());
+    aDisplayConnection = new Aspect_DisplayConnection (qgetenv ("DISPLAY").constData());
 #endif
     aGraphicDriver = new OpenGl_GraphicDriver (aDisplayConnection);
   }
@@ -190,8 +185,7 @@ void DocumentCommon::onColor()
     {
         Quantity_Color aShapeColor;
         myContext->Color( Current, aShapeColor );
-        aColor.setRgb( (Standard_Integer)(aShapeColor.Red() * 255), (Standard_Integer)(aShapeColor.Green() * 255),
-                       (Standard_Integer)(aShapeColor.Blue() * 255));
+        aColor.setRgb( aShapeColor.Red() * 255, aShapeColor.Green() * 255, aShapeColor.Blue() * 255 );
     }
     else
         aColor.setRgb( 255, 255, 255 );

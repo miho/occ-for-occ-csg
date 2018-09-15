@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{C2657099-121D-1973-010D-8FA93AAF4200}</UniqueIdentifier>
+      <UniqueIdentifier>{FDCDA3CC-019F-034C-1590-E300F75462D7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\StlAPI">
-      <UniqueIdentifier>{1628826B-1863-0E18-1238-70AAFEEA259E}</UniqueIdentifier>
+      <UniqueIdentifier>{2533C9B6-0CE1-0973-0D8C-E05EA0648879}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\RWStl">
-      <UniqueIdentifier>{4BB7ED31-0165-01BC-0CE8-6ECF7BF7B2B8}</UniqueIdentifier>
+      <UniqueIdentifier>{3BCCF520-0F24-023F-0796-27027F1514C1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

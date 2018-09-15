@@ -35,6 +35,8 @@ public:
                                         const AIS_ManipulatorMode theMode,
                                         const Standard_Integer thePriority = 0);
 
+  Standard_EXPORT virtual ~AIS_ManipulatorOwner() {}
+
   Standard_EXPORT virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& thePM,
                                                  const Handle(Prs3d_Drawer)& theStyle,
                                                  const Standard_Integer theMode) Standard_OVERRIDE;
@@ -44,10 +46,10 @@ public:
 
   Standard_EXPORT virtual void Unhilight (const Handle(PrsMgr_PresentationManager)& thePM, const Standard_Integer theMode) Standard_OVERRIDE;
 
-  AIS_ManipulatorMode Mode() const { return myMode; }
+  Standard_EXPORT AIS_ManipulatorMode Mode() const { return myMode; }
 
   //! @return index of manipulator axis.
-  Standard_Integer Index() const { return myIndex; }
+  Standard_EXPORT Standard_Integer Index() const { return myIndex; }
 
 protected:
 

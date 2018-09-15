@@ -53,7 +53,7 @@ public:
     typedef Persistent PersistentBase;
 
     //! Import transient object from the persistent data.
-    virtual Handle(Transient) Import()
+    Standard_EXPORT virtual Handle(Transient) Import()
       { return myTransient; }
 
   public:
@@ -67,20 +67,20 @@ public:
   {
   public:
     //! Read persistent data from a file.
-    virtual void Read (StdObjMgt_ReadData& theReadData)
+    Standard_EXPORT virtual void Read (StdObjMgt_ReadData& theReadData)
       { PersistentData().Read (theReadData); }
     //! Write persistent data to a file.
-    virtual void Write (StdObjMgt_WriteData& theWriteData) const
+    Standard_EXPORT virtual void Write (StdObjMgt_WriteData& theWriteData) const
       { PersistentData().Write (theWriteData); }
     //! Gets persistent child objects
-    virtual void PChildren(StdObjMgt_Persistent::SequenceOfPersistent& theChildren) const
+    Standard_EXPORT virtual void PChildren(StdObjMgt_Persistent::SequenceOfPersistent& theChildren) const
       { PersistentData().PChildren(theChildren); }
     //! Returns persistent type name
-    virtual Standard_CString PName() const
+    Standard_EXPORT virtual Standard_CString PName() const
       { return PersistentData().PName(); }
 
     //! Import transient object from the persistent data.
-    virtual Handle(Transient) Import()
+    Standard_EXPORT virtual Handle(Transient) Import()
       { return NULL; }
   };
 
@@ -90,7 +90,7 @@ private:
   {
   public:
     //! Import transient object from the persistent data.
-    virtual Handle(typename Base::TransientBase) Import()
+    Standard_EXPORT virtual Handle(typename Base::TransientBase) Import()
     {
       if (Base::myTransient.IsNull() && !myPersistent.IsNull())
       {
@@ -124,14 +124,14 @@ public:
 
   public:
     //! Read persistent data from a file.
-    virtual void Read (StdObjMgt_ReadData& theReadData)
+    Standard_EXPORT virtual void Read (StdObjMgt_ReadData& theReadData)
     {
       Handle(Persistent) aPersistent = new Persistent;
       aPersistent->Read (theReadData);
       this->myPersistent = aPersistent;
     }
     //! Write persistent data to a file.
-    virtual void Write(StdObjMgt_WriteData& theWriteData) const
+    Standard_EXPORT virtual void Write(StdObjMgt_WriteData& theWriteData) const
     { 
       Handle(Persistent) aPersistent = 
         DownCast<Persistent, typename Base::PersistentBase>::make(this->myPersistent);
@@ -140,7 +140,7 @@ public:
       aPersistent->Write(theWriteData);
     }
     //! Gets persistent child objects
-    virtual void PChildren(StdObjMgt_Persistent::SequenceOfPersistent& theChildren) const
+    Standard_EXPORT virtual void PChildren(StdObjMgt_Persistent::SequenceOfPersistent& theChildren) const
     {
       Handle(Persistent) aPersistent = 
         DownCast<Persistent, typename Base::PersistentBase>::make(this->myPersistent);
@@ -149,7 +149,7 @@ public:
       aPersistent->PChildren(theChildren);
     }
     //! Returns persistent type name
-    virtual Standard_CString PName() const 
+    Standard_EXPORT virtual Standard_CString PName() const 
     { 
       Handle(Persistent) aPersistent =
         DownCast<Persistent, typename Base::PersistentBase>::make(this->myPersistent);

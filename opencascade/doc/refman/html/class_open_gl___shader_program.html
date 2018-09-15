@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -105,9 +105,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac80ef04904ed43919f0db964f214793f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#ac80ef04904ed43919f0db964f214793f">Release</a> (<a class="el" href="class_open_gl___context.html">OpenGl_Context</a> *theCtx) override</td></tr>
 <tr class="memdesc:ac80ef04904ed43919f0db964f214793f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys shader program.  <a href="#ac80ef04904ed43919f0db964f214793f">More...</a><br /></td></tr>
 <tr class="separator:ac80ef04904ed43919f0db964f214793f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2be0e35d52a9a1f93023e79136c055dc"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_standard___type_def_8hxx.html#aafd0aa27030c44cea49764e622cedd68">Standard_Size</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a2be0e35d52a9a1f93023e79136c055dc">EstimatedDataSize</a> () const override</td></tr>
-<tr class="memdesc:a2be0e35d52a9a1f93023e79136c055dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns estimated GPU memory usage - cannot be easily estimated.  <a href="#a2be0e35d52a9a1f93023e79136c055dc">More...</a><br /></td></tr>
-<tr class="separator:a2be0e35d52a9a1f93023e79136c055dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0db4398a26ce704134c8c2d1ce4eea51"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a0db4398a26ce704134c8c2d1ce4eea51">AttachShader</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_open_gl___context.html">OpenGl_Context</a> &gt; &amp;theCtx, const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_open_gl___shader_object.html">OpenGl_ShaderObject</a> &gt; &amp;theShader)</td></tr>
 <tr class="memdesc:a0db4398a26ce704134c8c2d1ce4eea51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attaches shader object to the program object.  <a href="#a0db4398a26ce704134c8c2d1ce4eea51">More...</a><br /></td></tr>
 <tr class="separator:a0db4398a26ce704134c8c2d1ce4eea51"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,24 +127,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a4092ac15f0288a0ac33a114691bd75dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5849715ba22c1f36da61dbea9393425"><td class="memItemLeft" align="right" valign="top">GLuint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#ab5849715ba22c1f36da61dbea9393425">ProgramId</a> () const</td></tr>
 <tr class="separator:ab5849715ba22c1f36da61dbea9393425"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3324734407fe6be8bdc42ad2eb68bf8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#aa3324734407fe6be8bdc42ad2eb68bf8">HasTessellationStage</a> () const</td></tr>
-<tr class="memdesc:aa3324734407fe6be8bdc42ad2eb68bf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return TRUE if program defines tessellation stage.  <a href="#aa3324734407fe6be8bdc42ad2eb68bf8">More...</a><br /></td></tr>
-<tr class="separator:aa3324734407fe6be8bdc42ad2eb68bf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76ff636479f8df93f1b579af5529e091"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a76ff636479f8df93f1b579af5529e091">NbLightsMax</a> () const</td></tr>
-<tr class="memdesc:a76ff636479f8df93f1b579af5529e091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the length of array of light sources (THE_MAX_LIGHTS), to be used for initialization occLightSources (OpenGl_OCC_LIGHT_SOURCE_PARAMS).  <a href="#a76ff636479f8df93f1b579af5529e091">More...</a><br /></td></tr>
-<tr class="separator:a76ff636479f8df93f1b579af5529e091"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d2df060b0c0922875c9e4227dbcfa02"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a4d2df060b0c0922875c9e4227dbcfa02">NbClipPlanesMax</a> () const</td></tr>
-<tr class="memdesc:a4d2df060b0c0922875c9e4227dbcfa02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the length of array of clipping planes (THE_MAX_CLIP_PLANES), to be used for initialization occClipPlaneEquations (OpenGl_OCC_CLIP_PLANE_EQUATIONS).  <a href="#a4d2df060b0c0922875c9e4227dbcfa02">More...</a><br /></td></tr>
-<tr class="separator:a4d2df060b0c0922875c9e4227dbcfa02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa25cfdbdd047cdd0da9b5b2d9f5b9e14"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#aa25cfdbdd047cdd0da9b5b2d9f5b9e14">NbFragmentOutputs</a> () const</td></tr>
-<tr class="memdesc:aa25cfdbdd047cdd0da9b5b2d9f5b9e14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the length of array of Fragment Shader outputs (THE_NB_FRAG_OUTPUTS), to be used for initialization occFragColorArray/occFragColorN.  <a href="#aa25cfdbdd047cdd0da9b5b2d9f5b9e14">More...</a><br /></td></tr>
-<tr class="separator:aa25cfdbdd047cdd0da9b5b2d9f5b9e14"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa776ff67f7b9a68709fe8dd3678b45e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#aa776ff67f7b9a68709fe8dd3678b45e2">HasAlphaTest</a> () const</td></tr>
-<tr class="memdesc:aa776ff67f7b9a68709fe8dd3678b45e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if Fragment Shader should perform alpha test; FALSE by default.  <a href="#aa776ff67f7b9a68709fe8dd3678b45e2">More...</a><br /></td></tr>
-<tr class="separator:aa776ff67f7b9a68709fe8dd3678b45e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aacc835cd578cd83b423087a4b0217dd8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#aacc835cd578cd83b423087a4b0217dd8">HasWeightOitOutput</a> () const</td></tr>
-<tr class="memdesc:aacc835cd578cd83b423087a4b0217dd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if Fragment Shader color should output the weighted OIT coverage; FALSE by default.  <a href="#aacc835cd578cd83b423087a4b0217dd8">More...</a><br /></td></tr>
-<tr class="separator:aacc835cd578cd83b423087a4b0217dd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82f9fc01103f396fce6dea8bb84d8029"><td class="memItemLeft" align="right" valign="top">GLint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a82f9fc01103f396fce6dea8bb84d8029">GetUniformLocation</a> (const <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_open_gl___context.html">OpenGl_Context</a> &gt; &amp;theCtx, const GLchar *theName) const</td></tr>
 <tr class="memdesc:a82f9fc01103f396fce6dea8bb84d8029"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns location of the specific uniform variable.  <a href="#a82f9fc01103f396fce6dea8bb84d8029">More...</a><br /></td></tr>
 <tr class="separator:a82f9fc01103f396fce6dea8bb84d8029"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -402,24 +381,6 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a3ae4897fb1d34251abde888f2415137c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a3ae4897fb1d34251abde888f2415137c">myShareCount</a></td></tr>
 <tr class="memdesc:a3ae4897fb1d34251abde888f2415137c"><td class="mdescLeft">&#160;</td><td class="mdescRight">program users count, initialized with 1 (already shared by one user)  <a href="#a3ae4897fb1d34251abde888f2415137c">More...</a><br /></td></tr>
 <tr class="separator:a3ae4897fb1d34251abde888f2415137c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71986a34357307042eb5b4f1ad76663a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a71986a34357307042eb5b4f1ad76663a">myNbLightsMax</a></td></tr>
-<tr class="memdesc:a71986a34357307042eb5b4f1ad76663a"><td class="mdescLeft">&#160;</td><td class="mdescRight">length of array of light sources (THE_MAX_LIGHTS)  <a href="#a71986a34357307042eb5b4f1ad76663a">More...</a><br /></td></tr>
-<tr class="separator:a71986a34357307042eb5b4f1ad76663a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0a3e897b7fad44f067739979e9e06d4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#ab0a3e897b7fad44f067739979e9e06d4">myNbClipPlanesMax</a></td></tr>
-<tr class="memdesc:ab0a3e897b7fad44f067739979e9e06d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">length of array of clipping planes (THE_MAX_CLIP_PLANES)  <a href="#ab0a3e897b7fad44f067739979e9e06d4">More...</a><br /></td></tr>
-<tr class="separator:ab0a3e897b7fad44f067739979e9e06d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d0aac973bc4191a4471cb57deef50eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a0d0aac973bc4191a4471cb57deef50eb">myNbFragOutputs</a></td></tr>
-<tr class="memdesc:a0d0aac973bc4191a4471cb57deef50eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">length of array of Fragment Shader outputs (THE_NB_FRAG_OUTPUTS)  <a href="#a0d0aac973bc4191a4471cb57deef50eb">More...</a><br /></td></tr>
-<tr class="separator:a0d0aac973bc4191a4471cb57deef50eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2110d26177d809b256d6092f133c9d2b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a2110d26177d809b256d6092f133c9d2b">myHasAlphaTest</a></td></tr>
-<tr class="memdesc:a2110d26177d809b256d6092f133c9d2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">flag indicating that Fragment Shader should perform alpha-test  <a href="#a2110d26177d809b256d6092f133c9d2b">More...</a><br /></td></tr>
-<tr class="separator:a2110d26177d809b256d6092f133c9d2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb615321cd8838c099479db116fe9064"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#abb615321cd8838c099479db116fe9064">myHasWeightOitOutput</a></td></tr>
-<tr class="memdesc:abb615321cd8838c099479db116fe9064"><td class="mdescLeft">&#160;</td><td class="mdescRight">flag indicating that Fragment Shader includes weighted OIT coverage  <a href="#abb615321cd8838c099479db116fe9064">More...</a><br /></td></tr>
-<tr class="separator:abb615321cd8838c099479db116fe9064"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52b2876b691ebd6f38c0e9c4aea67938"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a52b2876b691ebd6f38c0e9c4aea67938">myHasTessShader</a></td></tr>
-<tr class="memdesc:a52b2876b691ebd6f38c0e9c4aea67938"><td class="mdescLeft">&#160;</td><td class="mdescRight">flag indicating that program defines tessellation stage  <a href="#a52b2876b691ebd6f38c0e9c4aea67938">More...</a><br /></td></tr>
-<tr class="separator:a52b2876b691ebd6f38c0e9c4aea67938"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a353b7fbe476764e967b95b9b1b16f859"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#aafd0aa27030c44cea49764e622cedd68">Standard_Size</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_open_gl___shader_program.html#a353b7fbe476764e967b95b9b1b16f859">myCurrentState</a> [<a class="el" href="_open_gl___shader_program_8hxx.html#a121bfef2a193b656e88836486a36a56ca5046b6e5f6e3c206a5e885d9653a9347">OpenGl_UniformStateType_NB</a>]</td></tr>
 <tr class="memdesc:a353b7fbe476764e967b95b9b1b16f859"><td class="mdescLeft">&#160;</td><td class="mdescRight">defines last modification for variables of each state type  <a href="#a353b7fbe476764e967b95b9b1b16f859">More...</a><br /></td></tr>
 <tr class="separator:a353b7fbe476764e967b95b9b1b16f859"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -601,35 +562,6 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Detaches shader object to the program object. </p>
-
-</div>
-</div>
-<a id="a2be0e35d52a9a1f93023e79136c055dc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2be0e35d52a9a1f93023e79136c055dc">&#9670;&nbsp;</a></span>EstimatedDataSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="_standard___type_def_8hxx.html#aafd0aa27030c44cea49764e622cedd68">Standard_Size</a> OpenGl_ShaderProgram::EstimatedDataSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns estimated GPU memory usage - cannot be easily estimated. </p>
-
-<p>Implements <a class="el" href="class_open_gl___resource.html#a897bbee62a1f3cfeecd056899274c9a4">OpenGl_Resource</a>.</p>
 
 </div>
 </div>
@@ -1029,87 +961,6 @@ Additional Inherited Members</h2></td></tr>
 
 </div>
 </div>
-<a id="aa776ff67f7b9a68709fe8dd3678b45e2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa776ff67f7b9a68709fe8dd3678b45e2">&#9670;&nbsp;</a></span>HasAlphaTest()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> OpenGl_ShaderProgram::HasAlphaTest </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return true if Fragment Shader should perform alpha test; FALSE by default. </p>
-
-</div>
-</div>
-<a id="aa3324734407fe6be8bdc42ad2eb68bf8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3324734407fe6be8bdc42ad2eb68bf8">&#9670;&nbsp;</a></span>HasTessellationStage()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> OpenGl_ShaderProgram::HasTessellationStage </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return TRUE if program defines tessellation stage. </p>
-
-</div>
-</div>
-<a id="aacc835cd578cd83b423087a4b0217dd8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aacc835cd578cd83b423087a4b0217dd8">&#9670;&nbsp;</a></span>HasWeightOitOutput()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> OpenGl_ShaderProgram::HasWeightOitOutput </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return true if Fragment Shader color should output the weighted OIT coverage; FALSE by default. </p>
-
-</div>
-</div>
 <a id="aa01d9a70a77d203523f01b682b6986f3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa01d9a70a77d203523f01b682b6986f3">&#9670;&nbsp;</a></span>Initialize()</h2>
 
@@ -1183,87 +1034,6 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Links the program object. </p>
-
-</div>
-</div>
-<a id="a4d2df060b0c0922875c9e4227dbcfa02"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d2df060b0c0922875c9e4227dbcfa02">&#9670;&nbsp;</a></span>NbClipPlanesMax()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> OpenGl_ShaderProgram::NbClipPlanesMax </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return the length of array of clipping planes (THE_MAX_CLIP_PLANES), to be used for initialization occClipPlaneEquations (OpenGl_OCC_CLIP_PLANE_EQUATIONS). </p>
-
-</div>
-</div>
-<a id="aa25cfdbdd047cdd0da9b5b2d9f5b9e14"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa25cfdbdd047cdd0da9b5b2d9f5b9e14">&#9670;&nbsp;</a></span>NbFragmentOutputs()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> OpenGl_ShaderProgram::NbFragmentOutputs </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return the length of array of Fragment Shader outputs (THE_NB_FRAG_OUTPUTS), to be used for initialization occFragColorArray/occFragColorN. </p>
-
-</div>
-</div>
-<a id="a76ff636479f8df93f1b579af5529e091"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76ff636479f8df93f1b579af5529e091">&#9670;&nbsp;</a></span>NbLightsMax()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> OpenGl_ShaderProgram::NbLightsMax </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Return the length of array of light sources (THE_MAX_LIGHTS), to be used for initialization occLightSources (OpenGl_OCC_LIGHT_SOURCE_PARAMS). </p>
 
 </div>
 </div>
@@ -3057,150 +2827,6 @@ Additional Inherited Members</h2></td></tr>
 </div><div class="memdoc">
 
 <p>defines last modification for variables of each state type </p>
-
-</div>
-</div>
-<a id="a2110d26177d809b256d6092f133c9d2b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2110d26177d809b256d6092f133c9d2b">&#9670;&nbsp;</a></span>myHasAlphaTest</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> OpenGl_ShaderProgram::myHasAlphaTest</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>flag indicating that Fragment Shader should perform alpha-test </p>
-
-</div>
-</div>
-<a id="a52b2876b691ebd6f38c0e9c4aea67938"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52b2876b691ebd6f38c0e9c4aea67938">&#9670;&nbsp;</a></span>myHasTessShader</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> OpenGl_ShaderProgram::myHasTessShader</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>flag indicating that program defines tessellation stage </p>
-
-</div>
-</div>
-<a id="abb615321cd8838c099479db116fe9064"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb615321cd8838c099479db116fe9064">&#9670;&nbsp;</a></span>myHasWeightOitOutput</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a> OpenGl_ShaderProgram::myHasWeightOitOutput</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>flag indicating that Fragment Shader includes weighted OIT coverage </p>
-
-</div>
-</div>
-<a id="ab0a3e897b7fad44f067739979e9e06d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab0a3e897b7fad44f067739979e9e06d4">&#9670;&nbsp;</a></span>myNbClipPlanesMax</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> OpenGl_ShaderProgram::myNbClipPlanesMax</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>length of array of clipping planes (THE_MAX_CLIP_PLANES) </p>
-
-</div>
-</div>
-<a id="a0d0aac973bc4191a4471cb57deef50eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d0aac973bc4191a4471cb57deef50eb">&#9670;&nbsp;</a></span>myNbFragOutputs</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> OpenGl_ShaderProgram::myNbFragOutputs</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>length of array of Fragment Shader outputs (THE_NB_FRAG_OUTPUTS) </p>
-
-</div>
-</div>
-<a id="a71986a34357307042eb5b4f1ad76663a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a71986a34357307042eb5b4f1ad76663a">&#9670;&nbsp;</a></span>myNbLightsMax</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="_standard___type_def_8hxx.html#a844729aed1c6f9f5aadd6d4e9ddd5984">Standard_Integer</a> OpenGl_ShaderProgram::myNbLightsMax</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>length of array of light sources (THE_MAX_LIGHTS) </p>
 
 </div>
 </div>

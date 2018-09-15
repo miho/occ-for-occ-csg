@@ -15,7 +15,7 @@
 
 // modified     20.04.2009 Sergey Zaritchny
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <XmlMDataStd.hxx>
 #include <XmlMDataStd_AsciiStringDriver.hxx>
 #include <XmlMDataStd_BooleanArrayDriver.hxx>
@@ -51,7 +51,7 @@ static Standard_Integer myDocumentVersion = -1;
 //purpose  : 
 //=======================================================================
 void XmlMDataStd::AddDrivers (const Handle(XmlMDF_ADriverTable)& aDriverTable,
-                              const Handle(Message_Messenger)&   anMsgDrv)
+                              const Handle(CDM_MessageDriver)&   anMsgDrv)
 {
   aDriverTable-> AddDriver (new XmlMDataStd_DirectoryDriver     (anMsgDrv));
   aDriverTable-> AddDriver (new XmlMDataStd_IntegerArrayDriver  (anMsgDrv));

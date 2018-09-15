@@ -27,14 +27,14 @@ void StdLPersistent_HArray2::base::Read (StdObjMgt_ReadData& theReadData)
   theReadData >> aLowerRow >> aLowerCol >> anUpperRow >> anUpperCol;
   createArray (aLowerRow, aLowerCol, anUpperRow, anUpperCol);
 
-  StdObjMgt_ReadData::ObjectSentry aSentry (theReadData);
+  StdObjMgt_ReadData::Object anObjectData (theReadData);
 
   Standard_Integer aSize;
-  theReadData >> aSize;
+  anObjectData >> aSize;
 
   for (Standard_Integer aRow = aLowerRow; aRow <= anUpperRow; aRow++)
     for (Standard_Integer aCol = aLowerCol; aCol <= anUpperCol; aCol++)
-      readValue (theReadData, aRow, aCol);
+      readValue (anObjectData, aRow, aCol);
 }
 
 //=======================================================================
@@ -48,12 +48,12 @@ void StdLPersistent_HArray2::base::Write (StdObjMgt_WriteData& theWriteData) con
   upperBound(anUpperRow, anUpperCol);
   theWriteData << aLowerRow << aLowerCol << anUpperRow << anUpperCol;
 
-  StdObjMgt_WriteData::ObjectSentry aSentry (theWriteData);
+  StdObjMgt_WriteData::Object anObjectData(theWriteData);
 
   Standard_Integer aSize = (anUpperRow - aLowerRow + 1) * (anUpperCol - aLowerCol + 1);
-  theWriteData << aSize;
+  anObjectData << aSize;
 
   for (Standard_Integer aRow = aLowerRow; aRow <= anUpperRow; aRow++)
     for (Standard_Integer aCol = aLowerCol; aCol <= anUpperCol; aCol++)
-      writeValue(theWriteData, aRow, aCol);
+      writeValue(anObjectData, aRow, aCol);
 }

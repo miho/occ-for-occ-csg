@@ -135,6 +135,10 @@
         <translation>shadows.png</translation>
     </message>
     <message>
+        <source>ICON_TOOL_RAYTRACING</source>
+        <translation>shadows.png</translation>
+    </message>
+    <message>
         <source>ICON_TOOL_REFLECTIONS</source>
         <translation>reflections.png</translation>
     </message>

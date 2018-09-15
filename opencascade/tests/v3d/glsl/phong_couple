@@ -8,9 +8,8 @@ tclean f
 box b 2 0 0 1 0.5 0.25
 
 # draw box
-vclear
-vclose ALL
 vinit View1
+vclear
 vdefaults -absDefl 0.5
 vsetdispmode 1
 vaxo

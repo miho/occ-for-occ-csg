@@ -187,24 +187,28 @@ void StdSelect_ViewerSelector3d::Pick (const TColgp_Array1OfPnt2d& thePolyline,
 //=======================================================================
 void StdSelect_ViewerSelector3d::DisplaySensitive (const Handle(V3d_View)& theView)
 {
-  for (SelectMgr_SelectableObjectSet::Iterator aSelectableIt (mySelectableObjects); aSelectableIt.More(); aSelectableIt.Next())
+  SelectMgr_SelectableObjectSet::Iterator aSelectableIt (mySelectableObjects);
+
+  for (; aSelectableIt.More(); aSelectableIt.Next())
   {
-    Handle(Graphic3d_Structure) aStruct = new Graphic3d_Structure (theView->Viewer()->StructureManager());
     const Handle (SelectMgr_SelectableObject)& anObj = aSelectableIt.Value();
-    for (SelectMgr_SequenceOfSelection::Iterator aSelIter (anObj->Selections()); aSelIter.More(); aSelIter.Next())
+
+    Handle(Graphic3d_Structure) aStruct = new Graphic3d_Structure (theView->Viewer()->StructureManager());
+
+    for (anObj->Init(); anObj->More(); anObj->Next())
     {
-      if (aSelIter.Value()->GetSelectionState() == SelectMgr_SOS_Activated)
+      if (anObj->CurrentSelection()->GetSelectionState() == SelectMgr_SOS_Activated)
       {
-        computeSensitivePrs (aStruct, aSelIter.Value(), anObj->Transformation(), Handle(Graphic3d_TransformPers)());
+        computeSensitivePrs (aStruct, anObj->CurrentSelection(), anObj->Transformation(), Handle(Graphic3d_TransformPers)());
       }
     }
 
     myStructs.Append (aStruct);
   }
 
-  for (Graphic3d_SequenceOfStructure::Iterator aStructIter (myStructs); aStructIter.More(); aStructIter.Next())
+  for (Standard_Integer aStructIdx = 1; aStructIdx <= myStructs.Length(); ++aStructIdx)
   {
-    Handle(Graphic3d_Structure)& aStruct = aStructIter.ChangeValue();
+    Handle(Graphic3d_Structure)& aStruct = myStructs.ChangeValue (aStructIdx);
     aStruct->SetDisplayPriority (10);
     aStruct->Display();
   }
@@ -218,10 +222,11 @@ void StdSelect_ViewerSelector3d::DisplaySensitive (const Handle(V3d_View)& theVi
 //=======================================================================
 void StdSelect_ViewerSelector3d::ClearSensitive (const Handle(V3d_View)& theView)
 {
-  for (Graphic3d_SequenceOfStructure::Iterator aStructIter (myStructs); aStructIter.More(); aStructIter.Next())
+  for (Standard_Integer aStructIdx = 1; aStructIdx <= myStructs.Length(); ++aStructIdx)
   {
-    aStructIter.ChangeValue()->Remove();
+    myStructs.Value (aStructIdx)->Remove();
   }
+
   myStructs.Clear();
 
   if (!theView.IsNull())
@@ -269,20 +274,25 @@ void StdSelect_ViewerSelector3d::computeSensitivePrs (const Handle(Graphic3d_Str
   Handle(Graphic3d_Group) aSensGroup  = theStructure->NewGroup();
 
   Quantity_Color aColor (Quantity_NOC_INDIANRED3);
-  Handle(Graphic3d_AspectMarker3d) aMarkerAspect =new Graphic3d_AspectMarker3d (Aspect_TOM_O_PLUS, aColor, 2.0);
+  Handle(Graphic3d_AspectMarker3d) aMarkerAspect =
+    new Graphic3d_AspectMarker3d (Aspect_TOM_O_PLUS, aColor, 2.0);
 
   aSensGroup->SetPrimitivesAspect (aMarkerAspect);
-  aSensGroup->SetPrimitivesAspect (new Graphic3d_AspectLine3d (Quantity_NOC_GRAY40, Aspect_TOL_SOLID, 2.0));
+  aSensGroup->SetPrimitivesAspect (
+    new Graphic3d_AspectLine3d (Quantity_NOC_GRAY40, Aspect_TOL_SOLID, 2.0));
 
   Handle(Graphic3d_Group) anAreaGroup = theStructure->NewGroup();
 
-  anAreaGroup->SetPrimitivesAspect (new Graphic3d_AspectLine3d (Quantity_NOC_AQUAMARINE1, Aspect_TOL_DASH, 1.0));
+  anAreaGroup->SetPrimitivesAspect (
+    new Graphic3d_AspectLine3d (Quantity_NOC_AQUAMARINE1, Aspect_TOL_DASH, 1.0));
 
   TColgp_SequenceOfPnt aSeqLines, aSeqFree;
   TColStd_SequenceOfInteger aSeqBnds;
-  for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (theSel->Entities()); aSelEntIter.More(); aSelEntIter.Next())
+
+  for (theSel->Init(); theSel->More(); theSel->Next())
   {
-    Handle(Select3D_SensitiveEntity) Ent = Handle(Select3D_SensitiveEntity)::DownCast(aSelEntIter.Value()->BaseSensitive());
+    Handle(Select3D_SensitiveEntity) Ent =
+      Handle(Select3D_SensitiveEntity)::DownCast(theSel->Sensitive()->BaseSensitive());
     const Standard_Boolean hasloc = theLoc.Form() != gp_Identity;
 
     //==============
@@ -731,12 +741,12 @@ namespace
       for (SelectMgr_SelectableObjectSet::Iterator anObjIter (theSelObjects); anObjIter.More(); anObjIter.Next())
       {
         const Handle(SelectMgr_SelectableObject)& anObj = anObjIter.Value();
-        for (SelectMgr_SequenceOfSelection::Iterator aSelIter (anObj->Selections()); aSelIter.More(); aSelIter.Next())
+        for (anObj->Init(); anObj->More(); anObj->Next())
         {
-          const Handle(SelectMgr_Selection)& aSel = aSelIter.Value();
-          for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (aSel->Entities()); aSelEntIter.More(); aSelEntIter.Next())
+          const Handle(SelectMgr_Selection)& aSel = anObj->CurrentSelection();
+          for (aSel->Init(); aSel->More(); aSel->Next())
           {
-            const Handle(SelectMgr_SensitiveEntity)& aSens = aSelEntIter.Value();
+            const Handle(SelectMgr_SensitiveEntity)& aSens = aSel->Sensitive();
             if (!myMapEntityColors.IsBound (aSens->BaseSensitive()))
             {
               Quantity_Color aColor;
@@ -811,15 +821,14 @@ namespace
     //! Normalize the depth values.
     virtual void Flush() Standard_OVERRIDE
     {
-      float aFrom  = 0.0f;
-      float aDelta = 1.0f;
+      Standard_Real aFrom  = 0.0;
+      Standard_Real aDelta = 1.0;
       if (myDepthMin <= myDepthMax)
       {
-        aFrom  = float(myDepthMin);
-        aDelta = float(myDepthMax) - float(myDepthMin);
-        if (aDelta <= ShortRealEpsilon())
+        aFrom = myDepthMin;
+        if (myDepthMin != myDepthMax)
         {
-          aDelta = 1.0f;
+          aDelta = myDepthMax - myDepthMin;
         }
       }
       for (Standard_Size aRowIter = 0; aRowIter < myUnnormImage.SizeY(); ++aRowIter)
@@ -835,7 +844,7 @@ namespace
             continue;
           }
 
-          float aNormDepth = (aDepth - aFrom) / aDelta;
+          float aNormDepth = float((Standard_Real(aDepth) - aFrom) / aDelta);
           if (myToInverse)
           {
             aNormDepth = 1.0f - aNormDepth;
@@ -875,7 +884,7 @@ namespace
 
       const SelectMgr_SortCriterion& aSortCriterion = myMainSel->PickedData (thePicked);
       const float aDepth = float(aSortCriterion.Depth);
-      myImage->SetPixelColor (theCol, theRow, Quantity_ColorRGBA (Graphic3d_Vec4 (aDepth, aDepth, aDepth, 1.0f)));
+      myImage->SetPixelColor (theCol, theRow, Quantity_ColorRGBA (aDepth, aDepth, aDepth, 1.0f));
     }
   };
 
@@ -893,12 +902,12 @@ namespace
       for (SelectMgr_SelectableObjectSet::Iterator anObjIter (theSelObjects); anObjIter.More(); anObjIter.Next())
       {
         const Handle(SelectMgr_SelectableObject)& anObj = anObjIter.Value();
-        for (SelectMgr_SequenceOfSelection::Iterator aSelIter (anObj->Selections()); aSelIter.More(); aSelIter.Next())
+        for (anObj->Init(); anObj->More(); anObj->Next())
         {
-          const Handle(SelectMgr_Selection)& aSel = aSelIter.Value();
-          for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (aSel->Entities()); aSelEntIter.More(); aSelEntIter.Next())
+          const Handle(SelectMgr_Selection)& aSel = anObj->CurrentSelection();
+          for (aSel->Init(); aSel->More(); aSel->Next())
           {
-            const Handle(SelectMgr_SensitiveEntity)& aSens   = aSelEntIter.Value();
+            const Handle(SelectMgr_SensitiveEntity)& aSens   = aSel->Sensitive();
             const Handle(SelectBasics_EntityOwner)&  anOwner = aSens->BaseSensitive()->OwnerId();
             if (!myMapOwnerColors.IsBound (anOwner))
             {
@@ -971,12 +980,12 @@ namespace
       Standard_Integer aSelectionMode = -1;
       const Handle(SelectMgr_SelectableObject)&   aSelectable = myMainSel->Picked       (thePicked)->Selectable();
       const Handle(SelectBasics_SensitiveEntity)& anEntity    = myMainSel->PickedEntity (thePicked);
-      for (SelectMgr_SequenceOfSelection::Iterator aSelIter (aSelectable->Selections()); aSelIter.More(); aSelIter.Next())
+      for (aSelectable->Init(); aSelectable->More(); aSelectable->Next())
       {
-        const Handle(SelectMgr_Selection)& aSelection = aSelIter.Value();
-        for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (aSelection->Entities()); aSelEntIter.More(); aSelEntIter.Next())
+        const Handle(SelectMgr_Selection)& aSelection = aSelectable->CurrentSelection();
+        for (aSelection->Init(); aSelection->More(); aSelection->Next())
         {
-          if (aSelEntIter.Value()->BaseSensitive() == anEntity)
+          if (aSelection->Sensitive()->BaseSensitive() == anEntity)
           {
             aSelectionMode = aSelection->Mode();
             break;

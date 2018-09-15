@@ -55,16 +55,19 @@ OpenGl_View::OpenGl_View (const Handle(Graphic3d_StructureManager)& theMgr,
   myCaps           (theCaps),
   myWasRedrawnGL   (Standard_False),
   myCulling        (Standard_True),
+  myShadingModel   (Graphic3d_TOSM_FACET),
   myBackfacing     (Graphic3d_TOBM_AUTOMATIC),
   myBgColor        (Quantity_NOC_BLACK),
   myCamera         (new Graphic3d_Camera()),
   myToShowGradTrihedron  (false),
   myZLayers        (Structure_MAX_PRIORITY - Structure_MIN_PRIORITY + 1),
   myStateCounter         (theCounter),
-  myCurrLightSourceState (theCounter->Increment()),
-  myLightsRevision       (0),
   myLastLightSourceState (0, 0),
+#if !defined(GL_ES_VERSION_2_0)
   myFboColorFormat       (GL_RGBA8),
+#else
+  myFboColorFormat       (GL_RGBA),
+#endif
   myFboDepthFormat       (GL_DEPTH24_STENCIL8),
   myToFlipOutput         (Standard_False),
   myFrameCounter         (0),
@@ -95,12 +98,15 @@ OpenGl_View::OpenGl_View (const Handle(Graphic3d_StructureManager)& theMgr,
 {
   myWorkspace = new OpenGl_Workspace (this, NULL);
 
-  Handle(Graphic3d_CLight) aLight = new Graphic3d_CLight (Graphic3d_TOLS_AMBIENT);
-  aLight->SetHeadlight (false);
-  aLight->SetColor (Quantity_NOC_WHITE);
-  myNoShadingLight = new Graphic3d_LightSet();
-  myNoShadingLight->Add (aLight);
+  OpenGl_Light       aLight;
+  aLight.Type        = Graphic3d_TOLS_AMBIENT;
+  aLight.IsHeadlight = Standard_False;
+  aLight.Color.r()   = 1.;
+  aLight.Color.g()   = 1.;
+  aLight.Color.b()   = 1.;
+  myNoShadingLight.Append (aLight);
 
+  myCurrLightSourceState     = myStateCounter->Increment();
   myMainSceneFbos[0]         = new OpenGl_FrameBuffer();
   myMainSceneFbos[1]         = new OpenGl_FrameBuffer();
   myMainSceneFbosOit[0]      = new OpenGl_FrameBuffer();
@@ -136,7 +142,6 @@ OpenGl_View::~OpenGl_View()
 void OpenGl_View::ReleaseGlResources (const Handle(OpenGl_Context)& theCtx)
 {
   myGraduatedTrihedron.Release (theCtx.operator->());
-  myFrameStatsPrs.Release (theCtx.operator->());
 
   if (!myTextureEnv.IsNull())
   {

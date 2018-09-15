@@ -22,7 +22,7 @@
 #include <Standard_GUID.hxx>
 
 class BinMDF_ADriverTable;
-class Message_Messenger;
+class CDM_MessageDriver;
 class TDocStd_Application;
 
 //! Class for registering storage/retrieval drivers for TObj Bin persistence
@@ -42,7 +42,7 @@ class BinTObjDrivers
 
   Standard_EXPORT static void AddDrivers
                         (const Handle(BinMDF_ADriverTable)& aDriverTable,
-                         const Handle(Message_Messenger)&   aMsgDrv);
+                         const Handle(CDM_MessageDriver)&   aMsgDrv);
 
 };
 

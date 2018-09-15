@@ -13,7 +13,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "06240F2B0E24183108680036"
+               BlueprintIdentifier = "16280BBB18C418F004B80EBC"
                BuildableName = "libTKFeat.dylib"
                BlueprintName = "TKFeat"
                ReferencedContainer = "container:TKFeat.xcodeproj">

@@ -2,22 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source files">
-      <UniqueIdentifier>{168C10E4-0F6A-0978-14F5-7BA198AE329E}</UniqueIdentifier>
+      <UniqueIdentifier>{EEE8868E-1133-0FAE-0B96-E98FDCE3B892}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\StdDrivers">
-      <UniqueIdentifier>{7D267F26-10E2-128F-0B59-5C8E1874CDF1}</UniqueIdentifier>
+      <UniqueIdentifier>{6AB638CE-0613-1398-1610-88B452F68D69}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\StdObject">
-      <UniqueIdentifier>{7CC4F246-1093-0FEE-11F7-C5E7DBF8F985}</UniqueIdentifier>
+      <UniqueIdentifier>{BDFF8EDD-00E1-17FA-08B5-583B5FA21107}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\StdPersistent">
-      <UniqueIdentifier>{C5AA8C43-0F1C-0010-06FE-ADFA15FDAACC}</UniqueIdentifier>
+      <UniqueIdentifier>{0C1ACC5B-10DA-0FD1-059E-48962D7B9B61}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\StdStorage">
-      <UniqueIdentifier>{D86AE095-1756-0486-1367-840D3E818ABE}</UniqueIdentifier>
+      <UniqueIdentifier>{1633E4BA-18C5-1919-0384-78BB916252C9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\ShapePersistent">
-      <UniqueIdentifier>{BBC6DF6F-0146-0753-0D65-C33FF19B1CF2}</UniqueIdentifier>
+      <UniqueIdentifier>{292917B4-070A-14F0-1330-3E94F5A592B3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

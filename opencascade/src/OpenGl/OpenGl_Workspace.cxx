@@ -153,13 +153,13 @@ OpenGl_Workspace::OpenGl_Workspace (OpenGl_View* theView, const Handle(OpenGl_Wi
   #if !defined(GL_ES_VERSION_2_0)
     if (myGlContext->core11 != NULL)
     {
-      // enable two-side lighting by default
+      // Eviter d'avoir les faces mal orientees en noir.
+      // Pourrait etre utiliser pour detecter les problemes d'orientation
       glLightModeli ((GLenum )GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-      glHint (GL_POINT_SMOOTH_HINT, GL_FASTEST);
-      if (myGlContext->caps->ffpEnable)
-      {
-        glHint (GL_FOG_HINT, GL_FASTEST);
-      }
+
+      // Optimisation pour le Fog et l'antialiasing
+      glHint (GL_FOG_HINT,            GL_FASTEST);
+      glHint (GL_POINT_SMOOTH_HINT,   GL_FASTEST);
     }
 
     glHint (GL_LINE_SMOOTH_HINT,    GL_FASTEST);
@@ -169,16 +169,10 @@ OpenGl_Workspace::OpenGl_Workspace (OpenGl_View* theView, const Handle(OpenGl_Wi
 
   myDefaultCappingAlgoFilter = new OpenGl_CappingAlgoFilter();
 
-  myFontFaceAspect.Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Mask, 0.285f);
-  myFontFaceAspect.Aspect()->SetShadingModel (Graphic3d_TOSM_UNLIT);
-
   myNoneCulling .Aspect()->SetSuppressBackFaces (false);
   myNoneCulling .Aspect()->SetDrawEdges (false);
-  myNoneCulling .Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Opaque);
-
   myFrontCulling.Aspect()->SetSuppressBackFaces (true);
   myFrontCulling.Aspect()->SetDrawEdges (false);
-  myFrontCulling.Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Opaque);
 }
 
 // =======================================================================
@@ -203,10 +197,7 @@ Standard_Boolean OpenGl_Workspace::Activate()
   {
     myGlContext->core20fwd->glUseProgram (OpenGl_ShaderProgram::NO_PROGRAM);
   }
-  if (myGlContext->caps->ffpEnable)
-  {
-    myGlContext->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
-  }
+  myGlContext->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
   return Standard_True;
 }
 
@@ -226,7 +217,7 @@ void OpenGl_Workspace::ResetAppliedAspect()
   myAspectMarkerSet     = &myDefaultAspectMarker;
   myAspectMarkerApplied.Nullify();
   myAspectTextSet       = &myDefaultAspectText;
-  myGlContext->SetPolygonOffset (Graphic3d_PolygonOffset());
+  myPolygonOffsetApplied= Graphic3d_PolygonOffset();
 
   ApplyAspectLine();
   ApplyAspectFace();
@@ -302,10 +293,7 @@ const OpenGl_AspectFace* OpenGl_Workspace::ApplyAspectFace()
     }
     if (toSuppressBackFaces)
     {
-      if (myAspectFaceSet->Aspect()->AlphaMode() == Graphic3d_AlphaMode_Blend
-       || myAspectFaceSet->Aspect()->AlphaMode() == Graphic3d_AlphaMode_Mask
-       || (myAspectFaceSet->Aspect()->AlphaMode() == Graphic3d_AlphaMode_BlendAuto
-        && myAspectFaceSet->Aspect()->FrontMaterial().Transparency() != 0.0f))
+      if ((float )myAspectFaceSet->Aspect()->FrontMaterial().Transparency() != 0.0f)
       {
         // disable culling in case of translucent shading aspect
         toSuppressBackFaces = false;
@@ -364,18 +352,22 @@ const OpenGl_AspectFace* OpenGl_Workspace::ApplyAspectFace()
   // Aspect_POM_None means: do not change current settings
   if ((myAspectFaceSet->Aspect()->PolygonOffset().Mode & Aspect_POM_None) != Aspect_POM_None)
   {
-    myGlContext->SetPolygonOffset (myAspectFaceSet->Aspect()->PolygonOffset());
+    if (myPolygonOffsetApplied.Mode   != myAspectFaceSet->Aspect()->PolygonOffset().Mode
+     || myPolygonOffsetApplied.Factor != myAspectFaceSet->Aspect()->PolygonOffset().Factor
+     || myPolygonOffsetApplied.Units  != myAspectFaceSet->Aspect()->PolygonOffset().Units)
+    {
+      SetPolygonOffset (myAspectFaceSet->Aspect()->PolygonOffset());
+    }
   }
 
   // Case of hidden line
   if (myAspectFaceSet->Aspect()->InteriorStyle() == Aspect_IS_HIDDENLINE)
   {
     // copy all values including line edge aspect
-    *myAspectFaceHl.Aspect() = *myAspectFaceSet->Aspect();
+    *myAspectFaceHl.Aspect().operator->() = *myAspectFaceSet->Aspect();
     myAspectFaceHl.SetAspectEdge (myAspectFaceSet->AspectEdge());
-    myAspectFaceHl.Aspect()->SetShadingModel (Graphic3d_TOSM_UNLIT);
     myAspectFaceHl.Aspect()->SetInteriorColor (myView->BackgroundColor().GetRGB());
-    myAspectFaceHl.SetNoLighting();
+    myAspectFaceHl.SetNoLighting (true);
     myAspectFaceSet = &myAspectFaceHl;
   }
   else
@@ -394,6 +386,45 @@ const OpenGl_AspectFace* OpenGl_Workspace::ApplyAspectFace()
 
   myAspectFaceApplied = myAspectFaceSet->Aspect();
   return myAspectFaceSet;
+}
+
+//=======================================================================
+//function : SetPolygonOffset
+//purpose  :
+//=======================================================================
+void OpenGl_Workspace::SetPolygonOffset (const Graphic3d_PolygonOffset& theParams)
+{
+  myPolygonOffsetApplied = theParams;
+
+  if ((theParams.Mode & Aspect_POM_Fill) == Aspect_POM_Fill)
+  {
+    glEnable (GL_POLYGON_OFFSET_FILL);
+  }
+  else
+  {
+    glDisable (GL_POLYGON_OFFSET_FILL);
+  }
+
+#if !defined(GL_ES_VERSION_2_0)
+  if ((theParams.Mode & Aspect_POM_Line) == Aspect_POM_Line)
+  {
+    glEnable (GL_POLYGON_OFFSET_LINE);
+  }
+  else
+  {
+    glDisable (GL_POLYGON_OFFSET_LINE);
+  }
+
+  if ((theParams.Mode & Aspect_POM_Point) == Aspect_POM_Point)
+  {
+    glEnable (GL_POLYGON_OFFSET_POINT);
+  }
+  else
+  {
+    glDisable (GL_POLYGON_OFFSET_POINT);
+  }
+#endif
+  glPolygonOffset (theParams.Factor, theParams.Units);
 }
 
 // =======================================================================
@@ -487,6 +518,31 @@ void OpenGl_Workspace::FBORelease (Handle(OpenGl_FrameBuffer)& theFbo)
 }
 
 // =======================================================================
+// function : getAligned
+// purpose  :
+// =======================================================================
+inline Standard_Size getAligned (const Standard_Size theNumber,
+                                 const Standard_Size theAlignment)
+{
+  return theNumber + theAlignment - 1 - (theNumber - 1) % theAlignment;
+}
+
+template<typename T>
+inline void convertRowFromRgba (T* theRgbRow,
+                                const Image_ColorRGBA* theRgbaRow,
+                                const Standard_Size theWidth)
+{
+  for (Standard_Size aCol = 0; aCol < theWidth; ++aCol)
+  {
+    const Image_ColorRGBA& anRgba = theRgbaRow[aCol];
+    T& anRgb = theRgbRow[aCol];
+    anRgb.r() = anRgba.r();
+    anRgb.g() = anRgba.g();
+    anRgb.b() = anRgba.b();
+  }
+}
+
+// =======================================================================
 // function : BufferDump
 // purpose  :
 // =======================================================================
@@ -494,9 +550,207 @@ Standard_Boolean OpenGl_Workspace::BufferDump (const Handle(OpenGl_FrameBuffer)&
                                                Image_PixMap&                     theImage,
                                                const Graphic3d_BufferType&       theBufferType)
 {
-  return !theImage.IsEmpty()
-      && Activate()
-      && OpenGl_FrameBuffer::BufferDump (GetGlContext(), theFbo, theImage, theBufferType);
+  if (theImage.IsEmpty()
+  || !Activate())
+  {
+    return Standard_False;
+  }
+
+  GLenum aFormat = 0;
+  GLenum aType   = 0;
+  bool toSwapRgbaBgra = false;
+  bool toConvRgba2Rgb = false;
+  switch (theImage.Format())
+  {
+  #if !defined(GL_ES_VERSION_2_0)
+    case Image_Format_Gray:
+      aFormat = GL_DEPTH_COMPONENT;
+      aType   = GL_UNSIGNED_BYTE;
+      break;
+    case Image_Format_GrayF:
+      aFormat = GL_DEPTH_COMPONENT;
+      aType   = GL_FLOAT;
+      break;
+    case Image_Format_RGB:
+      aFormat = GL_RGB;
+      aType   = GL_UNSIGNED_BYTE;
+      break;
+    case Image_Format_BGR:
+      aFormat = GL_BGR;
+      aType   = GL_UNSIGNED_BYTE;
+      break;
+    case Image_Format_BGRA:
+    case Image_Format_BGR32:
+      aFormat = GL_BGRA;
+      aType   = GL_UNSIGNED_BYTE;
+      break;
+    case Image_Format_BGRF:
+      aFormat = GL_BGR;
+      aType   = GL_FLOAT;
+      break;
+    case Image_Format_BGRAF:
+      aFormat = GL_BGRA;
+      aType   = GL_FLOAT;
+      break;
+  #else
+    case Image_Format_Gray:
+    case Image_Format_GrayF:
+    case Image_Format_BGRF:
+    case Image_Format_BGRAF:
+      return Standard_False;
+    case Image_Format_BGRA:
+    case Image_Format_BGR32:
+      aFormat = GL_RGBA;
+      aType   = GL_UNSIGNED_BYTE;
+      toSwapRgbaBgra = true;
+      break;
+    case Image_Format_BGR:
+    case Image_Format_RGB:
+      aFormat = GL_RGBA;
+      aType   = GL_UNSIGNED_BYTE;
+      toConvRgba2Rgb = true;
+      break;
+  #endif
+    case Image_Format_RGBA:
+    case Image_Format_RGB32:
+      aFormat = GL_RGBA;
+      aType   = GL_UNSIGNED_BYTE;
+      break;
+    case Image_Format_RGBF:
+      aFormat = GL_RGB;
+      aType   = GL_FLOAT;
+      break;
+    case Image_Format_RGBAF:
+      aFormat = GL_RGBA;
+      aType   = GL_FLOAT;
+      break;
+    case Image_Format_Alpha:
+    case Image_Format_AlphaF:
+      return Standard_False; // GL_ALPHA is no more supported in core context
+    case Image_Format_UNKNOWN:
+      return Standard_False;
+  }
+
+  if (aFormat == 0)
+  {
+    return Standard_False;
+  }
+
+#if !defined(GL_ES_VERSION_2_0)
+  GLint aReadBufferPrev = GL_BACK;
+  if (theBufferType == Graphic3d_BT_Depth
+   && aFormat != GL_DEPTH_COMPONENT)
+  {
+    return Standard_False;
+  }
+#else
+  (void )theBufferType;
+#endif
+
+  // bind FBO if used
+  if (!theFbo.IsNull() && theFbo->IsValid())
+  {
+    theFbo->BindBuffer (GetGlContext());
+  }
+  else
+  {
+  #if !defined(GL_ES_VERSION_2_0)
+    glGetIntegerv (GL_READ_BUFFER, &aReadBufferPrev);
+    GLint aDrawBufferPrev = GL_BACK;
+    glGetIntegerv (GL_DRAW_BUFFER, &aDrawBufferPrev);
+    glReadBuffer (aDrawBufferPrev);
+  #endif
+  }
+
+  // setup alignment
+  const GLint anAligment   = Min (GLint(theImage.MaxRowAligmentBytes()), 8); // limit to 8 bytes for OpenGL
+  glPixelStorei (GL_PACK_ALIGNMENT, anAligment);
+  bool isBatchCopy = !theImage.IsTopDown();
+
+  const GLint   anExtraBytes       = GLint(theImage.RowExtraBytes());
+  GLint         aPixelsWidth       = GLint(theImage.SizeRowBytes() / theImage.SizePixelBytes());
+  Standard_Size aSizeRowBytesEstim = getAligned (theImage.SizePixelBytes() * aPixelsWidth, anAligment);
+  if (anExtraBytes < anAligment)
+  {
+    aPixelsWidth = 0;
+  }
+  else if (aSizeRowBytesEstim != theImage.SizeRowBytes())
+  {
+    aPixelsWidth = 0;
+    isBatchCopy  = false;
+  }
+#if !defined(GL_ES_VERSION_2_0)
+  glPixelStorei (GL_PACK_ROW_LENGTH, aPixelsWidth);
+#else
+  if (aPixelsWidth != 0)
+  {
+    isBatchCopy = false;
+  }
+#endif
+  if (toConvRgba2Rgb)
+  {
+    Handle(NCollection_BaseAllocator) anAlloc = new NCollection_AlignedAllocator (16);
+    const Standard_Size aRowSize = theImage.SizeX() * 4;
+    NCollection_Buffer aRowBuffer (anAlloc);
+    if (!aRowBuffer.Allocate (aRowSize))
+    {
+      return Standard_False;
+    }
+
+    for (Standard_Size aRow = 0; aRow < theImage.SizeY(); ++aRow)
+    {
+      // Image_PixMap rows indexation always starts from the upper corner
+      // while order in memory depends on the flag and processed by ChangeRow() method
+      glReadPixels (0, GLint(theImage.SizeY() - aRow - 1), GLsizei (theImage.SizeX()), 1, aFormat, aType, aRowBuffer.ChangeData());
+      const Image_ColorRGBA* aRowDataRgba = (const Image_ColorRGBA* )aRowBuffer.Data();
+      if (theImage.Format() == Image_Format_BGR)
+      {
+        convertRowFromRgba ((Image_ColorBGR* )theImage.ChangeRow (aRow), aRowDataRgba, theImage.SizeX());
+      }
+      else
+      {
+        convertRowFromRgba ((Image_ColorRGB* )theImage.ChangeRow (aRow), aRowDataRgba, theImage.SizeX());
+      }
+    }
+  }
+  else if (!isBatchCopy)
+  {
+    // copy row by row
+    for (Standard_Size aRow = 0; aRow < theImage.SizeY(); ++aRow)
+    {
+      // Image_PixMap rows indexation always starts from the upper corner
+      // while order in memory depends on the flag and processed by ChangeRow() method
+      glReadPixels (0, GLint(theImage.SizeY() - aRow - 1), GLsizei (theImage.SizeX()), 1, aFormat, aType, theImage.ChangeRow (aRow));
+    }
+  }
+  else
+  {
+    glReadPixels (0, 0, GLsizei (theImage.SizeX()), GLsizei (theImage.SizeY()), aFormat, aType, theImage.ChangeData());
+  }
+  const bool hasErrors = myGlContext->ResetErrors (true);
+
+  glPixelStorei (GL_PACK_ALIGNMENT,  1);
+#if !defined(GL_ES_VERSION_2_0)
+  glPixelStorei (GL_PACK_ROW_LENGTH, 0);
+#endif
+
+  if (!theFbo.IsNull() && theFbo->IsValid())
+  {
+    theFbo->UnbindBuffer (GetGlContext());
+  }
+  else
+  {
+  #if !defined(GL_ES_VERSION_2_0)
+    glReadBuffer (aReadBufferPrev);
+  #endif
+  }
+
+  if (toSwapRgbaBgra)
+  {
+    Image_PixMap::SwapRgbaBgra (theImage);
+  }
+
+  return !hasErrors;
 }
 
 // =======================================================================

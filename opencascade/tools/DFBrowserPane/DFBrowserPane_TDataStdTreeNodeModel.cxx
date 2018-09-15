@@ -18,9 +18,7 @@
 
 #include <TDataStd_TreeNode.hxx>
 
-#include <Standard_WarningsDisable.hxx>
 #include <QAbstractItemModel>
-#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : Constructor
@@ -29,16 +27,7 @@
 DFBrowserPane_TDataStdTreeNodeModel::DFBrowserPane_TDataStdTreeNodeModel (QObject* theParent)
 : TreeModel_ModelBase (theParent)
 {
-  createRootItem(0);
-}
-
-// =======================================================================
-// function : createRootItem
-// purpose :
-// =======================================================================
-void DFBrowserPane_TDataStdTreeNodeModel::createRootItem (const int theColumnId)
-{
-  m_pRootItem = DFBrowserPane_TDataStdTreeNodeItem::CreateItem (TreeModel_ItemBasePtr(), 0, theColumnId);
+  m_pRootItem = DFBrowserPane_TDataStdTreeNodeItem::CreateItem (TreeModel_ItemBasePtr(), 0, 0);
 }
 
 // =======================================================================

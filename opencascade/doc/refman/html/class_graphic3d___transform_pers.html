@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Open CASCADE Technology
-   &#160;<span id="projectnumber">7.3.0</span>
+   &#160;<span id="projectnumber">7.2.0</span>
    </div>
   </td>
  </tr>
@@ -73,7 +73,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Transformation Persistence definition.  
+<p>Class for keeping and computing transformation persistence. Note that instance of this class can not define no transformation persistence Graphic3d_TMF_None - NULL handle should be used for this purpose.  
  <a href="class_graphic3d___transform_pers.html#details">More...</a></p>
 
 <p><code>#include &lt;Graphic3d_TransformPers.hxx&gt;</code></p>
@@ -92,10 +92,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:abe91739109a908390f64f358aeffe75b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set transformation persistence.  <a href="#abe91739109a908390f64f358aeffe75b">More...</a><br /></td></tr>
 <tr class="separator:abe91739109a908390f64f358aeffe75b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97dc8b12a3a326ba3dd37e2392446275"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___transform_pers.html#a97dc8b12a3a326ba3dd37e2392446275">Graphic3d_TransformPers</a> (const <a class="el" href="_graphic3d___trans_mode_flags_8hxx.html#a6e379524d93a3030779b307e967cb17e">Graphic3d_TransModeFlags</a> theMode, const <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;thePnt)</td></tr>
-<tr class="memdesc:a97dc8b12a3a326ba3dd37e2392446275"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Zoom/Rotate transformation persistence with an anchor 3D point. Anchor point defines the origin of Local Coordinate system within World Coordinate system. Throws an exception if persistence mode is not Graphic3d_TMF_ZoomPers, Graphic3d_TMF_ZoomRotatePers or Graphic3d_TMF_RotatePers.  <a href="#a97dc8b12a3a326ba3dd37e2392446275">More...</a><br /></td></tr>
+<tr class="memdesc:a97dc8b12a3a326ba3dd37e2392446275"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set Zoom/Rotate transformation persistence with an anchor 3D point. Throws an exception if persistence mode is not Graphic3d_TMF_ZoomPers, Graphic3d_TMF_ZoomRotatePers or Graphic3d_TMF_RotatePers.  <a href="#a97dc8b12a3a326ba3dd37e2392446275">More...</a><br /></td></tr>
 <tr class="separator:a97dc8b12a3a326ba3dd37e2392446275"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1c60f3ff685249265bd58015ff49f77"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___transform_pers.html#ab1c60f3ff685249265bd58015ff49f77">Graphic3d_TransformPers</a> (const <a class="el" href="_graphic3d___trans_mode_flags_8hxx.html#a6e379524d93a3030779b307e967cb17e">Graphic3d_TransModeFlags</a> theMode, const <a class="el" href="_aspect___type_of_triedron_position_8hxx.html#a3941ccc196760977bbc475e8b50bfb52">Aspect_TypeOfTriedronPosition</a> theCorner, const <a class="el" href="_graphic3d___vec2_8hxx.html#a0dbf9d415436eb4d25c7e38d464b50d3">Graphic3d_Vec2i</a> &amp;theOffset=<a class="el" href="_graphic3d___vec2_8hxx.html#a0dbf9d415436eb4d25c7e38d464b50d3">Graphic3d_Vec2i</a>(0, 0))</td></tr>
-<tr class="memdesc:ab1c60f3ff685249265bd58015ff49f77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set 2d/trihedron transformation persistence with a corner and 2D offset. 2D offset defines the origin of Local Coordinate system as projection of 2D point on screen plane into World Coordinate system. Throws an exception if persistence mode is not Graphic3d_TMF_TriedronPers or Graphic3d_TMF_2d. The offset is a positive displacement from the view corner in pixels.  <a href="#ab1c60f3ff685249265bd58015ff49f77">More...</a><br /></td></tr>
+<tr class="memdesc:ab1c60f3ff685249265bd58015ff49f77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set 2d/trihedron transformation persistence with a corner and 2D offset. Throws an exception if persistence mode is not Graphic3d_TMF_TriedronPers or Graphic3d_TMF_2d. The offset is a positive displacement from the view corner in pixels.  <a href="#ab1c60f3ff685249265bd58015ff49f77">More...</a><br /></td></tr>
 <tr class="separator:ab1c60f3ff685249265bd58015ff49f77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44c5f8f46132f4f0f146e20a79c635b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_standard___type_def_8hxx.html#a03b92feca37cfb9c80cb41a5f6df6cef">Standard_Boolean</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___transform_pers.html#a44c5f8f46132f4f0f146e20a79c635b1">IsZoomOrRotate</a> () const</td></tr>
 <tr class="memdesc:a44c5f8f46132f4f0f146e20a79c635b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true for Graphic3d_TMF_ZoomPers, Graphic3d_TMF_ZoomRotatePers or Graphic3d_TMF_RotatePers modes.  <a href="#a44c5f8f46132f4f0f146e20a79c635b1">More...</a><br /></td></tr>
@@ -202,7 +202,7 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:abd015cede74eeebd53f9e67ea535afb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if specified mode is 2d/trihedron transformation persistence.  <a href="#abd015cede74eeebd53f9e67ea535afb4">More...</a><br /></td></tr>
 <tr class="separator:abd015cede74eeebd53f9e67ea535afb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a932aada3a8dbe56cbef7371574cd67a2"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="_standard___handle_8hxx.html#a464f2f86d5d805f03f4e3c9beb007e40">Handle</a>&lt; <a class="el" href="class_graphic3d___transform_pers.html">Graphic3d_TransformPers</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_graphic3d___transform_pers.html#a932aada3a8dbe56cbef7371574cd67a2">FromDeprecatedParams</a> (<a class="el" href="_graphic3d___trans_mode_flags_8hxx.html#a6e379524d93a3030779b307e967cb17e">Graphic3d_TransModeFlags</a> theFlag, const <a class="el" href="classgp___pnt.html">gp_Pnt</a> &amp;thePoint)</td></tr>
-<tr class="memdesc:a932aada3a8dbe56cbef7371574cd67a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create <a class="el" href="class_graphic3d___transform_pers.html" title="Transformation Persistence definition. ">Graphic3d_TransformPers</a> instance from deprecated parameters set decoding 2D corner + offset parameters from 3D point.  <a href="#a932aada3a8dbe56cbef7371574cd67a2">More...</a><br /></td></tr>
+<tr class="memdesc:a932aada3a8dbe56cbef7371574cd67a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create <a class="el" href="class_graphic3d___transform_pers.html" title="Class for keeping and computing transformation persistence. Note that instance of this class can not ...">Graphic3d_TransformPers</a> instance from deprecated parameters set decoding 2D corner + offset parameters from 3D point.  <a href="#a932aada3a8dbe56cbef7371574cd67a2">More...</a><br /></td></tr>
 <tr class="separator:a932aada3a8dbe56cbef7371574cd67a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_methods_class_standard___transient"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_class_standard___transient')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="class_standard___transient.html">Standard_Transient</a></td></tr>
 <tr class="memitem:a0f5a2b0f378a5a58ca42d50092ae637a inherit pub_static_methods_class_standard___transient"><td class="memItemLeft" align="right" valign="top">static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_standard___transient.html#a0f5a2b0f378a5a58ca42d50092ae637a">get_type_name</a> ()</td></tr>
@@ -220,11 +220,7 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:a6cdf8e1478fba7bae45bcbc8c4e4ebb9 inherit pub_types_class_standard___transient"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Transformation Persistence definition. </p>
-<p>Transformation Persistence defines a mutable Local Coordinate system which depends on camera position, so that visual appearance of the object becomes partially immutable while camera moves. Object visually preserves particular property such as size, placement, rotation or their combination.</p>
-<p>Graphic3d_TMF_ZoomPers, Graphic3d_TMF_RotatePers and Graphic3d_TMF_ZoomRotatePers define Local Coordinate system having origin in specified anchor point defined in World Coordinate system, while Graphic3d_TMF_TriedronPers and Graphic3d_TMF_2d define origin as 2D offset from screen corner in pixels.</p>
-<p>Graphic3d_TMF_2d, Graphic3d_TMF_TriedronPers and Graphic3d_TMF_ZoomPers defines Local Coordinate system where length units are pixels. Beware that <a class="el" href="class_graphic3d___rendering_params.html#a3f131c3443b09c9ad3514836b522c528" title="Returns resolution ratio. ">Graphic3d_RenderingParams::ResolutionRatio()</a> will be ignored! For other Persistence flags, normal (world) length units will apply.</p>
-<p>WARNING: Graphic3d_TMF_None is not permitted for defining instance of this class - NULL handle should be used for this purpose! </p>
+<div class="textblock"><p>Class for keeping and computing transformation persistence. Note that instance of this class can not define no transformation persistence Graphic3d_TMF_None - NULL handle should be used for this purpose. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abe91739109a908390f64f358aeffe75b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abe91739109a908390f64f358aeffe75b">&#9670;&nbsp;</a></span>Graphic3d_TransformPers() <span class="overload">[1/3]</span></h2>
@@ -288,7 +284,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Set Zoom/Rotate transformation persistence with an anchor 3D point. Anchor point defines the origin of Local Coordinate system within World Coordinate system. Throws an exception if persistence mode is not Graphic3d_TMF_ZoomPers, Graphic3d_TMF_ZoomRotatePers or Graphic3d_TMF_RotatePers. </p>
+<p>Set Zoom/Rotate transformation persistence with an anchor 3D point. Throws an exception if persistence mode is not Graphic3d_TMF_ZoomPers, Graphic3d_TMF_ZoomRotatePers or Graphic3d_TMF_RotatePers. </p>
 
 </div>
 </div>
@@ -332,7 +328,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Set 2d/trihedron transformation persistence with a corner and 2D offset. 2D offset defines the origin of Local Coordinate system as projection of 2D point on screen plane into World Coordinate system. Throws an exception if persistence mode is not Graphic3d_TMF_TriedronPers or Graphic3d_TMF_2d. The offset is a positive displacement from the view corner in pixels. </p>
+<p>Set 2d/trihedron transformation persistence with a corner and 2D offset. Throws an exception if persistence mode is not Graphic3d_TMF_TriedronPers or Graphic3d_TMF_2d. The offset is a positive displacement from the view corner in pixels. </p>
 
 </div>
 </div>
@@ -707,7 +703,7 @@ template&lt;class T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Create <a class="el" href="class_graphic3d___transform_pers.html" title="Transformation Persistence definition. ">Graphic3d_TransformPers</a> instance from deprecated parameters set decoding 2D corner + offset parameters from 3D point. </p>
+<p>Create <a class="el" href="class_graphic3d___transform_pers.html" title="Class for keeping and computing transformation persistence. Note that instance of this class can not ...">Graphic3d_TransformPers</a> instance from deprecated parameters set decoding 2D corner + offset parameters from 3D point. </p>
 
 </div>
 </div>

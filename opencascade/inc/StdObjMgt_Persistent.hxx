@@ -47,18 +47,18 @@ public:
     { return new Persistent; }
 
   //! Read persistent data from a file.
-  virtual void Read (StdObjMgt_ReadData& theReadData) = 0;
+  Standard_EXPORT virtual void Read (StdObjMgt_ReadData& theReadData) = 0;
 
   //! Write persistent data to a file.
-  virtual void Write (StdObjMgt_WriteData& theWriteData) const = 0;
+  Standard_EXPORT virtual void Write (StdObjMgt_WriteData& theWriteData) const = 0;
 
   typedef NCollection_Sequence<Handle(StdObjMgt_Persistent)> SequenceOfPersistent;
 
   //! Gets persistent child objects
-  virtual void PChildren (SequenceOfPersistent&) const = 0;
+  Standard_EXPORT virtual void PChildren (SequenceOfPersistent&) const = 0;
 
   //! Returns persistent type name
-  virtual Standard_CString PName() const = 0;
+  Standard_EXPORT virtual Standard_CString PName() const = 0;
 
   //! Import transient document from the persistent data
   //! (to be overriden by document class;

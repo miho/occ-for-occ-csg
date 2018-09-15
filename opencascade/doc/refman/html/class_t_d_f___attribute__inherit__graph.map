@@ -66,11 +66,11 @@
 <area shape="rect" id="node68" href="$class_x_c_a_f_doc___color.html" title="attribute to store color " alt="" coords="375,3248,490,3275"/>
 <area shape="rect" id="node69" href="$class_x_c_a_f_doc___color_tool.html" title="Provides tools to store and retrieve attributes (colors) of TopoDS_Shape in and from TDocStd_Document..." alt="" coords="363,3299,502,3325"/>
 <area shape="rect" id="node70" href="$class_x_c_a_f_doc___datum.html" title="attribute to store datum " alt="" coords="371,3349,494,3376"/>
-<area shape="rect" id="node71" href="$class_x_c_a_f_doc___dimension.html" title="Attribute that identifies a dimension in the GD&amp;T table. Its parent label is used as a container to s..." alt="" coords="359,3400,506,3427"/>
+<area shape="rect" id="node71" href="$class_x_c_a_f_doc___dimension.html" title="attribute to store dimension " alt="" coords="359,3400,506,3427"/>
 <area shape="rect" id="node72" href="$class_x_c_a_f_doc___dim_tol.html" title="attribute to store dimension and tolerance " alt="" coords="370,3451,495,3477"/>
-<area shape="rect" id="node73" href="$class_x_c_a_f_doc___dim_tol_tool.html" title="Attribute containing GD&amp;T section of XCAF document. Provide tools for GD&amp;T section management..." alt="" coords="358,3501,507,3528"/>
+<area shape="rect" id="node73" href="$class_x_c_a_f_doc___dim_tol_tool.html" title="Provides tools to store and retrieve attributes (colors) of TopoDS_Shape in and from TDocStd_Document..." alt="" coords="358,3501,507,3528"/>
 <area shape="rect" id="node74" href="$class_x_c_a_f_doc___document_tool.html" title="Defines sections structure of an XDE document. attribute marking CAF document as being DECAF document..." alt="" coords="349,3552,517,3579"/>
-<area shape="rect" id="node75" href="$class_x_c_a_f_doc___geom_tolerance.html" title="Attribute to store dimension and tolerance. " alt="" coords="345,3603,521,3629"/>
+<area shape="rect" id="node75" href="$class_x_c_a_f_doc___geom_tolerance.html" title="attribute to store dimension and tolerance " alt="" coords="345,3603,521,3629"/>
 <area shape="rect" id="node76" href="$class_x_c_a_f_doc___graph_node.html" title="This attribute allow user multirelation tree of labels. This GraphNode is experimental Graph that not..." alt="" coords="357,3653,508,3680"/>
 <area shape="rect" id="node77" href="$class_x_c_a_f_doc___layer_tool.html" title="Provides tools to store and retrieve attributes (Layers) of TopoDS_Shape in and from TDocStd_Document..." alt="" coords="362,3704,503,3731"/>
 <area shape="rect" id="node78" href="$class_x_c_a_f_doc___location.html" title="attribute to store TopLoc_Location " alt="" coords="365,3755,500,3781"/>
@@ -80,7 +80,7 @@
 <area shape="rect" id="node85" href="$class_x_c_a_f_doc___notes_tool.html" title="A tool to annotate items in the hierarchical product structure. There are two basic entities..." alt="" coords="361,3957,504,3984"/>
 <area shape="rect" id="node86" href="$class_x_c_a_f_doc___shape_map_tool.html" title="attribute containing map of sub shapes " alt="" coords="347,4008,518,4035"/>
 <area shape="rect" id="node87" href="$class_x_c_a_f_doc___shape_tool.html" title="A tool to store shapes in an XDE document in the form of assembly structure, and to maintain this str..." alt="" coords="359,4059,506,4085"/>
-<area shape="rect" id="node88" href="$class_x_c_a_f_doc___view.html" title="Attribute to store view. " alt="" coords="376,4109,489,4136"/>
+<area shape="rect" id="node88" href="$class_x_c_a_f_doc___view.html" title="attribute to store view " alt="" coords="376,4109,489,4136"/>
 <area shape="rect" id="node89" href="$class_x_c_a_f_doc___view_tool.html" title="Provides tools to store and retrieve Views in and from TDocStd_Document Each View contains parts XCAF..." alt="" coords="364,4160,501,4187"/>
 <area shape="rect" id="node90" href="$class_x_c_a_f_doc___volume.html" title="attribute to store volume " alt="" coords="368,4211,497,4237"/>
 <area shape="rect" id="node2" href="$class_standard___transient.html" title="Abstract class which forms the root of the entire Transient class hierarchy. " alt="" coords="5,2108,140,2135"/>

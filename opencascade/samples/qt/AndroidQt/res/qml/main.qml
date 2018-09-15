@@ -28,9 +28,6 @@ Window {
   id: root_window
   visible: true
 
-  width:  (Qt.platform.os == "android" || Qt.platform.os == "ios") ? Screen.width : 600
-  height: (Qt.platform.os == "android" || Qt.platform.os == "ios") ? Screen.height : 400
-
   Item {
     id: root_item
     anchors.fill: parent
@@ -55,8 +52,8 @@ Window {
       anchors.left: parent.left
 
       // size
-      width:  (Qt.platform.os == "android" || Qt.platform.os == "ios") ? 200 : 150
-      height: (Qt.platform.os == "android" || Qt.platform.os == "ios") ? 200 : 150
+      width:  200
+      height: 200
 
       color: "white"
 
@@ -65,7 +62,7 @@ Window {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
 
-        source: "qrc:/ic_action_collection.png"
+        source: "qrc:///icons/res/icons/ic_action_collection.png"
       }
 
       MouseArea {

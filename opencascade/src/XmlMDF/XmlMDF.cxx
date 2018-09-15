@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <Message_Messenger.hxx>
+#include <CDM_MessageDriver.hxx>
 #include <Storage_Schema.hxx>
 #include <TColStd_MapOfTransient.hxx>
 #include <TDF_Attribute.hxx>
@@ -36,7 +36,6 @@
 #include <XmlLDrivers.hxx>
 #include <TDocStd_Owner.hxx>
 #include <TDocStd_Document.hxx>
-#include <Standard_GUID.hxx>
 
 IMPLEMENT_DOMSTRING (TagString,         "tag")
 IMPLEMENT_DOMSTRING (LabelString,       "label")
@@ -209,7 +208,7 @@ Standard_Integer XmlMDF::ReadSubTree (const XmlObjMgt_Element&    theElement,
           TCollection_ExtendedString anErrorMessage =
             TCollection_ExtendedString ("Wrong Tag value for OCAF Label: ")
               + aTag;
-          theDriverMap.Find("TDF_TagSource") -> myMessageDriver->Send (anErrorMessage, Message_Fail);
+          theDriverMap.Find("TDF_TagSource") -> WriteMessage (anErrorMessage);
           return -1;
         }
         // create label
@@ -249,7 +248,7 @@ Standard_Integer XmlMDF::ReadSubTree (const XmlObjMgt_Element&    theElement,
             TCollection_ExtendedString anErrorMessage =
              TCollection_ExtendedString("Wrong ID of OCAF attribute with type ")
                + aName;
-            driver -> myMessageDriver->Send (anErrorMessage, Message_Fail);
+            driver -> WriteMessage (anErrorMessage);
             return -1;
           }
           Handle(TDF_Attribute) tAtt;
@@ -258,36 +257,20 @@ Standard_Integer XmlMDF::ReadSubTree (const XmlObjMgt_Element&    theElement,
             tAtt = Handle(TDF_Attribute)::DownCast(theRelocTable.Find(anID));
           else
             tAtt = driver -> NewEmpty();
-
-          if (tAtt->Label().IsNull())
-          {
-            try
-            {
-              theLabel.AddAttribute (tAtt);
-            }
-            catch (const Standard_DomainError&)
-            {
-              // For attributes that can have arbitrary GUID (e.g. TDataStd_Integer), exception
-              // will be raised in valid case if attribute of that type with default GUID is already
-              // present  on the same label; the reason is that actual GUID will be read later.
-              // To avoid this, set invalid (null) GUID to the newly added attribute (see #29669)
-              static const Standard_GUID fbidGuid;
-              tAtt->SetID (fbidGuid);
-              theLabel.AddAttribute (tAtt);
-            }
-          }
+	  if (tAtt->Label().IsNull())
+	    theLabel.AddAttribute (tAtt);
 	  else
-	    driver->myMessageDriver->Send
+	    driver->WriteMessage
 	      (TCollection_ExtendedString("XmlDriver warning: ") +
 	       "attempt to attach attribute " +
-	       aName + " to a second label", Message_Warning);
+	       aName + " to a second label");
 
           if (! driver -> Paste (pAtt, tAtt, theRelocTable))
           {
             // error converting persistent to transient
-            driver->myMessageDriver->Send
+            driver->WriteMessage
               (TCollection_ExtendedString("XmlDriver warning: ") +
-               "failure reading attribute " + aName, Message_Warning);
+               "failure reading attribute " + aName);
           }
           else if (isBound == Standard_False)
             theRelocTable.Bind (anID, tAtt);
@@ -320,7 +303,7 @@ Standard_Integer XmlMDF::ReadSubTree (const XmlObjMgt_Element&    theElement,
 //purpose  : 
 //=======================================================================
 void XmlMDF::AddDrivers (const Handle(XmlMDF_ADriverTable)& aDriverTable,
-                         const Handle(Message_Messenger)&   aMessageDriver)
+                         const Handle(CDM_MessageDriver)&   aMessageDriver)
 {
   aDriverTable->AddDriver (new XmlMDF_TagSourceDriver(aMessageDriver)); 
   aDriverTable->AddDriver (new XmlMDF_ReferenceDriver(aMessageDriver));
@@ -342,9 +325,9 @@ void XmlMDF::CreateDrvMap (const Handle(XmlMDF_ADriverTable)& theDrivers,
     if (theAsciiDriverMap.IsBound (aTypeName) == Standard_False)
       theAsciiDriverMap.Bind (aTypeName, aDriver);
     else
-      aDriver -> myMessageDriver->Send
+      aDriver -> WriteMessage
         (TCollection_ExtendedString ("Warning: skipped driver name: \"")
-         + aTypeName + '\"', Message_Warning);
+         + aTypeName + '\"');
     anIter.Next();
   }
 }

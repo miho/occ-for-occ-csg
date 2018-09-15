@@ -29,13 +29,13 @@ public:
   //! Write persistent data to a file.
   Standard_EXPORT virtual void Write (StdObjMgt_WriteData& theWriteData) const;
   //! Gets persistent child objects
-  virtual void PChildren(StdObjMgt_Persistent::SequenceOfPersistent& theChildren) const
+  Standard_EXPORT virtual void PChildren(StdObjMgt_Persistent::SequenceOfPersistent& theChildren) const
   {
     theChildren.Append(myLabels);
     theChildren.Append(myAttributes);
   }
   //! Returns persistent type name
-  virtual Standard_CString PName() const
+  Standard_EXPORT virtual Standard_CString PName() const
     { return "PDF_Data"; }
 
   //! Import transient data from the persistent data.

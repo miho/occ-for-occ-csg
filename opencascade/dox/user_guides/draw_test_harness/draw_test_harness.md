@@ -5529,7 +5529,6 @@ surface_radius c pi 3 c1 c2
 
 * **intersect** computes intersections of surfaces; 
 * **2dintersect** computes intersections of 2d curves.
-* **intconcon** computes intersections of 2d conic curves.
 
 @subsubsection occt_draw_6_7_1  intersect
 
@@ -5548,43 +5547,21 @@ plane p 0 0 40 0 1 5
 intersect e c p 
 ~~~~~
 
-@subsubsection occt_draw_6_7_2  2dintersect
+@subsubsection occt_draw_6_7_2  dintersect
 
 Syntax:      
 ~~~~~
-2dintersect curve1 [curve2] [-tol tol] [-state]
-~~~~~
-
-Displays the intersection points between 2d curves.
-Options:
- -tol - allows changing the intersection tolerance (default value is 1.e-3);
- -state - allows printing the intersection state for each point.
-
-**Example:** 
-~~~~~
-# intersect two 2d ellipses 
-ellipse e1 0 0 5 2 
-ellipse e2 0 0 0 1 5 2 
-2dintersect e1 e2 -tol 1.e-10 -state
-~~~~~
-
-@subsubsection occt_draw_6_7_3 intconcon
-
-Syntax:      
-~~~~~
-intconcon curve1 curve2 
+2dintersect curve1 curve2 
 ~~~~~
 
 Displays the intersection points between two 2d curves. 
-Curves must be only conic sections: 2d lines, circles, ellipses,
-hyperbolas, parabolas. The algorithm from *IntAna2d_AnaIntersection* is used.
 
 **Example:** 
 ~~~~~
 # intersect two 2d ellipses 
 ellipse e1 0 0 5 2 
 ellipse e2 0 0 0 1 5 2 
-intconcon e1 e2 
+2dintersect e1 e2 
 ~~~~~
 
 @subsection occt_draw_6_8  Approximations
@@ -5844,7 +5821,6 @@ The following topics are covered in the eight sections of this chapter:
   * Transformations of shapes: translation, copy, etc.
   * Topological operations, or booleans.
   * Drafting and blending.
-  * Defeaturing.
   * Analysis of shapes.
 
 
@@ -7323,33 +7299,13 @@ buildevol
 ~~~~~
 
 
-@subsection occt_draw_defeaturing Defeaturing
-
-Draw command **removefeatures** is intended for performing @ref occt_modalg_defeaturing "3D Model Defeaturing", i.e. it performs the removal of the requested features from the shape.
-
-Syntax:
-~~~~
-removefeatures result shape f1 f2 ... [-nohist] [-parallel]
-
-Where:
-result   - result of the operation;
-shape    - the shape to remove the features from;
-f1, f2   - features to remove from the shape;
-
-Options:
-nohist   - disables the history collection;
-parallel - enables the parallel processing mode.
-~~~~
-
-
 @subsection occt_draw_7_9  Analysis of topology and geometry
 
 Analysis of shapes includes commands to compute length, area, volumes and inertial properties, as well as to compute some aspects impacting shape validity.
 
   * Use **lprops**, **sprops**, **vprops** to compute integral properties.
-  * Use **bounding** to compute and to display the bounding box of a shape.
+  * Use **bounding** to display the bounding box of a shape.
   * Use **distmini** to calculate the minimum distance between two shapes.
-  * Use **isbbinterf** to check if the two shapes are interfered by their bounding boxes. 
   * Use **xdistef**, **xdistcs**, **xdistcc**, **xdistc2dc2dss**, **xdistcc2ds** to check the distance between two objects on even grid.
   * Use **checkshape** to check validity of the shape.
   * Use **tolsphere** to see the tolerance spheres of all vertices in the shape.
@@ -7402,135 +7358,20 @@ I.Z = 314159.265357595
 
 Syntax:      
 ~~~~~
-bounding {-s shape | -c xmin ymin zmin xmax ymax zmax} [-obb] [-shape name] [-dump] [-notriangulation] [-perfmeter name NbIters] [-save xmin ymin zmin xmax ymax zmax] [-nodraw] [-optimal] [-exttoler]
+bounding shape 
 ~~~~~
 
-Computes and displays the bounding box (BndBox) of a shape. The bounding box is a cuboid that circumscribes the source shape.
-Generaly, bounding boxes can be divided into two main types:
-  - axis-aligned BndBox (AABB). I.e. the box whose edges are parallel to an axis of World Coordinate System (WCS);
-  - oriented BndBox (OBB). I.e. not AABB.
+Displays the bounding box of a shape. The bounding box is a cuboid created with faces parallel to the x, y, and z planes. The command returns the dimension values of the the box, *xmin ymin zmin xmax ymax zmax.* 
 
-Detailed information about this command is availabe in DRAW help-system (enter "help bounding" in DRAW application).
-  
-**Example 1: Creation of AABB with given corners** 
+**Example:** 
 ~~~~~
-bounding -c 50 100 30 180 200 100 -shape result
-# look at the box
-vdisplay result
-vfit
-vsetdispmode 1
-~~~~~
-
-**Example 2: Compare AABB and OBB** 
-~~~~~
-# Create a torus and rotate it
+# bounding box of a torus 
 ptorus t 20 5 
-trotate t 5 10 15 1 1 1 28
-
-# Create AABB from the torus
-bounding -s t -shape ra -dump -save x1 y1 z1 x2 y2 z2
-==Axes-aligned bounding box
-==X-range: -26.888704600189307 23.007685197265488
-==Y-range: -22.237699567214314 27.658690230240481
-==Z-range: -13.813966507560762 12.273995247458407
-
-# Obtain the boundaries
-dump x1 y1 z1 x2 y2 z2
-==*********** Dump of x1 *************
-==-26.8887046001893
-
-==*********** Dump of y1 *************
-==-22.2376995672143
-
-==*********** Dump of z1 *************
-==-13.8139665075608
-
-==*********** Dump of x2 *************
-==23.0076851972655
-
-==*********** Dump of y2 *************
-==27.6586902302405
-
-==*********** Dump of z2 *************
-==12.2739952474584
-
-# Compute the volume of AABB
-vprops ra 1.0e-12
-==Mass :         64949.9
-
-# Let us check this value
-dval (x2-x1)*(y2-y1)*(z2-z1)
-==64949.886543606823
-~~~~~
-
-The same result is obtained.
-
-~~~~~
-# Create OBB from the torus
-bounding -s t -shape ro -dump -obb
-==Oriented bounding box
-==Center: -1.9405097014619073 2.7104953315130857 -0.76998563005117782
-==X-axis: 0.31006700219833244 -0.23203206410428409 0.9219650619059514
-==Y-axis: 0.098302309139513336 -0.95673739537318336 -0.27384340837854165
-==Z-axis: 0.94561890324040099 0.17554109923901748 -0.27384340837854493
-==Half X: 5.0000002000000077
-==Half Y: 26.783728747002169
-==Half Z: 26.783728747002165
-
-# Compute the volume of OBB
-vprops ro 1.0e-12
-==Mass :         28694.7
-~~~~~
-
-As we can see, the volume of OBB is significantly less than the volume of AABB.
-
-@subsubsection occt_draw_7_9_2a   isbbinterf
-
-Syntax:      
-~~~~~
-isbbinterf shape1 shape2 [-o]
-~~~~~
-
-Checks whether the bounding boxes created from the given shapes are interfered. If "-o"-option is switched on then the oriented boxes will be checked. Otherwise, axis-aligned boxes will be checked.
-
-**Example 1: Not interfered AABB** 
-~~~~~
-box b1 100 60 140 20 10 80
-box b2 210 200 80 120 60 90
-isbbinterf b1 b2
-==The shapes are NOT interfered by AABB.
-~~~~~
-
-**Example 2: Interfered AABB** 
-~~~~~
-box b1 300 300 300
-box b2 100 100 100 50 50 50
-isbbinterf b1 b2
-==The shapes are interfered by AABB.
-~~~~~
-
-**Example 3: Not interfered OBB** 
-~~~~~
-box b1 100 150 200
-copy b1 b2
-trotate b1 -150 -150 -150 1 2 3 -40
-trotate b2 -150 -150 -150 1 5 2 60
-
-# Check of interference
-isbbinterf b1 b2 -o
-==The shapes are NOT interfered by OBB.
-~~~~~
-
-**Example 4: Interfered OBB** 
-~~~~~
-box b1 100 150 200
-copy b1 b2
-trotate b1 -50 -50 -50 1 1 1 -40
-trotate b2 -50 -50 -50 1 1 1 60
-
-# Check of interference
-isbbinterf b1 b2 -o
-==The shapes are interfered by OBB.
+bounding t 
+==-27.059805107309852              -27.059805107309852 - 
+5.0000001000000003 
+==27.059805107309852               27.059805107309852 
+5.0000001000000003 
 ~~~~~
 
 @subsubsection occt_draw_7_9_3  distmini
@@ -7540,7 +7381,7 @@ Syntax:
 distmini name Shape1 Shape2 
 ~~~~~
 
-Calculates the minimum distance between two shapes. The calculation returns the number of solutions, if more than one solution exists. The options are displayed in the viewer in red and the results are listed in the shell window. The *distmini* lines are considered as shapes which have a value v. 
+Calculates the minimum distance between two shapes. The calculation returns the number of solutions, If more than one solution exists. The options are displayed in the viewer(red) and the results are listed in the shell window. The *distmini* lines are considered as shapes which have a value v. 
 
 **Example:** 
 ~~~~~
@@ -7610,8 +7451,8 @@ checkshape [-top] shape [result] [-short]
 
 Where: 
 * *top* -- optional parameter, which allows checking only topological validity of a shape. 
-* *shape* -- the only required parameter, defines the name of the shape to check. 
-* *result* -- optional parameter, defines custom prefix for the output shape names.
+* *shape* -- the only required parameter which represents the name of the shape to check. 
+* *result* -- optional parameter which is the prefix of the output shape names. 
 * *short* -- a short description of the check. 
 
 **checkshape** examines the selected object for topological and geometric coherence. The object should be a three dimensional shape. 
@@ -7656,9 +7497,9 @@ validrange edge [(out) u1 u2]
 
 Where: 
 * *edge* -- the name of the edge to analyze. 
-* *u1*, *u2* -- optional names of variables to put into the range.
+* *u1*, *u2* -- optional names of variables to put the range into.
 
-**validrange** computes valid range of the edge. If *u1* and *u2* are not given, it returns the first and the last parameters. Otherwise, it sets variables *u1* and *u2*.
+**validrange** computes valid range of the edge. If *u1* and *u2* are not given it returns first and last parameters. Otherwise, it sets the variables u1 and u2.
 
 **Example:** 
 ~~~~~
@@ -8032,163 +7873,6 @@ Options:
  * -a AngTol - angular tolerance used for distinguishing the planar faces;
  * -s Shared(0/1) - boolean flag which defines whether the input edges are already shared or have to be intersected.
 
-@subsection occt_draw_hist History commands
-
-Draw module for @ref occt_modalg_hist "History Information support" includes the command to save history of modifications performed by Boolean operation or sibling commands into a drawable object and the actual history commands:
-
-* *savehistory*;
-* *isdeleted*;
-* *modified*;
-* *generated*.
-
-@subsubsection occt_draw_hist_save savehistory
-
-*savehistory* command saves the history from the session into a drawable object with the given name.
-
-Syntax:
-~~~~
-savehistory     : savehistory name
-~~~~
-
-If the history of shape modifications performed during an operation is needed, the *savehistory* command should be called after the command performing the operation.
-If another operation supporting history will be performed before the history of the first operation is saved it will be overwritten with the new history.
-
-Example:
-~~~~
-box b1 10 10 10
-box b2 5 0 0 10 10 15
-bfuse r b1 b2
-savehistory fuse_hist
-
-dump fuse_hist
-#*********** Dump of fuse_hist *************
-# History contains:
-# - 4 Deleted shapes;
-# - 20 Modified shapes;
-# - 6 Generated shapes.
-
-unifysamedom ru r
-savehistory usd_hist
-dump usd_hist
-#*********** Dump of usd_hist *************
-#History contains:
-# - 14 Deleted shapes;
-# - 28 Modified shapes;
-# - 0 Generated shapes.
-~~~~
-
-@subsubsection occt_draw_hist_isdel isdeleted
-
-*isdeleted* command checks if the given shape has been deleted in the given history.
-
-Syntax:
-~~~~
-isdeleted       : isdeleted history shape
-~~~~
-
-Example:
-~~~~
-box b1 4 4 4 2 2 2
-box b2 10 10 10
-bcommon r b1 b2
-
-savehistory com_hist
-# all vertices, edges and faces of the b2 are deleted
-foreach s [join [list [explode b2 v] [explode b2 e] [explode b2 f] ] ] {
-  isdeleted com_hist $s
-  # Deleted
-}
-~~~~
-
-@subsubsection occt_draw_hist_mod modified
-
-*modified* command returns the shapes Modified from the given shape in the given history. All modified shapes are put into a compound. If the shape has not been modified, the resulting compound will be empty. Note that if the shape has been modified into a single shape only, it will be returned without enclosure into the compound.
-
-Syntax:
-~~~~
-modified        : modified modified_shapes history shape
-~~~~
-
-Example:
-~~~~
-box b 10 10 10
-explode b e
-fillet r b 2 b_1
-
-savehistory fillet_hist
-
-explode b f
-
-modified m3 fillet_hist b_3
-modified m5 fillet_hist b_5
-~~~~
-
-@subsubsection occt_draw_hist_gen generated
-
-*generated* command returns the shapes Generated from the given shape in the given history. All generated shapes are put into a compound. If no shapes have been generated from the shape, the resulting compound will be empty. Note that; if the shape has generated a single shape only, it will be returned without enclosure into the compound.
-
-Syntax:
-~~~~
-generated       : generated generated_shapes history shape
-~~~~
-
-Example:
-~~~~
-polyline w1 0 0 0 10 0 0 10 10 0
-polyline w2 5 1 10 9 1 10 9 5 10
-
-thrusections r 0 0 w1 w2
-
-savehistory loft_hist
-
-explode w1 e
-explode w2 e
-
-generated g11 loft_hist w1_1
-generated g12 loft_hist w1_2
-generated g21 loft_hist w2_1
-generated g22 loft_hist w2_2
-
-compare g11 g21
-# equal shapes
-
-compare g12 g22
-# equal shapes
-~~~~
-
-@subsubsection occt_draw_hist_extension Enabling Draw history support for the algorithms
-
-Draw History mechanism allows fast and easy enabling of the Draw history support for the OCCT algorithms supporting standard history methods.
-To enable History commands for the algorithm it is necessary to save the history of the algorithm into the session.
-For that, it is necessary to put the following code into the command implementation just after the command is done:
-~~~~
-BRepTest_Objects::SetHistory(ListOfArguments, Algorithm);
-~~~~
-
-Here is the example of how it is done in the command performing Split operation (see implementation of the *bapisplit* command):
-~~~~
-BRepAlgoAPI_Splitter aSplitter;
-// setting arguments
-aSplitter.SetArguments(BOPTest_Objects::Shapes());
-// setting tools
-aSplitter.SetTools(BOPTest_Objects::Tools());
-
-// setting options
-aSplitter.SetRunParallel(BOPTest_Objects::RunParallel());
-aSplitter.SetFuzzyValue(BOPTest_Objects::FuzzyValue());
-aSplitter.SetNonDestructive(BOPTest_Objects::NonDestructive());
-aSplitter.SetGlue(BOPTest_Objects::Glue());
-aSplitter.SetCheckInverted(BOPTest_Objects::CheckInverted());
-aSplitter.SetUseOBB(BOPTest_Objects::UseOBB());
-
-// performing operation
-aSplitter.Build();
-
-// Store the history for the Objects (overwrites the history in the session)
-BRepTest_Objects::SetHistory(BOPTest_Objects::Shapes(), aSplitter);
-// Add the history for the Tools
-BRepTest_Objects::AddHistory(BOPTest_Objects::Tools(), aSplitter);
-~~~~
 
 @subsection occt_draw_7_12  Texture Mapping to a Shape
 
@@ -11020,24 +10704,24 @@ tinspector [-plugins {name1 ... [nameN] | all}]
            [-select {object | name1 ... [nameN]}]
            [-show {0|1} = 1]
 ~~~~~
-Starts inspection tool.
+Starts tool of inspection.
 Options:
 * *plugins* enters plugins that should be added in the inspector.
-Available names are: *dfbrowser*, *vinspector* and *shapeview*.
-Plugins order will be the same as defined in the arguments.
+Available names are: dfbrowser, vinspector and shapeview.
+Plugins order will be the same as defined in arguments.
 'all' adds all available plugins in the order:
 DFBrowser, VInspector and ShapeView.
-If at the first call this option is not used, 'all' option is applied;
+If at the first call this option is not used, 'all' option is applyed;
 * *activate* activates the plugin in the tool view.
 If at the first call this option is not used, the first plugin is activated;
-* *shape* initializes plugin(s) by the shape object. If 'name' is empty, initializes all plugins;
-* *open* gives the file to the plugin(s). If the plugin is active after open, the content will be updated;
+* *shape* initializes plugin/s by the shape object. If 'name' is empty, initializes all plugins;
+* *open* gives the file to the plugin/s. If the plugin is active, after open, update content will be done;
 * *update* updates content of the active plugin;
 * *select* sets the parameter that should be selected in an active tool view.
-Depending on the active tool the parameter is:
-ShapeView: 'object' is an instance of *TopoDS_Shape TShape*,
-DFBrowser: 'name' is an entry of *TDF_Label* and 'name2' (optionally) for *TDF_Attribute* type name,
-VInspector: 'object' is an instance of *AIS_InteractiveObject*;
+Depending on active tool the parameter is:
+ShapeView: 'object' is an instance of TopoDS_Shape TShape,
+DFBrowser: 'name' is an entry of TDF_Label and name2(optionaly) for TDF_Attribute type name,
+VInspector: 'object' is an instance of AIS_InteractiveObject;
 * *show* sets Inspector view visible or hidden. The first call of this command will show it.
 
 **Example:** 

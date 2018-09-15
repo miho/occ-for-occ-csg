@@ -24,7 +24,7 @@
 #include <BinObjMgt_Persistent.hxx>
 
 class BinMDF_ADriverTable;
-class Message_Messenger;
+class CDM_MessageDriver;
 class BinMDataStd_NameDriver;
 class BinMDataStd_IntegerDriver;
 class BinMDataStd_RealDriver;
@@ -61,7 +61,7 @@ public:
 
   
   //! Adds the attribute drivers to <theDriverTable>.
-  Standard_EXPORT static void AddDrivers (const Handle(BinMDF_ADriverTable)& theDriverTable, const Handle(Message_Messenger)& aMsgDrv);
+  Standard_EXPORT static void AddDrivers (const Handle(BinMDF_ADriverTable)& theDriverTable, const Handle(CDM_MessageDriver)& aMsgDrv);
   
   Standard_EXPORT static void SetDocumentVersion (const Standard_Integer DocVersion);
   

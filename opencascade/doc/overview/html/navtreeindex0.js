@@ -18,7 +18,6 @@ var NAVTREEINDEX0 =
 "index.html#OCCT_OVW_SECTION_7_3_2":[0,6,2,1],
 "index.html#OCCT_OVW_SECTION_7_3_3":[0,6,2,2],
 "index.html#OCCT_OVW_SECTION_7_3_4":[0,6,2,3],
-"index.html#OCCT_OVW_SECTION_7_3_5":[0,6,2,4],
 "index.html#overview_req_cpp":[0,3,0],
 "index.html#overview_req_hw":[0,3,2],
 "index.html#overview_req_libs":[0,3,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX0 =
 "occt_dev_guides__tests.html#testmanual_3_3":[4,5,2,2],
 "occt_dev_guides__tests.html#testmanual_3_4":[4,5,2,3],
 "occt_dev_guides__tests.html#testmanual_3_6":[4,5,2,5],
-"occt_dev_guides__tests.html#testmanual_3_7":[4,5,2,6]
+"occt_dev_guides__tests.html#testmanual_3_7":[4,5,2,6],
+"occt_dev_guides__tests.html#testmanual_4":[4,5,3]
 };

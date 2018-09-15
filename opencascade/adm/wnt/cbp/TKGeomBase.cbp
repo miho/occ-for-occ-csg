@@ -17,6 +17,28 @@
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DNo_Exception" />
+					<Add option="-D__ProjLib_DLL" />
+					<Add option="-D__GeomProjLib_DLL" />
+					<Add option="-D__GCPnts_DLL" />
+					<Add option="-D__CPnts_DLL" />
+					<Add option="-D__Approx_DLL" />
+					<Add option="-D__AppParCurves_DLL" />
+					<Add option="-D__FEmTool_DLL" />
+					<Add option="-D__AppCont_DLL" />
+					<Add option="-D__Extrema_DLL" />
+					<Add option="-D__IntAna_DLL" />
+					<Add option="-D__IntAna2d_DLL" />
+					<Add option="-D__GeomConvert_DLL" />
+					<Add option="-D__AdvApp2Var_DLL" />
+					<Add option="-D__GeomLib_DLL" />
+					<Add option="-D__Geom2dConvert_DLL" />
+					<Add option="-D__Hermit_DLL" />
+					<Add option="-D__BndLib_DLL" />
+					<Add option="-D__AppDef_DLL" />
+					<Add option="-D__GeomTools_DLL" />
+					<Add option="-D__GC_DLL" />
+					<Add option="-D__GCE2d_DLL" />
+					<Add option="-D__gce_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKGeomBase_obj.link" />
@@ -35,6 +57,28 @@
 					<Add option="-O0" />
 					<Add option="-g" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D__ProjLib_DLL" />
+					<Add option="-D__GeomProjLib_DLL" />
+					<Add option="-D__GCPnts_DLL" />
+					<Add option="-D__CPnts_DLL" />
+					<Add option="-D__Approx_DLL" />
+					<Add option="-D__AppParCurves_DLL" />
+					<Add option="-D__FEmTool_DLL" />
+					<Add option="-D__AppCont_DLL" />
+					<Add option="-D__Extrema_DLL" />
+					<Add option="-D__IntAna_DLL" />
+					<Add option="-D__IntAna2d_DLL" />
+					<Add option="-D__GeomConvert_DLL" />
+					<Add option="-D__AdvApp2Var_DLL" />
+					<Add option="-D__GeomLib_DLL" />
+					<Add option="-D__Geom2dConvert_DLL" />
+					<Add option="-D__Hermit_DLL" />
+					<Add option="-D__BndLib_DLL" />
+					<Add option="-D__AppDef_DLL" />
+					<Add option="-D__GeomTools_DLL" />
+					<Add option="-D__GC_DLL" />
+					<Add option="-D__GCE2d_DLL" />
+					<Add option="-D__gce_DLL" />
 				</Compiler>
 				<Linker>
 					<Add option="@TKGeomBase_objd.link" />

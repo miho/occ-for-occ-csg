@@ -98,6 +98,7 @@
 		<Unit filename="../../../src/HLRBRep/HLRBRep_PCLocFOfTheLocateExtPCOfTheProjPCurOfCInter_0.cxx" />
 		<Unit filename="../../../src/HLRBRep/HLRBRep_PolyAlgo.cxx" />
 		<Unit filename="../../../src/HLRBRep/HLRBRep_PolyHLRToShape.cxx" />
+		<Unit filename="../../../src/HLRBRep/HLRBRep_SLPropsATool.cxx" />
 		<Unit filename="../../../src/HLRBRep/HLRBRep_SLProps_0.cxx" />
 		<Unit filename="../../../src/HLRBRep/HLRBRep_ShapeBounds.cxx" />
 		<Unit filename="../../../src/HLRBRep/HLRBRep_ShapeToHLR.cxx" />

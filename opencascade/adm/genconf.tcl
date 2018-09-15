@@ -142,6 +142,9 @@ proc wokdep:gui:UpdateList {} {
     if { "$::HAVE_GL2PS" == "true" } {
       lappend anIncErrs "Error: gl2ps can not be used with OpenGL ES"
     }
+    if { "$::HAVE_D3D" == "true" } {
+      lappend anIncErrs "Error: Direct3D can not be used with OpenGL ES"
+    }
     wokdep:SearchEGL     anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs
     wokdep:SearchGLES    anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs
   }

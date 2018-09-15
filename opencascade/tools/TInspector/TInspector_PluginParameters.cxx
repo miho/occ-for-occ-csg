@@ -15,17 +15,6 @@
 
 
 #include <inspector/TInspector_PluginParameters.hxx>
-#include <inspector/TInspector_Preferences.hxx>
-
-// =======================================================================
-// function : Constructor
-// purpose :
-// =======================================================================
-TInspector_PluginParameters::TInspector_PluginParameters (TInspector_Window* theWindow)
-: myWindow (theWindow), myPreferences (new TInspector_Preferences())
-{
-  myPreferences->SetDirectory (GetTemporaryDirectory());
-}
 
 // =======================================================================
 // function : SetParameters
@@ -42,16 +31,4 @@ void TInspector_PluginParameters::SetParameters (const TCollection_AsciiString& 
 
   SetSelected (thePluginName, theParameters);
   myWindow->ActivateTool (thePluginName);
-}
-
-// =======================================================================
-// function : SetTemporaryDirectory
-// purpose :
-// =======================================================================
-void TInspector_PluginParameters::SetTemporaryDirectory (const TCollection_AsciiString& thePath)
-{
-  if (thePath.IsEqual (myPreferences->GetDirectory()))
-    return;
-
-  myPreferences->SetDirectory (thePath);
 }

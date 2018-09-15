@@ -22,11 +22,10 @@ matrix:
 cache:
   ccache: true
   directories:
-   - $HOME/Library/Caches/Homebrew
-   # TODO: how can we do conditional caching of directories (depending on OS)
-   #- /home/travis/build/miho/OCC-CSG/oce-OCE-0.18.3
-   - /Users/travis/build/miho/occ-for-occ-csg/opencascade
-   - /Users/travis/build/miho/occ-for-occ-csg/dependencies
+   # - $HOME/Library/Caches/Homebrew
+   ## TODO: how can we do conditional caching of directories (depending on OS)
+   # - /Users/travis/build/miho/occ-for-occ-csg/opencascade
+   # - /Users/travis/build/miho/occ-for-occ-csg/dependencies
 
 env:
   global:

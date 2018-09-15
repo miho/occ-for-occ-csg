@@ -69,7 +69,7 @@ script:
     - rm -rf ./*
     
     # configuring OCE via cmake
-    - cmake .. -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=$OUR_DIR/dependencies-installation -DCMAKE_INSTALL_PREFIX=$OUR_DIR/opencascade-installation -DINSTALL_FREETYPE:BOOL=true
+    - cmake .. -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=$OUR_DIR/dependencies-installation -DCMAKE_INSTALL_PREFIX=$OUR_DIR/opencascade-installation -DINSTALL_FREETYPE:BOOL=true -DFREETYPE_INCLUDE_DIRS=$OUR_DIR/dependencies-installation/freetype/include
     
     # now we build OCE
     # -> On macOS we use a timeout to prevent travis from terminating our build job

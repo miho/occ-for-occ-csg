@@ -22,10 +22,10 @@ matrix:
 cache:
   ccache: true
   directories:
-   # - $HOME/Library/Caches/Homebrew
+   - $HOME/Library/Caches/Homebrew
    ## TODO: how can we do conditional caching of directories (depending on OS)
-   # - /Users/travis/build/miho/occ-for-occ-csg/opencascade
-   # - /Users/travis/build/miho/occ-for-occ-csg/dependencies
+   - /Users/travis/build/miho/occ-for-occ-csg/opencascade
+   - /Users/travis/build/miho/occ-for-occ-csg/dependencies
 
 env:
   global:
@@ -65,6 +65,8 @@ script:
     # setting OCE install dir
     # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export OCE_INSTALL_DIR=$(pwd)/../opencascade-installation/OCE.framework/Versions/0.18/Resources; fi
     # - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export OCE_INSTALL_DIR=$(pwd)/../opencascade-installation/lib/oce-0.18/; fi
+    
+    - rm -r $OUR_DIR/build
     
     # configuring OCE via cmake
     - cmake .. -DBUILD_LIBRARY_TYPE:String="Static" -DCMAKE_BUILD_TYPE=Release -DBUILD_MODULE_Draw:BOOL=false -D3RDPARTY_DIR=$OUR_DIR/dependencies-installation -DCMAKE_INSTALL_PREFIX=$OUR_DIR/opencascade-installation -DINSTALL_FREETYPE:BOOL=true

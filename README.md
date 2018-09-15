@@ -1,7 +1,7 @@
 # occ-for-occ-csg
 
-https://travis-ci.org/miho/occ-for-occ-csg.svg?branch=master
-[![Build status](https://ci.appveyor.com/api/projects/status/30p27ltwtdo4360c/branch/master?svg=true)](https://ci.appveyor.com/project/miho/occ-for-occ-csg)
+[![Build status](https://travis-ci.org/miho/occ-for-occ-csg.svg?branch=master)]
+[![Build status](https://ci.appveyor.com/api/projects/status/30p27ltwtdo4360c/branch/master?svg=true)]
 
 The purpose of this repository is to provide OpenCascade and required dependencies for [OCC-CSG](https://github.com/miho/OCC-CSG). We [provide static builds](https://github.com/miho/occ-for-occ-csg/releases) for Linux, macOS and Windows (we only build for x64).
 

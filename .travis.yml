@@ -24,8 +24,8 @@ cache:
   directories:
    - $HOME/Library/Caches/Homebrew
    ## TODO: how can we do conditional caching of directories (depending on OS)
-   #- /Users/travis/build/miho/occ-for-occ-csg/opencascade
-   #- /Users/travis/build/miho/occ-for-occ-csg/dependencies
+   - /Users/travis/build/miho/occ-for-occ-csg/opencascade
+   - /Users/travis/build/miho/occ-for-occ-csg/dependencies
 
 env:
   global:

@@ -81,7 +81,7 @@ script:
     # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then travis_wait 30 timeout -s SIGTERM $TIMEOUT_BUILD make -j4 install > install_out.txt || export BUILD_SUCCESS=false ; fi
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then travis_wait 30 make -j8 && make install > install_out.txt || export BUILD_SUCCESS=false; fi
     # show last 30 lines of install output
-    - tail -n 30 install_out.txt
+    - if [ -e install_out.txt ] ; then tail -n 30 install_out.txt ; fi
     
     
     # finally build and test occ-csg

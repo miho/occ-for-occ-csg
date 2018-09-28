@@ -10,7 +10,7 @@ The purpose of this repository is to provide OpenCascade and required dependenci
 
 ## Original Readme:
 
-All file locations mentioned below are relative to the opencascade folder inside this preository.
+All file locations mentioned below are relative to the opencascade folder inside this repository.
 
 Open CASCADE Technology
 =======================

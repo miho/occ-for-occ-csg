@@ -218,8 +218,10 @@ namespace
 
         if (theHasTexels && aUVNodes.Upper() == aNodes.Upper())
         {
-          const gp_Pnt2d aTexel = gp_Pnt2d ((-theUVOrigin.X() + (theUVRepeat.X() * (aUVNodes (aNodeIter).X() - aUmin)) / dUmax) / theUVScale.X(),
-                                            (-theUVOrigin.Y() + (theUVRepeat.Y() * (aUVNodes (aNodeIter).Y() - aVmin)) / dVmax) / theUVScale.Y());
+          const gp_Pnt2d aTexel = (dUmax == 0.0 || dVmax == 0.0)
+                                ? aUVNodes (aNodeIter)
+                                : gp_Pnt2d ((-theUVOrigin.X() + (theUVRepeat.X() * (aUVNodes(aNodeIter).X() - aUmin)) / dUmax) / theUVScale.X(),
+                                            (-theUVOrigin.Y() + (theUVRepeat.Y() * (aUVNodes(aNodeIter).Y() - aVmin)) / dVmax) / theUVScale.Y());
           anArray->AddVertex (aPoint, aNorm, aTexel);
         }
         else
@@ -266,9 +268,9 @@ namespace
         aV1.Cross (aV2);
         if (aV1.SquareMagnitude() > aPreci)
         {
-          anArray->AddEdge (anIndex[0] + aDecal);
-          anArray->AddEdge (anIndex[1] + aDecal);
-          anArray->AddEdge (anIndex[2] + aDecal);
+          anArray->AddEdges (anIndex[0] + aDecal,
+                             anIndex[1] + aDecal,
+                             anIndex[2] + aDecal);
         }
       }
     }
@@ -311,8 +313,7 @@ namespace
     for (TopExp_Explorer aFaceIter (theShape, TopAbs_FACE); aFaceIter.More(); aFaceIter.Next())
     {
       const TopoDS_Face& aFace = TopoDS::Face (aFaceIter.Current());
-      TopoDS_Iterator aSubShapeIter (aFace);
-      if (!aSubShapeIter.More())
+      if (aFace.NbChildren() == 0)
       {
         // handle specifically faces without boundary definition (triangulation-only)
         StdPrs_WFShape::AddEdgesOnTriangulation (aSeqPntsExtra, aFace, Standard_False);
@@ -552,15 +553,13 @@ void StdPrs_ShadedShape::Add (const Handle (Prs3d_Presentation)& thePrs,
     aBuilder.MakeCompound (anOpened);
     ExploreSolids (theShape, aBuilder, aClosed, anOpened, Standard_True);
 
-    TopoDS_Iterator aShapeIter (aClosed);
-    if (aShapeIter.More())
+    if (aClosed.NbChildren() > 0)
     {
       shadeFromShape (aClosed, thePrs, theDrawer,
                       theHasTexels, theUVOrigin, theUVRepeat, theUVScale, true);
     }
 
-    aShapeIter.Initialize (anOpened);
-    if (aShapeIter.More())
+    if (anOpened.NbChildren() > 0)
     {
       shadeFromShape (anOpened, thePrs, theDrawer,
                       theHasTexels, theUVOrigin, theUVRepeat, theUVScale, false);

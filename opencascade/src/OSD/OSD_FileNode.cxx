@@ -373,13 +373,13 @@ Standard_Integer OSD_FileNode::Error()const{
 #include <Standard_ProgramError.hxx>
 #include <TCollection_ExtendedString.hxx>
 
-#include <OSD_WNT_1.hxx>
+#include <OSD_WNT.hxx>
 
 #ifndef _INC_TCHAR
 # include <tchar.h>
 #endif  // _INC_TCHAR
 
-#include <Strsafe.h>
+#include <strsafe.h>
 
 #define TEST_RAISE( arg ) _test_raise (  fName, ( arg )  )
 #define RAISE( arg ) throw Standard_ProgramError (  ( arg )  )
@@ -858,6 +858,9 @@ void _osd_wnt_set_error ( OSD_Error& err, OSD_WhoAmI who, ... ) {
 }  // end _set_error
 
 #if defined(__CYGWIN32__) || defined(__MINGW32__)
+#ifdef __try /* is defined on MinGw as either "try" or "if (true)" */
+#undef __try
+#endif
 #define __try
 #define __finally
 #define __leave return retVal
@@ -903,10 +906,6 @@ static BOOL __fastcall _get_file_time (const wchar_t* fName, LPSYSTEMTIME lpSysT
    CloseHandle ( hFile );
  
  }  // end __finally
-
-#ifdef VAC
-leave: ;      // added for VisualAge
-#endif
 
  return retVal;
 

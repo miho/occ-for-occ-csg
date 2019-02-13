@@ -14,7 +14,7 @@
 // commercial license or contractual agreement.
 
 
-#include <CDM_MessageDriver.hxx>
+#include <Message_Messenger.hxx>
 #include <Plugin_Macro.hxx>
 #include <Standard_GUID.hxx>
 #include <TDocStd_Application.hxx>
@@ -111,7 +111,7 @@ void XmlLDrivers::DefineFormat (const Handle(TDocStd_Application)& theApp)
 //purpose  : 
 //=======================================================================
 Handle(XmlMDF_ADriverTable) XmlLDrivers::AttributeDrivers
-                (const Handle(CDM_MessageDriver)& theMessageDriver)
+                (const Handle(Message_Messenger)& theMessageDriver)
 {
   Handle(XmlMDF_ADriverTable) aTable = new XmlMDF_ADriverTable();
   //
@@ -131,10 +131,6 @@ Handle(XmlMDF_ADriverTable) XmlLDrivers::AttributeDrivers
 int XmlLDrivers::StorageVersion()
 {
   return CURRENT_DOCUMENT_VERSION;
-}
-void XmlLDrivers::SetStorageVersion(const int version)
-{
-  CURRENT_DOCUMENT_VERSION = version;
 }
 
 // Declare entry point PLUGINFACTORY

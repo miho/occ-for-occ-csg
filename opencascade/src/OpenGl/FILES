@@ -13,6 +13,10 @@ OpenGl_AspectMarker.cxx
 OpenGl_AspectMarker.hxx
 OpenGl_AspectText.cxx
 OpenGl_AspectText.hxx
+OpenGl_FrameStats.cxx
+OpenGl_FrameStats.hxx
+OpenGl_FrameStatsPrs.cxx
+OpenGl_FrameStatsPrs.hxx
 OpenGl_Group.hxx
 OpenGl_Group.cxx
 OpenGl_Structure.hxx
@@ -33,7 +37,6 @@ OpenGl_View.hxx
 OpenGl_View.cxx
 OpenGl_View_Raytrace.cxx
 OpenGl_View_Redraw.cxx
-OpenGl_Light.hxx
 OpenGl_GraduatedTrihedron.hxx
 OpenGl_GraduatedTrihedron.cxx
 OpenGl_MapOfZLayerSettings.hxx
@@ -74,6 +77,7 @@ OpenGl_Caps.cxx
 OpenGl_Caps.hxx
 OpenGl_Clipping.cxx
 OpenGl_Clipping.hxx
+OpenGl_ClippingIterator.hxx
 OpenGl_Context.cxx
 OpenGl_Context.hxx
 OpenGl_Context_1.mm
@@ -107,7 +111,6 @@ OpenGl_IndexBuffer.cxx
 OpenGl_IndexBuffer.hxx
 OpenGl_Layer.cxx
 OpenGl_Layer.hxx
-OpenGl_RenderFilter.cxx
 OpenGl_RenderFilter.hxx
 OpenGl_Sampler.cxx
 OpenGl_Sampler.hxx
@@ -138,3 +141,4 @@ OpenGl_VertexBufferEditor.hxx
 OpenGl_TextBuilder.hxx
 OpenGl_TextBuilder.cxx
 OpenGl_HaltonSampler.hxx
+OpenGl_ShaderProgramDumpLevel.hxx

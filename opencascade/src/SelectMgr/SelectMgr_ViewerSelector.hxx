@@ -112,6 +112,9 @@ public:
   //! Returns the number of detected owners.
   Standard_Integer NbPicked() const { return mystored.Extent(); }
 
+  //! Clears picking results.
+  Standard_EXPORT void ClearPicked();
+
   //! Returns the entity Owner for the object picked at specified position.
   //! @param theRank rank of detected object within range 1...NbPicked()
   Standard_EXPORT Handle(SelectMgr_EntityOwner) Picked (const Standard_Integer theRank) const;
@@ -215,7 +218,7 @@ public:
   //! Continues the interation scanning for the owners detected at a position in the view,
   //! or continues the iteration scanning for the owner closest to the position in the view.
   Standard_DEPRECATED("Deprecated method More()")
-  Standard_EXPORT Standard_Boolean More() { return morePicked(); }
+  Standard_Boolean More() { return morePicked(); }
 
   //! Returns the next owner found in the iteration. This is
   //! a scan for the owners detected at a position in the view.
@@ -321,6 +324,13 @@ private: // implementation of deprecated methods
     return myCurRank <= myIndexes->Length();
   }
 
+  //! Compute 3d position for detected entity.
+  void updatePoint3d (SelectMgr_SortCriterion& theCriterion,
+                      const SelectBasics_PickResult& thePickResult,
+                      const Handle(SelectBasics_SensitiveEntity)& theEntity,
+                      const gp_GTrsf& theInversedTrsf,
+                      const SelectMgr_SelectingVolumeManager& theMgr) const;
+
 protected:
 
   Standard_Boolean                              preferclosest;
@@ -331,6 +341,9 @@ protected:
   SelectMgr_ToleranceMap                        myTolerances;
   NCollection_DataMap<Graphic3d_ZLayerId, Standard_Integer> myZLayerOrderMap;
   Handle(Select3D_BVHBuilder3d)                 myEntitySetBuilder;
+  gp_Pnt                                        myCameraEye;
+  gp_Dir                                        myCameraDir;
+  Standard_Real                                 myCameraScale;
 
 private:
 

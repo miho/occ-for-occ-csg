@@ -23,6 +23,7 @@
 #include <Graphic3d_TransformPers.hxx>
 #include <Graphic3d_TransModeFlags.hxx>
 #include <Graphic3d_ZLayerId.hxx>
+#include <Prs3d_Drawer.hxx>
 #include <PrsMgr_ListOfPresentableObjects.hxx>
 #include <PrsMgr_Presentation.hxx>
 #include <PrsMgr_Presentations.hxx>
@@ -58,10 +59,16 @@ public:
   //! Returns information on whether the object accepts display in HLR mode or not.
   PrsMgr_TypeOfPresentation3d TypeOfPresentation3d() const { return myTypeOfPresentation3d; }
 
-  //! @return transform persistence of the presentable object.
+  //! Returns Transformation Persistence defining a special Local Coordinate system where this presentable object is located or NULL handle if not defined.
+  //! Position of the object having Transformation Persistence is mutable and depends on camera position.
+  //! The same applies to a bounding box of the object.
+  //! @sa Graphic3d_TransformPers class description
   const Handle(Graphic3d_TransformPers)& TransformPersistence() const { return myTransformPersistence; }
 
-  //! Sets up Transform Persistence for this object.
+  //! Sets up Transform Persistence defining a special Local Coordinate system where this object should be located.
+  //! Note that management of Transform Persistence object is more expensive than of the normal one,
+  //! because it requires its position being recomputed basing on camera position within each draw call / traverse.
+  //! @sa Graphic3d_TransformPers class description
   Standard_EXPORT virtual void SetTransformPersistence (const Handle(Graphic3d_TransformPers)& theTrsfPers);
 
   //! Sets up Transform Persistence Mode for this object.
@@ -113,39 +120,50 @@ public:
   Standard_EXPORT void ToBeUpdated (TColStd_ListOfInteger& ListOfMode) const;
   
   //! Return the local transformation.
+  //! Note that the local transformation of the object having Transformation Persistence
+  //! is applied within Local Coordinate system defined by this Persistence.
   const Handle(Geom_Transformation)& LocalTransformationGeom() const { return myLocalTransformation; }
 
   //! Sets local transformation to theTransformation.
+  //! Note that the local transformation of the object having Transformation Persistence
+  //! is applied within Local Coordinate system defined by this Persistence.
   void SetLocalTransformation (const gp_Trsf& theTrsf) { setLocalTransformation (new Geom_Transformation (theTrsf)); }
 
   //! Sets local transformation to theTransformation.
+  //! Note that the local transformation of the object having Transformation Persistence
+  //! is applied within Local Coordinate system defined by this Persistence.
   void SetLocalTransformation (const Handle(Geom_Transformation)& theTrsf) { setLocalTransformation (theTrsf); }
 
   //! Returns true if object has a transformation that is different from the identity.
   Standard_Boolean HasTransformation() const { return !myTransformation.IsNull() && myTransformation->Form() != gp_Identity; }
 
   //! Return the transformation taking into account transformation of parent object(s).
+  //! Note that the local transformation of the object having Transformation Persistence
+  //! is applied within Local Coordinate system defined by this Persistence.
   const Handle(Geom_Transformation)& TransformationGeom() const { return myTransformation; }
 
   //! Return the local transformation.
+  //! Note that the local transformation of the object having Transformation Persistence
+  //! is applied within Local Coordinate system defined by this Persistence.
   const gp_Trsf& LocalTransformation() const { return !myLocalTransformation.IsNull()
                                                      ? myLocalTransformation->Trsf()
                                                      : getIdentityTrsf(); }
 
   //! Return the transformation taking into account transformation of parent object(s).
+  //! Note that the local transformation of the object having Transformation Persistence
+  //! is applied within Local Coordinate system defined by this Persistence.
   const gp_Trsf& Transformation() const { return !myTransformation.IsNull()
                                                 ? myTransformation->Trsf()
                                                 : getIdentityTrsf(); }
 
   const gp_GTrsf& InversedTransformation() const { return myInvTransformation; }
-  
+
   //! resets local transformation to identity.
   Standard_EXPORT virtual void ResetTransformation();
-  
+
+  //! Updates final transformation (parent + local) of presentable object and its presentations.
   Standard_EXPORT virtual void UpdateTransformation();
-  
-  Standard_EXPORT virtual void UpdateTransformation (const Handle(Prs3d_Presentation)& P);
-  
+
   //! Set Z layer ID and update all presentations of the presentable object.
   //! The layers mechanism allows drawing objects in higher layers in overlay of objects in lower layers.
   Standard_EXPORT virtual void SetZLayer (const Graphic3d_ZLayerId theLayerId);

@@ -53,6 +53,7 @@
 #include <TColStd_MapIteratorOfPackedMapOfInteger.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
+#include <UnitsMethods.hxx>
 #include <V3d_View.hxx>
 #include <ViewerTest.hxx>
 #include <VrmlAPI.hxx>
@@ -105,36 +106,61 @@ static Standard_Integer readstl(Draw_Interpretor& theDI,
                                 Standard_Integer theArgc,
                                 const char** theArgv)
 {
-  if (theArgc < 3)
+  TCollection_AsciiString aShapeName, aFilePath;
+  bool toCreateCompOfTris = false;
+  for (Standard_Integer anArgIter = 1; anArgIter < theArgc; ++anArgIter)
   {
-    theDI << "wrong number of parameters" << "\n";
-    return 1;
-  }
-  else
-  {
-    if (theArgc == 4 &&
-        strcmp("triangulation", theArgv[3]) == 0)
+    TCollection_AsciiString anArg (theArgv[anArgIter]);
+    anArg.LowerCase();
+    if (aShapeName.IsEmpty())
     {
-      // Read STL file to the triangulation.
-      Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator (theDI, 1);
-      Handle(Poly_Triangulation) aTriangulation = RWStl::ReadFile (theArgv[2], aProgress);
-
-      TopoDS_Face aFace;
-      BRep_Builder aB;
-      aB.MakeFace(aFace);
-      aB.UpdateFace(aFace, aTriangulation);
-      DBRep::Set(theArgv[1], aFace);
+      aShapeName = theArgv[anArgIter];
+    }
+    else if (aFilePath.IsEmpty())
+    {
+      aFilePath = theArgv[anArgIter];
+    }
+    else if (anArg == "-brep")
+    {
+      toCreateCompOfTris = true;
+      if (anArgIter + 1 < theArgc
+       && ViewerTest::ParseOnOff (theArgv[anArgIter + 1], toCreateCompOfTris))
+      {
+        ++anArgIter;
+      }
     }
     else
     {
-      TopoDS_Shape aShape;
-      Standard_DISABLE_DEPRECATION_WARNINGS
-      StlAPI::Read(aShape, theArgv[2]);
-      Standard_ENABLE_DEPRECATION_WARNINGS
-      DBRep::Set(theArgv[1], aShape);
+      std::cout << "Syntax error: unknown argument '" << theArgv[anArgIter] << "'\n";
+      return 1;
     }
   }
+  if (aFilePath.IsEmpty())
+  {
+    std::cout << "Syntax error: not enough arguments\n";
+    return 1;
+  }
 
+  TopoDS_Shape aShape;
+  if (!toCreateCompOfTris)
+  {
+    // Read STL file to the triangulation.
+    Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator (theDI, 1);
+    Handle(Poly_Triangulation) aTriangulation = RWStl::ReadFile (aFilePath.ToCString(), aProgress);
+
+    TopoDS_Face aFace;
+    BRep_Builder aB;
+    aB.MakeFace (aFace);
+    aB.UpdateFace (aFace, aTriangulation);
+    aShape = aFace;
+  }
+  else
+  {
+    Standard_DISABLE_DEPRECATION_WARNINGS
+    StlAPI::Read(aShape, aFilePath.ToCString());
+    Standard_ENABLE_DEPRECATION_WARNINGS
+  }
+  DBRep::Set (aShapeName.ToCString(), aShape);
   return 0;
 }
 
@@ -214,6 +240,8 @@ static Standard_Integer loadvrml
       }
 
       VrmlData_Scene aScene;
+      Standard_Real anOCCUnit = UnitsMethods::GetCasCadeLengthUnit();
+      aScene.SetLinearScale(1000. / anOCCUnit);
 
       aScene.SetVrmlDir (aVrmlDir);
       aScene << aStream;
@@ -531,13 +559,6 @@ static Standard_Integer mdisplay
         di << "The context is null\n";
       else
       {
-        Standard_DISABLE_DEPRECATION_WARNINGS
-        if (aContext->HasOpenedContext())
-        {
-          aContext->CloseLocalContext();
-        }
-        Standard_ENABLE_DEPRECATION_WARNINGS
-
         aContext->Display (aMesh, Standard_True);
       }
     }
@@ -561,13 +582,6 @@ static Standard_Integer merase
         di << "The context is null\n";
       else
       {
-        Standard_DISABLE_DEPRECATION_WARNINGS
-        if (aContext->HasOpenedContext())
-        {
-          aContext->CloseLocalContext();
-        }
-        Standard_ENABLE_DEPRECATION_WARNINGS
-
         aContext->Erase (aMesh, Standard_True);
       }
     }
@@ -1247,7 +1261,12 @@ void  XSDRAWSTLVRML::InitCommands (Draw_Interpretor& theCommands)
 
   theCommands.Add ("writevrml", "shape file [version VRML#1.0/VRML#2.0 (1/2): 2 by default] [representation shaded/wireframe/both (0/1/2): 1 by default]",__FILE__,writevrml,g);
   theCommands.Add ("writestl",  "shape file [ascii/binary (0/1) : 1 by default] [InParallel (0/1) : 0 by default]",__FILE__,writestl,g);
-  theCommands.Add ("readstl",   "shape file [triangulation: no by default]",__FILE__,readstl,g);
+  theCommands.Add ("readstl",
+                   "readstl shape file [-brep]"
+                   "\n\t\t: Reads STL file and creates a new shape with specified name."
+                   "\n\t\t: When -brep is specified, creates a Compound of per-triangle Faces."
+                   "\n\t\t: Single triangulation-only Face is created otherwise (default).",
+                   __FILE__, readstl, g);
   theCommands.Add ("loadvrml" , "shape file",__FILE__,loadvrml,g);
 
   theCommands.Add ("meshfromstl",     "creates MeshVS_Mesh from STL file",            __FILE__, createmesh,      g );

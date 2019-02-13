@@ -112,20 +112,14 @@ void Select3D_SensitiveWire::Swap (const Standard_Integer theIdx1,
 // purpose  : Checks whether the entity with index theIdx overlaps the
 //            current selecting volume
 // =======================================================================
-Standard_Boolean Select3D_SensitiveWire::overlapsElement (SelectBasics_SelectingVolumeManager& theMgr,
+Standard_Boolean Select3D_SensitiveWire::overlapsElement (SelectBasics_PickResult& thePickResult,
+                                                          SelectBasics_SelectingVolumeManager& theMgr,
                                                           Standard_Integer theElemIdx,
-                                                          Standard_Real& theMatchDepth)
+                                                          Standard_Boolean )
 {
   const Standard_Integer aSensitiveIdx = myEntityIndexes.Value (theElemIdx);
   const Handle(SelectBasics_SensitiveEntity)& aSeg = myEntities.Value (aSensitiveIdx);
-  SelectBasics_PickResult aMatchResult;
-  if (aSeg->Matches (theMgr, aMatchResult))
-  {
-    theMatchDepth = aMatchResult.Depth();
-    return Standard_True;
-  }
-
-  return Standard_False;
+  return aSeg->Matches (theMgr, thePickResult);
 }
 
 // =======================================================================
@@ -133,7 +127,8 @@ Standard_Boolean Select3D_SensitiveWire::overlapsElement (SelectBasics_Selecting
 // purpose  :
 // =======================================================================
 Standard_Boolean Select3D_SensitiveWire::elementIsInside (SelectBasics_SelectingVolumeManager& theMgr,
-                                                          const Standard_Integer               theElemIdx)
+                                                          Standard_Integer theElemIdx,
+                                                          Standard_Boolean )
 {
   SelectBasics_PickResult aMatchResult;
   return myEntities.Value (myEntityIndexes.Value (theElemIdx))->Matches (theMgr, aMatchResult);

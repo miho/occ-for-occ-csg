@@ -47,6 +47,9 @@ public:
                                const OpenGl_TextParam&  theParams,
                                const bool               theHasOwnAnchor = true);
 
+  //! Destructor
+  Standard_EXPORT virtual ~OpenGl_Text();
+
   //! Setup new string and position
   Standard_EXPORT void Init (const Handle(OpenGl_Context)& theCtx,
                              const Standard_Utf8Char*      theText,
@@ -67,6 +70,12 @@ public:
 
   Standard_EXPORT virtual void Render  (const Handle(OpenGl_Workspace)& theWorkspace) const;
   Standard_EXPORT virtual void Release (OpenGl_Context* theContext);
+
+  //! Return defined text.
+  const NCollection_String& Text() const { return myString; }
+
+  //! Return text formatting parameters.
+  const OpenGl_TextParam& FormatParams() const { return myParams; }
 
 public: //! @name methods for compatibility with layers
 
@@ -108,16 +117,13 @@ public: //! @name methods for compatibility with layers
 
 protected:
 
-  //! Destructor
-  Standard_EXPORT virtual ~OpenGl_Text();
-
   friend class OpenGl_Trihedron;
   friend class OpenGl_GraduatedTrihedron;
 
-private:
-
   //! Release cached VBO resources
-  void releaseVbos (OpenGl_Context* theCtx);
+  Standard_EXPORT void releaseVbos (OpenGl_Context* theCtx);
+
+private:
 
   //! Setup matrix.
   void setupMatrix (const Handle(OpenGl_Context)& theCtx,

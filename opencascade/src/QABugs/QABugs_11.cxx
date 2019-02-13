@@ -950,56 +950,6 @@ static Standard_Integer OCC277bug (Draw_Interpretor& di, Standard_Integer nb, co
   return 0;
 }
 
-#include <ShapeAnalysis_Edge.hxx>
-
-static Standard_Integer OCC333bug (Draw_Interpretor& di, Standard_Integer n, const char ** a)
-{
-  if( n < 3) {
-    di<<"-1\n";
-    di << "Usage: " << a[0] << " edge1 edge2 [toler domaindist]\n";
-    return 1;
-  }
-  TopoDS_Shape Sh1 = DBRep::Get(a[1]);
-  TopoDS_Shape Sh2 = DBRep::Get(a[2]);
-  if(Sh1.IsNull() || Sh2.IsNull()) {
-    di<<"-2\n";
-    di<<"Invalid arguments\n";
-    return 1;
-  }
-  TopoDS_Edge e1 = TopoDS::Edge(Sh1);
-  TopoDS_Edge e2 = TopoDS::Edge(Sh2);
-  if(e1.IsNull() || e2.IsNull()) {
-    di<<"-3\n";
-    di<<"Invalid type of arguments\n";
-    return 1;
-  }
-  Standard_Real aTol = Precision::Confusion();
-  Standard_Real aDistDomain = 0.0;
-  Standard_Integer k = 3;
-  if(k < n)
-    aTol = Draw::Atof(a[k++]);
-  if(k < n)
-    aDistDomain = Draw::Atof(a[k++]);
-
-  ShapeAnalysis_Edge sae;
-  if(sae.CheckOverlapping(e1,e2,aTol,aDistDomain)) {
-    if(aDistDomain ==0.0) {
-      di<<"1\n";
-      di<<"Edges is overlaping comletly\n";
-    } else {
-      di<<"2\n";
-      di<<"Edges is overlaped\n";
-      di<<"with tolerance = "<<aTol<<"\n";
-      di<<"on segment length = "<<aDistDomain<<"\n";
-    }
-  } else {
-    di<<"3\n";
-    di<<"Edges is not overlaped\n";
-  }
-  return 0;
-}
-
-
 #include <DDocStd_DrawDocument.hxx>
 #include <TDataStd_Name.hxx>
 #include <Draw.hxx>
@@ -1245,6 +1195,7 @@ static Standard_Integer OCC22 (Draw_Interpretor& di, Standard_Integer argc, cons
 
 #include <TopTools_DataMapIteratorOfDataMapOfShapeShape.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
+#include <IMeshTools_Parameters.hxx>
 
 //=======================================================================
 //function : OCC24
@@ -1309,10 +1260,10 @@ static Standard_Integer OCC369(Draw_Interpretor& di, Standard_Integer argc, cons
     if(aShape.IsNull()) {di << "OCC369 FAULTY. Entry shape is NULL \n"; return 0;}
 
     // 3. Build mesh
-    BRepMesh_FastDiscret::Parameters aMeshParams;
-    aMeshParams.Relative = Standard_True;
+    IMeshTools_Parameters aMeshParams;
+    aMeshParams.Relative   = Standard_True;
     aMeshParams.Deflection = 0.2;
-    aMeshParams.Angle = M_PI / 6;
+    aMeshParams.Angle      = M_PI / 6.0;
     BRepMesh_IncrementalMesh aMesh(aShape, aMeshParams);
 
   }
@@ -1591,22 +1542,19 @@ static Standard_Integer OCC708 (Draw_Interpretor& di, Standard_Integer argc, con
   TCollection_AsciiString aName(argv[1]);
   Handle(AIS_InteractiveObject) AISObj;
 
-  if(!aMap.IsBound2(aName)) {
+  if (!aMap.Find2 (aName, AISObj)
+    || AISObj.IsNull())
+  {
     di << "Use 'vdisplay' before\n";
     return 1;
-  } else {
-    AISObj = Handle(AIS_InteractiveObject)::DownCast(aMap.Find2(aName));
-    if(AISObj.IsNull()){
-      di << argv[1] << " : No interactive object\n";
-      return 1;
-    } 
-    AISObj->ResetTransformation();
-
-    aContext->Erase(AISObj, updateviewer);
-    aContext->UpdateCurrentViewer();
-    aContext->Display(AISObj, updateviewer);
-    aContext->UpdateCurrentViewer();
   }
+
+  AISObj->ResetTransformation();
+
+  aContext->Erase(AISObj, updateviewer);
+  aContext->UpdateCurrentViewer();
+  aContext->Display(AISObj, updateviewer);
+  aContext->UpdateCurrentViewer();
   return 0;
 }
 
@@ -2399,7 +2347,7 @@ static Standard_Integer OCC6143 (Draw_Interpretor& di, Standard_Integer argc, co
       di << "(Real) Underflow";
       //cout.flush();
       di << "\n";
-      Standard_Real res, r=1.0e-308;
+      Standard_Real res, r = RealSmall();
       res = r * r;
       //res = res + 1.;
       //++++ cout<<"-- "<<res<<"="<<r<<"*"<<r<<"   Does not Caught... KO"<<endl;
@@ -4505,31 +4453,6 @@ static Standard_Integer OCC20627 (Draw_Interpretor& di, Standard_Integer argc, c
   return 0;
 }
 
-#include <Graphic3d_Vector.hxx>
-Standard_Integer OCC22762 (Draw_Interpretor& di, Standard_Integer argc, const char ** argv)
-{
-    if (argc!=7)
-	{
-	    di << "Wrong number of arguments\n";
-	    return -1;
-	}
-    Standard_Real X1_Pnt = Draw::Atof(argv[1]);
-    Standard_Real Y1_Pnt = Draw::Atof(argv[2]);
-    Standard_Real Z1_Pnt = Draw::Atof(argv[3]);
-    Standard_Real X2_Pnt = Draw::Atof(argv[4]);
-    Standard_Real Y2_Pnt = Draw::Atof(argv[5]);
-    Standard_Real Z2_Pnt = Draw::Atof(argv[6]);
-    
-    Graphic3d_Vector AV1(X1_Pnt, Y1_Pnt, Z1_Pnt);
-    Graphic3d_Vector AV2(X2_Pnt, Y2_Pnt, Z2_Pnt);
-     
-    di << "Result is: " << (Graphic3d_Vector::IsParallel(AV1, AV2) ? "true" : "false") << "\n" ;
-    return 0;
-}
-    
-    
-
-
 #include <IntCurvesFace_ShapeIntersector.hxx>
 #include <gp_Lin.hxx>
 Standard_Integer OCC17424 (Draw_Interpretor& di, Standard_Integer argc, const char ** argv)
@@ -4858,8 +4781,6 @@ void QABugs::Commands_11(Draw_Interpretor& theCommands) {
   //theCommands.Add("OCC277","OCC277", __FILE__, OCC277bug, group);
   theCommands.Add("OCC277","OCC277", __FILE__, OCC277bug, group);
 
-  theCommands.Add("OCC333","OCC333 edge1 edge2 [toler domaindist]; Check overlapping edges", __FILE__, OCC333bug, group);
-
   theCommands.Add("OCC363", "OCC363 document filename ", __FILE__, OCC363, group);
   // Must use OCC299
   //theCommands.Add("OCC372", "OCC372", __FILE__, OCC372, group);
@@ -4916,7 +4837,6 @@ void QABugs::Commands_11(Draw_Interpretor& theCommands) {
   theCommands.Add("OCC22301", "OCC22301", __FILE__, OCC22301, group);
   theCommands.Add("OCC22736", "OCC22736 X_mirrorFirstPoint Y_mirrorFirstPoint X_mirrorSecondPoint Y_mirrorSecondPoint X_p1 Y_p1 X_p2 Y_p2", __FILE__, OCC22736, group);
   theCommands.Add("OCC22744", "OCC22744", __FILE__, OCC22744, group);
-  theCommands.Add("OCC22762", "OCC22762 x1 y1 z1 x2 y2 z3", __FILE__, OCC22762, group);
   theCommands.Add("OCC22558", "OCC22558 x_vec y_vec z_vec x_dir y_dir z_dit x_pnt y_pnt z_pnt", __FILE__, OCC22558, group);
   theCommands.Add("CR23403", "CR23403 string", __FILE__, CR23403, group);
   theCommands.Add("OCC23429", "OCC23429 res shape tool [appr]", __FILE__, OCC23429, group);

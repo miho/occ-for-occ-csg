@@ -120,7 +120,11 @@ public:
   
   //! Returns label of instance of an assembly component
   //! corresponding to a given NAUO
-  Standard_EXPORT static TDF_Label FindInstance (const Handle(StepRepr_NextAssemblyUsageOccurrence)& NAUO, const Handle(XCAFDoc_ShapeTool)& STool, const STEPConstruct_Tool& Tool, const STEPCAFControl_DataMapOfPDExternFile& PDRFileMap, const XCAFDoc_DataMapOfShapeLabel& ShapeLabelMap);
+  Standard_EXPORT static TDF_Label FindInstance
+                (const Handle(StepRepr_NextAssemblyUsageOccurrence)& NAUO, 
+                 const Handle(XCAFDoc_ShapeTool)& STool,
+                 const STEPConstruct_Tool& Tool, 
+                 const XCAFDoc_DataMapOfShapeLabel& ShapeLabelMap);
   
   //! Set ColorMode for indicate read Colors or not.
   Standard_EXPORT void SetColorMode (const Standard_Boolean colormode);
@@ -189,7 +193,10 @@ protected:
   
   //! Reads style assignments from STEP model and sets
   //! corresponding color assignments in the DECAF document
-  Standard_EXPORT Standard_Boolean ReadColors (const Handle(XSControl_WorkSession)& WS, Handle(TDocStd_Document)& doc, const STEPCAFControl_DataMapOfPDExternFile& PDFileMap, const XCAFDoc_DataMapOfShapeLabel& ShapeLabelMap) const;
+  Standard_EXPORT Standard_Boolean ReadColors
+                (const Handle(XSControl_WorkSession)& WS,
+                 Handle(TDocStd_Document)& doc,
+                 const XCAFDoc_DataMapOfShapeLabel& ShapeLabelMap) const;
   
   //! Reads names of parts defined in the STEP model and
   //! assigns them to corresponding labels in the DECAF document
@@ -222,7 +229,7 @@ protected:
   //! Populates the sub-Label of the passed TDF Label with shape
   //! data associated with the given STEP Representation Item,
   //! including naming and topological information.
-  Standard_EXPORT TDF_Label SettleShapeData (const Handle(StepRepr_RepresentationItem)& theItem, TDF_Label& theLab, const Handle(XCAFDoc_ShapeTool)& theShapeTool, const Handle(Transfer_TransientProcess)& theTP) const;
+  Standard_EXPORT TDF_Label SettleShapeData (const Handle(StepRepr_RepresentationItem)& theItem, const TDF_Label& theLab, const Handle(XCAFDoc_ShapeTool)& theShapeTool, const Handle(Transfer_TransientProcess)& theTP) const;
   
   //! Given the maps of already translated shapes, this method
   //! expands their correspondent Labels in XDE Document so that

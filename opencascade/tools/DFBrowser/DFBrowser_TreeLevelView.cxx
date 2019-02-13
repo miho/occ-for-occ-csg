@@ -21,12 +21,14 @@
 #include <inspector/DFBrowserPane_Tools.hxx>
 #include <inspector/TreeModel_ModelBase.hxx>
 
+#include <inspector/ViewControl_Tools.hxx>
+#include <Standard_WarningsDisable.hxx>
 #include <QItemSelectionModel>
-
 #include <QGridLayout>
 #include <QHeaderView>
 #include <QTableView>
 #include <QWidget>
+#include <Standard_WarningsRestore.hxx>
 
 const int LABEL_OR_ATTRIBUTECOLUMN_WIDTH = 160;
 
@@ -61,7 +63,7 @@ DFBrowser_TreeLevelView::DFBrowser_TreeLevelView (QWidget* theParent)
   connect (myTableView, SIGNAL (doubleClicked (const QModelIndex&)),
            this, SLOT (onTableDoubleClicked (const QModelIndex&)));
 
-  DFBrowser_Window::SetWhiteBackground (myTableView);
+  ViewControl_Tools::SetWhiteBackground (myTableView);
   myTableView->setGridStyle (Qt::NoPen);
 }
 
@@ -128,7 +130,7 @@ void DFBrowser_TreeLevelView::onTableSelectionChanged (const QItemSelection& the
                                                        const QItemSelection&)
 {
   QModelIndexList aSelectedIndices = theSelected.indexes();
-  QModelIndex aSelectedIndex = DFBrowser_Window::SingleSelected (aSelectedIndices, 0);
+  QModelIndex aSelectedIndex = TreeModel_ModelBase::SingleSelected (aSelectedIndices, 0);
 
   DFBrowser_TreeLevelViewModel* aTableModel = dynamic_cast<DFBrowser_TreeLevelViewModel*> (myTableView->model());
   if (aTableModel && aTableModel->IsInitialized())

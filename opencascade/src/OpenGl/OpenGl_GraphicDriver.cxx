@@ -55,6 +55,45 @@ IMPLEMENT_STANDARD_RTTIEXT(OpenGl_GraphicDriver,Graphic3d_GraphicDriver)
 namespace
 {
   static const Handle(OpenGl_Context) TheNullGlCtx;
+
+#if defined(HAVE_EGL) || defined(HAVE_GLES2) || defined(OCCT_UWP) || defined(__ANDROID__) || defined(__QNX__)
+  //! Wrapper over eglChooseConfig() called with preferred defaults.
+  static EGLConfig chooseEglSurfConfig (EGLDisplay theDisplay)
+  {
+    EGLint aConfigAttribs[] =
+    {
+      EGL_RED_SIZE,     8,
+      EGL_GREEN_SIZE,   8,
+      EGL_BLUE_SIZE,    8,
+      EGL_ALPHA_SIZE,   0,
+      EGL_DEPTH_SIZE,   24,
+      EGL_STENCIL_SIZE, 8,
+    #if defined(GL_ES_VERSION_2_0)
+      EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+    #else
+      EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
+    #endif
+      EGL_NONE
+    };
+
+    EGLConfig aCfg = NULL;
+    EGLint aNbConfigs = 0;
+    if (eglChooseConfig (theDisplay, aConfigAttribs, &aCfg, 1, &aNbConfigs) == EGL_TRUE
+     || aCfg != NULL)
+    {
+      return aCfg;
+    }
+
+    eglGetError();
+    aConfigAttribs[4 * 2 + 1] = 16; // try config with smaller depth buffer
+    if (eglChooseConfig (theDisplay, aConfigAttribs, &aCfg, 1, &aNbConfigs) != EGL_TRUE
+     || aCfg == NULL)
+    {
+      eglGetError();
+    }
+    return aCfg;
+  }
+#endif
 }
 
 // =======================================================================
@@ -299,34 +338,11 @@ Standard_Boolean OpenGl_GraphicDriver::InitContext()
     return Standard_False;
   }
 
-  EGLint aConfigAttribs[] =
+  myEglConfig = chooseEglSurfConfig ((EGLDisplay )myEglDisplay);
+  if (myEglConfig == NULL)
   {
-    EGL_RED_SIZE,     8,
-    EGL_GREEN_SIZE,   8,
-    EGL_BLUE_SIZE,    8,
-    EGL_ALPHA_SIZE,   0,
-    EGL_DEPTH_SIZE,   24,
-    EGL_STENCIL_SIZE, 8,
-  #if defined(GL_ES_VERSION_2_0)
-    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-  #else
-    EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
-  #endif
-    EGL_NONE
-  };
-
-  EGLint aNbConfigs = 0;
-  if (eglChooseConfig ((EGLDisplay )myEglDisplay, aConfigAttribs, &myEglConfig, 1, &aNbConfigs) != EGL_TRUE
-   || myEglConfig == NULL)
-  {
-    eglGetError();
-    aConfigAttribs[4 * 2 + 1] = 16; // try config with smaller depth buffer
-    if (eglChooseConfig ((EGLDisplay )myEglDisplay, aConfigAttribs, &myEglConfig, 1, &aNbConfigs) != EGL_TRUE
-     || myEglConfig == NULL)
-    {
-      ::Message::DefaultMessenger()->Send ("Error: EGL does not provide compatible configurations!", Message_Fail);
-      return Standard_False;
-    }
+    ::Message::DefaultMessenger()->Send ("Error: EGL does not provide compatible configurations!", Message_Fail);
+    return Standard_False;
   }
 
 #if defined(GL_ES_VERSION_2_0)
@@ -384,14 +400,22 @@ Standard_Boolean OpenGl_GraphicDriver::InitEglContext (Aspect_Display          t
 #endif
 
   if ((EGLDisplay )theEglDisplay == EGL_NO_DISPLAY
-   || (EGLContext )theEglContext == EGL_NO_CONTEXT
-   || theEglConfig == NULL)
+   || (EGLContext )theEglContext == EGL_NO_CONTEXT)
   {
     return Standard_False;
   }
   myEglDisplay = theEglDisplay;
   myEglContext = theEglContext;
   myEglConfig  = theEglConfig;
+  if (theEglConfig == NULL)
+  {
+    myEglConfig = chooseEglSurfConfig ((EGLDisplay )myEglDisplay);
+    if (myEglConfig == NULL)
+    {
+      ::Message::DefaultMessenger()->Send ("Error: EGL does not provide compatible configurations!", Message_Fail);
+      return Standard_False;
+    }
+  }
   return Standard_True;
 }
 #endif
@@ -406,7 +430,7 @@ Standard_Integer OpenGl_GraphicDriver::InquireLimit (const Graphic3d_TypeOfLimit
   switch (theType)
   {
     case Graphic3d_TypeOfLimit_MaxNbLights:
-      return OpenGLMaxLights;
+      return Graphic3d_ShaderProgram::THE_MAX_LIGHTS_DEFAULT;
     case Graphic3d_TypeOfLimit_MaxNbClipPlanes:
       return !aCtx.IsNull() ? aCtx->MaxClipPlanes() : 0;
     case Graphic3d_TypeOfLimit_MaxNbViews:
@@ -417,6 +441,10 @@ Standard_Integer OpenGl_GraphicDriver::InquireLimit (const Graphic3d_TypeOfLimit
       return !aCtx.IsNull() ? aCtx->MaxCombinedTextureUnits() : 1;
     case Graphic3d_TypeOfLimit_MaxMsaa:
       return !aCtx.IsNull() ? aCtx->MaxMsaaSamples() : 0;
+    case Graphic3d_TypeOfLimit_MaxViewDumpSizeX:
+      return !aCtx.IsNull() ? aCtx->MaxDumpSizeX() : 1024;
+    case Graphic3d_TypeOfLimit_MaxViewDumpSizeY:
+      return !aCtx.IsNull() ? aCtx->MaxDumpSizeY() : 1024;
     case Graphic3d_TypeOfLimit_HasRayTracing:
       return (!aCtx.IsNull() && aCtx->HasRayTracing()) ? 1 : 0;
     case Graphic3d_TypeOfLimit_HasRayTracingTextures:
@@ -431,6 +459,10 @@ Standard_Integer OpenGl_GraphicDriver::InquireLimit (const Graphic3d_TypeOfLimit
       return (!aCtx.IsNull()
             && aCtx->hasSampleVariables != OpenGl_FeatureNotAvailable
             && (InquireLimit (Graphic3d_TypeOfLimit_HasBlendedOit) == 1)) ? 1 : 0;
+    case Graphic3d_TypeOfLimit_HasFlatShading:
+      return !aCtx.IsNull() && aCtx->hasFlatShading != OpenGl_FeatureNotAvailable ? 1 : 0;
+    case Graphic3d_TypeOfLimit_IsWorkaroundFBO:
+      return !aCtx.IsNull() && aCtx->MaxTextureSize() != aCtx->MaxDumpSizeX() ? 1 : 0;
     case Graphic3d_TypeOfLimit_NB:
       return 0;
   }

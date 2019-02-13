@@ -18,11 +18,10 @@
 
 #include <Standard.hxx>
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4127) // conditional expression is constant
-#endif
+#include <Standard_WarningsDisable.hxx>
 #include <QList>
 #include <QObject>
+#include <Standard_WarningsRestore.hxx>
 
 class DFBrowser_Module;
 class DFBrowser_ThreadItem;
@@ -42,10 +41,6 @@ public:
 
   //! Destructor
   virtual ~DFBrowser_Thread() {}
-
-  //! Sets module to the started thread items
-  //! \param theModule a current module
-  Standard_EXPORT void SetModule (DFBrowser_Module* theModule);
 
   //! Starts all candidate thread items
   Standard_EXPORT void ProcessApplication();
@@ -72,6 +67,7 @@ private:
   QList<QThread*> myStartedThreads; //!< container of started threads
   DFBrowser_ThreadItem* myPostponedItem; //!< currently processed item in onFinished()
   bool myIsFinishProcessing; //!< blocking state if onFinished() is started but has not been finished yet
+  Standard_Boolean myIsProcessPostponed; //!< state if process application should be done by finish active thread
 };
 
 

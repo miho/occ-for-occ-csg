@@ -22,6 +22,10 @@
 
 #include <inspector/DFBrowserPane_Tools.hxx>
 
+#include <inspector/TreeModel_ModelBase.hxx>
+#include <inspector/TreeModel_Tools.hxx>
+
+#include <Standard_WarningsDisable.hxx>
 #include <QAbstractItemModel>
 #include <QFrame>
 #include <QGridLayout>
@@ -32,6 +36,7 @@
 #include <QTableView>
 #include <QToolButton>
 #include <QWidget>
+#include <Standard_WarningsRestore.hxx>
 
 const int HISTORY_SIZE = 10;
 const int MARGIN_SIZE = 2;
@@ -63,7 +68,7 @@ DFBrowser_TreeLevelLine::DFBrowser_TreeLevelLine (QWidget* theParent)
   myTableView->horizontalHeader()->setVisible (false);
   QHeaderView* aVHeader = myTableView->verticalHeader();
   aVHeader->setVisible (false);
-  int aDefCellSize = aVHeader->minimumSectionSize() + DFBrowserPane_Tools::HeaderSectionMargin();
+  int aDefCellSize = aVHeader->minimumSectionSize() + TreeModel_Tools::HeaderSectionMargin();
   aVHeader->setDefaultSectionSize (aDefCellSize);
   aLayout->addWidget (myTableView, 0, 2);
 
@@ -118,7 +123,7 @@ void DFBrowser_TreeLevelLine::OnTreeViewSelectionChanged (const QItemSelection& 
                                                           const QItemSelection&)
 {
   QModelIndexList aSelectedIndices = theSelected.indexes();
-  QModelIndex aSelectedIndex = DFBrowser_Window::SingleSelected (aSelectedIndices, 0);
+  QModelIndex aSelectedIndex = TreeModel_ModelBase::SingleSelected (aSelectedIndices, 0);
 
   if (!mySelectionProcessingBlocked) // we're processing action click
     setForwardIndex (aSelectedIndex);
@@ -150,7 +155,7 @@ void DFBrowser_TreeLevelLine::onTableSelectionChanged (const QItemSelection& the
   if (!aTableModel)
     return;
 
-  QModelIndex aSelectedIndex = DFBrowser_Window::SingleSelected (theSelected.indexes(), 0, Qt::Vertical);
+  QModelIndex aSelectedIndex = TreeModel_ModelBase::SingleSelected (theSelected.indexes(), 0, Qt::Vertical);
   emit indexSelected (aTableModel->GetTreeViewIndex (aSelectedIndex));
 }
 

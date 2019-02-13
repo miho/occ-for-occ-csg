@@ -273,7 +273,7 @@ public:
   
   //! Adds a component given by its label and location to the assembly
   //! Note: assembly must be IsAssembly() or IsSimpleShape()
-  Standard_EXPORT TDF_Label AddComponent (const TDF_Label& assembly, const TDF_Label& comp, const TopLoc_Location& Loc) const;
+  Standard_EXPORT TDF_Label AddComponent (const TDF_Label& assembly, const TDF_Label& comp, const TopLoc_Location& Loc);
   
   //! Adds a shape (located) as a component to the assembly
   //! If necessary, creates an additional top-level shape for
@@ -404,12 +404,8 @@ public:
   //! Returns null attribute if no SHUO found
   Standard_EXPORT static Standard_Boolean FindSHUO (const TDF_LabelSequence& Labels, Handle(XCAFDoc_GraphNode)& theSHUOAttr);
   
-  //! Convert Shape (compound) to assembly
+  //! Convert Shape (compound/compsolid/shell/wire) to assembly
   Standard_EXPORT Standard_Boolean Expand (const TDF_Label& Shape) ;
-
-    //! Make subshape for Part from Shape
-  Standard_EXPORT void makeSubShape (const TDF_Label& Part, const TopoDS_Shape& Shape) ;
-
 
 
   DEFINE_STANDARD_RTTIEXT(XCAFDoc_ShapeTool,TDF_Attribute)
@@ -434,6 +430,11 @@ private:
   //! Makes a shape on label L to be a reference to shape refL
   //! with location loc
   Standard_EXPORT static void MakeReference (const TDF_Label& L, const TDF_Label& refL, const TopLoc_Location& loc);
+
+  //! Auxiliary method for Expand
+  //! Add declared under expanded theMainShapeL subshapes to new part label thePart
+  //! Recursively iterate all subshapes of shape from thePart, current shape to iterate its subshapes is theShape.
+  Standard_EXPORT void makeSubShape(const TDF_Label& theMainShapeL, const TDF_Label& thePart, const TopoDS_Shape& theShape, const TopLoc_Location& theLoc);
 
   XCAFDoc_DataMapOfShapeLabel myShapeLabels;
   XCAFDoc_DataMapOfShapeLabel mySubShapes;

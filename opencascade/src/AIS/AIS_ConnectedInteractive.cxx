@@ -164,54 +164,10 @@ void AIS_ConnectedInteractive::Compute(const Handle(Prs3d_Projector)& aProjector
 //purpose  :
 //=======================================================================
 void AIS_ConnectedInteractive::Compute (const Handle(Prs3d_Projector)& theProjector,
-                                        const Handle(Prs3d_Presentation)& thePresentation,
+                                        const Handle(Prs3d_Presentation)& thePrs,
                                         const TopoDS_Shape& theShape)
 {
-  if (myShape.IsNull())
-  {
-    return;
-  }
-
-  switch (theShape.ShapeType())
-  {
-    case TopAbs_VERTEX:
-    case TopAbs_EDGE:
-    case TopAbs_WIRE:
-    {
-      thePresentation->SetDisplayPriority (4);
-      StdPrs_WFShape::Add (thePresentation, theShape, myDrawer);
-      break;
-    }
-    default:
-    {
-      Handle(Prs3d_Drawer) aDefaultDrawer = GetContext()->DefaultDrawer();
-      if (aDefaultDrawer->DrawHiddenLine()) 
-      {
-        myDrawer->EnableDrawHiddenLine();
-      }
-      else 
-      {
-        myDrawer->DisableDrawHiddenLine();
-      }
-      
-      Aspect_TypeOfDeflection aPrevDeflection = aDefaultDrawer->TypeOfDeflection();
-      aDefaultDrawer->SetTypeOfDeflection(Aspect_TOD_RELATIVE);
-
-      // process HLRAngle and HLRDeviationCoefficient()
-      Standard_Real aPrevAngle = myDrawer->HLRAngle();
-      Standard_Real aNewAngle = aDefaultDrawer->HLRAngle();
-      if (myDrawer->IsAutoTriangulation() &&
-          Abs (aNewAngle - aPrevAngle) > Precision::Angular())
-      {
-        BRepTools::Clean (theShape);
-      }
-
-      myDrawer->SetHLRAngle (aNewAngle);
-      myDrawer->SetHLRDeviationCoefficient (aDefaultDrawer->HLRDeviationCoefficient());
-      StdPrs_HLRPolyShape::Add (thePresentation, theShape, myDrawer, theProjector);
-      aDefaultDrawer->SetTypeOfDeflection (aPrevDeflection);
-    }
-  }
+  AIS_Shape::computeHlrPresentation (theProjector, thePrs, theShape, myDrawer);
 }
 
 //=======================================================================
@@ -267,7 +223,6 @@ void AIS_ConnectedInteractive::ComputeSelection (const Handle(SelectMgr_Selectio
 
   const Handle(SelectMgr_Selection)& TheRefSel = myReference->Selection (theMode);
   Handle(SelectMgr_EntityOwner) anOwner = new SelectMgr_EntityOwner (this);
-  Handle(Select3D_SensitiveEntity) aSensitive, aNewSensitive;
 
   TopLoc_Location aLocation (Transformation());
   anOwner->SetLocation (aLocation);
@@ -277,17 +232,16 @@ void AIS_ConnectedInteractive::ComputeSelection (const Handle(SelectMgr_Selectio
     myReference->RecomputePrimitives (theMode);
   }
 
-  for (TheRefSel->Init(); TheRefSel->More(); TheRefSel->Next())
+  for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (TheRefSel->Entities()); aSelEntIter.More(); aSelEntIter.Next())
   {
-    aSensitive = Handle(Select3D_SensitiveEntity)::DownCast (TheRefSel->Sensitive()->BaseSensitive());
-    if (!aSensitive.IsNull())
+    if (Handle(Select3D_SensitiveEntity) aSensitive = Handle(Select3D_SensitiveEntity)::DownCast (aSelEntIter.Value()->BaseSensitive()))
     {
       // Get the copy of SE3D
-      aNewSensitive = aSensitive->GetConnected();
-
-      aNewSensitive->Set(anOwner);
-
-      theSelection->Add (aNewSensitive);
+      if (Handle(Select3D_SensitiveEntity) aNewSensitive = aSensitive->GetConnected())
+      {
+        aNewSensitive->Set(anOwner);
+        theSelection->Add (aNewSensitive);
+      }
     }
   }
 }
@@ -304,38 +258,28 @@ void AIS_ConnectedInteractive::computeSubShapeSelection (const Handle(SelectMgr_
     Shapes2EntitiesMap;
 
   if (!myReference->HasSelection (theMode))
+  {
     myReference->RecomputePrimitives (theMode);
-   
-  const Handle(SelectMgr_Selection)& aRefSel = myReference->Selection (theMode);
+  }
 
+  const Handle(SelectMgr_Selection)& aRefSel = myReference->Selection (theMode);
   if (aRefSel->IsEmpty() || aRefSel->UpdateStatus() == SelectMgr_TOU_Full)
   {
     myReference->RecomputePrimitives (theMode);
   }
-  
-  Handle(StdSelect_BRepOwner) anOwner;
-  TopLoc_Location aDummyLoc;
 
-  Handle(Select3D_SensitiveEntity) aSE, aNewSE;
+  // Fill in the map of subshapes and corresponding sensitive entities associated with aMode
   Shapes2EntitiesMap aShapes2EntitiesMap;
-
-  SensitiveList aSEList;
-  TopoDS_Shape aSubShape;
-
-  // Fill in the map of subshapes and corresponding 
-  // sensitive entities associated with aMode 
-  for (aRefSel->Init(); aRefSel->More(); aRefSel->Next())
+  for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (aRefSel->Entities()); aSelEntIter.More(); aSelEntIter.Next())
   {
-    aSE = Handle(Select3D_SensitiveEntity)::DownCast (aRefSel->Sensitive()->BaseSensitive());
-    if(!aSE.IsNull())
+    if (Handle(Select3D_SensitiveEntity) aSE = Handle(Select3D_SensitiveEntity)::DownCast (aSelEntIter.Value()->BaseSensitive()))
     {
-      anOwner = Handle(StdSelect_BRepOwner)::DownCast (aSE->OwnerId());
-      if(!anOwner.IsNull())
+      if (Handle(StdSelect_BRepOwner) anOwner = Handle(StdSelect_BRepOwner)::DownCast (aSE->OwnerId()))
       {
-        aSubShape = anOwner->Shape(); 
+        const TopoDS_Shape& aSubShape = anOwner->Shape();
         if(!aShapes2EntitiesMap.IsBound (aSubShape))
         {
-          aShapes2EntitiesMap.Bind (aSubShape, aSEList);
+          aShapes2EntitiesMap.Bind (aSubShape, SensitiveList());
         }
         aShapes2EntitiesMap (aSubShape).Append (aSE);
       }
@@ -345,21 +289,16 @@ void AIS_ConnectedInteractive::computeSubShapeSelection (const Handle(SelectMgr_
   // Fill in selection from aShapes2EntitiesMap
   for (Shapes2EntitiesMap::Iterator aMapIt (aShapes2EntitiesMap); aMapIt.More(); aMapIt.Next())
   {
-    aSEList = aMapIt.Value();
-    anOwner = new StdSelect_BRepOwner (aMapIt.Key(), 
-                                       this, 
-                                       aSEList.First()->OwnerId()->Priority(), 
-                                       Standard_True);
+    const SensitiveList& aSEList = aMapIt.Value();
+    Handle(StdSelect_BRepOwner) anOwner = new StdSelect_BRepOwner (aMapIt.Key(), this, aSEList.First()->OwnerId()->Priority(), Standard_True);
     anOwner->SetLocation (Transformation());
-
     for (SensitiveList::Iterator aListIt (aSEList); aListIt.More(); aListIt.Next())
     {
-      aSE = aListIt.Value();
-
-      aNewSE = aSE->GetConnected();
-      aNewSE->Set (anOwner);
-
-      theSelection->Add (aNewSE);
+      if (Handle(Select3D_SensitiveEntity) aNewSE = aListIt.Value()->GetConnected())
+      {
+        aNewSE->Set (anOwner);
+        theSelection->Add (aNewSE);
+      }
     }
   }
 

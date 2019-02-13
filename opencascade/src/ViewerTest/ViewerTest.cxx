@@ -41,7 +41,6 @@
 #include <AIS_Relation.hxx>
 #include <AIS_TypeFilter.hxx>
 #include <AIS_SignatureFilter.hxx>
-#include <AIS_LocalContext.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 #include <Aspect_InteriorStyle.hxx>
@@ -331,6 +330,60 @@ Standard_Boolean ViewerTest::ParseMarkerType (Standard_CString theArg,
 }
 
 //=======================================================================
+//function : ParseShadingModel
+//purpose  :
+//=======================================================================
+Standard_Boolean ViewerTest::ParseShadingModel (Standard_CString              theArg,
+                                                Graphic3d_TypeOfShadingModel& theModel)
+{
+  TCollection_AsciiString aTypeStr (theArg);
+  aTypeStr.LowerCase();
+  if (aTypeStr == "unlit"
+   || aTypeStr == "color"
+   || aTypeStr == "none")
+  {
+    theModel = Graphic3d_TOSM_UNLIT;
+  }
+  else if (aTypeStr == "flat"
+        || aTypeStr == "facet")
+  {
+    theModel = Graphic3d_TOSM_FACET;
+  }
+  else if (aTypeStr == "gouraud"
+        || aTypeStr == "vertex"
+        || aTypeStr == "vert")
+  {
+    theModel = Graphic3d_TOSM_VERTEX;
+  }
+  else if (aTypeStr == "phong"
+        || aTypeStr == "fragment"
+        || aTypeStr == "frag"
+        || aTypeStr == "pixel")
+  {
+    theModel = Graphic3d_TOSM_FRAGMENT;
+  }
+  else if (aTypeStr == "default"
+        || aTypeStr == "def")
+  {
+    theModel = Graphic3d_TOSM_DEFAULT;
+  }
+  else if (aTypeStr.IsIntegerValue())
+  {
+    const int aTypeInt = aTypeStr.IntegerValue();
+    if (aTypeInt <= Graphic3d_TOSM_DEFAULT || aTypeInt >= Graphic3d_TypeOfShadingModel_NB)
+    {
+      return Standard_False;
+    }
+    theModel = (Graphic3d_TypeOfShadingModel)aTypeInt;
+  }
+  else
+  {
+    return Standard_False;
+  }
+  return Standard_True;
+}
+
+//=======================================================================
 //function : GetTypeNames
 //purpose  :
 //=======================================================================
@@ -455,8 +508,7 @@ Standard_Boolean ViewerTest::Display (const TCollection_AsciiString&       theNa
       return Standard_False;
     }
 
-    Handle(AIS_InteractiveObject) anOldObj = Handle(AIS_InteractiveObject)::DownCast (aMap.Find2 (theName));
-    if (!anOldObj.IsNull())
+    if (Handle(AIS_InteractiveObject) anOldObj = aMap.Find2 (theName))
     {
       aCtx->Remove (anOldObj, theObject.IsNull() && theToUpdate);
     }
@@ -605,30 +657,25 @@ static TopoDS_Shape GetShapeFromName(const char* name)
 //==============================================================================
 Handle(AIS_Shape) GetAISShapeFromName(const char* name)
 {
-  Handle(AIS_Shape) retsh;
-
-  if(GetMapOfAIS().IsBound2(name)){
-    const Handle(AIS_InteractiveObject) IO =
-      Handle(AIS_InteractiveObject)::DownCast(GetMapOfAIS().Find2(name));
-    if (!IO.IsNull()) {
-      if(IO->Type()==AIS_KOI_Shape) {
-        if(IO->Signature()==0){
-          retsh = Handle(AIS_Shape)::DownCast (IO);
-        }
-        else
-          cout << "an Object which is not an AIS_Shape "
-            "already has this name!!!"<<endl;
-      }
+  Handle(AIS_InteractiveObject) aPrs;
+  if (GetMapOfAIS().Find2 (name, aPrs)
+  && !aPrs.IsNull())
+  {
+    if (Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast (aPrs))
+    {
+      return aShapePrs;
     }
-    return retsh;
+
+    std::cout << "an Object which is not an AIS_Shape already has this name!!!\n";
+    return Handle(AIS_Shape)();
   }
 
-
-  TopoDS_Shape S = GetShapeFromName(name);
-  if ( !S.IsNull() ) {
-    retsh = new AIS_Shape(S);
+  TopoDS_Shape aShape = GetShapeFromName (name);
+  if (!aShape.IsNull())
+  {
+    return new AIS_Shape(aShape);
   }
-  return retsh;
+  return Handle(AIS_Shape)();
 }
 
 
@@ -646,7 +693,7 @@ void ViewerTest::Clear()
   NCollection_Sequence<Handle(AIS_InteractiveObject)> aListRemoved;
   for (ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName anObjIter (GetMapOfAIS()); anObjIter.More(); anObjIter.Next())
   {
-    const Handle(AIS_InteractiveObject) anObj = Handle(AIS_InteractiveObject)::DownCast (anObjIter.Key1());
+    const Handle(AIS_InteractiveObject) anObj = anObjIter.Key1();
     if (anObj->GetContext() != TheAISContext())
     {
       continue;
@@ -671,60 +718,6 @@ void ViewerTest::Clear()
     }
   }
 }
-
-//==============================================================================
-//function : StandardModesActivation
-//purpose  : Activate a selection mode, vertex, edge, wire ..., in a local
-//           Context
-//==============================================================================
-Standard_DISABLE_DEPRECATION_WARNINGS
-void ViewerTest::StandardModeActivation(const Standard_Integer mode )
-{
-  Handle(AIS_InteractiveContext) aContext = ViewerTest::GetAISContext();
-  if(mode==0) {
-    if (TheAISContext()->HasOpenedContext())
-    {
-      aContext->CloseLocalContext();
-    }
-  } else {
-
-    if(!aContext->HasOpenedContext()) {
-      // To unhilight the preselected object
-      aContext->UnhilightSelected(Standard_False);
-      // Open a local Context in order to be able to select subshape from
-      // the selected shape if any or for all if there is no selection
-      if (!aContext->FirstSelectedObject().IsNull()){
-        aContext->OpenLocalContext(Standard_False);
-
-	for(aContext->InitSelected();aContext->MoreSelected();aContext->NextSelected()){
-	  aContext->Load(	aContext->SelectedInteractive(),-1,Standard_True);
-	}
-      }
-      else
-      {
-        aContext->OpenLocalContext();
-      }
-    }
-
-    const TopAbs_ShapeEnum aShapeType = AIS_Shape::SelectionType (mode);
-    const char* cmode = mode >= 0 && mode <= 8
-                      ? TopAbs::ShapeTypeToString (aShapeType)
-                      : "???";
-    if(theactivatedmodes.Contains(mode))
-    { // Desactivate
-      aContext->DeactivateStandardMode(AIS_Shape::SelectionType(mode));
-      theactivatedmodes.Remove(mode);
-      cout<<"Mode "<< cmode <<" OFF"<<endl;
-    }
-    else
-    { // Activate
-      aContext->ActivateStandardMode(AIS_Shape::SelectionType(mode));
-      theactivatedmodes.Add(mode);
-      cout<<"Mode "<< cmode << " ON" << endl;
-    }
-  }
-}
-Standard_ENABLE_DEPRECATION_WARNINGS
 
 //==============================================================================
 //function : CopyIsoAspect
@@ -803,34 +796,31 @@ static int visos (Draw_Interpretor& di, Standard_Integer argc, const char** argv
 
   Standard_Integer i;
 
-  for (i = 1; i <= aLastInd; i++) {
+  for (i = 1; i <= aLastInd; i++)
+  {
     TCollection_AsciiString name(argv[i]);
-    Standard_Boolean IsBound = GetMapOfAIS().IsBound2(name);
+    Handle(AIS_InteractiveObject) aShape;
+    GetMapOfAIS().Find2(name, aShape);
+    if (aShape.IsNull())
+    {
+      std::cout << "Syntax error: object '" << name << "' is not found\n";
+      return 1;
+    }
 
-    if (IsBound) {
-      const Handle(Standard_Transient) anObj = GetMapOfAIS().Find2(name);
-      if (anObj->IsKind(STANDARD_TYPE(AIS_InteractiveObject))) {
-        const Handle(AIS_InteractiveObject) aShape =
-        Handle(AIS_InteractiveObject)::DownCast (anObj);
-        Handle(Prs3d_Drawer) CurDrawer = aShape->Attributes();
-        Handle(Prs3d_IsoAspect) aUIso = CurDrawer->UIsoAspect();
-        Handle(Prs3d_IsoAspect) aVIso = CurDrawer->VIsoAspect();
-
-        if (isChanged) {
-          CurDrawer->SetUIsoAspect(CopyIsoAspect(aUIso, aNbUIsos));
-          CurDrawer->SetVIsoAspect(CopyIsoAspect(aVIso, aNbVIsos));
-          TheAISContext()->SetLocalAttributes
-                  (aShape, CurDrawer, Standard_False);
-          TheAISContext()->Redisplay (aShape, Standard_False);
-        } else {
-          di << "Number of isos for " << argv[i] << " : "
-             << aUIso->Number() << " " << aVIso->Number() << "\n";
-        }
-      } else {
-        di << argv[i] << ": Not an AIS interactive object!\n";
-      }
-    } else {
-      di << argv[i] << ": Use 'vdisplay' before\n";
+    Handle(Prs3d_Drawer) CurDrawer = aShape->Attributes();
+    Handle(Prs3d_IsoAspect) aUIso = CurDrawer->UIsoAspect();
+    Handle(Prs3d_IsoAspect) aVIso = CurDrawer->VIsoAspect();
+    if (isChanged)
+    {
+      CurDrawer->SetUIsoAspect(CopyIsoAspect(aUIso, aNbUIsos));
+      CurDrawer->SetVIsoAspect(CopyIsoAspect(aVIso, aNbVIsos));
+      TheAISContext()->SetLocalAttributes (aShape, CurDrawer, Standard_False);
+      TheAISContext()->Redisplay (aShape, Standard_False);
+    }
+    else
+    {
+      di << "Number of isos for " << argv[i] << " : "
+          << aUIso->Number() << " " << aVIso->Number() << "\n";
     }
   }
 
@@ -891,15 +881,10 @@ static int VDir (Draw_Interpretor& theDI,
                  Standard_Integer ,
                  const char** )
 {
-  if (!a3DView().IsNull())
-  {
-    return 0;
-  }
-
   for (ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName anIter (GetMapOfAIS());
        anIter.More(); anIter.Next())
   {
-    theDI << "\t" << anIter.Key2().ToCString() << "\n";
+    theDI << "\t" << anIter.Key2() << "\n";
   }
   return 0;
 }
@@ -1257,13 +1242,11 @@ static int VDispMode (Draw_Interpretor& , Standard_Integer argc, const char** ar
     else
     {
       TCollection_AsciiString aName = argv[1];
-      if (GetMapOfAIS().IsBound2 (aName))
+      Handle(AIS_InteractiveObject) aPrs;
+      if (GetMapOfAIS().Find2 (aName, aPrs)
+      && !aPrs.IsNull())
       {
-        Handle(AIS_InteractiveObject) aPrs = Handle(AIS_InteractiveObject)::DownCast(GetMapOfAIS().Find2 (aName));
-        if (!aPrs.IsNull())
-        {
-          VwrTst_DispErase (aPrs, -1, TypeOfDispOperation_UnsetDispMode, Standard_True);
-        }
+        VwrTst_DispErase (aPrs, -1, TypeOfDispOperation_UnsetDispMode, Standard_True);
       }
     }
   }
@@ -1285,11 +1268,8 @@ static int VDispMode (Draw_Interpretor& , Standard_Integer argc, const char** ar
   {
     Handle(AIS_InteractiveObject) aPrs;
     TCollection_AsciiString aName (argv[1]);
-    if (GetMapOfAIS().IsBound2 (aName))
-    {
-      aPrs = Handle(AIS_InteractiveObject)::DownCast(GetMapOfAIS().Find2 (aName));
-    }
-    if (!aPrs.IsNull())
+    if (GetMapOfAIS().Find2 (aName, aPrs)
+     && !aPrs.IsNull())
     {
       VwrTst_DispErase (aPrs, Draw::Atoi(argv[2]), aType, Standard_True);
     }
@@ -1329,14 +1309,13 @@ static int VSubInt(Draw_Interpretor& di, Standard_Integer argc, const char** arg
   else {
     Handle(AIS_InteractiveObject) IO;
     TCollection_AsciiString name = argv[2];
-    if(GetMapOfAIS().IsBound2(name)){
-      IO = Handle(AIS_InteractiveObject)::DownCast(GetMapOfAIS().Find2(name));
-      if (!IO.IsNull()) {
-        if(On==1)
-          Ctx->SubIntensityOn(IO, Standard_True);
-        else
-          Ctx->SubIntensityOff(IO, Standard_True);
-      }
+    if (GetMapOfAIS().Find2 (name, IO)
+    && !IO.IsNull())
+    {
+      if(On==1)
+        Ctx->SubIntensityOn(IO, Standard_True);
+      else
+        Ctx->SubIntensityOff(IO, Standard_True);
     }
     else return 1;
   }
@@ -1618,52 +1597,60 @@ static int VSetInteriorStyle (Draw_Interpretor& theDI,
 //! Auxiliary structure for VAspects
 struct ViewerTest_AspectsChangeSet
 {
-  Standard_Integer         ToSetVisibility;
-  Standard_Integer         Visibility;
+  Standard_Integer             ToSetVisibility;
+  Standard_Integer             Visibility;
 
-  Standard_Integer         ToSetColor;
-  Quantity_Color           Color;
+  Standard_Integer             ToSetColor;
+  Quantity_Color               Color;
 
-  Standard_Integer         ToSetLineWidth;
-  Standard_Real            LineWidth;
+  Standard_Integer             ToSetLineWidth;
+  Standard_Real                LineWidth;
 
-  Standard_Integer         ToSetTypeOfLine;
-  Aspect_TypeOfLine        TypeOfLine;
+  Standard_Integer             ToSetTypeOfLine;
+  Aspect_TypeOfLine            TypeOfLine;
 
-  Standard_Integer         ToSetTypeOfMarker;
-  Aspect_TypeOfMarker      TypeOfMarker;
-  Handle(Image_PixMap)     MarkerImage;
+  Standard_Integer             ToSetTypeOfMarker;
+  Aspect_TypeOfMarker          TypeOfMarker;
+  Handle(Image_PixMap)         MarkerImage;
 
-  Standard_Integer         ToSetMarkerSize;
-  Standard_Real            MarkerSize;
+  Standard_Integer             ToSetMarkerSize;
+  Standard_Real                MarkerSize;
 
-  Standard_Integer         ToSetTransparency;
-  Standard_Real            Transparency;
+  Standard_Integer             ToSetTransparency;
+  Standard_Real                Transparency;
 
-  Standard_Integer         ToSetMaterial;
-  Graphic3d_NameOfMaterial Material;
-  TCollection_AsciiString  MatName;
+  Standard_Integer             ToSetAlphaMode;
+  Graphic3d_AlphaMode          AlphaMode;
+  Standard_ShortReal           AlphaCutoff;
+
+  Standard_Integer             ToSetMaterial;
+  Graphic3d_NameOfMaterial     Material;
+  TCollection_AsciiString      MatName;
 
   NCollection_Sequence<TopoDS_Shape> SubShapes;
 
-  Standard_Integer         ToSetShowFreeBoundary;
-  Standard_Integer         ToSetFreeBoundaryWidth;
-  Standard_Real            FreeBoundaryWidth;
-  Standard_Integer         ToSetFreeBoundaryColor;
-  Quantity_Color           FreeBoundaryColor;
+  Standard_Integer             ToSetShowFreeBoundary;
+  Standard_Integer             ToSetFreeBoundaryWidth;
+  Standard_Real                FreeBoundaryWidth;
+  Standard_Integer             ToSetFreeBoundaryColor;
+  Quantity_Color               FreeBoundaryColor;
 
-  Standard_Integer         ToEnableIsoOnTriangulation;
+  Standard_Integer             ToEnableIsoOnTriangulation;
 
-  Standard_Integer         ToSetMaxParamValue;
-  Standard_Real            MaxParamValue;
+  Standard_Integer             ToSetMaxParamValue;
+  Standard_Real                MaxParamValue;
 
-  Standard_Integer         ToSetSensitivity;
-  Standard_Integer         SelectionMode;
-  Standard_Integer         Sensitivity;
+  Standard_Integer             ToSetSensitivity;
+  Standard_Integer             SelectionMode;
+  Standard_Integer             Sensitivity;
 
-  Standard_Integer         ToSetHatch;
-  Standard_Integer         StdHatchStyle;
-  TCollection_AsciiString  PathToHatchPattern;
+  Standard_Integer             ToSetHatch;
+  Standard_Integer             StdHatchStyle;
+  TCollection_AsciiString      PathToHatchPattern;
+
+  Standard_Integer             ToSetShadingModel;
+  Graphic3d_TypeOfShadingModel ShadingModel;
+  TCollection_AsciiString      ShadingModelName;
 
   //! Empty constructor
   ViewerTest_AspectsChangeSet()
@@ -1681,6 +1668,9 @@ struct ViewerTest_AspectsChangeSet
     MarkerSize        (1.0),
     ToSetTransparency (0),
     Transparency      (0.0),
+    ToSetAlphaMode    (0),
+    AlphaMode         (Graphic3d_AlphaMode_BlendAuto),
+    AlphaCutoff       (0.5f),
     ToSetMaterial     (0),
     Material          (Graphic3d_NOM_DEFAULT),
     ToSetShowFreeBoundary      (0),
@@ -1689,13 +1679,15 @@ struct ViewerTest_AspectsChangeSet
     ToSetFreeBoundaryColor     (0),
     FreeBoundaryColor          (DEFAULT_FREEBOUNDARY_COLOR),
     ToEnableIsoOnTriangulation (-1),
-    ToSetMaxParamValue (0),
-    MaxParamValue (500000),
-    ToSetSensitivity (0),
-    SelectionMode (-1),
-    Sensitivity (-1),
-    ToSetHatch (0),
-    StdHatchStyle (-1)
+    ToSetMaxParamValue         (0),
+    MaxParamValue              (500000),
+    ToSetSensitivity           (0),
+    SelectionMode              (-1),
+    Sensitivity                (-1),
+    ToSetHatch                 (0),
+    StdHatchStyle              (-1),
+    ToSetShadingModel          (0),
+    ShadingModel               (Graphic3d_TOSM_DEFAULT)
     {}
 
   //! @return true if no changes have been requested
@@ -1704,6 +1696,7 @@ struct ViewerTest_AspectsChangeSet
     return ToSetVisibility        == 0
         && ToSetLineWidth         == 0
         && ToSetTransparency      == 0
+        && ToSetAlphaMode         == 0
         && ToSetColor             == 0
         && ToSetMaterial          == 0
         && ToSetShowFreeBoundary  == 0
@@ -1711,11 +1704,12 @@ struct ViewerTest_AspectsChangeSet
         && ToSetFreeBoundaryWidth == 0
         && ToSetMaxParamValue     == 0
         && ToSetSensitivity       == 0
-        && ToSetHatch             == 0;
+        && ToSetHatch             == 0
+        && ToSetShadingModel      == 0;
   }
 
   //! @return true if properties are valid
-  Standard_Boolean Validate (const Standard_Boolean theIsSubPart) const
+  Standard_Boolean Validate() const
   {
     Standard_Boolean isOk = Standard_True;
     if (Visibility != 0 && Visibility != 1)
@@ -1735,10 +1729,10 @@ struct ViewerTest_AspectsChangeSet
       std::cout << "Error: the transparency should be within [0; 1] range (specified " << Transparency << ")\n";
       isOk = Standard_False;
     }
-    if (theIsSubPart
-     && ToSetTransparency)
+    if (ToSetAlphaMode == 1
+     && (AlphaCutoff <= 0.0f || AlphaCutoff >= 1.0f))
     {
-      std::cout << "Error: the transparency can not be defined for sub-part of object!\n";
+      std::cout << "Error: alpha cutoff value should be within (0; 1) range (specified " << AlphaCutoff << ")\n";
       isOk = Standard_False;
     }
     if (ToSetMaterial == 1
@@ -1766,6 +1760,12 @@ struct ViewerTest_AspectsChangeSet
     if (ToSetHatch == 1 && StdHatchStyle < 0 && PathToHatchPattern == "")
     {
       std::cout << "Error: hatch style must be specified\n";
+      isOk = Standard_False;
+    }
+    if (ToSetShadingModel == 1
+    && (ShadingModel < Graphic3d_TOSM_DEFAULT || ShadingModel > Graphic3d_TOSM_FRAGMENT))
+    {
+      std::cout << "Error: unknown shading model " << ShadingModelName << ".\n";
       isOk = Standard_False;
     }
     return isOk;
@@ -1978,6 +1978,53 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
       {
         aChangeSet->ToSetTransparency = -1;
         aChangeSet->Transparency = 0.0;
+      }
+    }
+    else if (anArg == "-setalphamode")
+    {
+      if (++anArgIter >= theArgNb)
+      {
+        std::cout << "Error: wrong syntax at " << anArg << "\n";
+        return 1;
+      }
+      aChangeSet->ToSetAlphaMode = 1;
+      aChangeSet->AlphaCutoff = 0.5f;
+      {
+        TCollection_AsciiString aParam (theArgVec[anArgIter]);
+        aParam.LowerCase();
+        if (aParam == "opaque")
+        {
+          aChangeSet->AlphaMode = Graphic3d_AlphaMode_Opaque;
+        }
+        else if (aParam == "mask")
+        {
+          aChangeSet->AlphaMode = Graphic3d_AlphaMode_Mask;
+        }
+        else if (aParam == "blend")
+        {
+          aChangeSet->AlphaMode = Graphic3d_AlphaMode_Blend;
+        }
+        else if (aParam == "blendauto"
+              || aParam == "auto")
+        {
+          aChangeSet->AlphaMode = Graphic3d_AlphaMode_BlendAuto;
+        }
+        else
+        {
+          std::cout << "Error: wrong syntax at " << aParam << "\n";
+          return 1;
+        }
+      }
+
+      if (anArgIter + 1 < theArgNb
+       && theArgVec[anArgIter + 1][0] != '-')
+      {
+        TCollection_AsciiString aParam2 (theArgVec[anArgIter + 1]);
+        if (aParam2.IsRealValue())
+        {
+          aChangeSet->AlphaCutoff = (float )aParam2.RealValue();
+          ++anArgIter;
+        }
       }
     }
     else if (anArg == "-setvis"
@@ -2309,6 +2356,9 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
       aChangeSet->MarkerSize = 1.0;
       aChangeSet->ToSetTransparency = -1;
       aChangeSet->Transparency = 0.0;
+      aChangeSet->ToSetAlphaMode = -1;
+      aChangeSet->AlphaMode = Graphic3d_AlphaMode_BlendAuto;
+      aChangeSet->AlphaCutoff = 0.5f;
       aChangeSet->ToSetColor = -1;
       aChangeSet->Color = DEFAULT_COLOR;
       aChangeSet->ToSetMaterial = -1;
@@ -2321,6 +2371,8 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
       aChangeSet->ToSetHatch = -1;
       aChangeSet->StdHatchStyle = -1;
       aChangeSet->PathToHatchPattern.Clear();
+      aChangeSet->ToSetShadingModel = -1;
+      aChangeSet->ShadingModel = Graphic3d_TOSM_DEFAULT;
     }
     else if (anArg == "-isoontriangulation"
           || anArg == "-isoontriang")
@@ -2413,6 +2465,26 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
         aChangeSet->PathToHatchPattern = anArgHatch;
       }
     }
+    else if (anArg == "-setshadingmodel")
+    {
+      if (++anArgIter >= theArgNb)
+      {
+        std::cout << "Error: wrong syntax at " << anArg << "\n";
+        return 1;
+      }
+      aChangeSet->ToSetShadingModel = 1;
+      aChangeSet->ShadingModelName  = theArgVec[anArgIter];
+      if (!ViewerTest::ParseShadingModel (theArgVec[anArgIter], aChangeSet->ShadingModel))
+      {
+        std::cout << "Error: wrong syntax at " << anArg << "\n";
+        return 1;
+      }
+    }
+    else if (anArg == "-unsetshadingmodel")
+    {
+      aChangeSet->ToSetShadingModel = -1;
+      aChangeSet->ShadingModel = Graphic3d_TOSM_DEFAULT;
+    }
     else
     {
       std::cout << "Error: wrong syntax at " << anArg << "\n";
@@ -2420,15 +2492,13 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
     }
   }
 
-  Standard_Boolean isFirst = Standard_True;
   for (NCollection_Sequence<ViewerTest_AspectsChangeSet>::Iterator aChangesIter (aChanges);
        aChangesIter.More(); aChangesIter.Next())
   {
-    if (!aChangesIter.Value().Validate (!isFirst))
+    if (!aChangesIter.Value().Validate())
     {
       return 1;
     }
-    isFirst = Standard_False;
   }
 
   // special case for -defaults parameter.
@@ -2476,6 +2546,10 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
     {
       aDrawer->ShadingAspect()->SetTransparency (aChangeSet->Transparency);
     }
+    if (aChangeSet->ToSetAlphaMode != 0)
+    {
+      aDrawer->ShadingAspect()->Aspect()->SetAlphaMode (aChangeSet->AlphaMode, aChangeSet->AlphaCutoff);
+    }
     if (aChangeSet->ToSetMaterial != 0)
     {
       aDrawer->ShadingAspect()->SetMaterial (aChangeSet->Material);
@@ -2504,6 +2578,10 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
     {
       aDrawer->SetMaximalParameterValue (aChangeSet->MaxParamValue);
     }
+    if (aChangeSet->ToSetShadingModel == 1)
+    {
+      aDrawer->ShadingAspect()->Aspect()->SetShadingModel (aChangeSet->ShadingModel);
+    }
 
     // redisplay all objects in context
     for (ViewTest_PrsIter aPrsIter (aNames); aPrsIter.More(); aPrsIter.Next())
@@ -2519,8 +2597,13 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
 
   for (ViewTest_PrsIter aPrsIter (aNames); aPrsIter.More(); aPrsIter.Next())
   {
-    const TCollection_AsciiString& aName   = aPrsIter.CurrentName();
-    Handle(AIS_InteractiveObject)  aPrs    = aPrsIter.Current();
+    const TCollection_AsciiString& aName = aPrsIter.CurrentName();
+    Handle(AIS_InteractiveObject)  aPrs  = aPrsIter.Current();
+    if (aPrs.IsNull())
+    {
+      return 1;
+    }
+
     Handle(Prs3d_Drawer)           aDrawer = aPrs->Attributes();
     Handle(AIS_ColoredShape) aColoredPrs;
     Standard_Boolean toDisplay = Standard_False;
@@ -2699,6 +2782,21 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
           }
           toRedisplay = Standard_True;
         }
+        if (aChangeSet->ToSetShadingModel != 0)
+        {
+          aDrawer->SetShadingModel ((aChangeSet->ToSetShadingModel == -1) ? Graphic3d_TOSM_DEFAULT : aChangeSet->ShadingModel, aChangeSet->ToSetShadingModel != -1);
+          toRedisplay = Standard_True;
+        }
+        if (aChangeSet->ToSetAlphaMode != 0)
+        {
+          if (!aDrawer->HasOwnShadingAspect())
+          {
+            aDrawer->SetShadingAspect (new Prs3d_ShadingAspect());
+            *aDrawer->ShadingAspect()->Aspect() = *aCtx->DefaultDrawer()->ShadingAspect()->Aspect();
+          }
+          aDrawer->ShadingAspect()->Aspect()->SetAlphaMode (aChangeSet->AlphaMode, aChangeSet->AlphaCutoff);
+          toRedisplay = Standard_True;
+        }
       }
 
       for (aChangesIter.Next(); aChangesIter.More(); aChangesIter.Next())
@@ -2717,6 +2815,10 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
           {
             aColoredPrs->SetCustomColor (aSubShape, aChangeSet->Color);
           }
+          if (aChangeSet->ToSetTransparency == 1)
+          {
+            aColoredPrs->SetCustomTransparency (aSubShape, aChangeSet->Transparency);
+          }
           if (aChangeSet->ToSetLineWidth == 1)
           {
             aColoredPrs->SetCustomWidth (aSubShape, aChangeSet->LineWidth);
@@ -2734,6 +2836,11 @@ static Standard_Integer VAspects (Draw_Interpretor& /*theDI*/,
           if (aChangeSet->ToSetSensitivity != 0)
           {
             aCtx->SetSelectionSensitivity (aPrs, aChangeSet->SelectionMode, aChangeSet->Sensitivity);
+          }
+          if (aChangeSet->ToSetShadingModel != 0)
+          {
+            Handle(AIS_ColoredDrawer) aCurColDrawer = aColoredPrs->CustomAspects (aSubShape);
+            aCurColDrawer->SetShadingModel ((aChangeSet->ToSetShadingModel == -1) ? Graphic3d_TOSM_DEFAULT : aChangeSet->ShadingModel, aChangeSet->ToSetShadingModel != -1);
           }
         }
       }
@@ -2772,13 +2879,6 @@ static int VDonly2 (Draw_Interpretor& ,
     return 1;
   }
 
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (aCtx->HasOpenedContext())
-  {
-    aCtx->CloseLocalContext();
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
   Standard_Integer anArgIter = 1;
   for (; anArgIter < theArgNb; ++anArgIter)
   {
@@ -2808,14 +2908,12 @@ static int VDonly2 (Draw_Interpretor& ,
     for (; anArgIter < theArgNb; ++anArgIter)
     {
       TCollection_AsciiString aName = theArgVec[anArgIter];
-      if (GetMapOfAIS().IsBound2 (aName))
+      Handle(AIS_InteractiveObject) aShape;
+      if (GetMapOfAIS().Find2 (aName, aShape)
+      && !aShape.IsNull())
       {
-        const Handle(AIS_InteractiveObject) aShape = Handle(AIS_InteractiveObject)::DownCast (GetMapOfAIS().Find2 (aName));
-        if (!aShape.IsNull())
-        {
-          aCtx->Display (aShape, Standard_False);
-          aDispSet.Add (aShape);
-        }
+        aCtx->Display (aShape, Standard_False);
+        aDispSet.Add (aShape);
       }
     }
   }
@@ -2828,8 +2926,7 @@ static int VDonly2 (Draw_Interpretor& ,
       continue;
     }
 
-    const Handle(AIS_InteractiveObject) aShape = Handle(AIS_InteractiveObject)::DownCast (anIter.Key1());
-    if (aShape.IsNull())
+    if (Handle(AIS_InteractiveObject) aShape = anIter.Key1())
     {
       aCtx->Erase (aShape, Standard_False);
     }
@@ -2860,7 +2957,6 @@ int VRemove (Draw_Interpretor& theDI,
   Standard_Boolean isContextOnly = Standard_False;
   Standard_Boolean toRemoveAll   = Standard_False;
   Standard_Boolean toPrintInfo   = Standard_True;
-  Standard_Boolean toRemoveLocal = Standard_False;
 
   Standard_Integer anArgIter = 1;
   for (; anArgIter < theArgNb; ++anArgIter)
@@ -2879,10 +2975,6 @@ int VRemove (Draw_Interpretor& theDI,
     {
       toPrintInfo = Standard_False;
     }
-    else if (anArg == "-local")
-    {
-      toRemoveLocal = Standard_True;
-    }
     else if (anUpdateTool.parseRedrawMode (anArg))
     {
       continue;
@@ -2899,18 +2991,6 @@ int VRemove (Draw_Interpretor& theDI,
     return 1;
   }
 
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (toRemoveLocal && !aCtx->HasOpenedContext())
-  {
-    std::cerr << "Error: local selection context is not open.\n";
-    return 1;
-  }
-  else if (!toRemoveLocal && aCtx->HasOpenedContext())
-  {
-    aCtx->CloseAllContexts (Standard_False);
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
   NCollection_List<TCollection_AsciiString> anIONameList;
   if (toRemoveAll)
   {
@@ -2925,16 +3005,16 @@ int VRemove (Draw_Interpretor& theDI,
     for (; anArgIter < theArgNb; ++anArgIter)
     {
       TCollection_AsciiString aName = theArgVec[anArgIter];
-      if (!GetMapOfAIS().IsBound2 (aName))
+      Handle(AIS_InteractiveObject) anIO;
+      if (!GetMapOfAIS().Find2 (aName, anIO))
       {
-        theDI << aName.ToCString() << " was not bound to some object.\n";
+        theDI << aName << " was not bound to some object.\n";
         continue;
       }
 
-      const Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast (GetMapOfAIS().Find2 (aName));
       if (anIO->GetContext() != aCtx)
       {
-        theDI << aName.ToCString() << " was not displayed in current context.\n";
+        theDI << aName << " was not displayed in current context.\n";
         theDI << "Please activate view with this object displayed and try again.\n";
         continue;
       }
@@ -2948,8 +3028,7 @@ int VRemove (Draw_Interpretor& theDI,
     for (ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName anIter (GetMapOfAIS());
          anIter.More(); anIter.Next())
     {
-      const Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast (anIter.Key1());
-      if (!aCtx->IsSelected (anIO))
+      if (!aCtx->IsSelected (anIter.Key1()))
       {
         continue;
       }
@@ -2963,28 +3042,17 @@ int VRemove (Draw_Interpretor& theDI,
   for (NCollection_List<TCollection_AsciiString>::Iterator anIter (anIONameList);
        anIter.More(); anIter.Next())
   {
-    const Handle(AIS_InteractiveObject) anIO  = Handle(AIS_InteractiveObject)::DownCast (GetMapOfAIS().Find2 (anIter.Value()));
+    const Handle(AIS_InteractiveObject) anIO = GetMapOfAIS().Find2 (anIter.Value());
     aCtx->Remove (anIO, Standard_False);
     if (toPrintInfo)
     {
-      theDI << anIter.Value().ToCString() << " was removed\n";
+      theDI << anIter.Value() << " was removed\n";
     }
     if (!isContextOnly)
     {
       GetMapOfAIS().UnBind2 (anIter.Value());
     }
   }
-
-  // Close local context if it is empty
-  TColStd_MapOfTransient aLocalIO;
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (aCtx->HasOpenedContext()
-   && !aCtx->LocalContext()->DisplayedObjects (aLocalIO))
-  {
-    aCtx->CloseAllContexts (Standard_False);
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
   return 0;
 }
 
@@ -3009,7 +3077,6 @@ int VErase (Draw_Interpretor& theDI,
   const Standard_Boolean toEraseAll = TCollection_AsciiString (theArgNb > 0 ? theArgVec[0] : "") == "veraseall";
 
   Standard_Integer anArgIter = 1;
-  Standard_Boolean toEraseLocal  = Standard_False;
   Standard_Boolean toEraseInView = Standard_False;
   TColStd_SequenceOfAsciiString aNamesOfEraseIO;
   for (; anArgIter < theArgNb; ++anArgIter)
@@ -3019,10 +3086,6 @@ int VErase (Draw_Interpretor& theDI,
     if (anUpdateTool.parseRedrawMode (anArgCase))
     {
       continue;
-    }
-    else if (anArgCase == "-local")
-    {
-      toEraseLocal = Standard_True;
     }
     else if (anArgCase == "-view"
           || anArgCase == "-inview")
@@ -3041,32 +3104,19 @@ int VErase (Draw_Interpretor& theDI,
     return 1;
   }
 
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (toEraseLocal && !aCtx->HasOpenedContext())
-  {
-    std::cerr << "Error: local selection context is not open.\n";
-    return 1;
-  }
-  else if (!toEraseLocal && aCtx->HasOpenedContext())
-  {
-    aCtx->CloseAllContexts (Standard_False);
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
   if (!aNamesOfEraseIO.IsEmpty())
   {
     // Erase named objects
     for (Standard_Integer anIter = 1; anIter <= aNamesOfEraseIO.Length(); ++anIter)
     {
       TCollection_AsciiString aName = aNamesOfEraseIO.Value (anIter);
-      if (!GetMapOfAIS().IsBound2 (aName))
+      Handle(AIS_InteractiveObject) anIO;
+      if (!GetMapOfAIS().Find2 (aName, anIO))
       {
         continue;
       }
 
-      const Handle(Standard_Transient)    anObj = GetMapOfAIS().Find2 (aName);
-      const Handle(AIS_InteractiveObject) anIO  = Handle(AIS_InteractiveObject)::DownCast (anObj);
-      theDI << aName.ToCString() << " ";
+      theDI << aName << " ";
       if (!anIO.IsNull())
       {
         if (toEraseInView)
@@ -3083,22 +3133,17 @@ int VErase (Draw_Interpretor& theDI,
   else if (!toEraseAll && aCtx->NbSelected() > 0)
   {
     // Erase selected objects
-    const Standard_Boolean aHasOpenedContext = aCtx->HasOpenedContext();
     for (ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName anIter (GetMapOfAIS());
          anIter.More(); anIter.Next())
     {
-      const Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast (anIter.Key1());
+      const Handle(AIS_InteractiveObject) anIO = anIter.Key1();
       if (!anIO.IsNull()
        && aCtx->IsSelected (anIO))
       {
-        theDI << anIter.Key2().ToCString() << " ";
+        theDI << anIter.Key2() << " ";
         if (toEraseInView)
         {
           aCtx->SetViewAffinity (anIO, aView, Standard_False);
-        }
-        else if (aHasOpenedContext)
-        {
-          aCtx->Erase (anIO, Standard_False);
         }
       }
     }
@@ -3114,7 +3159,7 @@ int VErase (Draw_Interpretor& theDI,
     for (ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName anIter (GetMapOfAIS());
          anIter.More(); anIter.Next())
     {
-      const Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast (anIter.Key1());
+      Handle(AIS_InteractiveObject) anIO = anIter.Key1();
       if (!anIO.IsNull())
       {
         if (toEraseInView)
@@ -3134,7 +3179,6 @@ int VErase (Draw_Interpretor& theDI,
 
 //==============================================================================
 //function : VDisplayAll
-//author   : ege
 //purpose  : Display all the objects of the Map
 //==============================================================================
 static int VDisplayAll (Draw_Interpretor& ,
@@ -3151,16 +3195,11 @@ static int VDisplayAll (Draw_Interpretor& ,
   }
 
   Standard_Integer anArgIter = 1;
-  Standard_Boolean toDisplayLocal = Standard_False;
   for (; anArgIter < theArgNb; ++anArgIter)
   {
     TCollection_AsciiString anArgCase (theArgVec[anArgIter]);
     anArgCase.LowerCase();
-    if (anArgCase == "-local")
-    {
-      toDisplayLocal = Standard_True;
-    }
-    else if (anUpdateTool.parseRedrawMode (anArgCase))
+    if (anUpdateTool.parseRedrawMode (anArgCase))
     {
       continue;
     }
@@ -3175,30 +3214,16 @@ static int VDisplayAll (Draw_Interpretor& ,
     return 1;
   }
 
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (toDisplayLocal && !aCtx->HasOpenedContext())
-  {
-    std::cerr << "Error: local selection context is not open.\n";
-    return 1;
-  }
-  else if (!toDisplayLocal && aCtx->HasOpenedContext())
-  {
-    aCtx->CloseLocalContext (Standard_False);
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
   for (ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName anIter (GetMapOfAIS());
        anIter.More(); anIter.Next())
   {
-    const Handle(AIS_InteractiveObject) aShape = Handle(AIS_InteractiveObject)::DownCast (anIter.Key1());
-    aCtx->Erase (aShape, Standard_False);
+    aCtx->Erase (anIter.Key1(), Standard_False);
   }
 
   for (ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName anIter (GetMapOfAIS());
        anIter.More(); anIter.Next())
   {
-    const Handle(AIS_InteractiveObject) aShape = Handle(AIS_InteractiveObject)::DownCast (anIter.Key1());
-    aCtx->Display (aShape, Standard_False);
+    aCtx->Display (anIter.Key1(), Standard_False);
   }
   return 0;
 }
@@ -3347,13 +3372,13 @@ int VBounding (Draw_Interpretor& theDI,
     for (; anArgIter < theArgNb; ++anArgIter)
     {
       TCollection_AsciiString aName = theArgVec[anArgIter];
-      if (!GetMapOfAIS().IsBound2 (aName))
+      Handle(AIS_InteractiveObject) anIO;
+      if (!GetMapOfAIS().Find2 (aName, anIO))
       {
         std::cout << "Error: presentation " << aName << " does not exist\n";
         return 1;
       }
 
-      Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast (GetMapOfAIS().Find2 (aName));
       aHighlightedMode = checkMode (aCtx, anIO, aMode);
       if (aHighlightedMode == -1)
       {
@@ -3383,7 +3408,7 @@ int VBounding (Draw_Interpretor& theDI,
     for (ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName anIter (GetMapOfAIS());
          anIter.More(); anIter.Next())
     {
-      Handle(AIS_InteractiveObject) anIO = Handle(AIS_InteractiveObject)::DownCast (anIter.Key1());
+      Handle(AIS_InteractiveObject) anIO = anIter.Key1();
       aHighlightedMode = checkMode (aCtx, anIO, aMode);
       if (aHighlightedMode != -1)
       {
@@ -3419,7 +3444,8 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
   Graphic3d_TypeOfTextureFilter      aFilter       = Graphic3d_TOTF_NEAREST;
   Graphic3d_LevelOfTextureAnisotropy anAnisoFilter = Graphic3d_LOTA_OFF;
 
-  Handle(AIS_Shape) aTexturedIO;
+  Handle(AIS_InteractiveObject) aTexturedIO;
+  Handle(AIS_Shape) aTexturedShape;
   Handle(Graphic3d_TextureSet) aTextureSetOld;
   NCollection_Vector<Handle(Graphic3d_Texture2Dmanual)> aTextureVecNew;
   bool toSetGenRepeat = false;
@@ -3446,7 +3472,8 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
       const ViewerTest_DoubleMapOfInteractiveAndName& aMapOfIO = GetMapOfAIS();
       if (aMapOfIO.IsBound2 (aName))
       {
-        aTexturedIO = Handle(AIS_Shape)::DownCast (aMapOfIO.Find2 (aName));
+        aTexturedIO = aMapOfIO.Find2 (aName);
+        aTexturedShape = Handle(AIS_Shape)::DownCast (aTexturedIO);
       }
       if (aTexturedIO.IsNull())
       {
@@ -3459,9 +3486,10 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
         aTextureSetOld = aTexturedIO->Attributes()->ShadingAspect()->Aspect()->TextureSet();
       }
     }
-    else if (aNameCase == "-scale"
-          || aNameCase == "-setscale"
-          || aCommandName == "vtexscale")
+    else if (!aTexturedShape.IsNull()
+          && (aNameCase == "-scale"
+           || aNameCase == "-setscale"
+           || aCommandName == "vtexscale"))
     {
       if (aCommandName != "vtexscale")
       {
@@ -3475,7 +3503,7 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
         toSetGenScale = true;
         if (aValUCase == "off")
         {
-          aTexturedIO->SetTextureScaleUV (gp_Pnt2d (1.0, 1.0));
+          aTexturedShape->SetTextureScaleUV (gp_Pnt2d (1.0, 1.0));
           continue;
         }
         else if (anArgIter + 1 < theArgsNb)
@@ -3484,7 +3512,7 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
           if (aValU.IsRealValue()
            && aValV.IsRealValue())
           {
-            aTexturedIO->SetTextureScaleUV (gp_Pnt2d (aValU.RealValue(), aValV.RealValue()));
+            aTexturedShape->SetTextureScaleUV (gp_Pnt2d (aValU.RealValue(), aValV.RealValue()));
             ++anArgIter;
             continue;
           }
@@ -3493,9 +3521,10 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
       std::cout << "Syntax error: unexpected argument '" << aName << "'\n";
       return 1;
     }
-    else if (aNameCase == "-origin"
-          || aNameCase == "-setorigin"
-          || aCommandName == "vtexorigin")
+    else if (!aTexturedShape.IsNull()
+          && (aNameCase == "-origin"
+           || aNameCase == "-setorigin"
+           || aCommandName == "vtexorigin"))
     {
       if (aCommandName != "vtexorigin")
       {
@@ -3509,7 +3538,7 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
         toSetGenOrigin = true;
         if (aValUCase == "off")
         {
-          aTexturedIO->SetTextureOriginUV (gp_Pnt2d (0.0, 0.0));
+          aTexturedShape->SetTextureOriginUV (gp_Pnt2d (0.0, 0.0));
           continue;
         }
         else if (anArgIter + 1 < theArgsNb)
@@ -3518,7 +3547,7 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
           if (aValU.IsRealValue()
            && aValV.IsRealValue())
           {
-            aTexturedIO->SetTextureOriginUV (gp_Pnt2d (aValU.RealValue(), aValV.RealValue()));
+            aTexturedShape->SetTextureOriginUV (gp_Pnt2d (aValU.RealValue(), aValV.RealValue()));
             ++anArgIter;
             continue;
           }
@@ -3527,9 +3556,10 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
       std::cout << "Syntax error: unexpected argument '" << aName << "'\n";
       return 1;
     }
-    else if (aNameCase == "-repeat"
-          || aNameCase == "-setrepeat"
-          || aCommandName == "vtexrepeat")
+    else if (!aTexturedShape.IsNull()
+          && (aNameCase == "-repeat"
+           || aNameCase == "-setrepeat"
+           || aCommandName == "vtexrepeat"))
     {
       if (aCommandName != "vtexrepeat")
       {
@@ -3543,7 +3573,7 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
         toSetGenRepeat = true;
         if (aValUCase == "off")
         {
-          aTexturedIO->SetTextureRepeatUV (gp_Pnt2d (1.0, 1.0));
+          aTexturedShape->SetTextureRepeatUV (gp_Pnt2d (1.0, 1.0));
           continue;
         }
         else if (anArgIter + 1 < theArgsNb)
@@ -3552,7 +3582,7 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
           if (aValU.IsRealValue()
            && aValV.IsRealValue())
           {
-            aTexturedIO->SetTextureRepeatUV (gp_Pnt2d (aValU.RealValue(), aValV.RealValue()));
+            aTexturedShape->SetTextureRepeatUV (gp_Pnt2d (aValU.RealValue(), aValV.RealValue()));
             ++anArgIter;
             continue;
           }
@@ -3737,7 +3767,11 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
       {
         aTextureVecNew.SetValue (aTexIndex, Handle(Graphic3d_Texture2Dmanual)());
       }
-      aTextureVecNew.ChangeValue (aTexIndex)->GetParams()->SetTextureUnit ((Graphic3d_TextureUnit )aTexIndex);
+
+      if (aTextureVecNew.Value (aTexIndex))
+      {
+        aTextureVecNew.ChangeValue(aTexIndex)->GetParams()->SetTextureUnit((Graphic3d_TextureUnit)aTexIndex);
+      }
     }
     else
     {
@@ -3795,6 +3829,10 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
 
     if (!aTexturedIO->Attributes()->HasOwnShadingAspect())
     {
+      if (aTexturedShape.IsNull())
+      {
+        aTexturedIO->SetToUpdate();
+      }
       aTexturedIO->Attributes()->SetShadingAspect (new Prs3d_ShadingAspect());
       *aTexturedIO->Attributes()->ShadingAspect()->Aspect() = *aCtx->DefaultDrawer()->ShadingAspect()->Aspect();
     }
@@ -3884,33 +3922,45 @@ Standard_Integer VTexture (Draw_Interpretor& theDi, Standard_Integer theArgsNb, 
    && (aCommandName == "vtexrepeat"
     || toSetDefaults))
   {
-    aTexturedIO->SetTextureRepeatUV (gp_Pnt2d (1.0, 1.0));
+    if (!aTexturedShape.IsNull())
+    {
+      aTexturedShape->SetTextureRepeatUV (gp_Pnt2d (1.0, 1.0));
+    }
     toSetGenRepeat = true;
   }
   if (!toSetGenOrigin
    && (aCommandName == "vtexorigin"
     || toSetDefaults))
   {
-    aTexturedIO->SetTextureOriginUV (gp_Pnt2d (0.0, 0.0));
+    if (!aTexturedShape.IsNull())
+    {
+      aTexturedShape->SetTextureOriginUV (gp_Pnt2d (0.0, 0.0));
+    }
     toSetGenOrigin = true;
   }
   if (!toSetGenScale
    && (aCommandName == "vtexscale"
     || toSetDefaults))
   {
-    aTexturedIO->SetTextureScaleUV  (gp_Pnt2d (1.0, 1.0));
+    if (!aTexturedShape.IsNull())
+    {
+      aTexturedShape->SetTextureScaleUV  (gp_Pnt2d (1.0, 1.0));
+    }
     toSetGenScale = true;
   }
 
   if (toSetGenRepeat || toSetGenOrigin || toSetGenScale || toComputeUV)
   {
-    aTexturedIO->SetToUpdate (AIS_Shaded);
-    if (toSetImage)
+    if (!aTexturedShape.IsNull())
     {
-      if ((aTexturedIO->HasDisplayMode() && aTexturedIO->DisplayMode() != AIS_Shaded)
-       || aCtx->DisplayMode() != AIS_Shaded)
+      aTexturedShape->SetToUpdate (AIS_Shaded);
+      if (toSetImage)
       {
-        aCtx->SetDisplayMode (aTexturedIO, AIS_Shaded, false);
+        if ((aTexturedIO->HasDisplayMode() && aTexturedIO->DisplayMode() != AIS_Shaded)
+         || aCtx->DisplayMode() != AIS_Shaded)
+        {
+          aCtx->SetDisplayMode (aTexturedIO, AIS_Shaded, false);
+        }
       }
     }
   }
@@ -4038,7 +4088,6 @@ static int VDisplay2 (Draw_Interpretor& theDI,
   ViewerTest_AutoUpdater anUpdateTool (aCtx, ViewerTest::CurrentView());
   Standard_Integer   isMutable      = -1;
   Graphic3d_ZLayerId aZLayer        = Graphic3d_ZLayerId_UNKNOWN;
-  Standard_Boolean   toDisplayLocal = Standard_False;
   Standard_Boolean   toReDisplay    = Standard_False;
   Standard_Integer   isSelectable   = -1;
   Standard_Integer   anObjDispMode  = -2;
@@ -4241,14 +4290,14 @@ static int VDisplay2 (Draw_Interpretor& theDI,
     {
       toDisplayInView = Standard_True;
     }
-    else if (aNameCase == "-local")
-    {
-      aDispStatus = AIS_DS_Temporary;
-      toDisplayLocal = Standard_True;
-    }
     else if (aNameCase == "-redisplay")
     {
       toReDisplay = Standard_True;
+    }
+    else if (aNameCase == "-erased"
+          || aNameCase == "-load")
+    {
+      aDispStatus = AIS_DS_Erased;
     }
     else
     {
@@ -4262,27 +4311,15 @@ static int VDisplay2 (Draw_Interpretor& theDI,
     return 1;
   }
 
-  // Prepare context for display
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (toDisplayLocal && !aCtx->HasOpenedContext())
-  {
-    aCtx->OpenLocalContext (Standard_False);
-  }
-  else if (!toDisplayLocal && aCtx->HasOpenedContext())
-  {
-    aCtx->CloseAllContexts (Standard_False);
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
   // Display interactive objects
   for (Standard_Integer anIter = 1; anIter <= aNamesOfDisplayIO.Length(); ++anIter)
   {
     const TCollection_AsciiString& aName = aNamesOfDisplayIO.Value(anIter);
-
-    if (!GetMapOfAIS().IsBound2 (aName))
+    Handle(AIS_InteractiveObject) aShape;
+    if (!GetMapOfAIS().Find2 (aName, aShape))
     {
       // create the AIS_Shape from a name
-      const Handle(AIS_InteractiveObject) aShape = GetAISShapeFromName (aName.ToCString());
+      aShape = GetAISShapeFromName (aName.ToCString());
       if (!aShape.IsNull())
       {
         if (isMutable != -1)
@@ -4305,9 +4342,8 @@ static int VDisplay2 (Draw_Interpretor& theDI,
         {
           aShape->SetHilightMode (anObjHighMode);
         }
-        if (!toDisplayLocal)
-          GetMapOfAIS().Bind (aShape, aName);
 
+        GetMapOfAIS().Bind (aShape, aName);
         Standard_Integer aDispMode = aShape->HasDisplayMode()
                                    ? aShape->DisplayMode()
                                    : (aShape->AcceptDisplayMode (aCtx->DisplayMode())
@@ -4319,9 +4355,7 @@ static int VDisplay2 (Draw_Interpretor& theDI,
           aSelMode = aShape->GlobalSelectionMode();
         }
 
-        aCtx->Display (aShape, aDispMode, aSelMode,
-                       Standard_False, aShape->AcceptShapeDecomposition(),
-                       aDispStatus);
+        aCtx->Display (aShape, aDispMode, aSelMode, Standard_False, aDispStatus);
         if (toDisplayInView)
         {
           for (V3d_ListOfViewIterator aViewIter (aCtx->CurrentViewer()->DefinedViewIterator()); aViewIter.More(); aViewIter.Next())
@@ -4338,7 +4372,6 @@ static int VDisplay2 (Draw_Interpretor& theDI,
       continue;
     }
 
-    Handle(AIS_InteractiveObject) aShape = Handle(AIS_InteractiveObject)::DownCast (GetMapOfAIS().Find2 (aName));
     if (isMutable != -1)
     {
       aShape->SetMutable (isMutable == 1);
@@ -4398,9 +4431,7 @@ static int VDisplay2 (Draw_Interpretor& theDI,
       {
         aCtx->Erase (aShape, Standard_False);
       }
-      aCtx->Display (aShape, aDispMode, aSelMode,
-                     Standard_False, aShape->AcceptShapeDecomposition(),
-                     aDispStatus);
+      aCtx->Display (aShape, aDispMode, aSelMode, Standard_False, aDispStatus);
       if (toDisplayInView)
       {
         aCtx->SetViewAffinity (aShape, ViewerTest::CurrentView(), Standard_True);
@@ -4440,7 +4471,7 @@ static Standard_Integer VNbDisplayed (Draw_Interpretor& theDi,
   }
 
   AIS_ListOfInteractive aListOfIO;
-  aContextAIS->DisplayedObjects(aListOfIO, false);
+  aContextAIS->DisplayedObjects (aListOfIO);
 
   theDi << aListOfIO.Extent() << "\n";
   return 0;
@@ -4465,20 +4496,13 @@ static int VUpdate (Draw_Interpretor& /*theDi*/, Standard_Integer theArgsNb, con
     return 1;
   }
 
-  const ViewerTest_DoubleMapOfInteractiveAndName& anAISMap = GetMapOfAIS();
-
   AIS_ListOfInteractive aListOfIO;
-
   for (int anArgIt = 1; anArgIt < theArgsNb; ++anArgIt)
   {
     TCollection_AsciiString aName = TCollection_AsciiString (theArgVec[anArgIt]);
 
     Handle(AIS_InteractiveObject) anAISObj;
-    if (anAISMap.IsBound2 (aName))
-    {
-      anAISObj = Handle(AIS_InteractiveObject)::DownCast (anAISMap.Find2 (aName));
-    }
-
+    GetMapOfAIS().Find2 (aName, anAISObj);
     if (anAISObj.IsNull())
     {
       std::cout << theArgVec[0] << ": no AIS interactive object named \"" << aName << "\".\n";
@@ -4518,10 +4542,9 @@ static int VShading(Draw_Interpretor& ,Standard_Integer argc, const char** argv)
   }
 
   TCollection_AsciiString name=argv[1];
-  if (GetMapOfAIS().IsBound2(name ))
-    TheAisIO = Handle(AIS_InteractiveObject)::DownCast(GetMapOfAIS().Find2(name));
+  GetMapOfAIS().Find2(name, TheAisIO);
   if (TheAisIO.IsNull())
-    TheAisIO=GetAISShapeFromName((const char *)name.ToCString());
+    TheAisIO=GetAISShapeFromName(name.ToCString());
 
   if (HaveToSet)
     TheAISContext()->SetDeviationCoefficient(TheAisIO,myDevCoef,Standard_True);
@@ -4531,254 +4554,43 @@ static int VShading(Draw_Interpretor& ,Standard_Integer argc, const char** argv)
   TheAISContext()->Redisplay (TheAisIO, Standard_True);
   return 0;
 }
-//==============================================================================
-//function : HaveMode
-//use      : VActivatedModes
-//==============================================================================
-#include <TColStd_ListIteratorOfListOfInteger.hxx>
-
-Standard_Boolean  HaveMode(const Handle(AIS_InteractiveObject)& TheAisIO,const Standard_Integer mode  )
-{
-  TColStd_ListOfInteger List;
-  TheAISContext()->ActivatedModes (TheAisIO,List);
-  TColStd_ListIteratorOfListOfInteger it;
-  Standard_Boolean Found=Standard_False;
-  for (it.Initialize(List); it.More()&&!Found; it.Next() ){
-    if (it.Value()==mode ) Found=Standard_True;
-  }
-  return Found;
-}
-
-
-
-//==============================================================================
-//function : VActivatedMode
-//author   : ege
-//purpose  : permet d'attribuer a chacune des shapes un mode d'activation
-//           (edges,vertex...)qui lui est propre et le mode de selection standard.
-//           La fonction s'applique aux shapes selectionnees(current ou selected dans le viewer)
-//             Dans le cas ou on veut psser la shape en argument, la fonction n'autorise
-//           qu'un nom et qu'un mode.
-//Draw arg : vsetam  [ShapeName] mode(0,1,2,3,4,5,6,7)
-//==============================================================================
-#include <AIS_ListIteratorOfListOfInteractive.hxx>
-
-static int VActivatedMode (Draw_Interpretor& di, Standard_Integer argc, const char** argv)
-
-{
-  Standard_Boolean ThereIsName = Standard_False ;
-
-  if(!a3DView().IsNull()){
-
-    const Standard_Boolean HaveToSet = (strcasecmp(argv[0],"vsetam") == 0);
-    // verification des arguments
-    if (HaveToSet) {
-      if (argc<2||argc>3) { di<<" Syntaxe error\n";return 1;}
-      ThereIsName = (argc == 3);
-    }
-    else
-    {
-      Standard_DISABLE_DEPRECATION_WARNINGS
-      // vunsetam
-      if (argc>1) {di<<" Syntaxe error\n";return 1;}
-      else {
-        di<<" R.A.Z de tous les modes de selecion\n";
-        di<<" Fermeture du Context local\n";
-        if (TheAISContext()->HasOpenedContext())
-        {
-          TheAISContext()->CloseLocalContext();
-        }
-      }
-      Standard_ENABLE_DEPRECATION_WARNINGS
-    }
-
-    // IL n'y a aps de nom de shape passe en argument
-    if (HaveToSet && !ThereIsName){
-      Standard_Integer aMode=Draw::Atoi(argv [1]);
-      const TopAbs_ShapeEnum aShapeType = AIS_Shape::SelectionType (aMode);
-      const char* cmode = aMode >= 0 && aMode <= 8
-                        ? TopAbs::ShapeTypeToString (aShapeType)
-                        : "???";
-      if( !TheAISContext()->HasOpenedContext() ) {
-        // il n'y a pas de Context local d'ouvert
-        // on en ouvre un et on charge toutes les shapes displayees
-        // on load tous les objets displayees et on Activate les objets de la liste
-        AIS_ListOfInteractive ListOfIO;
-        // on sauve dans une AISListOfInteractive tous les objets currents
-        if (TheAISContext()->NbSelected()>0 ){
-          TheAISContext()->UnhilightSelected(Standard_False);
-
-          for (TheAISContext()->InitSelected(); TheAISContext()->MoreSelected(); TheAISContext()->NextSelected() ){
-            ListOfIO.Append(TheAISContext()->SelectedInteractive() );
-	  }
-	}
-
-  Standard_DISABLE_DEPRECATION_WARNINGS
-	TheAISContext()->OpenLocalContext(Standard_False);
-  Standard_ENABLE_DEPRECATION_WARNINGS
-	ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName
-          it (GetMapOfAIS());
-	while(it.More()){
-	  Handle(AIS_InteractiveObject) aIO =
-            Handle(AIS_InteractiveObject)::DownCast(it.Key1());
-          if (!aIO.IsNull())
-            TheAISContext()->Load(aIO,0,Standard_False);
-	  it.Next();
-	}
-	// traitement des objets qui etaient currents dans le Contexte global
-	if (!ListOfIO.IsEmpty() ) {
-	  // il y avait des objets currents
-	  AIS_ListIteratorOfListOfInteractive iter;
-	  for (iter.Initialize(ListOfIO); iter.More() ; iter.Next() ) {
-	    Handle(AIS_InteractiveObject) aIO=iter.Value();
-	    TheAISContext()->Activate(aIO,aMode);
-	    di<<" Mode: "<<cmode<<" ON pour "<<GetMapOfAIS().Find1(aIO).ToCString()  <<"\n";
-	  }
-	}
-	else {
-	  // On applique le mode a tous les objets displayes
-	  ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName
-            it2 (GetMapOfAIS());
-	  while(it2.More()){
-            Handle(AIS_InteractiveObject) aIO =
-              Handle(AIS_InteractiveObject)::DownCast(it2.Key1());
-            if (!aIO.IsNull()) {
-              di<<" Mode: "<<cmode<<" ON pour "<<it2.Key2().ToCString() <<"\n";
-              TheAISContext()->Activate(aIO,aMode);
-            }
-	    it2.Next();
-	  }
-	}
-
-      }
-
-      else {
-	// un Context local est deja ouvert
-	// Traitement des objets du Context local
-	if (TheAISContext()->NbSelected()>0 ){
-	  TheAISContext()->UnhilightSelected(Standard_False);
-	  // il y a des objets selected,on les parcourt
-	  for (TheAISContext()->InitSelected(); TheAISContext()->MoreSelected(); TheAISContext()->NextSelected() ){
-	    Handle(AIS_InteractiveObject) aIO=TheAISContext()->SelectedInteractive();
-
-
-	    if (HaveMode(aIO,aMode) ) {
-	      di<<" Mode: "<<cmode<<" OFF pour "<<GetMapOfAIS().Find1(aIO).ToCString() <<"\n";
-	      TheAISContext()->Deactivate(aIO,aMode);
-	    }
-	    else{
-	      di<<" Mode: "<<cmode<<" ON pour "<<GetMapOfAIS().Find1(aIO).ToCString() <<"\n";
-	      TheAISContext()->Activate(aIO,aMode);
-	    }
-
-	  }
-	}
-	else{
-	  // il n'y a pas d'objets selected
-	  // tous les objets diplayes sont traites
-	  ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName
-            it (GetMapOfAIS());
-	  while(it.More()){
-	    Handle(AIS_InteractiveObject) aIO =
-              Handle(AIS_InteractiveObject)::DownCast(it.Key1());
-            if (!aIO.IsNull()) {
-              if (HaveMode(aIO,aMode) ) {
-                di<<" Mode: "<<cmode<<" OFF pour "
-                  <<GetMapOfAIS().Find1(aIO).ToCString() <<"\n";
-                TheAISContext()->Deactivate(aIO,aMode);
-              }
-              else{
-                di<<" Mode: "<<cmode<<" ON pour"
-                  <<GetMapOfAIS().Find1(aIO).ToCString() <<"\n";
-                TheAISContext()->Activate(aIO,aMode);
-              }
-            }
-	    it.Next();
-          }
-	}
-      }
-    }
-    else if (HaveToSet && ThereIsName){
-      Standard_Integer aMode=Draw::Atoi(argv [2]);
-      Handle(AIS_InteractiveObject) aIO =
-        Handle(AIS_InteractiveObject)::DownCast(GetMapOfAIS().Find2(argv[1]));
-
-      if (!aIO.IsNull()) {
-        const TopAbs_ShapeEnum aShapeType = AIS_Shape::SelectionType (aMode);
-        const char* cmode = aMode >= 0 && aMode <= 8
-                          ? TopAbs::ShapeTypeToString (aShapeType)
-                          : "???";
-        if( !TheAISContext()->HasOpenedContext() ) {
-          Standard_DISABLE_DEPRECATION_WARNINGS
-          TheAISContext()->OpenLocalContext(Standard_False);
-          Standard_ENABLE_DEPRECATION_WARNINGS
-          // On charge tous les objets de la map
-          ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName it (GetMapOfAIS());
-          while(it.More()){
-            Handle(AIS_InteractiveObject) aShape=
-              Handle(AIS_InteractiveObject)::DownCast(it.Key1());
-            if (!aShape.IsNull())
-              TheAISContext()->Load(aShape,0,Standard_False);
-            it.Next();
-          }
-          TheAISContext()->Activate(aIO,aMode);
-          di<<" Mode: "<<cmode<<" ON pour "<<argv[1]<<"\n";
-        }
-
-        else {
-          // un Context local est deja ouvert
-          if (HaveMode(aIO,aMode) ) {
-            di<<" Mode: "<<cmode<<" OFF pour "<<argv[1]<<"\n";
-            TheAISContext()->Deactivate(aIO,aMode);
-          }
-          else{
-            di<<" Mode: "<<cmode<<" ON pour "<<argv[1]<<"\n";
-            TheAISContext()->Activate(aIO,aMode);
-          }
-        }
-      }
-    }
-  }
-  return 0;
-}
 
 //! Auxiliary method to print Interactive Object information
 static void objInfo (const NCollection_Map<Handle(AIS_InteractiveObject)>& theDetected,
-                     const Handle(Standard_Transient)&                     theObject,
+                     const Handle(AIS_InteractiveObject)&                  theObj,
                      Draw_Interpretor&                                     theDI)
 {
-  const Handle(AIS_InteractiveObject) anObj = Handle(AIS_InteractiveObject)::DownCast (theObject);
-  if (anObj.IsNull())
+  if (theObj.IsNull())
   {
-    theDI << theObject->DynamicType()->Name() << " is not AIS presentation\n";
+    theDI << "NULL presentation\n";
     return;
   }
 
-  theDI << (TheAISContext()->IsDisplayed  (anObj) ? "Displayed"  : "Hidden   ")
-        << (TheAISContext()->IsSelected   (anObj) ? " Selected" : "         ")
-        << (theDetected.Contains (anObj)          ? " Detected" : "         ")
+  theDI << (TheAISContext()->IsDisplayed (theObj) ? "Displayed"  : "Hidden   ")
+        << (TheAISContext()->IsSelected  (theObj) ? " Selected" : "         ")
+        << (theDetected.Contains (theObj)         ? " Detected" : "         ")
         << " Type: ";
-  if (anObj->Type() == AIS_KOI_Datum)
+  if (theObj->Type() == AIS_KOI_Datum)
   {
     // AIS_Datum
-    if      (anObj->Signature() == 3) { theDI << " AIS_Trihedron"; }
-    else if (anObj->Signature() == 2) { theDI << " AIS_Axis"; }
-    else if (anObj->Signature() == 6) { theDI << " AIS_Circle"; }
-    else if (anObj->Signature() == 5) { theDI << " AIS_Line"; }
-    else if (anObj->Signature() == 7) { theDI << " AIS_Plane"; }
-    else if (anObj->Signature() == 1) { theDI << " AIS_Point"; }
-    else if (anObj->Signature() == 4) { theDI << " AIS_PlaneTrihedron"; }
+    if      (theObj->Signature() == 3) { theDI << " AIS_Trihedron"; }
+    else if (theObj->Signature() == 2) { theDI << " AIS_Axis"; }
+    else if (theObj->Signature() == 6) { theDI << " AIS_Circle"; }
+    else if (theObj->Signature() == 5) { theDI << " AIS_Line"; }
+    else if (theObj->Signature() == 7) { theDI << " AIS_Plane"; }
+    else if (theObj->Signature() == 1) { theDI << " AIS_Point"; }
+    else if (theObj->Signature() == 4) { theDI << " AIS_PlaneTrihedron"; }
   }
   // AIS_Shape
-  else if (anObj->Type()      == AIS_KOI_Shape
-        && anObj->Signature() == 0)
+  else if (theObj->Type()      == AIS_KOI_Shape
+        && theObj->Signature() == 0)
   {
     theDI << " AIS_Shape";
   }
-  else if (anObj->Type() == AIS_KOI_Relation)
+  else if (theObj->Type() == AIS_KOI_Relation)
   {
     // AIS_Dimention and AIS_Relation
-    Handle(AIS_Relation) aRelation = Handle(AIS_Relation)::DownCast (anObj);
+    Handle(AIS_Relation) aRelation = Handle(AIS_Relation)::DownCast (theObj);
     switch (aRelation->KindOfDimension())
     {
       case AIS_KOD_PLANEANGLE:     theDI << " AIS_AngleDimension"; break;
@@ -4795,7 +4607,7 @@ static void objInfo (const NCollection_Map<Handle(AIS_InteractiveObject)>& theDe
   {
     theDI << " UserPrs";
   }
-  theDI << " (" << theObject->DynamicType()->Name() << ")";
+  theDI << " (" << theObj->DynamicType()->Name() << ")";
 }
 
 //! Print information about locally selected sub-shapes
@@ -4912,9 +4724,8 @@ static Standard_Integer VState (Draw_Interpretor& theDI,
   if (toPrintEntities)
   {
     theDI << "Detected entities:\n";
-    Standard_DISABLE_DEPRECATION_WARNINGS
-    Handle(StdSelect_ViewerSelector3d) aSelector = aCtx->HasOpenedContext() ? aCtx->LocalSelector() : aCtx->MainSelector();
-    Standard_ENABLE_DEPRECATION_WARNINGS
+    Handle(StdSelect_ViewerSelector3d) aSelector = aCtx->MainSelector();
+
     SelectMgr_SelectingVolumeManager aMgr = aSelector->GetManager();
     for (Standard_Integer aPickIter = 1; aPickIter <= aSelector->NbPicked(); ++aPickIter)
     {
@@ -4964,12 +4775,10 @@ static Standard_Integer VState (Draw_Interpretor& theDI,
   }
 
   NCollection_Map<Handle(AIS_InteractiveObject)> aDetected;
-  Standard_DISABLE_DEPRECATION_WARNINGS
   for (aCtx->InitDetected(); aCtx->MoreDetected(); aCtx->NextDetected())
   {
-    aDetected.Add (aCtx->DetectedCurrentObject());
+    aDetected.Add (Handle(AIS_InteractiveObject)::DownCast (aCtx->DetectedCurrentOwner()->Selectable()));
   }
-  Standard_ENABLE_DEPRECATION_WARNINGS
 
   const Standard_Boolean toShowAll = (theArgNb >= 2 && *theArgVec[1] == '*');
   if (theArgNb >= 2
@@ -4978,23 +4787,23 @@ static Standard_Integer VState (Draw_Interpretor& theDI,
     for (Standard_Integer anArgIter = 1; anArgIter < theArgNb; ++anArgIter)
     {
       const TCollection_AsciiString anObjName = theArgVec[anArgIter];
-      if (!GetMapOfAIS().IsBound2 (anObjName))
+      Handle(AIS_InteractiveObject) anObj;
+      if (!GetMapOfAIS().Find2 (anObjName, anObj))
       {
         theDI << anObjName << " doesn't exist!\n";
         continue;
       }
 
-      const Handle(Standard_Transient) anObjTrans = GetMapOfAIS().Find2 (anObjName);
       TCollection_AsciiString aName = anObjName;
       aName.LeftJustify (20, ' ');
       theDI << "  " << aName << " ";
-      objInfo (aDetected, anObjTrans, theDI);
+      objInfo (aDetected, anObj, theDI);
       theDI << "\n";
     }
     return 0;
   }
 
-  if (!aCtx->HasOpenedContext() && aCtx->NbSelected() > 0 && !toShowAll)
+  if (aCtx->NbSelected() > 0 && !toShowAll)
   {
     NCollection_DataMap<Handle(SelectMgr_EntityOwner), TopoDS_Shape> anOwnerShapeMap;
     for (aCtx->InitSelected(); aCtx->MoreSelected(); aCtx->NextSelected())
@@ -5022,8 +4831,7 @@ static Standard_Integer VState (Draw_Interpretor& theDI,
   for (ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName anObjIter (GetMapOfAIS());
        anObjIter.More(); anObjIter.Next())
   {
-    Handle(AIS_InteractiveObject) anObj = Handle(AIS_InteractiveObject)::DownCast (anObjIter.Key1());
-    if (anObj.IsNull())
+    if (anObjIter.Key1().IsNull())
     {
       continue;
     }
@@ -5031,129 +4839,11 @@ static Standard_Integer VState (Draw_Interpretor& theDI,
     TCollection_AsciiString aName = anObjIter.Key2();
     aName.LeftJustify (20, ' ');
     theDI << "  " << aName << " ";
-    objInfo (aDetected, anObj, theDI);
+    objInfo (aDetected, anObjIter.Key1(), theDI);
     theDI << "\n";
   }
   printLocalSelectionInfo (aCtx, theDI);
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (aCtx->HasOpenedContext())
-    printLocalSelectionInfo (aCtx->LocalContext(), theDI);
-  Standard_ENABLE_DEPRECATION_WARNINGS
   return 0;
-}
-
-//=======================================================================
-//function : PickObjects
-//purpose  :
-//=======================================================================
-Standard_Boolean  ViewerTest::PickObjects(Handle(TColStd_HArray1OfTransient)& arr,
-					  const AIS_KindOfInteractive TheType,
-					  const Standard_Integer TheSignature,
-					  const Standard_Integer MaxPick)
-{
-  Handle(AIS_InteractiveObject) IO;
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  Standard_Integer curindex = (TheType == AIS_KOI_None) ? 0 : TheAISContext()->OpenLocalContext();
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
-  // step 1: prepare the data
-  if(curindex !=0){
-    Handle(AIS_SignatureFilter) F1 = new AIS_SignatureFilter(TheType,TheSignature);
-    TheAISContext()->AddFilter(F1);
-  }
-
-  // step 2 : wait for the selection...
-  Standard_Integer NbPickGood (0),NbToReach(arr->Length());
-  Standard_Integer NbPickFail(0);
-  Standard_Integer argccc = 5;
-  const char *bufff[] = { "A", "B", "C","D", "E" };
-  const char **argvvv = (const char **) bufff;
-
-
-  while(NbPickGood<NbToReach && NbPickFail <= MaxPick){
-    while(ViewerMainLoop(argccc,argvvv)){}
-    Standard_Integer NbStored = TheAISContext()->NbSelected();
-    if(NbStored != NbPickGood)
-      NbPickGood= NbStored;
-    else
-      NbPickFail++;
-    cout<<"NbPicked =  "<<NbPickGood<<" |  Nb Pick Fail :"<<NbPickFail<<endl;
-  }
-
-  // step3 get result.
-
-  if (NbPickFail >= NbToReach)
-    return Standard_False;
-
-  Standard_Integer i(0);
-  for(TheAISContext()->InitSelected();
-      TheAISContext()->MoreSelected();
-      TheAISContext()->NextSelected()){
-    i++;
-    Handle(AIS_InteractiveObject) IO2 = TheAISContext()->SelectedInteractive();
-    arr->SetValue(i,IO2);
-  }
-
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (curindex > 0)
-  {
-    TheAISContext()->CloseLocalContext(curindex);
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
-  return Standard_True;
-}
-
-
-//=======================================================================
-//function : PickObject
-//purpose  :
-//=======================================================================
-Handle(AIS_InteractiveObject) ViewerTest::PickObject(const AIS_KindOfInteractive TheType,
-						     const Standard_Integer TheSignature,
-						     const Standard_Integer MaxPick)
-{
-  Handle(AIS_InteractiveObject) IO;
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  Standard_Integer curindex = (TheType == AIS_KOI_None) ? 0 : TheAISContext()->OpenLocalContext();
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
-  // step 1: prepare the data
-
-  if(curindex !=0){
-    Handle(AIS_SignatureFilter) F1 = new AIS_SignatureFilter(TheType,TheSignature);
-    TheAISContext()->AddFilter(F1);
-  }
-
-  // step 2 : wait for the selection...
-  Standard_Boolean IsGood (Standard_False);
-  Standard_Integer NbPick(0);
-  Standard_Integer argccc = 5;
-  const char *bufff[] = { "VPick", "X", "VPickY","VPickZ", "VPickShape" };
-  const char **argvvv = (const char **) bufff;
-
-
-  while(!IsGood && NbPick<= MaxPick){
-    while(ViewerMainLoop(argccc,argvvv)){}
-    IsGood = (TheAISContext()->NbSelected()>0) ;
-    NbPick++;
-    cout<<"Nb Pick :"<<NbPick<<endl;
-  }
-
-
-  // step3 get result.
-  if(IsGood){
-    TheAISContext()->InitSelected();
-    IO = TheAISContext()->SelectedInteractive();
-  }
-
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (curindex != 0)
-  {
-    TheAISContext()->CloseLocalContext(curindex);
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
-  return IO;
 }
 
 //=======================================================================
@@ -5162,137 +4852,104 @@ Handle(AIS_InteractiveObject) ViewerTest::PickObject(const AIS_KindOfInteractive
 //           pick objets that are of type <TheType>...
 //=======================================================================
 
-TopoDS_Shape ViewerTest::PickShape(const TopAbs_ShapeEnum TheType,
-				   const Standard_Integer MaxPick)
+TopoDS_Shape ViewerTest::PickShape (const TopAbs_ShapeEnum theShapeType,
+                                    const Standard_Integer theMaxPick)
 {
-
-  // step 1: prepare the data
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  Standard_Integer curindex = TheAISContext()->OpenLocalContext();
-  Standard_ENABLE_DEPRECATION_WARNINGS
-  TopoDS_Shape result;
-
-  if(TheType==TopAbs_SHAPE){
-    Handle(AIS_TypeFilter) F1 = new AIS_TypeFilter(AIS_KOI_Shape);
-    TheAISContext()->AddFilter(F1);
-  }
-  else{
-    Handle(StdSelect_ShapeTypeFilter) TF = new StdSelect_ShapeTypeFilter(TheType);
-    TheAISContext()->AddFilter(TF);
-    Standard_DISABLE_DEPRECATION_WARNINGS
-    TheAISContext()->ActivateStandardMode(TheType);
-    Standard_ENABLE_DEPRECATION_WARNINGS
-  }
-
-
-  // step 2 : wait for the selection...
-  Standard_Boolean NoShape (Standard_True);
-  Standard_Integer NbPick(0);
-  Standard_Integer argccc = 5;
-  const char *bufff[] = { "VPick", "X", "VPickY","VPickZ", "VPickShape" };
-  const char **argvvv = (const char **) bufff;
-
-
-  while(NoShape && NbPick<= MaxPick){
-    while(ViewerMainLoop(argccc,argvvv)){}
-    NoShape = (TheAISContext()->NbSelected()==0) ;
-    NbPick++;
-    cout<<"Nb Pick :"<<NbPick<<endl;
-  }
-
-  // step3 get result.
-
-  if(!NoShape){
-
-    TheAISContext()->InitSelected();
-    if(TheAISContext()->HasSelectedShape())
-      result = TheAISContext()->SelectedShape();
-    else{
-      Handle(AIS_InteractiveObject) IO = TheAISContext()->SelectedInteractive();
-      result = Handle(AIS_Shape)::DownCast (IO)->Shape();
-    }
-  }
-
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (curindex > 0)
-  {
-    TheAISContext()->CloseLocalContext(curindex);
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
-  return result;
+  Handle(TopTools_HArray1OfShape) aResArray = new TopTools_HArray1OfShape (1, 1);
+  PickShapes (theShapeType, aResArray, theMaxPick);
+  return aResArray->First();
 }
-
 
 //=======================================================================
 //function : PickShapes
 //purpose  :
 //=======================================================================
-Standard_Boolean ViewerTest::PickShapes (const TopAbs_ShapeEnum TheType,
-					 Handle(TopTools_HArray1OfShape)& thearr,
-					 const Standard_Integer MaxPick)
+Standard_Boolean ViewerTest::PickShapes (const TopAbs_ShapeEnum theShapeType,
+                                         Handle(TopTools_HArray1OfShape)& theResArray,
+                                         const Standard_Integer theMaxPick)
 {
-
-  Standard_Integer Taille = thearr->Length();
-  if(Taille>1)
-    cout<<" WARNING : Pick with Shift+ MB1 for Selection of more than 1 object\n";
+  const Standard_Integer aNbToReach = theResArray->Length();
+  if (aNbToReach > 1)
+  {
+    std::cout << " WARNING : Pick with Shift+ MB1 for Selection of more than 1 object\n";
+  }
 
   // step 1: prepare the data
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  Standard_Integer curindex = TheAISContext()->OpenLocalContext();
-  Standard_ENABLE_DEPRECATION_WARNINGS
-  if(TheType==TopAbs_SHAPE){
-    Handle(AIS_TypeFilter) F1 = new AIS_TypeFilter(AIS_KOI_Shape);
-    TheAISContext()->AddFilter(F1);
+  Handle(AIS_InteractiveContext) aCtx = ViewerTest::GetAISContext();
+  aCtx->RemoveFilters();
+  AIS_ListOfInteractive aDispObjects;
+  aCtx->DisplayedObjects (aDispObjects);
+  if (theShapeType == TopAbs_SHAPE)
+  {
+    aCtx->AddFilter (new AIS_TypeFilter (AIS_KOI_Shape));
   }
-  else{
-    Handle(StdSelect_ShapeTypeFilter) TF = new StdSelect_ShapeTypeFilter(TheType);
-    TheAISContext()->AddFilter(TF);
-    Standard_DISABLE_DEPRECATION_WARNINGS
-    TheAISContext()->ActivateStandardMode(TheType);
-    Standard_ENABLE_DEPRECATION_WARNINGS
+  else
+  {
+    aCtx->AddFilter (new StdSelect_ShapeTypeFilter (theShapeType));
   }
 
-  // step 2 : wait for the selection...
-  Standard_Integer NbPickGood (0),NbToReach(thearr->Length());
-  Standard_Integer NbPickFail(0);
-  Standard_Integer argccc = 5;
-  const char *bufff[] = { "A", "B", "C","D", "E" };
-  const char **argvvv = (const char **) bufff;
-
-
-  while(NbPickGood<NbToReach && NbPickFail <= MaxPick){
-    while(ViewerMainLoop(argccc,argvvv)){}
-    Standard_Integer NbStored = TheAISContext()->NbSelected();
-    if (NbStored != NbPickGood)
-      NbPickGood= NbStored;
-    else
-      NbPickFail++;
-    cout<<"NbPicked =  "<<NbPickGood<<" |  Nb Pick Fail :"<<NbPickFail<<"\n";
-  }
-
-  // step3 get result.
-
-  if (NbPickFail >= NbToReach)
-    return Standard_False;
-
-  Standard_Integer i(0);
-  for(TheAISContext()->InitSelected();TheAISContext()->MoreSelected();TheAISContext()->NextSelected()){
-    i++;
-    if(TheAISContext()->HasSelectedShape())
-      thearr->SetValue(i,TheAISContext()->SelectedShape());
-    else{
-      Handle(AIS_InteractiveObject) IO = TheAISContext()->SelectedInteractive();
-      thearr->SetValue(i,Handle(AIS_Shape)::DownCast (IO)->Shape());
+  const Standard_Integer aSelMode = AIS_Shape::SelectionMode (theShapeType);
+  for (AIS_ListOfInteractive::Iterator anObjIter (aDispObjects); anObjIter.More(); anObjIter.Next())
+  {
+    if (Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast (anObjIter.Value()))
+    {
+      aCtx->SetSelectionModeActive (aShapePrs, aSelMode, true, AIS_SelectionModesConcurrency_Single);
     }
   }
 
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  TheAISContext()->CloseLocalContext(curindex);
-  Standard_ENABLE_DEPRECATION_WARNINGS
+  // step 2 : wait for the selection...
+  Standard_Integer aNbPickGood = 0, aNbPickFail = 0;
+  Standard_Integer argccc = 5;
+  const char *bufff[] = { "A", "B", "C", "D", "E" };
+  const char **argvvv = (const char** )bufff;
+  for (; aNbPickGood < aNbToReach && aNbPickFail <= theMaxPick; )
+  {
+    while (ViewerMainLoop (argccc, argvvv)) {}
+    Standard_Integer aNbStored = aCtx->NbSelected();
+    if (aNbStored != aNbPickGood)
+    {
+      aNbPickGood = aNbStored;
+    }
+    else
+    {
+      ++aNbPickFail;
+    }
+    std::cout << "NbPicked =  " << aNbPickGood << " |  Nb Pick Fail :" << aNbPickFail << "\n";
+  }
+
+  // step3 get result.
+  if (aNbPickFail >= aNbToReach)
+  {
+    return Standard_False;
+  }
+
+  Standard_Integer anIndex = theResArray->Lower();
+  for (aCtx->InitSelected(); aCtx->MoreSelected(); aCtx->NextSelected(), ++anIndex)
+  {
+    if (aCtx->HasSelectedShape())
+    {
+      theResArray->SetValue (anIndex, aCtx->SelectedShape());
+    }
+    else
+    {
+      Handle(AIS_InteractiveObject) IO = aCtx->SelectedInteractive();
+      theResArray->SetValue (anIndex, Handle(AIS_Shape)::DownCast (IO)->Shape());
+    }
+  }
+
+  aCtx->RemoveFilters();
+  if (theShapeType != TopAbs_SHAPE)
+  {
+    for (AIS_ListOfInteractive::Iterator anObjIter (aDispObjects); anObjIter.More(); anObjIter.Next())
+    {
+      if (Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast (anObjIter.Value()))
+      {
+        aCtx->SetSelectionModeActive (aShapePrs, aSelMode, true, AIS_SelectionModesConcurrency_Single);
+      }
+    }
+  }
   return Standard_True;
 }
-
 
 //=======================================================================
 //function : VPickShape
@@ -5300,89 +4957,89 @@ Standard_Boolean ViewerTest::PickShapes (const TopAbs_ShapeEnum TheType,
 //=======================================================================
 static int VPickShape( Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
-  TopoDS_Shape PickSh;
-  TopAbs_ShapeEnum theType = TopAbs_COMPOUND;
-
-  if(argc==1)
-    theType = TopAbs_SHAPE;
-  else{
-    if(!strcasecmp(argv[1],"V" )) theType = TopAbs_VERTEX;
-    else if (!strcasecmp(argv[1],"E" )) theType = TopAbs_EDGE;
-    else if (!strcasecmp(argv[1],"W" )) theType = TopAbs_WIRE;
-    else if (!strcasecmp(argv[1],"F" )) theType = TopAbs_FACE;
-    else if(!strcasecmp(argv[1],"SHAPE" )) theType = TopAbs_SHAPE;
-    else if (!strcasecmp(argv[1],"SHELL" )) theType = TopAbs_SHELL;
-    else if (!strcasecmp(argv[1],"SOLID" )) theType = TopAbs_SOLID;
-  }
-
-  static Standard_Integer nbOfSub[8]={0,0,0,0,0,0,0,0};
-  static TCollection_AsciiString nameType[8] = {"COMPS","SOL","SHE","F","W","E","V","SHAP"};
-
-  TCollection_AsciiString name;
-
-
-  Standard_Integer NbToPick = argc>2 ? argc-2 : 1;
-  if(NbToPick==1){
-    PickSh = ViewerTest::PickShape(theType);
-
-    if(PickSh.IsNull())
+  TopAbs_ShapeEnum aShapeType = TopAbs_SHAPE;
+  if (argc != 1)
+  {
+    TCollection_AsciiString aShapeArg (argv[1]);
+    aShapeArg.LowerCase();
+    aShapeType = TopAbs_COMPOUND;
+    if      (aShapeArg == "v"
+          || aShapeArg == "vertex") aShapeType = TopAbs_VERTEX;
+    else if (aShapeArg == "e"
+          || aShapeArg == "edge")   aShapeType = TopAbs_EDGE;
+    else if (aShapeArg == "w"
+          || aShapeArg == "wire")   aShapeType = TopAbs_WIRE;
+    else if (aShapeArg == "f"
+          || aShapeArg == "face")   aShapeType = TopAbs_FACE;
+    else if (aShapeArg == "shape")  aShapeType = TopAbs_SHAPE;
+    else if (aShapeArg == "shell")  aShapeType = TopAbs_SHELL;
+    else if (aShapeArg == "solid")  aShapeType = TopAbs_SOLID;
+    else
+    {
+      std::cout << "Syntax error at '" << argv[1] << "'\n";
       return 1;
-    if(argc>2){
-      name += argv[2];
-    }
-    else{
-
-      if(!PickSh.IsNull()){
-	nbOfSub[Standard_Integer(theType)]++;
-	name += "Picked_";
-	name += nameType[Standard_Integer(theType)];
-	TCollection_AsciiString indxstring(nbOfSub[Standard_Integer(theType)]);
-	name +="_";
-	name+=indxstring;
-      }
-    }
-    // si on avait une petite methode pour voir si la shape
-    // est deja dans la Double map, ca eviterait de creer....
-    DBRep::Set(name.ToCString(),PickSh);
-
-    Handle(AIS_Shape) newsh = new AIS_Shape(PickSh);
-    GetMapOfAIS().Bind(newsh, name);
-    TheAISContext()->Display (newsh, Standard_True);
-    di<<"Nom de la shape pickee : "<<name.ToCString()<<"\n";
-  }
-
-  // Plusieurs objets a picker, vite vite vite....
-  //
-  else{
-    Standard_Boolean autonaming = !strcasecmp(argv[2],".");
-    Handle(TopTools_HArray1OfShape) arr = new TopTools_HArray1OfShape(1,NbToPick);
-    if(ViewerTest::PickShapes(theType,arr)){
-      for(Standard_Integer i=1;i<=NbToPick;i++){
-	PickSh = arr->Value(i);
-	if(!PickSh.IsNull()){
-	  if(autonaming){
-	    nbOfSub[Standard_Integer(theType)]++;
-	    name.Clear();
-	    name += "Picked_";
-	    name += nameType[Standard_Integer(theType)];
-	    TCollection_AsciiString indxstring(nbOfSub[Standard_Integer(theType)]);
-	    name +="_";
-	    name+=indxstring;
-	  }
-	}
-	else
-	  name = argv[1+i];
-
-	DBRep::Set(name.ToCString(),PickSh);
-	Handle(AIS_Shape) newsh = new AIS_Shape(PickSh);
-	GetMapOfAIS().Bind(newsh, name);
-	di<<"display of picke shape #"<<i<<" - nom : "<<name.ToCString()<<"\n";
-	TheAISContext()->Display (newsh, Standard_False);
-
-      }
-      TheAISContext()->UpdateCurrentViewer();
     }
   }
+
+  static Standard_Integer THE_NB_SHAPES_OF_TYPE[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+  static const TCollection_AsciiString THE_NAME_TYPE[8] = {"COMPS","SOL","SHE","F","W","E","V","SHAP"};
+
+  const Standard_Integer aNbToPick = argc > 2 ? argc - 2 : 1;
+  if (aNbToPick == 1)
+  {
+    TopoDS_Shape aPickedShape = ViewerTest::PickShape (aShapeType);
+    if (aPickedShape.IsNull())
+    {
+      return 1;
+    }
+
+    TCollection_AsciiString aName;
+    if (argc > 2)
+    {
+      aName = argv[2];
+    }
+    else
+    {
+      const int aShapeIndex = ++THE_NB_SHAPES_OF_TYPE[Standard_Integer(aShapeType)];
+      aName = TCollection_AsciiString ("Picked_") + THE_NAME_TYPE[Standard_Integer(aShapeType)] + "_" + aShapeIndex;
+    }
+
+    DBRep::Set (aName.ToCString(), aPickedShape);
+    Handle(AIS_Shape) aShapePrs = new AIS_Shape (aPickedShape);
+    ViewerTest::Display (aName, aShapePrs, false, true);
+    di << "Name of picked shape: " << aName <<"\n";
+  }
+  else
+  {
+    TCollection_AsciiString aName (argv[2]);
+    aName.LowerCase();
+    const Standard_Boolean isAutoNaming = aName == ".";
+    Handle(TopTools_HArray1OfShape) aPickedArray = new TopTools_HArray1OfShape (1, aNbToPick);
+    if (ViewerTest::PickShapes (aShapeType, aPickedArray))
+    {
+      for (Standard_Integer aPickedIter = aPickedArray->Lower(); aPickedIter <= aPickedArray->Upper(); ++aPickedIter)
+      {
+        TopoDS_Shape aPickedShape = aPickedArray->Value (aPickedIter);
+        aName.Clear();
+        if (!aPickedShape.IsNull()
+         && isAutoNaming)
+        {
+          const int aShapeIndex = ++THE_NB_SHAPES_OF_TYPE[Standard_Integer(aShapeType)];
+          aName = TCollection_AsciiString ("Picked_") + THE_NAME_TYPE[Standard_Integer(aShapeType)] + "_" + aShapeIndex;
+        }
+        else
+        {
+          aName = argv[1 + aPickedIter];
+        }
+
+        DBRep::Set (aName.ToCString(), aPickedShape);
+        Handle(AIS_Shape) aShapePrs = new AIS_Shape (aPickedShape);
+        di << "Display of picked shape #" << aPickedIter << " - name: " << aName <<"\n";
+        ViewerTest::Display (aName, aShapePrs, false, true);
+      }
+    }
+  }
+  TheAISContext()->UpdateCurrentViewer();
   return 0;
 }
 
@@ -5731,7 +5388,6 @@ static int VBsdf (Draw_Interpretor& theDI,
 
   // check viewer update mode
   ViewerTest_AutoUpdater anUpdateTool (ViewerTest::GetAISContext(), ViewerTest::CurrentView());
-
   for (Standard_Integer anArgIter = 1; anArgIter < theArgsNb; ++anArgIter)
   {
     if (anUpdateTool.parseRedrawMode (theArgVec[anArgIter]))
@@ -5740,17 +5396,15 @@ static int VBsdf (Draw_Interpretor& theDI,
     }
   }
 
-  TCollection_AsciiString aName (aCmd.Arg ("", 0).c_str());
-
   // find object
-  ViewerTest_DoubleMapOfInteractiveAndName& aMap = GetMapOfAIS();
-  if (!aMap.IsBound2 (aName) )
+  TCollection_AsciiString aName (aCmd.Arg ("", 0).c_str());
+  Handle(AIS_InteractiveObject) anIObj;
+  if (!GetMapOfAIS().Find2 (aName, anIObj))
   {
     std::cerr << "Use 'vdisplay' before\n";
     return 1;
   }
 
-  Handle(AIS_InteractiveObject) anIObj = Handle(AIS_InteractiveObject)::DownCast (aMap.Find2 (aName));
   Graphic3d_MaterialAspect aMaterial = anIObj->Attributes()->ShadingAspect()->Material();
   Graphic3d_BSDF aBSDF = aMaterial.BSDF();
 
@@ -5994,20 +5648,10 @@ static Standard_Integer VLoadSelection (Draw_Interpretor& /*theDi*/,
 
   // Parse input arguments
   TColStd_SequenceOfAsciiString aNamesOfIO;
-  Standard_Boolean isLocal = Standard_False;
   for (Standard_Integer anArgIter = 1; anArgIter < theArgNb; ++anArgIter)
   {
-    const TCollection_AsciiString aName     = theArgVec[anArgIter];
-    TCollection_AsciiString       aNameCase = aName;
-    aNameCase.LowerCase();
-    if (aNameCase == "-local")
-    {
-      isLocal = Standard_True;
-    }
-    else
-    {
-      aNamesOfIO.Append (aName);
-    }
+    const TCollection_AsciiString aName = theArgVec[anArgIter];
+    aNamesOfIO.Append (aName);
   }
 
   if (aNamesOfIO.IsEmpty())
@@ -6016,28 +5660,16 @@ static Standard_Integer VLoadSelection (Draw_Interpretor& /*theDi*/,
     return 1;
   }
 
-  // Prepare context
-  Standard_DISABLE_DEPRECATION_WARNINGS
-  if (isLocal && !aCtx->HasOpenedContext())
-  {
-    aCtx->OpenLocalContext (Standard_False);
-  }
-  else if (!isLocal && aCtx->HasOpenedContext())
-  {
-    aCtx->CloseAllContexts (Standard_False);
-  }
-  Standard_ENABLE_DEPRECATION_WARNINGS
-
   // Load selection of interactive objects
   for (Standard_Integer anIter = 1; anIter <= aNamesOfIO.Length(); ++anIter)
   {
     const TCollection_AsciiString& aName = aNamesOfIO.Value (anIter);
 
     Handle(AIS_InteractiveObject) aShape;
-    if (GetMapOfAIS().IsBound2 (aName))
-      aShape = Handle(AIS_InteractiveObject)::DownCast (GetMapOfAIS().Find2 (aName));
-    else
+    if (!GetMapOfAIS().Find2 (aName, aShape))
+    {
       aShape = GetAISShapeFromName (aName.ToCString());
+    }
 
     if (!aShape.IsNull())
     {
@@ -6046,7 +5678,7 @@ static Standard_Integer VLoadSelection (Draw_Interpretor& /*theDi*/,
         GetMapOfAIS().Bind (aShape, aName);
       }
 
-      aCtx->Load (aShape, -1, Standard_False);
+      aCtx->Load (aShape, -1);
       aCtx->Activate (aShape, aShape->GlobalSelectionMode(), Standard_True);
     }
   }
@@ -6084,7 +5716,7 @@ void ViewerTest::Commands(Draw_Interpretor& theCommands)
       "\n\t\t:                                         [offsetX offsetY]]]"
       "\n\t\t:          [-dispMode mode] [-highMode mode]"
       "\n\t\t:          [-layer index] [-top|-topmost|-overlay|-underlay]"
-      "\n\t\t:          [-redisplay]"
+      "\n\t\t:          [-redisplay] [-erased]"
       "\n\t\t:          name1 [name2] ... [name n]"
       "\n\t\t: Displays named objects."
       "\n\t\t: Option -local enables displaying of objects in local"
@@ -6093,6 +5725,7 @@ void ViewerTest::Commands(Draw_Interpretor& theCommands)
       "\n\t\t:  -noupdate    Suppresses viewer redraw call."
       "\n\t\t:  -mutable     Enables optimizations for mutable objects."
       "\n\t\t:  -neutral     Draws objects in main viewer."
+      "\n\t\t:  -erased      Loads the object into context, but does not display it."
       "\n\t\t:  -layer       Sets z-layer for objects."
       "\n\t\t:               Alternatively -overlay|-underlay|-top|-topmost"
       "\n\t\t:               options can be used for the default z-layers."
@@ -6151,17 +5784,13 @@ void ViewerTest::Commands(Draw_Interpretor& theCommands)
 		  __FILE__,VDonly2,group);
 
   theCommands.Add("vdisplayall",
-      "vidsplayall [-local]"
-      "\n\t\t: Displays all erased interactive objects (see vdir and vstate)."
-      "\n\t\t: Option -local enables displaying of the objects in local"
-      "\n\t\t: selection context.",
+      "vdisplayall"
+      "\n\t\t: Displays all erased interactive objects (see vdir and vstate).",
       __FILE__, VDisplayAll, group);
 
   theCommands.Add("veraseall",
-      "veraseall [-local]"
-      "\n\t\t: Erases all objects displayed in the viewer."
-      "\n\t\t: Option -local enables erasing of the objects in local"
-      "\n\t\t: selection context.",
+      "veraseall"
+      "\n\t\t: Erases all objects displayed in the viewer.",
       __FILE__, VErase, group);
 
   theCommands.Add("verasetype",
@@ -6229,6 +5858,9 @@ void ViewerTest::Commands(Draw_Interpretor& theCommands)
       "\n\t\t:          [-setMaxParamValue {value}]"
       "\n\t\t:          [-setSensitivity {selection_mode} {value}]"
       "\n\t\t:          [-setHatch HatchStyle]"
+      "\n\t\t:          [-setShadingModel {color|flat|gouraud|phong}]"
+      "\n\t\t:          [-unsetShadingModel]"
+      "\n\t\t:          [-setAlphaMode {opaque|mask|blend|blendauto} [alphaCutOff=0.5]]"
       "\n\t\t: Manage presentation properties of all, selected or named objects."
       "\n\t\t: When -subshapes is specified than following properties will be"
       "\n\t\t: assigned to specified sub-shapes."
@@ -6360,24 +5992,6 @@ void ViewerTest::Commands(Draw_Interpretor& theCommands)
                   "\n\t\t: Alias for vtexture name -default.",
 		  VTexture,group);
 
-  theCommands.Add("vsetam",
-      "vsetam [shapename] mode"
-      "\n\t\t: Activates selection mode for all selected or named shapes."
-      "\n\t\t: Mod can be:"
-      "\n\t\t:   0 - for shape itself" 
-      "\n\t\t:   1 - vertices"
-      "\n\t\t:   2 - edges"
-      "\n\t\t:   3 - wires"
-      "\n\t\t:   4 - faces"
-      "\n\t\t:   5 - shells"
-      "\n\t\t:   6 - solids"
-      "\n\t\t:   7 - compounds"
-      __FILE__,VActivatedMode,group);
-
-  theCommands.Add("vunsetam",
-      "vunsetam : Deactivates all selection modes for all shapes.",
-      __FILE__,VActivatedMode,group);
-
   theCommands.Add("vstate",
       "vstate [-entities] [-hasSelected] [name1] ... [nameN]"
       "\n\t\t: Reports show/hidden state for selected or named objects"
@@ -6386,8 +6000,10 @@ void ViewerTest::Commands(Draw_Interpretor& theCommands)
 		  __FILE__,VState,group);
 
   theCommands.Add("vpickshapes",
-		  "vpickshape subtype(VERTEX,EDGE,WIRE,FACE,SHELL,SOLID) [name1 or .] [name2 or .] [name n or .]",
-		  __FILE__,VPickShape,group);
+                  "vpickshape subtype(VERTEX,EDGE,WIRE,FACE,SHELL,SOLID) [name1 or .] [name2 or .] [name n or .]"
+                  "\n\t\t: Hold Ctrl and pick object by clicking Left mouse button."
+                  "\n\t\t: Hold also Shift for multiple selection.",
+                  __FILE__, VPickShape, group);
 
   theCommands.Add("vtypes",
 		  "vtypes : list of known types and signatures in AIS - To be Used in vpickobject command for selection with filters",
@@ -6410,8 +6026,7 @@ void ViewerTest::Commands(Draw_Interpretor& theCommands)
 
   theCommands.Add ("vloadselection",
     "vloadselection [-context] [name1] ... [nameN] : allows to load selection"
-    "\n\t\t: primitives for the shapes with names given without displaying them."
-    "\n\t\t:   -local - open local context before selection computation",
+    "\n\t\t: primitives for the shapes with names given without displaying them.",
     __FILE__, VLoadSelection, group);
 
   theCommands.Add("vbsdf", "vbsdf [name] [options]"
@@ -6564,15 +6179,14 @@ static Standard_Integer TDraft(Draw_Interpretor& di, Standard_Integer argc, cons
     Ctx->Display(ais, Standard_False);
 
     const char *Name = "draft1";
-    Standard_Boolean IsBound = GetMapOfAIS().IsBound2(Name);
-    if (IsBound) {
-      Handle(AIS_InteractiveObject) an_object =
-	Handle(AIS_InteractiveObject)::DownCast(GetMapOfAIS().Find2(Name));
-      if (!an_object.IsNull()) {
-        Ctx->Remove(an_object,
-                    Standard_True) ;
-        GetMapOfAIS().UnBind2(Name) ;
+    Handle(AIS_InteractiveObject) an_object;
+    if (GetMapOfAIS().Find2(Name, an_object))
+    {
+      if (!an_object.IsNull())
+      {
+        Ctx->Remove (an_object, Standard_True);
       }
+      GetMapOfAIS().UnBind2 (Name);
     }
     GetMapOfAIS().Bind(ais, Name);
 //  DBRep::Set("draft", ais->Shape());

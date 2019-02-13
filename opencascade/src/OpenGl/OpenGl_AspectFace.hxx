@@ -49,13 +49,13 @@ public:
   //! @return edge aspect.
   const OpenGl_AspectLine* AspectEdge() const  { return &myAspectEdge; }
 
-  //! Returns true if lighting should be disabled.
-  bool IsNoLighting() const { return myIsNoLighting; }
+  //! Returns Shading Model.
+  Graphic3d_TypeOfShadingModel ShadingModel() const { return myShadingModel; }
 
   //! Set if lighting should be disabled or not.
-  void SetNoLighting (bool theValue) { myIsNoLighting = theValue; }
+  void SetNoLighting() { myShadingModel = Graphic3d_TOSM_UNLIT; }
 
-  //! Returne textures map.
+  //! Returns textures map.
   const Handle(OpenGl_TextureSet)& TextureSet (const Handle(OpenGl_Context)& theCtx) const
   {
     if (!myResources.IsTextureReady())
@@ -79,8 +79,11 @@ public:
     return myResources.ShaderProgram;
   }
 
-  Standard_EXPORT virtual void Render  (const Handle(OpenGl_Workspace)& theWorkspace) const;
-  Standard_EXPORT virtual void Release (OpenGl_Context* theContext);
+  Standard_EXPORT virtual void Render  (const Handle(OpenGl_Workspace)& theWorkspace) const Standard_OVERRIDE;
+  Standard_EXPORT virtual void Release (OpenGl_Context* theContext) Standard_OVERRIDE;
+
+  //! Update presentation aspects parameters after their modification.
+  virtual void SynchronizeAspects() Standard_OVERRIDE { SetAspect (myAspect); }
 
 protected:
 
@@ -138,7 +141,7 @@ protected:
 
   Handle(Graphic3d_AspectFillArea3d) myAspect;
   OpenGl_AspectLine                  myAspectEdge;
-  bool                               myIsNoLighting;
+  Graphic3d_TypeOfShadingModel       myShadingModel;
 
 public:
 

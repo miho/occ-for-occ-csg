@@ -24,6 +24,7 @@
 #include <BRepSweep_Revol.hxx>
 #include <TopTools_ListOfShape.hxx>
 #include <BRepPrimAPI_MakeSweep.hxx>
+#include <BRepTools_History.hxx>
 #include <Standard_Real.hxx>
 #include <Standard_Boolean.hxx>
 class TopoDS_Shape;
@@ -90,7 +91,14 @@ public:
   //! Returns the TopoDS Shape of the end of the revol.
   Standard_EXPORT TopoDS_Shape LastShape() Standard_OVERRIDE;
   
+  //! Returns list of shape generated from shape S
+  //! Warning: shape S must be shape of type VERTEX, EDGE, FACE, SOLID.
+  //! For shapes of other types method always returns empty list
   Standard_EXPORT virtual const TopTools_ListOfShape& Generated (const TopoDS_Shape& S) Standard_OVERRIDE;
+
+  //! Returns true if the shape S has been deleted.
+  Standard_EXPORT virtual Standard_Boolean IsDeleted(const TopoDS_Shape& S) Standard_OVERRIDE;
+
   
   //! Returns the TopoDS Shape of the beginning of the revolution,
   //! generated with theShape  (subShape of the generating shape).
@@ -106,8 +114,6 @@ public:
   Standard_EXPORT const TopTools_ListOfShape& Degenerated() const;
 
 
-
-
 protected:
 
 
@@ -120,6 +126,7 @@ private:
 
   BRepSweep_Revol myRevol;
   TopTools_ListOfShape myDegenerated;
+  Handle(BRepTools_History) myHist;
 
 
 };

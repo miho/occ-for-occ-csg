@@ -40,7 +40,7 @@ Precompiled headers are generated automatically by Cotire tool.")
 # install variables
 set (INSTALL_DIR_DESCR 
 "The place where built OCCT libraries, headers, test cases (INSTALL_TEST_CASES variable),
-samples (INSTALL_SAMPLES_DESCR variable) and certain 3rdparties (INSTALL_GL2PS, INSTALL_TBB and
+samples (INSTALL_SAMPLES_DESCR variable) and certain 3rdparties (INSTALL_TBB and
 other similar variables) will be placed during the installation process (building INSTALL project)")
 
 set (INSTALL_DIR_WITH_VERSION_DESCR
@@ -88,7 +88,6 @@ INSTALL_MESSAGE (INSTALL_EIGEN            "EIGEN header files")
 INSTALL_MESSAGE (INSTALL_EGL              "EGL binaries")
 INSTALL_MESSAGE (INSTALL_GLES2            "OpenGL ES 2.0 binaries")
 INSTALL_MESSAGE (INSTALL_FREETYPE         "FreeType binaries")
-INSTALL_MESSAGE (INSTALL_GL2PS            "GL2PS binaries")
 INSTALL_MESSAGE (INSTALL_TBB              "TBB binaries")
 INSTALL_MESSAGE (INSTALL_TCL              "TCL binaries")
 INSTALL_MESSAGE (INSTALL_TK               "TK binaries")
@@ -117,8 +116,13 @@ want to build some particular libraries (toolkits) only, then you may uncheck
 all modules in the corresponding BUILD_MODUE_* options and provide the list of
 necessary libraries here. Of course, all dependencies will be resolved automatically")
 
-set (BUILD_MODULE_MfcSamples_DESCR
+set (BUILD_SAMPLES_MFC_DESCR
 "Indicates whether OCCT MFC samples should be built together with OCCT.
+These samples show some possibilities of using OCCT and they can be executed
+with script samples.bat from the installation directory (INSTALL_DIR)")
+
+set (BUILD_SAMPLES_QT_DESCR
+"Indicates whether OCCT Qt samples should be built together with OCCT.
 These samples show some possibilities of using OCCT and they can be executed
 with script samples.bat from the installation directory (INSTALL_DIR)")
 
@@ -159,10 +163,6 @@ module instead of conventional OpenGL context creation APIs")
 set (USE_GLES2_DESCR
 "Indicates whether OpenGL ES 2.0 should be used in OCCT visualization
 module instead of desktop OpenGL")
-
-set (USE_GL2PS_DESCR
-"Indicates whether GL2PS product should be used in OCCT visualization
-module for support of vector image formats (PS, EPS etc)")
 
 set (USE_TBB_DESCR
 "Indicates whether TBB is used or not. TBB stands for Threading Building Blocks,

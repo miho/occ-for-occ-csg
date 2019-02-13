@@ -21,11 +21,10 @@
 #include <inspector/View_ContextType.hxx>
 #include <inspector/View_ToolActionType.hxx>
 
-#ifdef _MSC_VER
-  #pragma warning(disable : 4127 4718) // conditional expression is constant, recursive call has no side effects
-#endif
+#include <Standard_WarningsDisable.hxx>
 #include <QObject>
 #include <QMap>
+#include <Standard_WarningsRestore.hxx>
 
 class QComboBox;
 class QToolButton;
@@ -45,7 +44,7 @@ class View_ToolBar : public QObject
 
 public:
   //! Constructor
-  Standard_EXPORT View_ToolBar (QWidget* theParent);
+  Standard_EXPORT View_ToolBar (QWidget* theParent, const bool isUseKeepView = true);
 
   //! Destructor
   virtual ~View_ToolBar() Standard_OVERRIDE {}

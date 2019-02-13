@@ -855,7 +855,7 @@ Standard_Boolean IntPatch_InterferencePolyhedron::TangentZoneValue
     // Arrays are increased to eliminate gcc warning.
     Standard_Real parO[10], parT[10];
     Standard_Integer nbNoInserted=0;
-    Standard_Integer piToInsert[10];
+    Standard_Integer piToInsert[17]; // for GCC 4.9
 
     for (nob=0; nob<3; nob++) {
       //processing of the object segment P[nob], P[nob+1]
@@ -901,11 +901,11 @@ Standard_Boolean IntPatch_InterferencePolyhedron::TangentZoneValue
 	if (nob<0) break;
       }
       if (nob>=0) {
-	while (nob<nbNoInserted) {
+	nbNoInserted--;
+	while (nob < nbNoInserted) {
 	  piToInsert[nob]=piToInsert[nob+1];
 	  nob++;
 	}
-	nbNoInserted--;
 	nob=nbNoInserted-1;
       }
     }

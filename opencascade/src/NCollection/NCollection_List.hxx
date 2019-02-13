@@ -58,9 +58,11 @@ public:
  public:
   // ---------- PUBLIC METHODS ------------
 
+  //! Empty constructor.
+  NCollection_List() : NCollection_BaseList(Handle(NCollection_BaseAllocator)()) {}
+
   //! Constructor
-  NCollection_List(const Handle(NCollection_BaseAllocator)& theAllocator=0L) :
-    NCollection_BaseList(theAllocator) {}
+  explicit NCollection_List(const Handle(NCollection_BaseAllocator)& theAllocator) : NCollection_BaseList(theAllocator) {}
 
   //! Copy constructor
   NCollection_List (const NCollection_List& theOther) :
@@ -272,8 +274,6 @@ public:
     else
     {
       // No - this list has different memory scope
-      Standard_NoSuchObject_Raise_if (!theIter.More(), "NCollection_List::InsertAfter");
-
       Iterator anIter;
       anIter.myPrevious = theIter.myCurrent;
       anIter.myCurrent = theIter.myCurrent->Next();

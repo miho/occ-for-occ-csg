@@ -14,6 +14,7 @@
 // commercial license or contractual agreement.
 
 #include <BRepLib.hxx>
+#include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <Geom_OffsetCurve.hxx>
@@ -100,7 +101,8 @@ static Standard_Boolean findNearestValidPoint(
         // cycle to go out of local singularity
         gp_Vec aD1;
         theCurve.D1(anUOut, aP, aD1);
-        if (aD1.SquareMagnitude() < aD1Mag)
+        isOut = (aP.SquareDistance(theVertPnt) > aSqTol);
+        if (!isOut && aD1.SquareMagnitude() < aD1Mag)
         {
           aStepLocal *= 2.;
           anUOut += aStepLocal;
@@ -156,8 +158,10 @@ Standard_Boolean BRepLib::FindValidRange
 {
   if (theParV2 - theParV1 < Precision::PConfusion())
     return Standard_False;
-  
-  Standard_Real anEps = Max(theCurve.Resolution(theTolE) * 0.1, Precision::PConfusion());
+
+  Standard_Real anEps = Max(Max(theCurve.Resolution(theTolE) * 0.1,
+                                Epsilon(Max(Abs(theParV1), Abs(theParV2)))),
+                            Precision::PConfusion());
 
   if (Precision::IsInfinite(theParV1))
     theFirst = theParV1;
@@ -233,4 +237,38 @@ Standard_Boolean BRepLib::FindValidRange
                         aParV[0], aPntV[0], aTolV[0],
                         aParV[1], aPntV[1], aTolV[1],
                         theFirst, theLast);
+}
+
+//=======================================================================
+//function : BuildPCurveForEdgeOnPlane
+//purpose  : 
+//=======================================================================
+void BRepLib::BuildPCurveForEdgeOnPlane(const TopoDS_Edge& aE,
+                                        const TopoDS_Face& aF)
+{
+  Standard_Boolean bToUpdate;
+  Standard_Real aTolE;
+  Handle(Geom2d_Curve) aC2D;
+  BRep_Builder aBB;
+  //
+  BuildPCurveForEdgeOnPlane(aE, aF, aC2D, bToUpdate);
+  if (bToUpdate) {
+    aTolE = BRep_Tool::Tolerance(aE);
+    aBB.UpdateEdge(aE, aC2D, aF, aTolE);
+  }
+}
+
+//=======================================================================
+//function : BuildPCurveForEdgeOnPlane
+//purpose  : 
+//=======================================================================
+void BRepLib::BuildPCurveForEdgeOnPlane(const TopoDS_Edge& aE,
+                                        const TopoDS_Face& aF,
+                                        Handle(Geom2d_Curve)& aC2D,
+                                        Standard_Boolean& bToUpdate)
+{
+  Standard_Real aT1, aT2;
+  Standard_Boolean isStored;
+  aC2D = BRep_Tool::CurveOnSurface(aE, aF, aT1, aT2, &isStored);
+  bToUpdate = !isStored && !aC2D.IsNull();
 }

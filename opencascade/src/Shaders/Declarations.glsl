@@ -13,10 +13,20 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-// This files includes definition of common uniform variables in OCCT GLSL programs
+//! @file Declarations.glsl
+//! This files includes definition of common uniform variables in OCCT GLSL programs
 
-#define THE_MAX_LIGHTS      8
-#define THE_MAX_CLIP_PLANES 8
+//! @def THE_MAX_LIGHTS
+//! Specifies the length of array of lights, which is 8 by default. Defined by Shader Manager.
+// #define THE_MAX_LIGHTS 8
+
+//! @def THE_MAX_CLIP_PLANES
+//! Specifies the length of array of clipping planes, which is 8 by default. Defined by Shader Manager.
+// #define THE_MAX_CLIP_PLANES 8
+
+//! @def THE_NB_FRAG_OUTPUTS
+//! Specifies the length of array of Fragment Shader outputs, which is 1 by default. Defined by Shader Manager.
+// #define THE_NB_FRAG_OUTPUTS 1
 
 // compatibility macros
 #if (__VERSION__ >= 130)
@@ -49,21 +59,46 @@
   THE_ATTRIBUTE vec3 occNormal;
   THE_ATTRIBUTE vec4 occTexCoord;
   THE_ATTRIBUTE vec4 occVertColor;
-#elif (__VERSION__ >= 130)
-  #ifdef OCC_ENABLE_draw_buffers
-    out vec4 occFragColorArray[2];
-    #define occFragColor    occFragColorArray[0]
-    #define occFragCoverage occFragColorArray[1]
+#elif defined(FRAGMENT_SHADER)
+  #if (__VERSION__ >= 130)
+    #ifdef OCC_ENABLE_draw_buffers
+      out vec4 occFragColorArray[THE_NB_FRAG_OUTPUTS];
+      #define occFragColorArrayAlias occFragColorArray
+      #define occFragColor0 occFragColorArray[0]
+    #else
+      out vec4 occFragColor0;
+    #endif
   #else
-    out vec4 occFragColor;
+    #ifdef OCC_ENABLE_draw_buffers
+      #define occFragColorArrayAlias gl_FragData
+      #define occFragColor0 gl_FragData[0]
+    #else
+      #define occFragColor0 gl_FragColor
+    #endif
   #endif
-#else
-  #ifdef OCC_ENABLE_draw_buffers
-    #define occFragColor    gl_FragData[0]
-    #define occFragCoverage gl_FragData[1]
+
+  #if (THE_NB_FRAG_OUTPUTS >= 2)
+    #define occFragColor1 occFragColorArrayAlias[1]
   #else
-    #define occFragColor gl_FragColor
+    vec4 occFragColor1;
   #endif
+  #if (THE_NB_FRAG_OUTPUTS >= 3)
+    #define occFragColor2 occFragColorArrayAlias[2]
+  #else
+    vec4 occFragColor2;
+  #endif
+  #if (THE_NB_FRAG_OUTPUTS >= 4)
+    #define occFragColor3 occFragColorArrayAlias[3]
+  #else
+    vec4 occFragColor3;
+  #endif
+
+  // Built-in outputs notation
+  #define occFragColor    occFragColor0
+  #define occFragCoverage occFragColor1
+
+  //! Define the main Fragment Shader output - color value.
+  void occSetFragColor (in vec4 theColor);
 #endif
 
 // Matrix state
@@ -90,6 +125,7 @@ const int OccLightType_Spot   = 3; //!< spot            light source
 
 // Light sources
 uniform               vec4 occLightAmbient;      //!< Cumulative ambient color
+#if defined(THE_MAX_LIGHTS) && (THE_MAX_LIGHTS > 0)
 uniform THE_PREC_ENUM int  occLightSourcesCount; //!< Total number of light sources
 int   occLight_Type              (in int theId); //!< Type of light source
 int   occLight_IsHeadlight       (in int theId); //!< Is light a headlight?
@@ -101,6 +137,7 @@ float occLight_ConstAttenuation  (in int theId); //!< Const attenuation factor o
 float occLight_LinearAttenuation (in int theId); //!< Linear attenuation factor of positional light source
 float occLight_SpotCutOff        (in int theId); //!< Maximum spread angle of the spot light (in radians)
 float occLight_SpotExponent      (in int theId); //!< Attenuation of the spot light intensity (from 0 to 1)
+#endif
 
 // Front material properties accessors
 vec4  occFrontMaterial_Emission(void);     //!< Emission color
@@ -131,7 +168,11 @@ uniform               float     occPointSize;          //!< point size
 //! Parameters of blended order-independent transparency rendering algorithm
 uniform               int       occOitOutput;      //!< Enable bit for writing output color buffers for OIT (occFragColor, occFragCoverage)
 uniform               float     occOitDepthFactor; //!< Influence of the depth component to the coverage of the accumulated fragment
+uniform               float     occAlphaCutoff;    //!< alpha test cutoff value
 
 //! Parameters of clipping planes
+#if defined(THE_MAX_CLIP_PLANES) && (THE_MAX_CLIP_PLANES > 0)
 uniform               vec4 occClipPlaneEquations[THE_MAX_CLIP_PLANES];
+uniform THE_PREC_ENUM int  occClipPlaneChains[THE_MAX_CLIP_PLANES]; //! Indicating the number of planes in the Chain
 uniform THE_PREC_ENUM int  occClipPlaneCount;   //!< Total number of clip planes
+#endif

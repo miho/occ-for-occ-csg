@@ -38,7 +38,7 @@
 #include <Graphic3d_GraduatedTrihedron.hxx>
 #include <Graphic3d_RenderingParams.hxx>
 #include <Graphic3d_SequenceOfHClipPlane.hxx>
-#include <Graphic3d_Vector.hxx>
+#include <Graphic3d_TypeOfShadingModel.hxx>
 #include <Graphic3d_Vertex.hxx>
 
 #include <Image_PixMap.hxx>
@@ -64,7 +64,6 @@
 
 #include <V3d_TypeOfBackfacingModel.hxx>
 #include <V3d_TypeOfOrientation.hxx>
-#include <V3d_TypeOfShadingModel.hxx>
 #include <V3d_TypeOfView.hxx>
 #include <V3d_TypeOfVisualization.hxx>
 #include <V3d_Viewer.hxx>
@@ -72,16 +71,12 @@
 
 class Aspect_Grid;
 class Aspect_Window;
-class Bnd_Box;
 class Graphic3d_Group;
 class Graphic3d_Structure;
 class Graphic3d_TextureEnv;
-class Graphic3d_Vector;
-class Quantity_Color;
 class Standard_MultiplyDefined;
 class Standard_TypeMismatch;
 class V3d_BadValue;
-class V3d_Light;
 class V3d_UnMapped;
 
 class V3d_View;
@@ -169,7 +164,7 @@ public:
   //! Returns True is The View is empty
   Standard_EXPORT Standard_Boolean IsEmpty() const;
 
-  //! Updates the lights of the view. The view is redrawn.
+  //! Updates the lights of the view.
   Standard_EXPORT void UpdateLights() const;
 
   //! Sets the automatic z-fit mode and its parameters.
@@ -235,7 +230,7 @@ public:
                                 const Standard_Real Vx, const Standard_Real Vy, const Standard_Real Vz);
 
   //! Defines the shading model for the visualization. Various models are available.
-  Standard_EXPORT void SetShadingModel (const V3d_TypeOfShadingModel theShadingModel);
+  Standard_EXPORT void SetShadingModel (const Graphic3d_TypeOfShadingModel theShadingModel);
 
   //! Sets the environment texture to use. No environment texture by default.
   Standard_EXPORT void SetTextureEnv (const Handle(Graphic3d_TextureEnv)& theTexture);
@@ -678,7 +673,7 @@ public:
   Standard_EXPORT Standard_Real Twist() const;
 
   //! Returns the current shading model.
-  Standard_EXPORT V3d_TypeOfShadingModel ShadingModel() const;
+  Standard_EXPORT Graphic3d_TypeOfShadingModel ShadingModel() const;
 
   Standard_EXPORT Handle(Graphic3d_TextureEnv) TextureEnv() const;
 
@@ -787,6 +782,21 @@ public:
   //! idem than WindowFit
   Standard_EXPORT void WindowFitAll (const Standard_Integer Xmin, const Standard_Integer Ymin, const Standard_Integer Xmax, const Standard_Integer Ymax);
 
+  //! Transform camera eye, center and scale to fit in the passed bounding box specified in WCS.
+  //! @param theCamera [in] the camera
+  //! @param theBox    [in] the bounding box
+  //! @param theMargin [in] the margin coefficient for view borders
+  //! @param theResolution [in] the minimum size of projection of bounding box in Xv or Yv direction when it considered to be a thin plane or point (without a volume);
+  //!                           in this case only the center of camera is adjusted
+  //! @param theToEnlargeIfLine [in] when TRUE - in cases when the whole bounding box projected into thin line going along Z-axis of screen,
+  //!                                the view plane is enlarged such thatwe see the whole line on rotation, otherwise only the center of camera is adjusted.
+  //! @return TRUE if the fit all operation can be done
+  Standard_EXPORT Standard_Boolean FitMinMax (const Handle(Graphic3d_Camera)& theCamera,
+                                              const Bnd_Box& theBox,
+                                              const Standard_Real theMargin,
+                                              const Standard_Real theResolution = 0.0,
+                                              const Standard_Boolean theToEnlargeIfLine = Standard_True) const;
+
   //! Defines or Updates the definition of the
   //! grid in <me>
   Standard_EXPORT void SetGrid (const gp_Ax3& aPlane, const Handle(Aspect_Grid)& aGrid);
@@ -795,26 +805,21 @@ public:
   //! grid in <me>
   Standard_EXPORT void SetGridActivity (const Standard_Boolean aFlag);
 
-  //! dump the full contents of the view at the same
-  //! scale in the file <theFile>. The file name
-  //! extension must be one of ".png",".bmp",".jpg",".gif".
-  //! Returns FALSE when the dump has failed
+  //! Dumps the full contents of the View into the image file. This is an alias for ToPixMap() with Image_AlienPixMap.
+  //! @param theFile destination image file (image format is determined by file extension like .png, .bmp, .jpg)
+  //! @param theBufferType buffer to dump
+  //! @return FALSE when the dump has failed
   Standard_EXPORT Standard_Boolean Dump (const Standard_CString theFile, const Graphic3d_BufferType& theBufferType = Graphic3d_BT_RGB);
 
-  //! Export scene into the one of the Vector graphics formats (SVG, PS, PDF...).
-  //! In contrast to Bitmaps, Vector graphics is scalable (so you may got quality benefits
-  //! on printing to laser printer). Notice however that results may differ a lot and
-  //! do not contain some elements.
-  Standard_DEPRECATED("Export to Vector graphic is incompatible with Programmable Pipeline and should not be used")
-  Standard_EXPORT Standard_Boolean Export (const Standard_CString theFileName,
-                                           const Graphic3d_ExportFormat theFormat,
-                                           const Graphic3d_SortType theSortType = Graphic3d_ST_BSP_Tree);
-
   //! Dumps the full contents of the view to a pixmap with specified parameters.
+  //! Internally this method calls Redraw() with an offscreen render buffer of requested target size (theWidth x theHeight),
+  //! so that there is no need resizing a window control for making a dump of different size.
   Standard_EXPORT Standard_Boolean ToPixMap (Image_PixMap&               theImage,
                                              const V3d_ImageDumpOptions& theParams);
 
   //! Dumps the full contents of the view to a pixmap.
+  //! Internally this method calls Redraw() with an offscreen render buffer of requested target size (theWidth x theHeight),
+  //! so that there is no need resizing a window control for making a dump of different size.
   //! @param theImage          target image, will be re-allocated to match theWidth x theHeight
   //! @param theWidth          target image width
   //! @param theHeight         target image height
@@ -906,29 +911,10 @@ public:
   Standard_EXPORT Graphic3d_RenderingParams& ChangeRenderingParams();
 
   //! @return flag value of objects culling mechanism
-  Standard_EXPORT Standard_Boolean IsCullingEnabled() const;
+  Standard_Boolean IsCullingEnabled() const { return RenderingParams().FrustumCullingState == Graphic3d_RenderingParams::FrustumCulling_On; }
 
-  //! Turn on/off automatic culling of objects outside frustrum (ON by default)
-  Standard_EXPORT void SetFrustumCulling (const Standard_Boolean theMode);
-
-friend   
-  //! Activates all of the views of a viewer attached
-  //! to a window.
-  Standard_EXPORT void V3d_Viewer::SetViewOn();
-friend   
-  //! Activates a particular view in the Viewer .
-  //! Must be call if the Window attached to the view
-  //! has been Deiconified .
-  Standard_EXPORT void V3d_Viewer::SetViewOn (const Handle(V3d_View)& View);
-friend   
-  //! Deactivates all the views of a Viewer
-  //! attached to a window.
-  Standard_EXPORT void V3d_Viewer::SetViewOff();
-friend   
-  //! Deactivates a particular view in the Viewer.
-  //! Must be call if the Window attached to the view
-  //! has been Iconified .
-  Standard_EXPORT void V3d_Viewer::SetViewOff (const Handle(V3d_View)& View);
+  //! Turn on/off automatic culling of objects outside frustum (ON by default)
+  void SetFrustumCulling (Standard_Boolean theMode) { ChangeRenderingParams().FrustumCullingState = theMode ? Graphic3d_RenderingParams::FrustumCulling_On : Graphic3d_RenderingParams::FrustumCulling_Off; }
 
   //! Fill in the dictionary with diagnostic info.
   //! Should be called within rendering thread.
@@ -942,28 +928,17 @@ friend
   Standard_EXPORT void DiagnosticInformation (TColStd_IndexedDataMapOfStringString& theDict,
                                               Graphic3d_DiagnosticInfo theFlags) const;
 
+  //! Returns string with statistic performance info.
+  Standard_EXPORT TCollection_AsciiString StatisticInformation() const;
+
+  //! Fills in the dictionary with statistic performance info.
+  Standard_EXPORT void StatisticInformation (TColStd_IndexedDataMapOfStringString& theDict) const;
+
   DEFINE_STANDARD_RTTIEXT(V3d_View,Standard_Transient)
 
 protected:
 
   Standard_EXPORT void ImmediateUpdate() const;
-
-  //! Transform camera eye, center and scale to fit in the
-  //! passed bounding box specified in WCS.
-  //! @param theCamera [in] the camera.
-  //! @param theBox [in] the bounding box.
-  //! @param theMargin [in] the margin coefficient for view borders.
-  //! @param theResolution [in] the minimum size of projection of
-  //! bounding box in Xv or Yv direction when it considered to
-  //! be a thin plane or point (without a volume).
-  //! In this case only the center of camera is adjusted.
-  //! @param theToEnlargeIfLine [in] if passed TRUE - in cases when the
-  //! whole bounding box projected into thin line going along
-  //! Z-axis of screen, the view plane is enlarged such that
-  //! we see the whole line on rotation, otherwise only the
-  //! center of camera is adjusted.
-  //! @return TRUE if the fit all operation can be done.
-  Standard_EXPORT Standard_Boolean FitMinMax (const Handle(Graphic3d_Camera)& theCamera, const Bnd_Box& theBox, const Standard_Real theMargin, const Standard_Real theResolution = 0.0, const Standard_Boolean theToEnlargeIfLine = Standard_True) const;
 
   //! Scales camera to fit the view frame of defined width and height
   //! keeping the aspect. For orthogonal camera the method changes scale,
@@ -982,7 +957,8 @@ private:
 
   //! Determines the screen axes in the reference
   //! framework of the view.
-  Standard_EXPORT static Standard_Boolean ScreenAxis (const gp_Dir& Vpn, const gp_Dir& Vup, Graphic3d_Vector& Xaxe, Graphic3d_Vector& Yaxe, Graphic3d_Vector& Zaxe);
+  Standard_EXPORT static Standard_Boolean screenAxis (const gp_Dir& theVpn, const gp_Dir& theVup,
+                                                      gp_Vec& theXaxe, gp_Vec& theYaxe, gp_Vec& theZaxe);
   
   //! Transforms the Vertex V according to the matrice Matrix .
   Standard_EXPORT static gp_XYZ TrsPoint (const Graphic3d_Vertex& V, const TColStd_Array2OfReal& Matrix);
@@ -1020,8 +996,8 @@ private:
 
   V3d_ViewerPointer MyViewer;
   V3d_ListOfLight myActiveLights;
-  Graphic3d_Vector MyDefaultViewAxis;
-  Graphic3d_Vertex MyDefaultViewPoint;
+  gp_Dir myDefaultViewAxis;
+  gp_Pnt myDefaultViewPoint;
   Handle(Aspect_Window) MyWindow;
   V3d_ListOfLight::Iterator myActiveLightsIterator;
   Standard_Integer sx;
@@ -1042,10 +1018,10 @@ private:
   TColStd_Array2OfReal MyTrsf;
   Handle(Graphic3d_Structure) MyGridEchoStructure;
   Handle(Graphic3d_Group) MyGridEchoGroup;
-  Graphic3d_Vector myXscreenAxis;
-  Graphic3d_Vector myYscreenAxis;
-  Graphic3d_Vector myZscreenAxis;
-  Graphic3d_Vector myViewAxis;
+  gp_Vec myXscreenAxis;
+  gp_Vec myYscreenAxis;
+  gp_Vec myZscreenAxis;
+  gp_Dir myViewAxis;
   Graphic3d_Vertex myGravityReferencePoint;
   Standard_Boolean myAutoZFitIsOn;
   Standard_Real myAutoZFitScaleFactor;

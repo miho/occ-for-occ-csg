@@ -15,13 +15,14 @@
 
 #include <inspector/DFBrowser_Thread.hxx>
 #include <inspector/DFBrowser_ThreadItemSearch.hxx>
-#include <inspector/DFBrowser_ThreadItemUsedShapesMap.hxx>
 #include <inspector/DFBrowser_TreeLevelLine.hxx>
 #include <inspector/DFBrowser_SearchLine.hxx>
 
 #include <inspector/DFBrowser_Window.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QThread>
+#include <Standard_WarningsRestore.hxx>
 
 //! \class DFBrowser_QThread
 //! Internal class to cover QThread in order to process ThreadItem.
@@ -61,25 +62,11 @@ private:
 // purpose :
 // =======================================================================
 DFBrowser_Thread::DFBrowser_Thread (DFBrowser_Window* theWindow)
-: QObject (theWindow), myPostponedItem (0), myIsFinishProcessing (false)
+: QObject (theWindow), myPostponedItem (0), myIsFinishProcessing (false),
+  myIsProcessPostponed (Standard_False)
 {
   DFBrowser_SearchLine* aSearchLine = theWindow->GetTreeLevelLine()->GetSearchLine();
   myItems.append (new DFBrowser_ThreadItemSearch(aSearchLine));
-  myItems.append (new DFBrowser_ThreadItemUsedShapesMap());
-}
-
-// =======================================================================
-// function : SetModule
-// purpose :
-// =======================================================================
-void DFBrowser_Thread::SetModule (DFBrowser_Module* theModule)
-{
-  for (int anItemId = 0, aSize = myItems.size(); anItemId < aSize; anItemId++)
-  {
-    DFBrowser_ThreadItemUsedShapesMap* aShapesItem = dynamic_cast<DFBrowser_ThreadItemUsedShapesMap*> (myItems[anItemId]);
-    if (aShapesItem)
-      aShapesItem->SetModule (theModule);
-  }
 }
 
 // =======================================================================
@@ -88,6 +75,11 @@ void DFBrowser_Thread::SetModule (DFBrowser_Module* theModule)
 // =======================================================================
 void DFBrowser_Thread::ProcessApplication()
 {
+  if (!myStartedThreads.empty())
+  {
+    myIsProcessPostponed = Standard_True;
+    return;
+  }
   for (int anItemId = 0, aSize = myItems.size(); anItemId < aSize; anItemId++)
     startThread (myItems[anItemId]);
 }
@@ -148,5 +140,11 @@ void DFBrowser_Thread::onFinished()
   {
     myPostponedItem->ApplyValues();
     myPostponedItem = 0;
+  }
+
+  if (myIsProcessPostponed)
+  {
+    myIsProcessPostponed = Standard_False;
+    ProcessApplication();
   }
 }

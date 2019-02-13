@@ -21,9 +21,9 @@
 /*            ones ) and other convinient functions.                          */
 /******************************************************************************/
 /***/
-#include <OSD_WNT_1.hxx>
+#include <OSD_WNT.hxx>
 
-#include <Strsafe.h>
+#include <strsafe.h>
 #include <wchar.h>
 #include <stdlib.h>
 

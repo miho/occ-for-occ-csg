@@ -23,8 +23,7 @@
 #include <BRepAdaptor_HSurface.hxx>
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepAlgo_NormalProjection.hxx>
-#include <BRepAlgo_SequenceOfSequenceOfInteger.hxx>
-#include <BRepAlgoAPI_Common.hxx>
+#include <BRepAlgoAPI_Section.hxx>
 #include <BRepLib_MakeEdge.hxx>
 #include <BRepLib_MakeVertex.hxx>
 #include <BRepLib_MakeWire.hxx>
@@ -84,14 +83,12 @@ void ResultChron( OSD_Chronometer & ch, Standard_Real & time)
 //=======================================================================
 
  BRepAlgo_NormalProjection::BRepAlgo_NormalProjection() 
-   : myWith3d(Standard_True)
-
+   : myIsDone(Standard_False), myMaxDist(-1.),
+     myWith3d(Standard_True), myFaceBounds(Standard_True)
 {
   BRep_Builder BB;
   BB.MakeCompound(TopoDS::Compound(myToProj));
-  myFaceBounds=Standard_True;
   SetDefaultParams();
-  myMaxDist = -1;
 }
 
 //=======================================================================
@@ -100,12 +97,12 @@ void ResultChron( OSD_Chronometer & ch, Standard_Real & time)
 //=======================================================================
 
  BRepAlgo_NormalProjection::BRepAlgo_NormalProjection(const TopoDS_Shape& S) 
-    : myWith3d(Standard_True)
+   : myIsDone(Standard_False), myMaxDist(-1.),
+     myWith3d(Standard_True), myFaceBounds(Standard_True)
 {
   BRep_Builder BB;
   BB.MakeCompound(TopoDS::Compound(myToProj));
   SetDefaultParams();
-  myMaxDist = -1;
   Init(S);
 }
 
@@ -481,9 +478,9 @@ void BRepAlgo_NormalProjection::SetDefaultParams()
             if (!Degenerated) {
               // Perform Boolean COMMON operation to get parts of projected edge
               // inside the face
-              BRepAlgoAPI_Common aCommon(Faces->Value(j), prj);
-              if (aCommon.IsDone()) {
-                const TopoDS_Shape& aRC = aCommon.Shape();
+              BRepAlgoAPI_Section aSection(Faces->Value(j), prj);
+              if (aSection.IsDone()) {
+                const TopoDS_Shape& aRC = aSection.Shape();
                 //
                 TopExp_Explorer aExpE(aRC, TopAbs_EDGE);
                 for (; aExpE.More(); aExpE.Next()) {

@@ -134,6 +134,9 @@ help testgrid {
   Run all tests, or specified group, or one grid
   Use: testgrid [groupmask [gridmask [casemask]]] [options...]
   Allowed options are:
+  -exclude N: exclude group, subgroup or single test case from executing, where
+              N is name of group, subgroup or case. Excluded items should be separated by comma.
+              Option should be used as the first argument after list of executed groups, grids, and test cases.
   -parallel N: run N parallel processes (default is number of CPUs, 0 to disable)
   -refresh N: save summary logs every N seconds (default 600, minimal 1, 0 to disable)
   -outdir dirname: set log directory (should be empty or non-existing)
@@ -165,6 +168,9 @@ proc testgrid {args} {
     set overwrite 0
     set xmlfile ""
     set signal 0
+    set exc_group 0
+    set exc_grid 0
+    set exc_case 0
     set regress 0
     set prev_logdir ""
     for {set narg 0} {$narg < [llength $args]} {incr narg} {
@@ -235,6 +241,45 @@ proc testgrid {args} {
                 set regress 1
             } else {
                 error "Option -regress requires argument"
+            }
+            continue
+        }
+
+        # exclude group, subgroup or single test case from executing
+        if { $arg == "-exclude" } {
+            incr narg
+            if { $narg < [llength $args] && ! [regexp {^-} [lindex $args $narg]] } {
+                set argts $args
+                set idx_begin [string first " -ex" $argts]
+                if { ${idx_begin} != "-1" } {
+                    set argts [string replace $argts 0 $idx_begin]
+                }
+                set idx_exclude [string first "exclude" $argts]
+                if { ${idx_exclude} != "-1" } {
+                    set argts [string replace $argts 0 $idx_exclude+7]
+                }
+                set idx [string first " -" $argts]
+                if { ${idx} != "-1" } {
+                    set argts [string replace $argts $idx end]
+                }
+                set argts [split $argts ,]
+                foreach argt $argts {
+                    if { [llength $argt] == 1 } {
+                        lappend exclude_group $argt
+                        set exc_group 1
+                    } elseif { [llength $argt] == 2 } {
+                        lappend exclude_grid $argt
+                        set exc_grid 1
+                        incr narg
+                    } elseif { [llength $argt] == 3 } {
+                        lappend exclude_case $argt
+                        set exc_case 1
+                        incr narg
+                        incr narg
+                    }
+                }
+            } else {
+                error "Option -exclude requires argument"
             }
             continue
         }
@@ -344,6 +389,18 @@ proc testgrid {args} {
             # search all directories in the current dir with specified mask
             if [catch {glob -directory $dir -tail -types d {*}$groupmask} groups] { continue }
 
+            # exclude selected groups from all groups
+            if { ${exc_group} > 0 } {
+                foreach exclude_group_element ${exclude_group} {
+                    set idx [lsearch $groups "${exclude_group_element}"]
+                    if { ${idx} != "-1" } {
+                        set groups [lreplace $groups $idx $idx]
+                    } else {
+                        continue
+                    }
+                }
+            }
+
             # iterate by groups
             if { $_tests_verbose > 0 } { _log_and_puts log "Groups to be executed: $groups" }
             foreach group [lsort -dictionary $groups] {
@@ -381,6 +438,19 @@ proc testgrid {args} {
                 }
                 close $fd
 
+                # exclude selected grids from all grids
+                if { ${exc_grid} > 0 } {
+                    foreach exclude_grid_element ${exclude_grid} {
+                        set exclude_elem [lindex $exclude_grid_element end]
+                        set idx [lsearch $gridlist "${exclude_elem}"]
+                        if { ${idx} != "-1" } {
+                            set gridlist [lreplace $gridlist $idx $idx]
+                        } else {
+                            continue
+                        }
+                    }
+                }
+
                 # iterate by all grids
                 foreach grid $gridlist {
 
@@ -405,6 +475,24 @@ proc testgrid {args} {
 
                     # iterate by all tests in the grid directory
                     if { [catch {glob -directory $griddir -type f {*}$casemask} testfiles] } { continue }
+
+                    # exclude selected test cases from all testfiles
+                    if { ${exc_case} > 0 } {
+                        foreach exclude_case_element ${exclude_case} {
+                            set exclude_casegroup_elem [lindex $exclude_case_element end-2]
+                            set exclude_casegrid_elem [lindex $exclude_case_element end-1]
+                            set exclude_elem [lindex $exclude_case_element end]
+                            if { ${exclude_casegrid_elem} == "${grid}" } {
+                                set idx [lsearch $testfiles "${dir}/${exclude_casegroup_elem}/${exclude_casegrid_elem}/${exclude_elem}"]
+                                if { ${idx} != "-1" } {
+                                    set testfiles [lreplace $testfiles $idx $idx]
+                                } else {
+                                    continue
+                                }
+                            }
+                        }
+                    }
+
                     foreach casefile [lsort -dictionary $testfiles] {
                         # filter out files with reserved names
                         set casename [file tail $casefile]
@@ -800,20 +888,29 @@ proc testdiff {dir1 dir2 args} {
 
 # Procedure to check data file before adding it to repository
 help testfile {
-  Check data file and prepare it for putting to test data files repository.
-  Use: testfile [filelist]
+  Checks specified data files for putting them into the test data files repository.
+
+  Use: testfile filelist
 
   Will report if:
   - data file (non-binary) is in DOS encoding (CR/LF)
   - same data file (with same or another name) already exists in the repository
   - another file with the same name already exists 
-  Note that names are assumed to be case-insensitive (for Windows).
+  Note that names are considered to be case-insensitive (for compatibility 
+  with Windows).
 
   Unless the file is already in the repository, tries to load it, reports
   the recognized file format, file size, number of faces and edges in the 
-  loaded shape (if any), and makes snapshot (in the temporary directory).
+  loaded shape (if any), information contained its triangulation, and makes 
+  snapshot (in the temporary directory).
+
   Finally it advises whether the file should be put to public section of the 
   repository.
+
+  Use: testfile -check
+
+  If "-check" is given as an argument, then procedure will check files already 
+  located in the repository (for possible duplicates and for DOS encoding).
 }
 proc testfile {filelist} {
     global env
@@ -823,8 +920,11 @@ proc testfile {filelist} {
         error "Environment variable CSF_TestDataPath must be defined!"
     }
 
+    set checkrepo f
+    if { "$filelist" == "-check" } { set checkrepo t }
+
     # build registry of existing data files (name -> path) and (size -> path)
-    puts "Checking available test data files..."
+    puts "Collecting info on test data files repository..."
     foreach dir [_split_path $env(CSF_TestDataPath)] {
         while {[llength $dir] != 0} {
             set curr [lindex $dir 0]
@@ -833,87 +933,141 @@ proc testfile {filelist} {
             foreach file [glob -nocomplain -directory $curr -type f *] {
                 set name [file tail $file]
                 set name_lower [string tolower $name]
+                set size [file size $file]
 
                 # check that the file is not in DOS encoding
-                if { [_check_dos_encoding $file] } {
-                    puts "Warning: file $file is in DOS encoding; was this intended?"
-                }
-                _check_file_format $file
-
-                # check if file with the same name is present twice or more
-                if { [info exists names($name_lower)] } {
-                    puts "Error: more than one file with name $name is present in the repository:"
-                    if { [_diff_files $file $names($name_lower)] } {
-                        puts "(files are different by content)"
-                    } else {
-                        puts "(files are same by content)"
+                if { $checkrepo } {
+                    if { [_check_dos_encoding $file] } {
+                        puts "Warning: file $file is in DOS encoding; was this intended?"
                     }
-                    puts "--> $file"
-                    puts "--> $names($name_lower)"
-                    continue
-                } 
+                    _check_file_format $file
+
+                    # check if file with the same name is present twice or more
+                    if { [info exists names($name_lower)] } {
+                        puts "Error: more than one file with name $name is present in the repository:"
+                        if { [_diff_files $file $names($name_lower)] } {
+                            puts "(files are different by content)"
+                        } else {
+                            puts "(files are same by content)"
+                        }
+                        puts "--> $file"
+                        puts "--> $names($name_lower)"
+                        continue
+                    } 
                 
-                # check if file with the same content exists
-                set size [file size $file]
-                if { [info exists sizes($size)] } {
-                    foreach other $sizes($size) {
-                        if { ! [_diff_files $file $other] } {
-                            puts "Warning: two files with the same content found:"
-                            puts "--> $file"
-                            puts "--> $other"
+                    # check if file with the same content exists
+                    if { [info exists sizes($size)] } {
+                        foreach other $sizes($size) {
+                            if { ! [_diff_files $file $other] } {
+                                puts "Warning: two files with the same content found:"
+                                puts "--> $file"
+                                puts "--> $other"
+                            }
                         }
                     }
                 }
 
                 # add the file to the registry
-                set names($name_lower) $file
+                lappend names($name_lower) $file
                 lappend sizes($size) $file
             }
         }
     }
-    if { [llength $filelist] <= 0 } { return }
+    if { $checkrepo || [llength $filelist] <= 0 } { return }
 
     # check the new files
     set has_images f
     puts "Checking new file(s)..."
     foreach file $filelist {
-        # check for DOS encoding
-        if { [_check_dos_encoding $file] } {
-            puts "$file: Warning: DOS encoding detected"
-        }
-
         set name [file tail $file]
         set name_lower [string tolower $name]
+        set found f
 
         # check for presence of the file with same name
         if { [info exists names($name_lower)] } {
-            if { [_diff_files $file $names($name_lower)] } {
-                puts "$file: Error: name is already used by existing file\n--> $names($name_lower)"
-            } else {
-                puts "$file: OK: already in the repository \n--> $names($name_lower)"
-                continue
+            set found f
+            foreach other $names($name_lower) {
+                # avoid comparing the file with itself
+                if { [file normalize $file] == [file normalize $other] } {
+                    continue
+                }
+                # compare content
+                if { [_diff_files $file $other] } {
+                    puts "\n* $file: error\n  name is already used by existing file\n  --> $other"
+                } else {
+                    puts "\n* $file: already present \n  --> $other"
+                }
+                set found t
+                break
             }
+            if { $found } { continue }
+        }
+
+        # get size of the file; if it is in DOS encoding and less than 1 MB,
+        # estimate also its size in UNIX encoding to be able to find same 
+        # file if already present but in UNIX encoding
+        set sizeact [file size $file]
+        set sizeunx ""
+        set isdos [_check_dos_encoding $file]
+        if { $isdos && $sizeact < 10000000 } {
+            set fd [open $file r]
+            fconfigure $fd -translation crlf
+            set sizeunx [string length [read $fd]]
+            close $fd
         }
                 
         # check if file with the same content exists
-        set size [file size $file]
-        if { [info exists sizes($size)] } {
-            set found f
+        foreach size "$sizeact $sizeunx" {
+          if { [info exists sizes($size)] } {
             foreach other $sizes($size) {
+                # avoid comparing the file with itself
+                if { [file normalize $file] == [file normalize $other] } {
+                    continue
+                }
+                # compare content
                 if { ! [_diff_files $file $other] } {
-                    puts "$file: OK: the same file is already present under name [file tail $other]\n--> $other"
+                    puts "\n* $file: duplicate \n  already present under name [file tail $other]\n  --> $other"
                     set found t
                     break
                 }
             }
-            if { $found } { continue }
+            if { $found } { break }
+          }
+        }
+        if { $found } { continue }
+
+        # file is not present yet, so to be analyzed
+        puts "\n* $file: new file"
+
+        # add the file to the registry as if it were added to the repository,
+        # to report possible duplicates among the currently processed files
+        lappend names($name_lower) $file
+        if { "$sizeunx" != "" } {
+            lappend sizes($sizeunx) $file
+        } else {
+            lappend sizes($sizeact) $file
+        }
+
+        # first of all, complain if it is in DOS encoding
+        if { $isdos } {
+            puts "  Warning: DOS encoding detected, consider converting to"
+            puts "           UNIX unless DOS line ends are needed for the test"
         }
 
         # try to read the file
         set format [_check_file_format $file]
         if { [catch {uplevel load_data_file $file $format a}] } {
-            puts "$file: Error: Cannot read as $format file"
+            puts "  Warning: Cannot read as $format file"
             continue
+        }
+
+        # warn if shape contains triangulation
+        pload MODELING
+        if { "$format" != "STL" &&
+             [regexp {contains\s+([0-9]+)\s+triangles} [uplevel trinfo a] res nbtriangles] &&
+             $nbtriangles != 0 } {
+            puts "  Warning: shape contains triangulation ($nbtriangles triangles),"
+            puts "           consider removing them unless they are needed for the test!"
         }
 
         # get number of faces and edges
@@ -928,16 +1082,10 @@ proc testfile {filelist} {
             set dir public
         } else {
             set dir private
-            # check if one of names of that file corresponds to typical name for 
-            # MDTV bugs or has extension .rle, this should be old model
-            if { [regexp -nocase {.*(cts|ats|pro|buc|ger|fra|usa|uki)[0-9]+.*} $name] ||
-                 [regexp -nocase {[.]rle\y} $name] } {
-                set dir old
-            }
         }
 
         # add stats
-        puts "$file: $format size=[expr $size / 1024] KiB, nbfaces=$faces, nbedges=$edges -> $dir"
+        puts "  $format size=[expr $size / 1024] KiB, nbfaces=$faces, nbedges=$edges -> $dir"
 
         set tmpdir [_get_temp_dir]
         file mkdir $tmpdir/$dir
@@ -945,6 +1093,7 @@ proc testfile {filelist} {
         # make snapshot
         pload AISV
         uplevel vdisplay a
+        uplevel vsetdispmode 1
         uplevel vfit
         uplevel vzfit
         uplevel vdump $tmpdir/$dir/[file rootname [file tail $file]].png
@@ -980,8 +1129,10 @@ proc locate_data_file {filename} {
             while {[llength $dir] != 0} { 
                 set name [lindex $dir 0]
                 set dir [lrange $dir 1 end]
+
                 # skip directories starting with dot
-                if { [regexp {^[.]} $name] } { continue }
+                set aTail [file tail $name]
+                if { [regexp {^[.]} $aTail] } { continue }
                 if { [file exists $name/$filename] } {
                     return [file normalize $name/$filename]
                 }
@@ -1517,7 +1668,7 @@ proc _html_highlight {status line} {
 
 # Internal procedure to generate HTML page presenting log of the tests
 # execution in tabular form, with links to reports on individual cases
-proc _log_html_summary {logdir log totals regressions improvements total_time} {
+proc _log_html_summary {logdir log totals regressions improvements skipped total_time} {
     global _test_case_regexp
 
     # create missing directories as needed
@@ -1564,14 +1715,14 @@ proc _log_html_summary {logdir log totals regressions improvements total_time} {
     }
    
     # print regressions and improvements
-    foreach featured [list $regressions $improvements] {
+    foreach featured [list $regressions $improvements $skipped] {
         if { [llength $featured] <= 1 } { continue }
         set status [string trim [lindex $featured 0] { :}]
         puts $fd "<h2>$status</h2>"
         puts $fd "<table>"
         set groupgrid ""
         foreach test [lrange $featured 1 end] {
-            if { ! [regexp {^(.*)\s+([\w.]+)$} $test res gg name] } {
+            if { ! [regexp {^(.*)\s+([\w\-.]+)$} $test res gg name] } {
                 set gg UNKNOWN
                 set name "Error building short list; check details"
             }
@@ -1671,13 +1822,16 @@ proc _log_summarize {logdir log {total_time {}}} {
     set totals {}
     set improvements {Improvements:}
     set regressions {Failed:}
+    set skipped {Skipped:}
     if { [info exists stat] } {
         foreach status [lsort [array names stat]] {
             lappend totals [list [llength $stat($status)] $status]
 
-            # separately count improvements (status starting with IMP) and regressions (all except IMP, OK, BAD, and SKIP)
+            # separately count improvements (status starting with IMP), skipped (status starting with SKIP) and regressions (all except IMP, OK, BAD, and SKIP)
             if { [regexp -nocase {^IMP} $status] } {
                 eval lappend improvements $stat($status)
+            } elseif { [regexp -nocase {^SKIP} $status] } {
+                eval lappend skipped $stat($status)
             } elseif { $status != "OK" && ! [regexp -nocase {^BAD} $status] && ! [regexp -nocase {^SKIP} $status] } {
                 eval lappend regressions $stat($status)
             }
@@ -1692,6 +1846,9 @@ proc _log_summarize {logdir log {total_time {}}} {
         if { [llength $regressions] > 1 } {
             _log_and_puts log [join $regressions "\n  "]
         }
+        if { [llength $skipped] > 1 } {
+            _log_and_puts log [join $skipped "\n  "]
+        }
         if { [llength $improvements] == 1 && [llength $regressions] == 1 } {
             _log_and_puts log "No regressions"
         }
@@ -1701,7 +1858,7 @@ proc _log_summarize {logdir log {total_time {}}} {
 
     # save log to files
     if { $logdir != "" } {
-        _log_html_summary $logdir $log $totals $regressions $improvements $total_time
+        _log_html_summary $logdir $log $totals $regressions $improvements $skipped $total_time
         _log_save $logdir/tests.log [join $log "\n"] "Tests summary"
     }
 
@@ -2340,7 +2497,7 @@ proc load_data_file {file format shape} {
         DRAW { uplevel restore $file $shape }
         IGES { pload XSDRAW; uplevel igesbrep $file $shape * }
         STEP { pload XSDRAW; uplevel stepread $file __a *; uplevel renamevar __a_1 $shape }
-        STL  { pload XSDRAW; uplevel readstl $shape $file }
+        STL  { pload XSDRAW; uplevel readstl $shape $file triangulation }
         default { error "Cannot read $format file $file" }
     }
 }

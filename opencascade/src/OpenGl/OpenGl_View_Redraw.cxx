@@ -29,6 +29,7 @@
 
 #include <OpenGl_AspectLine.hxx>
 #include <OpenGl_Context.hxx>
+#include <OpenGl_FrameStats.hxx>
 #include <OpenGl_Matrix.hxx>
 #include <OpenGl_Workspace.hxx>
 #include <OpenGl_View.hxx>
@@ -97,7 +98,8 @@ void OpenGl_View::drawBackground (const Handle(OpenGl_Workspace)& theWorkspace)
   {
   #if !defined(GL_ES_VERSION_2_0)
     GLint aShadingModelOld = GL_SMOOTH;
-    if (aCtx->core11 != NULL)
+    if (aCtx->core11 != NULL
+     && aCtx->caps->ffpEnable)
     {
       aCtx->core11fwd->glDisable (GL_LIGHTING);
       aCtx->core11fwd->glGetIntegerv (GL_SHADE_MODEL, &aShadingModelOld);
@@ -108,7 +110,8 @@ void OpenGl_View::drawBackground (const Handle(OpenGl_Workspace)& theWorkspace)
     myBgGradientArray->Render (theWorkspace);
 
   #if !defined(GL_ES_VERSION_2_0)
-    if (aCtx->core11 != NULL)
+    if (aCtx->core11 != NULL
+     && aCtx->caps->ffpEnable)
     {
       aCtx->core11->glShadeModel (aShadingModelOld);
     }
@@ -163,6 +166,7 @@ void OpenGl_View::Redraw()
   const Graphic3d_StereoMode   aStereoMode  = myRenderParams.StereoMode;
   Graphic3d_Camera::Projection aProjectType = myCamera->ProjectionType();
   Handle(OpenGl_Context)       aCtx         = myWorkspace->GetGlContext();
+  aCtx->FrameStats()->FrameStart (myWorkspace->View(), false);
 
   // release pending GL resources
   aCtx->ReleaseDelayed();
@@ -175,10 +179,19 @@ void OpenGl_View::Redraw()
             && !aCtx->caps->buffersNoSwap
             &&  aFrameBuffer == NULL;
 
-  Standard_Integer aSizeX = aFrameBuffer != NULL ? aFrameBuffer->GetVPSizeX() : myWindow->Width();
-  Standard_Integer aSizeY = aFrameBuffer != NULL ? aFrameBuffer->GetVPSizeY() : myWindow->Height();
-  Standard_Integer aRendSizeX = Standard_Integer(myRenderParams.RenderResolutionScale * aSizeX + 0.5f);
-  Standard_Integer aRendSizeY = Standard_Integer(myRenderParams.RenderResolutionScale * aSizeY + 0.5f);
+  const Standard_Integer aSizeX = aFrameBuffer != NULL ? aFrameBuffer->GetVPSizeX() : myWindow->Width();
+  const Standard_Integer aSizeY = aFrameBuffer != NULL ? aFrameBuffer->GetVPSizeY() : myWindow->Height();
+  const Standard_Integer aRendSizeX = Standard_Integer(myRenderParams.RenderResolutionScale * aSizeX + 0.5f);
+  const Standard_Integer aRendSizeY = Standard_Integer(myRenderParams.RenderResolutionScale * aSizeY + 0.5f);
+  if (aSizeX < 1
+   || aSizeY < 1
+   || aRendSizeX < 1
+   || aRendSizeY < 1)
+  {
+    myBackBufferRestored = Standard_False;
+    myIsImmediateDrawn   = Standard_False;
+    return;
+  }
 
   // determine multisampling parameters
   Standard_Integer aNbSamples = !myToDisableMSAA && aSizeX == aRendSizeX
@@ -541,7 +554,10 @@ void OpenGl_View::Redraw()
 
   // reset state for safety
   aCtx->BindProgram (Handle(OpenGl_ShaderProgram)());
-  aCtx->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
+  if (aCtx->caps->ffpEnable)
+  {
+    aCtx->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
+  }
 
   // Swap the buffers
   if (toSwap)
@@ -559,6 +575,7 @@ void OpenGl_View::Redraw()
 
   // reset render mode state
   aCtx->FetchState();
+  aCtx->FrameStats()->FrameEnd (myWorkspace->View(), false);
 
   myWasRedrawnGL = Standard_True;
 }
@@ -584,6 +601,7 @@ void OpenGl_View::RedrawImmediate()
   const Graphic3d_StereoMode   aStereoMode  = myRenderParams.StereoMode;
   Graphic3d_Camera::Projection aProjectType = myCamera->ProjectionType();
   OpenGl_FrameBuffer*          aFrameBuffer = myFBO.operator->();
+  aCtx->FrameStats()->FrameStart (myWorkspace->View(), true);
 
   if ( aFrameBuffer == NULL
    && !aCtx->DefaultFrameBuffer().IsNull()
@@ -711,7 +729,10 @@ void OpenGl_View::RedrawImmediate()
 
   // reset state for safety
   aCtx->BindProgram (Handle(OpenGl_ShaderProgram)());
-  aCtx->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
+  if (aCtx->caps->ffpEnable)
+  {
+    aCtx->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
+  }
 
   if (toSwap && !aCtx->caps->buffersNoSwap)
   {
@@ -721,6 +742,7 @@ void OpenGl_View::RedrawImmediate()
   {
     aCtx->core11fwd->glFlush();
   }
+  aCtx->FrameStats()->FrameEnd (myWorkspace->View(), true);
 
   myWasRedrawnGL = Standard_True;
 }
@@ -800,7 +822,8 @@ bool OpenGl_View::redrawImmediate (const Graphic3d_Camera::Projection theProject
   #if !defined(GL_ES_VERSION_2_0)
     aCtx->core11fwd->glGetBooleanv (GL_DOUBLEBUFFER, &toCopyBackToFront);
   #endif
-    if (toCopyBackToFront)
+    if (toCopyBackToFront
+     && myTransientDrawToFront)
     {
       if (!HasImmediateStructures()
        && !theIsPartialUpdate)
@@ -855,6 +878,7 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
   // ==================================
 
   const Handle(OpenGl_Context)& aContext = myWorkspace->GetGlContext();
+  aContext->SetSampleAlphaToCoverage (myRenderParams.ToEnableAlphaToCoverage);
 
 #if !defined(GL_ES_VERSION_2_0)
   // Disable current clipping planes
@@ -868,14 +892,24 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
   }
 #endif
 
-  // Update states of OpenGl_BVHTreeSelector (frustum culling algorithm).
+  // update states of OpenGl_BVHTreeSelector (frustum culling algorithm);
+  // note that we pass here window dimensions ignoring Graphic3d_RenderingParams::RenderResolutionScale
   myBVHSelector.SetViewVolume (myCamera);
-  myBVHSelector.SetViewportSize (myWindow->Width(), myWindow->Height());
+  myBVHSelector.SetViewportSize (myWindow->Width(), myWindow->Height(), myRenderParams.ResolutionRatio());
+  myBVHSelector.CacheClipPtsProjections();
 
-  const Handle(OpenGl_ShaderManager)& aManager   = aContext->ShaderManager();
-  if (StateInfo (myCurrLightSourceState, aManager->LightSourceState().Index()) != myLastLightSourceState)
+  const Handle(OpenGl_ShaderManager)& aManager = aContext->ShaderManager();
+  const Handle(Graphic3d_LightSet)&   aLights  = myShadingModel == Graphic3d_TOSM_UNLIT ? myNoShadingLight : myLights;
+  Standard_Size aLightsRevision = 0;
+  if (!aLights.IsNull())
   {
-    aManager->UpdateLightSourceStateTo (myShadingModel == Graphic3d_TOSM_NONE ? &myNoShadingLight : &myLights);
+    aLightsRevision = aLights->UpdateRevision();
+  }
+  if (StateInfo (myCurrLightSourceState, aManager->LightSourceState().Index()) != myLastLightSourceState
+   || aLightsRevision != myLightsRevision)
+  {
+    myLightsRevision = aLightsRevision;
+    aManager->UpdateLightSourceStateTo (aLights);
     myLastLightSourceState = StateInfo (myCurrLightSourceState, aManager->LightSourceState().Index());
   }
 
@@ -909,7 +943,8 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
 
 #if !defined(GL_ES_VERSION_2_0)
   // Switch off lighting by default
-  if (aContext->core11 != NULL)
+  if (aContext->core11 != NULL
+   && aContext->caps->ffpEnable)
   {
     glDisable(GL_LIGHTING);
   }
@@ -952,7 +987,7 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
   if (aContext->core11 != NULL)
   {
     aContext->core11->glShadeModel (myShadingModel == Graphic3d_TOSM_FACET
-                                 || myShadingModel == Graphic3d_TOSM_NONE ? GL_FLAT : GL_SMOOTH);
+                                 || myShadingModel == Graphic3d_TOSM_UNLIT ? GL_FLAT : GL_SMOOTH);
   }
 #endif
 
@@ -1002,10 +1037,20 @@ void OpenGl_View::render (Graphic3d_Camera::Projection theProjection,
         glDisable (GL_CULL_FACE);
     }
   }
+  else
+  {
+    renderFrameStats();
+  }
+
+  myWorkspace->ResetAppliedAspect();
+  aContext->SetSampleAlphaToCoverage (false);
 
   // reset FFP state for safety
   aContext->BindProgram (Handle(OpenGl_ShaderProgram)());
-  aContext->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
+  if (aContext->caps->ffpEnable)
+  {
+    aContext->ShaderManager()->PushState (Handle(OpenGl_ShaderProgram)());
+  }
 
   // ==============================================================
   //      Step 6: Keep shader manager informed about last View
@@ -1035,6 +1080,7 @@ void OpenGl_View::renderStructs (Graphic3d_Camera::Projection theProjection,
                                  OpenGl_FrameBuffer*          theOitAccumFbo,
                                  const Standard_Boolean       theToDrawImmediate)
 {
+  myZLayers.UpdateCulling (myWorkspace, theToDrawImmediate);
   if ( myZLayers.NbStructures() <= 0 )
     return;
 
@@ -1057,11 +1103,6 @@ void OpenGl_View::renderStructs (Graphic3d_Camera::Projection theProjection,
       const Standard_Integer aSizeY = theReadDrawFbo != NULL ? theReadDrawFbo->GetVPSizeY() : myWindow->Height();
       myOpenGlFBO ->InitLazy (aCtx, aSizeX, aSizeY, myFboColorFormat, myFboDepthFormat, 0);
 
-      if (myRaytraceFilter.IsNull())
-        myRaytraceFilter = new OpenGl_RaytraceFilter;
-
-      myRaytraceFilter->SetPrevRenderFilter (myWorkspace->GetRenderFilter());
-
       if (theReadDrawFbo != NULL)
         theReadDrawFbo->UnbindBuffer (aCtx);
 
@@ -1071,7 +1112,8 @@ void OpenGl_View::renderStructs (Graphic3d_Camera::Projection theProjection,
         // Render bottom OSD layer
         myZLayers.Render (myWorkspace, theToDrawImmediate, OpenGl_LF_Bottom, theReadDrawFbo, theOitAccumFbo);
 
-        myWorkspace->SetRenderFilter (myRaytraceFilter);
+        const Standard_Integer aPrevFilter = myWorkspace->RenderFilter() & ~(Standard_Integer )(OpenGl_RenderFilter_NonRaytraceableOnly);
+        myWorkspace->SetRenderFilter (aPrevFilter | OpenGl_RenderFilter_NonRaytraceableOnly);
         {
           if (theReadDrawFbo != NULL)
           {
@@ -1085,7 +1127,7 @@ void OpenGl_View::renderStructs (Graphic3d_Camera::Projection theProjection,
           // Render non-polygonal elements in default layer
           myZLayers.Render (myWorkspace, theToDrawImmediate, OpenGl_LF_Default, theReadDrawFbo, theOitAccumFbo);
         }
-        myWorkspace->SetRenderFilter (myRaytraceFilter->PrevRenderFilter());
+        myWorkspace->SetRenderFilter (aPrevFilter);
       }
 
       if (theReadDrawFbo != NULL)
@@ -1132,6 +1174,20 @@ void OpenGl_View::renderTrihedron (const Handle(OpenGl_Workspace) &theWorkspace)
   }
 }
 
+//=======================================================================
+//function : renderFrameStats
+//purpose  :
+//=======================================================================
+void OpenGl_View::renderFrameStats()
+{
+  if (myRenderParams.ToShowStats
+   && myRenderParams.CollectedStats != Graphic3d_RenderingParams::PerfCounters_NONE)
+  {
+    myFrameStatsPrs.Update (myWorkspace);
+    myFrameStatsPrs.Render (myWorkspace);
+  }
+}
+
 // =======================================================================
 // function : Invalidate
 // purpose  :
@@ -1153,7 +1209,7 @@ void OpenGl_View::renderScene (Graphic3d_Camera::Projection theProjection,
   const Handle(OpenGl_Context)& aContext = myWorkspace->GetGlContext();
 
   // Specify clipping planes in view transformation space
-  aContext->ChangeClipping().Reset (aContext, myClipPlanes);
+  aContext->ChangeClipping().Reset (myClipPlanes);
   if (!myClipPlanes.IsNull()
    && !myClipPlanes->IsEmpty())
   {
@@ -1166,7 +1222,7 @@ void OpenGl_View::renderScene (Graphic3d_Camera::Projection theProjection,
   // Apply restored view matrix.
   aContext->ApplyWorldViewMatrix();
 
-  aContext->ChangeClipping().Reset (aContext, Handle(Graphic3d_SequenceOfHClipPlane)());
+  aContext->ChangeClipping().Reset (Handle(Graphic3d_SequenceOfHClipPlane)());
   if (!myClipPlanes.IsNull()
    && !myClipPlanes->IsEmpty())
   {

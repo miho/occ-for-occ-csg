@@ -23,14 +23,12 @@
 #include <Graphic3d_CStructure.hxx>
 #include <Graphic3d_DataStructureManager.hxx>
 #include <Graphic3d_DiagnosticInfo.hxx>
-#include <Graphic3d_ExportFormat.hxx>
 #include <Graphic3d_GraduatedTrihedron.hxx>
 #include <Graphic3d_MapOfStructure.hxx>
 #include <Graphic3d_NMapOfTransient.hxx>
 #include <Graphic3d_RenderingParams.hxx>
 #include <Graphic3d_SequenceOfHClipPlane.hxx>
 #include <Graphic3d_SequenceOfStructure.hxx>
-#include <Graphic3d_SortType.hxx>
 #include <Graphic3d_Structure.hxx>
 #include <Graphic3d_TextureEnv.hxx>
 #include <Graphic3d_TypeOfAnswer.hxx>
@@ -59,6 +57,8 @@ DEFINE_STANDARD_HANDLE (Graphic3d_CView, Graphic3d_DataStructureManager)
 //! computed (HLR or "view-dependent") structures.
 class Graphic3d_CView : public Graphic3d_DataStructureManager
 {
+  friend class Graphic3d_StructureManager;
+  DEFINE_STANDARD_RTTIEXT(Graphic3d_CView, Graphic3d_DataStructureManager)
 public:
 
   //! Constructor.
@@ -88,6 +88,13 @@ public:
   Standard_Boolean IsRemoved() const { return myIsRemoved; }
 
 public:
+
+  //! Returns default Shading Model of the view; Graphic3d_TOSM_FRAGMENT by default.
+  Graphic3d_TypeOfShadingModel ShadingModel() const { return myShadingModel; }
+
+  //! Sets default Shading Model of the view.
+  //! Will throw an exception on attempt to set Graphic3d_TOSM_DEFAULT.
+  Standard_EXPORT void SetShadingModel (Graphic3d_TypeOfShadingModel theModel);
 
   //! Returns visualization type of the view.
   Graphic3d_TypeOfVisualization VisualizationType() const { return myVisualization; }
@@ -151,8 +158,6 @@ public:
   const Handle(Graphic3d_StructureManager)& StructureManager() const { return myStructureManager; }
 
 private:
-
-  friend class Graphic3d_StructureManager;
 
   //! Is it possible to display the structure in the view?
   Standard_EXPORT Graphic3d_TypeOfAnswer acceptDisplay (const Graphic3d_TypeOfStructure theStructType) const;
@@ -264,16 +269,8 @@ public:
   //! Dump active rendering buffer into specified memory buffer.
   virtual Standard_Boolean BufferDump (Image_PixMap& theImage, const Graphic3d_BufferType& theBufferType) = 0;
 
-  //! Export scene into the one of the Vector graphics formats (SVG, PS, PDF...).
-  //! In contrast to Bitmaps, Vector graphics is scalable (so you may got quality benefits
-  //! on printing to laser printer). Notice however that results may differ a lot and
-  //! do not contain some elements.
-  virtual Standard_Boolean Export (const Standard_CString theFileName,
-                                   const Graphic3d_ExportFormat theFormat,
-                                   const Graphic3d_SortType theSortType = Graphic3d_ST_BSP_Tree) = 0;
-
   //! Marks BVH tree and the set of BVH primitives of correspondent priority list with id theLayerId as outdated.
-  virtual void InvalidateBVHData (const Standard_Integer theLayerId) = 0;
+  virtual void InvalidateBVHData (const Graphic3d_ZLayerId theLayerId) = 0;
 
   //! Add a new top-level z layer with ID <theLayerId> for
   //! the view. Z layers allow drawing structures in higher layers
@@ -384,18 +381,6 @@ public:
   //! Sets environment texture for the view.
   virtual void SetTextureEnv (const Handle(Graphic3d_TextureEnv)& theTextureEnv) = 0;
 
-  //! Returns the state of frustum culling optimization.
-  virtual Standard_Boolean IsCullingEnabled() const = 0;
-
-  //! Enables or disables frustum culling optimization.
-  virtual void SetCullingEnabled (const Standard_Boolean theIsEnabled) = 0;
-
-  //! Returns shading model of the view.
-  virtual Graphic3d_TypeOfShadingModel ShadingModel() const = 0;
-
-  //! Sets shading model of the view.
-  virtual void SetShadingModel (const Graphic3d_TypeOfShadingModel theModel) = 0;
-
   //! Return backfacing model used for the view.
   virtual Graphic3d_TypeOfBackfacingModel BackfacingModel() const = 0;
 
@@ -409,10 +394,10 @@ public:
   virtual void SetCamera (const Handle(Graphic3d_Camera)& theCamera) = 0;
 
   //! Returns list of lights of the view.
-  virtual const Graphic3d_ListOfCLight& Lights() const = 0;
+  virtual const Handle(Graphic3d_LightSet)& Lights() const = 0;
 
   //! Sets list of lights for the view.
-  virtual void SetLights (const Graphic3d_ListOfCLight& theLights) = 0;
+  virtual void SetLights (const Handle(Graphic3d_LightSet)& theLights) = 0;
 
   //! Returns list of clip planes set for the view.
   virtual const Handle(Graphic3d_SequenceOfHClipPlane)& ClipPlanes() const = 0;
@@ -429,6 +414,12 @@ public:
   //! Thus application should not parse returned information to weed out specific parameters.
   virtual void DiagnosticInformation (TColStd_IndexedDataMapOfStringString& theDict,
                                       Graphic3d_DiagnosticInfo theFlags) const = 0;
+
+  //! Returns string with statistic performance info.
+  virtual TCollection_AsciiString StatisticInformation() const = 0;
+
+  //! Fills in the dictionary with statistic performance info.
+  virtual void StatisticInformation (TColStd_IndexedDataMapOfStringString& theDict) const = 0;
 
 private:
 
@@ -465,11 +456,9 @@ protected:
   Standard_Boolean myIsInComputedMode;
   Standard_Boolean myIsActive;
   Standard_Boolean myIsRemoved;
+  Graphic3d_TypeOfShadingModel  myShadingModel;
   Graphic3d_TypeOfVisualization myVisualization;
 
-private:
-
-  DEFINE_STANDARD_RTTIEXT(Graphic3d_CView,Graphic3d_DataStructureManager)
 };
 
 #endif // _Graphic3d_CView_HeaderFile

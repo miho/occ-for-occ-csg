@@ -21,9 +21,11 @@
 #include <Standard.hxx>
 #include <TDF_Attribute.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QObject>
 #include <QHash>
 #include <QByteArray>
+#include <Standard_WarningsRestore.hxx>
 
 //! \class DFBrowserPane_TDataStdTreeNodeModel
 //! \brief It builds a tree of items for the given tree node attribute.
@@ -53,6 +55,11 @@ public:
   //! \return integer value
   virtual int columnCount (const QModelIndex& theParent = QModelIndex()) const Standard_OVERRIDE
   { (void)theParent; return 1; }
+
+protected:
+  //! Creates root item
+  //! \param theColumnId index of a column
+  virtual void createRootItem (const int theColumnId) Standard_OVERRIDE;
 
 private:
 

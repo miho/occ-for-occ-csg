@@ -1263,10 +1263,14 @@ proc wokUtils:FILES:FileToString { fin } {
 
 # List extensions of compilable files in OCCT
 proc osutils:compilable {thePlatform} {
-  if { "$thePlatform" == "mac" || "$thePlatform" == "ios" } {
-    return [list .c .cxx .cpp .mm]
-  }
+  if { "$thePlatform" == "mac" || "$thePlatform" == "ios" } { return [list .c .cxx .cpp .mm] }
   return [list .c .cxx .cpp]
+}
+
+# List extensions of header file in OCCT
+proc osutils:fileExtensionsHeaders {thePlatform} {
+  if { "$thePlatform" == "mac" || "$thePlatform" == "ios" } { return [list .h .hxx .hpp .lxx .pxx .gxx ] }
+  return [list .h .hxx .hpp .lxx .pxx .gxx .mm ]
 }
 
 proc osutils:commonUsedTK { theToolKit } {
@@ -1318,9 +1322,6 @@ proc osutils:csfList { theOS theCsfLibsMap theCsfFrmsMap } {
   if { "$::HAVE_FFMPEG" == "true" } {
     set aLibsMap(CSF_FFmpeg) "avcodec avformat swscale avutil"
   }
-  if { "$::HAVE_GL2PS" == "true" } {
-    set aLibsMap(CSF_GL2PS) "gl2ps"
-  }
   if { "$::HAVE_TBB" == "true" } {
     set aLibsMap(CSF_TBB) "tbb tbbmalloc"
   }
@@ -1344,6 +1345,7 @@ proc osutils:csfList { theOS theCsfLibsMap theCsfFrmsMap } {
     set aLibsMap(CSF_advapi32)     "advapi32"
     set aLibsMap(CSF_gdi32)        "gdi32"
     set aLibsMap(CSF_user32)       "user32 comdlg32"
+    set aLibsMap(CSF_shell32)      "shell32"
     set aLibsMap(CSF_opengl32)     "opengl32"
     set aLibsMap(CSF_wsock32)      "wsock32"
     set aLibsMap(CSF_netapi32)     "netapi32"
@@ -1366,7 +1368,7 @@ proc osutils:csfList { theOS theCsfLibsMap theCsfFrmsMap } {
     set aLibsMap(CSF_dl)           "dl"
     if { "$theOS" == "mac" } {
       set aLibsMap(CSF_objc)       "objc"
-      set aFrmsMap(CSF_Appkit)     "Appkit"
+      set aFrmsMap(CSF_Appkit)     "AppKit"
       set aFrmsMap(CSF_IOKit)      "IOKit"
       set aFrmsMap(CSF_OpenGlLibs) "OpenGL"
       set aFrmsMap(CSF_TclLibs)    "Tcl"
@@ -1468,8 +1470,7 @@ proc osutils:tk:units { tkloc } {
 }
 
 proc osutils:justwnt { listloc } {
-  # ImageUtility is required for support for old (<6.5.4) versions of OCCT
-  set goaway [list Xdps Xw  ImageUtility WOKUnix]
+  set goaway [list Xw]
   return [osutils:juststation $goaway $listloc]
 }
 
@@ -1559,31 +1560,28 @@ proc wokUtils:FILES:wtail { f n } {
 }
 
 # Generate entry for one source file in Visual Studio 10 project file
-proc osutils:vcxproj:file { file params } {
-  append text "    <ClCompile Include=\"..\\..\\..\\[wokUtils:EASY:bs1 [wokUtils:FILES:wtail $file 3]]\">\n"
-  if { $params != "" } {
-    append text "      <AdditionalOptions Condition=\"\'\$(Configuration)|\$(Platform)\'==\'Debug|Win32\'\">[string trim ${params}]  %(AdditionalOptions)</AdditionalOptions>\n"
+proc osutils:vcxproj:cxxfile { theFile theParams } {
+  if { $theParams == "" } {
+    return "    <ClCompile Include=\"..\\..\\..\\[wokUtils:EASY:bs1 [wokUtils:FILES:wtail $theFile 3]]\" />\n"
   }
 
-  if { $params != "" } {
-    append text "      <AdditionalOptions Condition=\"\'\$(Configuration)|\$(Platform)\'==\'Release|Win32\'\">[string trim ${params}]  %(AdditionalOptions)</AdditionalOptions>\n"
-  }
-
-  if { $params != "" } {
-    append text "      <AdditionalOptions Condition=\"\'\$(Configuration)|\$(Platform)\'==\'Debug|x64\'\">[string trim ${params}]  %(AdditionalOptions)</AdditionalOptions>\n"
-  }
-
-  if { $params != "" } {
-    append text "      <AdditionalOptions Condition=\"\'\$(Configuration)|\$(Platform)\'==\'Release|x64\'\">[string trim ${params}]  %(AdditionalOptions)</AdditionalOptions>\n"
-  }
-
+  set aParams [string trim ${theParams}]
+  append text "    <ClCompile Include=\"..\\..\\..\\[wokUtils:EASY:bs1 [wokUtils:FILES:wtail $theFile 3]]\">\n"
+  append text "      <AdditionalOptions Condition=\"\'\$(Configuration)|\$(Platform)\'==\'Debug|Win32\'\">${aParams} %(AdditionalOptions)</AdditionalOptions>\n"
+  append text "      <AdditionalOptions Condition=\"\'\$(Configuration)|\$(Platform)\'==\'Release|Win32\'\">${aParams} %(AdditionalOptions)</AdditionalOptions>\n"
+  append text "      <AdditionalOptions Condition=\"\'\$(Configuration)|\$(Platform)\'==\'Debug|x64\'\">${aParams} %(AdditionalOptions)</AdditionalOptions>\n"
+  append text "      <AdditionalOptions Condition=\"\'\$(Configuration)|\$(Platform)\'==\'Release|x64\'\">${aParams} %(AdditionalOptions)</AdditionalOptions>\n"
   append text "    </ClCompile>\n"
   return $text
 }
 
+# Generate entry for one header file in Visual Studio 10 project file
+proc osutils:vcxproj:hxxfile { theFile } { return "    <ClInclude Include=\"..\\..\\..\\[wokUtils:EASY:bs1 [wokUtils:FILES:wtail $theFile 3]]\" />\n" }
+
 # Generate Visual Studio 2010 project filters file
-proc osutils:vcxproj:filters { dir proj theFilesMap } {
-  upvar $theFilesMap aFilesMap
+proc osutils:vcxproj:filters { dir proj theCxxFilesMap theHxxFilesMap } {
+  upvar $theCxxFilesMap aCxxFilesMap
+  upvar $theHxxFilesMap aHxxFilesMap
 
   # header
   append text "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
@@ -1594,60 +1592,25 @@ proc osutils:vcxproj:filters { dir proj theFilesMap } {
   append text "    <Filter Include=\"Source files\">\n"
   append text "      <UniqueIdentifier>[OS:genGUID]</UniqueIdentifier>\n"
   append text "    </Filter>\n"
-  foreach unit $aFilesMap(units) {
-    append text "    <Filter Include=\"Source files\\${unit}\">\n"
-    append text "      <UniqueIdentifier>[OS:genGUID]</UniqueIdentifier>\n"
-    append text "    </Filter>\n"
-  }
-  append text "  </ItemGroup>\n"
-
-  # list of files
-  append text "  <ItemGroup>\n"
-  foreach unit $aFilesMap(units) {
-    foreach file $aFilesMap($unit) {
-      append text "    <ClCompile Include=\"..\\..\\..\\[wokUtils:EASY:bs1 [wokUtils:FILES:wtail $file 3]]\">\n"
-      append text "      <Filter>Source files\\${unit}</Filter>\n"
-      append text "    </ClCompile>\n"
-    }
-  }
-  append text "  </ItemGroup>\n"
-
-  # end
-  append text "</Project>"
-
-  # write file
-  set fp [open [set fvcproj [file join $dir ${proj}.vcxproj.filters]] w]
-  fconfigure $fp -translation crlf
-  puts $fp $text
-  close $fp
-
-  return ${proj}.vcxproj.filters
-}
-
-# Generate Visual Studio 2011 project filters file
-proc osutils:vcx1proj:filters { dir proj theFilesMap } {
-  upvar $theFilesMap aFilesMap
-
-  # header
-  append text "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-  append text "<Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n"
-
-  # list of "filters" (units)
-  append text "  <ItemGroup>\n"
-  append text "    <Filter Include=\"Source files\">\n"
+  append text "    <Filter Include=\"Header files\">\n"
   append text "      <UniqueIdentifier>[OS:genGUID]</UniqueIdentifier>\n"
   append text "    </Filter>\n"
-  foreach unit $aFilesMap(units) {
+  foreach unit $aCxxFilesMap(units) {
     append text "    <Filter Include=\"Source files\\${unit}\">\n"
+    append text "      <UniqueIdentifier>[OS:genGUID]</UniqueIdentifier>\n"
+    append text "    </Filter>\n"
+  }
+  foreach unit $aHxxFilesMap(units) {
+    append text "    <Filter Include=\"Header files\\${unit}\">\n"
     append text "      <UniqueIdentifier>[OS:genGUID]</UniqueIdentifier>\n"
     append text "    </Filter>\n"
   }
   append text "  </ItemGroup>\n"
 
-  # list of files
+  # list of cxx files
   append text "  <ItemGroup>\n"
-  foreach unit $aFilesMap(units) {
-    foreach file $aFilesMap($unit) {
+  foreach unit $aCxxFilesMap(units) {
+    foreach file $aCxxFilesMap($unit) {
       append text "    <ClCompile Include=\"..\\..\\..\\[wokUtils:EASY:bs1 [wokUtils:FILES:wtail $file 3]]\">\n"
       append text "      <Filter>Source files\\${unit}</Filter>\n"
       append text "    </ClCompile>\n"
@@ -1655,8 +1618,19 @@ proc osutils:vcx1proj:filters { dir proj theFilesMap } {
   }
   append text "  </ItemGroup>\n"
 
+  # list of hxx files
   append text "  <ItemGroup>\n"
-  append text "    <ResourceCompile Include=\"${proj}.rc\" />"
+  foreach unit $aHxxFilesMap(units) {
+    foreach file $aHxxFilesMap($unit) {
+      append text "    <ClInclude Include=\"..\\..\\..\\[wokUtils:EASY:bs1 [wokUtils:FILES:wtail $file 3]]\">\n"
+      append text "      <Filter>Header files\\${unit}</Filter>\n"
+      append text "    </ClInclude>\n"
+    }
+  }
+  append text "  </ItemGroup>\n"
+
+  append text "  <ItemGroup>\n"
+  append text "    <ResourceCompile Include=\"${proj}.rc\" />\n"
   append text "  </ItemGroup>\n"
 
   # end
@@ -1727,11 +1701,11 @@ proc osutils:vcproj { theVcVer isUWP theOutDir theToolKit theGuidsMap } {
   regsub -all -- {__TKDEP__} $theProjTmpl $aUsedLibs theProjTmpl
 
   set anIncPaths "..\\..\\..\\inc"
-  set aTKDefines ""
+#  set aTKDefines ""
   set aFilesSection ""
-  set aVcFilesX(units) ""
+  set aVcFilesCxx(units) ""
+  set aVcFilesHxx(units) ""
   set listloc [osutils:tk:units $theToolKit]
-  set resultloc [osutils:justwnt $listloc]
   if [array exists written] { unset written }
   #puts "\t1 [wokparam -v %CMPLRS_CXX_Options [w_info -f]] father"
   #puts "\t2 [wokparam -v %CMPLRS_CXX_Options] branch"
@@ -1740,9 +1714,10 @@ proc osutils:vcproj { theVcVer isUWP theOutDir theToolKit theGuidsMap } {
   set fxloparamfcxx [lindex [osutils:intersect3 [_get_options wnt cmplrs_cxx f] [_get_options wnt cmplrs_cxx b]] 2]
   set fxloparamfc   [lindex [osutils:intersect3 [_get_options wnt cmplrs_c f] [_get_options wnt cmplrs_c b]] 2]
   set fxloparam ""
-  foreach fxlo $resultloc {
+  foreach fxlo $listloc {
     set xlo $fxlo
-    set aSrcFiles [osutils:tk:files $xlo wnt]
+    set aSrcFiles [osutils:tk:cxxfiles $xlo wnt]
+	set aHxxFiles [osutils:tk:hxxfiles $xlo wnt]
 	set fxlo_cmplrs_options_cxx [_get_options wnt cmplrs_cxx $fxlo]
     if {$fxlo_cmplrs_options_cxx == ""} {
       set fxlo_cmplrs_options_cxx [_get_options wnt cmplrs_cxx b]
@@ -1771,12 +1746,22 @@ proc osutils:vcproj { theVcVer isUWP theOutDir theToolKit theGuidsMap } {
       foreach aSrcFile [lsort $aSrcFiles] {
         if { ![info exists written([file tail $aSrcFile])] } {
           set written([file tail $aSrcFile]) 1
-          append aFilesSection [osutils:vcxproj:file $aSrcFile $needparam]
+          append aFilesSection [osutils:vcxproj:cxxfile $aSrcFile $needparam]
         } else {
           puts "Warning : in vcproj more than one occurences for [file tail $aSrcFile]"
         }
-        if { ! [info exists aVcFilesX($xlo)] } { lappend aVcFilesX(units) $xlo }
-        lappend aVcFilesX($xlo) $aSrcFile
+        if { ! [info exists aVcFilesCxx($xlo)] } { lappend aVcFilesCxx(units) $xlo }
+        lappend aVcFilesCxx($xlo) $aSrcFile
+      }
+      foreach aHxxFile [lsort $aHxxFiles] {
+        if { ![info exists written([file tail $aHxxFile])] } {
+          set written([file tail $aHxxFile]) 1
+          append aFilesSection [osutils:vcxproj:hxxfile $aHxxFile]
+        } else {
+          puts "Warning : in vcproj more than one occurences for [file tail $aHxxFile]"
+        }
+        if { ! [info exists aVcFilesHxx($xlo)] } { lappend aVcFilesHxx(units) $xlo }
+        lappend aVcFilesHxx($xlo) $aHxxFile
       }
     } else {
       append aFilesSection "\t\t\t<Filter\n"
@@ -1792,15 +1777,9 @@ proc osutils:vcproj { theVcVer isUWP theOutDir theToolKit theGuidsMap } {
       }
       append aFilesSection "\t\t\t</Filter>\n"
     }
-
-    # macros
-    append aTKDefines ";__${xlo}_DLL"
-    # common includes
-#    append anIncPaths ";..\\..\\..\\src\\${xlo}"
   }
 
   regsub -all -- {__TKINC__}  $theProjTmpl $anIncPaths theProjTmpl
-  regsub -all -- {__TKDEFS__} $theProjTmpl $aTKDefines theProjTmpl
   regsub -all -- {__FILES__}  $theProjTmpl $aFilesSection theProjTmpl
 
   # write file
@@ -1810,12 +1789,8 @@ proc osutils:vcproj { theVcVer isUWP theOutDir theToolKit theGuidsMap } {
   close $aFile
 
   # write filters file for vc10+
-  if { "$theVcVer" == "vc7" || "$theVcVer" == "vc8" || "$theVcVer" == "vc9" } {
-    # nothing
-  } elseif { "$theVcVer" == "vc10" } {
-    lappend aVcFiles [osutils:vcxproj:filters $theOutDir $theToolKit aVcFilesX]
-  } else {
-    lappend aVcFiles [osutils:vcx1proj:filters $theOutDir $theToolKit aVcFilesX]
+  if { "$theVcVer" != "vc7" && "$theVcVer" != "vc8" && "$theVcVer" != "vc9" } {
+    lappend aVcFiles [osutils:vcxproj:filters $theOutDir $theToolKit aVcFilesCxx aVcFilesHxx]
   }
 
   # write resource file
@@ -1847,16 +1822,14 @@ proc osutils:tk:loadunit { loc map } {
   return
 }
 
-# Returns the list of all compilable files name in a toolkit, or devunit of any type
-# Tfiles lists for each unit the type of file that can be compiled.
-proc osutils:tk:files { tkloc thePlatform } {
+# Returns the list of all files name in a toolkit within specified list of file extensions.
+proc osutils:tk:files { tkloc theExtensions } {
   set Tfiles(source,nocdlpack)     {source pubinclude}
   set Tfiles(source,toolkit)       {}
   set Tfiles(source,executable)    {source pubinclude}
   set listloc [concat [osutils:tk:units $tkloc] $tkloc]
   #puts " listloc = $listloc"
 
-  set l_comp [osutils:compilable $thePlatform]
   set resultloc $listloc
   set lret {}
   foreach loc $resultloc {
@@ -1866,6 +1839,7 @@ proc osutils:tk:files { tkloc thePlatform } {
          "t" { set utyp "toolkit" }
          "n" { set utyp "nocdlpack" }
          "x" { set utyp "executable" }
+         default { error "Error: Cannot determine type of unit $loc, check adm/UDLIST!" }
     }
     if [array exists map] { unset map }
     osutils:tk:loadunit $loc map
@@ -1880,7 +1854,7 @@ proc osutils:tk:files { tkloc thePlatform } {
       #puts $type
       foreach f $map($type) {
         #puts $f
-        if { [lsearch $l_comp [file extension $f]] != -1 } {
+        if { [lsearch $theExtensions [file extension $f]] != -1 } {
           lappend lret $f
         }
       }
@@ -1889,10 +1863,16 @@ proc osutils:tk:files { tkloc thePlatform } {
   return $lret
 }
 
+# Returns the list of all compilable files name in a toolkit.
+proc osutils:tk:cxxfiles { tkloc thePlatform } { return [osutils:tk:files $tkloc [osutils:compilable $thePlatform]] }
+
+# Returns the list of all header files name in a toolkit.
+proc osutils:tk:hxxfiles { tkloc thePlatform } { return [osutils:tk:files $tkloc [osutils:fileExtensionsHeaders $thePlatform]] }
+
 # Generate Visual Studio project file for executable
 proc osutils:vcprojx { theVcVer isUWP theOutDir theToolKit theGuidsMap } {
   set aVcFiles {}
-  foreach f [osutils:tk:files $theToolKit wnt] {
+  foreach f [osutils:tk:cxxfiles $theToolKit wnt] {
     set aProjTmpl [osutils:vcproj:readtemplate $theVcVer $isUWP 1]
 
     set aProjName [file rootname [file tail $f]]
@@ -1927,15 +1907,16 @@ proc osutils:vcprojx { theVcVer isUWP theOutDir theToolKit theGuidsMap } {
     regsub -all -- {__TKDEP__} $aProjTmpl $aUsedLibs aProjTmpl
 
     set aFilesSection ""
-    set aVcFilesX(units) ""
+    set aVcFilesCxx(units) ""
+	set aVcFilesHxx(units) ""
 
     if { ![info exists written([file tail $f])] } {
       set written([file tail $f]) 1
 
       if { "$theVcVer" != "vc7" && "$theVcVer" != "vc8" && "$theVcVer" != "vc9" } {
-        append aFilesSection [osutils:vcxproj:file $f ""]
-        if { ! [info exists aVcFilesX($theToolKit)] } { lappend aVcFilesX(units) $theToolKit }
-        lappend aVcFilesX($theToolKit) $f
+        append aFilesSection [osutils:vcxproj:cxxfile $f ""]
+        if { ! [info exists aVcFilesCxx($theToolKit)] } { lappend aVcFilesCxx(units) $theToolKit }
+        lappend aVcFilesCxx($theToolKit) $f
       } else {
         append aFilesSection "\t\t\t<Filter\n"
         append aFilesSection "\t\t\t\tName=\"$theToolKit\"\n"
@@ -1947,10 +1928,8 @@ proc osutils:vcprojx { theVcVer isUWP theOutDir theToolKit theGuidsMap } {
       puts "Warning : in vcproj there are than one occurences for [file tail $f]"
     }
     #puts "$aProjTmpl $aFilesSection"
-    set aTKDefines ";__${theToolKit}_DLL"
     set anIncPaths "..\\..\\..\\inc"
     regsub -all -- {__TKINC__}  $aProjTmpl $anIncPaths    aProjTmpl
-    regsub -all -- {__TKDEFS__} $aProjTmpl $aTKDefines    aProjTmpl
     regsub -all -- {__FILES__}  $aProjTmpl $aFilesSection aProjTmpl
     regsub -all -- {__CONF__}   $aProjTmpl Application    aProjTmpl
 
@@ -1966,8 +1945,11 @@ proc osutils:vcprojx { theVcVer isUWP theOutDir theToolKit theGuidsMap } {
 
     # write filters file for vc10
     if { "$theVcVer" != "vc7" && "$theVcVer" != "vc8" && "$theVcVer" != "vc9" } {
-      lappend aVcFiles [osutils:vcxproj:filters $theOutDir $aProjName aVcFilesX]
+      lappend aVcFiles [osutils:vcxproj:filters $theOutDir $aProjName aVcFilesCxx aVcFilesHxx]
     }
+
+    # write resource file
+    lappend aVcFiles [osutils:readtemplate:rc $theOutDir $aProjName]
 
     set aCommonSettingsFileTmpl ""
     if { "$theVcVer" == "vc7" || "$theVcVer" == "vc8" } {
@@ -2151,7 +2133,7 @@ proc osutils:cbptk { theCmpl theOutDir theToolKit thePlatform} {
   if [array exists written] { unset written }
   foreach fxlo $resultloc {
     set xlo       $fxlo
-    set aSrcFiles [osutils:tk:files $xlo $thePlatform]
+    set aSrcFiles [osutils:tk:cxxfiles $xlo $thePlatform]
     foreach aSrcFile [lsort $aSrcFiles] {
       if { ![info exists written([file tail $aSrcFile])] } {
         set written([file tail $aSrcFile]) 1
@@ -2162,9 +2144,9 @@ proc osutils:cbptk { theCmpl theOutDir theToolKit thePlatform} {
     }
 
     # macros for correct DLL exports
-    if { $thePlatform == "wnt" || $thePlatform == "uwp" } {
-      lappend aTKDefines "__${xlo}_DLL"
-    }
+#    if { $thePlatform == "wnt" || $thePlatform == "uwp" } {
+#      lappend aTKDefines "__${xlo}_DLL"
+#    }
   }
 
   return [osutils:cbp $theCmpl $theOutDir $theToolKit $thePlatform $aTKSrcFiles $aUsedLibs $aFrameworks $anIncPaths $aTKDefines]
@@ -2245,7 +2227,7 @@ proc osutils:cbpx { theCmpl theOutDir theToolKit thePlatform } {
   set aWokArch    "$::env(ARCH)"
 
   set aCbpFiles {}
-  foreach aSrcFile [osutils:tk:files $theToolKit $thePlatform] {
+  foreach aSrcFile [osutils:tk:cxxfiles $theToolKit $thePlatform] {
     # collect list of referred libraries to link with
     set aUsedLibs     [list]
     set aFrameworks   [list]
@@ -2281,9 +2263,9 @@ proc osutils:cbpx { theCmpl theOutDir theToolKit thePlatform } {
     }
 
     # macros for correct DLL exports
-    if { $thePlatform == "wnt" || $thePlatform == "uwp" } {
-      lappend aTKDefines "__${theToolKit}_DLL"
-    }
+#    if { $thePlatform == "wnt" || $thePlatform == "uwp" } {
+#      lappend aTKDefines "__${theToolKit}_DLL"
+#    }
 
     # common include paths
     lappend anIncPaths "../../../inc"
@@ -2684,7 +2666,7 @@ proc osutils:xcdtk:deps {theToolKit theTargetType theGuidsMap theFileRefSection 
   set aDepToolkits      [lappend [wokUtils:LIST:Purge [osutils:tk:close $theToolKit]] $theToolKit]
 
   if { "$theTargetType" == "executable" } {
-    set aFile [osutils:tk:files $theToolKit mac]
+    set aFile [osutils:tk:cxxfiles $theToolKit mac]
     set aProjName [file rootname [file tail $aFile]]
     set aDepToolkits [LibToLinkX $theToolKit $aProjName]
   }
@@ -2750,7 +2732,7 @@ proc osutils:xcdtk:sources {theToolKit theTargetType theSrcFileRefSection theGro
       set aGuidsMap($aPackage) [OS:genGUID "xcd"]
     }
 
-    set aSrcFiles [osutils:tk:files $xlo mac]
+    set aSrcFiles [osutils:tk:cxxfiles $xlo mac]
     foreach aSrcFile [lsort $aSrcFiles] {
       set aFileExt "sourcecode.cpp.cpp"
 

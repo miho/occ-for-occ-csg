@@ -88,6 +88,15 @@ void BRepAlgo_Loop::Init(const TopoDS_Face& F)
 static void Bubble(const TopoDS_Edge&        E,
 		   TopTools_SequenceOfShape& Seq) 
 {
+  //Remove duplicates
+  for (Standard_Integer i = 1; i < Seq.Length(); i++)
+    for (Standard_Integer j = i+1; j <= Seq.Length(); j++)
+      if (Seq(i) == Seq(j))
+      {
+        Seq.Remove(j);
+        j--;
+      }
+  
   Standard_Boolean Invert   = Standard_True;
   Standard_Integer NbPoints = Seq.Length();
   Standard_Real    U1,U2;
@@ -546,6 +555,7 @@ void BRepAlgo_Loop::Perform()
   TopTools_IndexedDataMapOfShapeListOfShape MVE;
 
   // add cut edges.
+  TopTools_MapOfShape Emap;
   for (itl.Initialize(myEdges); itl.More(); itl.Next())
   {
     const TopTools_ListOfShape* pLCE = myCutEdges.Seek (itl.Value());
@@ -553,6 +563,8 @@ void BRepAlgo_Loop::Perform()
     {
       for (itl1.Initialize(*pLCE); itl1.More(); itl1.Next()) {
         TopoDS_Edge& E = TopoDS::Edge(itl1.Value());
+        if (!Emap.Add(E))
+          continue;
         StoreInMVE(myFace,E,MVE,YaCouture,myVerticesForSubstitute);
       }
     }

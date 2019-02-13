@@ -5529,6 +5529,7 @@ surface_radius c pi 3 c1 c2
 
 * **intersect** computes intersections of surfaces; 
 * **2dintersect** computes intersections of 2d curves.
+* **intconcon** computes intersections of 2d conic curves.
 
 @subsubsection occt_draw_6_7_1  intersect
 
@@ -5547,21 +5548,43 @@ plane p 0 0 40 0 1 5
 intersect e c p 
 ~~~~~
 
-@subsubsection occt_draw_6_7_2  dintersect
+@subsubsection occt_draw_6_7_2  2dintersect
 
 Syntax:      
 ~~~~~
-2dintersect curve1 curve2 
+2dintersect curve1 [curve2] [-tol tol] [-state]
 ~~~~~
 
-Displays the intersection points between two 2d curves. 
+Displays the intersection points between 2d curves.
+Options:
+ -tol - allows changing the intersection tolerance (default value is 1.e-3);
+ -state - allows printing the intersection state for each point.
 
 **Example:** 
 ~~~~~
 # intersect two 2d ellipses 
 ellipse e1 0 0 5 2 
 ellipse e2 0 0 0 1 5 2 
-2dintersect e1 e2 
+2dintersect e1 e2 -tol 1.e-10 -state
+~~~~~
+
+@subsubsection occt_draw_6_7_3 intconcon
+
+Syntax:      
+~~~~~
+intconcon curve1 curve2 
+~~~~~
+
+Displays the intersection points between two 2d curves. 
+Curves must be only conic sections: 2d lines, circles, ellipses,
+hyperbolas, parabolas. The algorithm from *IntAna2d_AnaIntersection* is used.
+
+**Example:** 
+~~~~~
+# intersect two 2d ellipses 
+ellipse e1 0 0 5 2 
+ellipse e2 0 0 0 1 5 2 
+intconcon e1 e2 
 ~~~~~
 
 @subsection occt_draw_6_8  Approximations
@@ -5661,18 +5684,33 @@ projponf f pnt
 
 Syntax: 
 ~~~~~
-cirtang cname curve/point/radius curve/point/radius curve/point/radius 
+cirtang result [-t <Tolerance>] -c <curve> -p <point> -r <Radius>...
 ~~~~~
 
-Builds all circles satisfying the three constraints which are either a curve (the circle must be tangent to that curve), a point (the circle must pass through that point), or a radius for the circle. Only one constraint can be a radius. The solutions will be stored in variables *name_1*, *name_2*, etc. 
+Builds all circles satisfying the condition: 
+1. the circle must be tangent to every given curve;
+2. the circle must pass through every given point;
+3. the radius of the circle must be equal to the requested one. 
+
+Only following set of input data is supported: Curve-Curve-Curve, Curve-Curve-Point, Curve-Curve-Radius, Curve-Point-Point, Curve-Point-Radius, Point-Point-Point, Point-Point-Radius. The solutions will be stored in variables *result_1*, *result_2*, etc.
 
 **Example:** 
 ~~~~~
-# a point, a line and a radius. 2 solutions 
+# a point, a line and a radius. 2 solutions of type Curve-Point-Radius (C-P-R)
 point p 0 0 
-line 1 10 0 -1 1 
-cirtang c p 1 4 
-== c_1 c_2 
+line l 10 0 -1 1 
+cirtang c -p p -c l -r 4 
+== Solution of type C-P-R is: c_1 c_2
+~~~~~
+
+Additionally it is possible to create a circle(s) with given center and tangent to the given curve (Curve-Point type).
+
+**Example:** 
+~~~~~
+point pp 1 1
+2dbsplinecurve cc 1 2 0 2 1 2 -10 -5 1 10 -5 1
+cirtang r -p pp -c cc 
+== Solution of type C-P is: r_1 r_2 
 ~~~~~
 
 @subsubsection occt_draw_6_10_2  lintan
@@ -5821,6 +5859,9 @@ The following topics are covered in the eight sections of this chapter:
   * Transformations of shapes: translation, copy, etc.
   * Topological operations, or booleans.
   * Drafting and blending.
+  * Defeaturing.
+  * Making shapes periodic in 3D space.
+  * Making shapes connected.
   * Analysis of shapes.
 
 
@@ -6837,7 +6878,10 @@ tscale c1 0 0 0 0.5
 
 @subsubsection occt_draw_7_6_1  fuse, cut, common
 
-Syntax:      
+These commands are no longer supported, so the result may be unpredictable.
+Use the commands bfuse, bcut, bcommon instead.
+
+Syntax:
 ~~~~~
 fuse name shape1 shape2 
 cut name shape1 shape2 
@@ -6872,6 +6916,9 @@ ttranslate s4 0 -40 0
 
 
 @subsubsection occt_draw_7_6_2  section, psection
+
+These commands are no longer supported, so the result may be unpredictable.
+Use the command **bsection** instead.
 
 Syntax:      
 ~~~~~
@@ -6916,186 +6963,14 @@ whatis sr
 sr is a shape COMPOUND FORWARD Free Modified 
 ~~~~~
 
-@subsection occt_draw_7_7  New Topological operations
+@subsection occt_draw_7_7 New Topological operations
 
+The new algorithm of Boolean operations avoids a large number of weak points and limitations presented in the old Boolean operation algorithm.
+It also provides wider range of options and diagnostics.
+The algorithms of Boolean component are fully described in the @ref occt_algorithms_1 "Boolean Operations" of boolean operation user guide.
 
-The new algorithm of Boolean operations avoids a large number of weak points and limitations presented in the old boolean operation algorithm. 
+For the Draw commands to perform operations in Boolean component, read the dedicated section @ref occt_draw_bop "Boolean operations commands"
 
-
-@subsubsection occt_draw_7_7_1  bparallelmode
-
-* **bparallelmode** enable or disable parallel mode for boolean operations. Sequential computing is used by default.
-
-Syntax: 
-~~~~~
-bparallelmode [1/0]
-
-~~~~~
-
-Without arguments, bparallelmode shows current state of parallel mode for boolean operations.
-
-* *0* Disable parallel mode, 
-* *1* Enable parallel mode 
-
-**Example:**
-~~~~~
-# Enable parallel mode for boolean operations.
-bparallelmode 1
-
-# Show state of parallel mode for boolean operations.
-bparallelmode
-~~~~~
-
-@subsubsection occt_draw_7_7_2  bop, bopfuse, bopcut, boptuc, bopcommon
-
-* **bop** defines *shape1* and *shape2* subject to ulterior Boolean operations 
-* **bopfuse** creates a new shape by a boolean operation on two existing shapes. The new shape contains both originals intact. 
-* **bopcut** creates a new shape which contains all parts of the second shape but only the first shape without the intersection of the two shapes. 
-* **boptuc** is a reverced **bopcut**. 
-* **bopcommon** creates a new shape which contains only whatever is in common between the two original shapes in their intersection. 
-
-Syntax:      
-~~~~~
-bop shape1 shape2 
-bopcommon result 
-bopfuse result 
-bopcut result 
-boptuc result 
-~~~~~
-
-These commands have short variants: 
-
-~~~~~
-bcommon result shape1 shape2 
-bfuse result shape1 shape2 
-bcut result shape1 shape2 
-~~~~~
-
-
-**bop** fills data structure (DS) of boolean operation for *shape1* and *shape2*. 
-**bopcommon, bopfuse, bopcut, boptuc** commands are used after **bop** command. After one **bop** command it is possible to call several commands from the list above. For example:
-
-~~~~~
-bop S1 S2
-bopfuse R
-~~~~~ 
-
-
-**Example:** 
-
-Let us produce all four boolean operations on a box and a cylinder: 
-
-~~~~~
-box b 0 -10 5 20 20 10 
-pcylinder c 5 20 
-
-# fills data structure 
-bop b c 
-
-bopfuse s1 
-ttranslate s1 40 0 0 
-
-bopcut s2 
-ttranslate s2 -40 0 0 
-
-boptuc s3 
-ttranslate s3 0 40 0 
-
-bopcommon s4 
-ttranslate s4 0 -40 0 
-~~~~~
-
-Now use short variants of the commands: 
-
-~~~~~
-bfuse s11 b c 
-ttranslate s11 40 0 100 
-
-bcut s12 b c 
-ttranslate s12 -40 0 100 
-
-bcommon s14 b c 
-ttranslate s14 0 -40 100 
-~~~~~
-
-@subsubsection occt_draw_7_7_3  bopsection
-
-Syntax:      
-~~~~~
-bop shape1 shape2 
-bopsection result 
-~~~~~
-
-* **bopsection** -- creates a compound object consisting of the edges for the intersection curves on the faces of two shapes.
-* **bop** -- fills data structure (DS) of boolean operation for *shape1* and *shape2*. 
-* **bopsection** -- is used after **bop** command.
- 
-Short variant syntax:      
-~~~~~
-bsection result shape1 shape2 [-2d/-2d1/-2s2] [-a] 
-~~~~~
-
-* <i>-2d</i>  --  PCurves are computed on both parts. 
-* <i>-2d1</i> -- PCurves are computed on first part. 
-* <i>-2d2</i> -- PCurves are computed on second part. 
-* <i>-a</i>  --   built geometries  are approximated. 
-
-**Example:** 
-
-Let us build a section line between a cylinder and a box 
-~~~~~
-pcylinder c 10 20 
-box b 0 0 5 15 15 15 
-trotate b 0 0 0 1 1 1 20 
-bop b c 
-bopsection s 
-# Short variant: 
-bsection s2 b c 
-~~~~~
-
-@subsubsection occt_draw_7_7_4  bopcheck, bopargshape
-
-Syntax:      
-~~~~~
-bopcheck shape 
-bopargcheck shape1 [[shape2] [-F/O/C/T/S/U] [/R|F|T|V|E|I|P]] [#BF] 
-~~~~~
-
-**bopcheck** checks a shape for self-interference. 
-
-**bopargcheck** checks the validity of argument(s) for boolean operations. 
-
-* Boolean Operation -- (by default a section is made) : 
-  * **F** (fuse) 
-  * **O** (common) 
-  * **C** (cut) 
-  * **T** (cut21) 
-  * **S** (section) 
-  * **U** (unknown) 
-* Test Options -- (by default all options are enabled) : 
-  * **R** (disable small edges (shrink range) test) 
-  * **F** (disable faces verification test) 
-  * **T** (disable tangent faces searching test) 
-  * **V** (disable test possibility to merge vertices) 
-  * **E** (disable test possibility to merge edges) 
-  * **I** (disable self-interference test) 
-  * **P** (disable shape type test) 
-* Additional Test Options :
-  * **B** (stop test on first faulty found) -- by default it is off; 
-  * **F** (full output for faulty shapes) -- by default the output is made in a short format.
-
-**Note** that Boolean Operation and Test Options are used only for a couple of argument shapes, except for <b>I</b> and <b>P</b> options that are always used to test a couple of shapes as well as a single shape.
-
-**Example:** 
-~~~~~
-# checks a shape on self-interference 
-box b1 0 0 0 1 1 1 
-bopcheck b1 
-
-# checks the validity of argument for boolean cut operations 
-box b2 0 0 0 10 10 10 
-bopargcheck b1 b2 -C 
-~~~~~
 
 @subsection occt_draw_7_8  Drafting and blending
 
@@ -7299,13 +7174,187 @@ buildevol
 ~~~~~
 
 
+@subsection occt_draw_defeaturing Defeaturing
+
+Draw command **removefeatures** is intended for performing @ref occt_modalg_defeaturing "3D Model Defeaturing", i.e. it performs the removal of the requested features from the shape.
+
+Syntax:
+~~~~
+removefeatures result shape f1 f2 ... [-nohist] [-parallel]
+
+Where:
+result   - result of the operation;
+shape    - the shape to remove the features from;
+f1, f2   - features to remove from the shape;
+
+Options:
+nohist   - disables the history collection;
+parallel - enables the parallel processing mode.
+~~~~
+
+
+@subsection occt_draw_makeperiodic 3D Model Periodicity
+
+Draw module for @ref occt_modalg_makeperiodic "making the shape periodic" includes the following commands:
+* **makeperiodic** - makes the shape periodic in required directions;
+* **repeatshape** - repeats the periodic shape in requested periodic direction;
+* **periodictwins** - returns the periodic twins for the shape;
+* **clearrepetitions** - clears all previous repetitions of the periodic shape.
+
+@subsubsection occt_draw_makeperiodic_makeperiodic makeperiodic
+
+The command makes the shape periodic in the required directions with the required period.
+If trimming is given it trims the shape to fit the requested period.
+
+Syntax:
+~~~~
+makeperiodic result shape [-x/y/z period [-trim first]]
+
+Where:
+result        - resulting periodic shape;
+shape         - input shape to make it periodic:
+-x/y/z period - option to make the shape periodic in X, Y or Z direction with the given period;
+-trim first   - option to trim the shape to fit the required period, starting the period in first.
+~~~~
+
+@subsubsection occt_draw_makeperiodic_repeatshape repeatshape
+
+The command repeats the periodic shape in periodic direction requested number of time.
+The result contains the all the repeated shapes glued together.
+The command should be called after **makeperiodic** command.
+
+Syntax:
+~~~~
+repeatshape result -x/y/z times
+
+Where:
+result       - resulting shape;
+-x/y/z times - direction for repetition and number of repetitions (negative number of times means the repetition in negative direction).
+~~~~
+
+@subsubsection occt_draw_makeperiodic_periodictwins periodictwins
+
+For the given shape the command returns the identical shapes located on the opposite sides of the periodic direction.
+All periodic twins should have the same geometry.
+The command should be called after **makeperiodic** command.
+
+Syntax:
+~~~~
+periodictwins twins shape
+
+Where:
+twins - periodic twins for the given shape
+shape - shape to find the twins for
+~~~~
+
+@subsubsection occt_draw_makeperiodic_clearrepetitions clearrepetitions
+
+The command clears all previous repetitions of the periodic shape allowing to start the repetitions over.
+No arguments are needed for the command.
+
+
+@subsection occt_draw_makeconnected Making the touching shapes connected
+
+Draw module for @ref occt_modalg_makeconnected "making the touching same-dimensional shapes connected" includes the following commands:
+* **makeconnected** - make the input shapes connected or glued, performs material associations;
+* **cmaterialson** - returns the materials located on the requested side of a shape;
+* **cmakeperiodic** - makes the connected shape periodic in requested directions;
+* **crepeatshape** - repeats the periodic connected shape in requested directions requested number of times;
+* **cperiodictwins** - returns all periodic twins for the shape;
+* **cclearrepetitions** - clears all previous repetitions of the periodic shape, keeping the shape periodic.
+
+@subsubsection occt_draw_makeconnected_makeconnected makeconnected
+
+The command makes the input touching shapes connected.
+
+Syntax:
+~~~~
+makeconnected result shape1 shape2 ...
+
+Where:
+result            - resulting connected shape.
+shape1 shape2 ... - shapes to be made connected.
+~~~~
+
+@subsubsection occt_draw_makeconnected_cmaterialson cmaterialson
+
+The command returns the materials located on the requested side of the shape.
+The command should be called after the shapes have been made connected, i.e. after the command **makeconnected**.
+
+Syntax:
+~~~~
+cmaterialson result +/- shape
+
+Where:
+result - material shapes
+shape  - shape for which the materials are needed
++/-    - side of a given shape ('+' for positive side, '-' - for negative).
+~~~~
+
+@subsubsection occt_draw_makeconnected_cmakeperiodic cmakeperiodic
+
+The command makes the connected shape periodic in the required directions with the required period.
+The command should be called after the shapes have been made connected, i.e. after the command **makeconnected**.
+
+Syntax:
+~~~~
+cmakeperiodic result [-x/y/z period [-trim first]]
+ 
+Where:
+result        - resulting periodic shape;
+shape         - input shape to make it periodic:
+-x/y/z period - option to make the shape periodic in X, Y or Z direction with the given period;
+-trim first   - option to trim the shape to fit the required period, starting the period in first.
+~~~~
+
+@subsubsection occt_draw_makeconnected_crepeatshape crepeatshape
+
+The command repeats the connected periodic shape in the required periodic directions required number of times.
+The command should be called after the shapes have been made connected and periodic, i.e. after the commands **makeconnected** and **cmakeperiodic**.
+
+Syntax:
+~~~~
+crepeatshape result -x/y/z times
+
+Where:
+result       - resulting shape;
+-x/y/z times - direction for repetition and number of repetitions (negative number of times means the repetition in negative direction).
+~~~~
+
+@subsubsection occt_draw_makeconnected_cperiodictwins cperiodictwins
+
+The command returns all periodic twins for the shape.
+The command should be called after the shapes have been made connected and periodic, i.e. after the commands **makeconnected** and **cmakeperiodic**.
+
+Syntax:
+~~~~
+cperiodictwins twins shape
+
+Where:
+twins - periodic twins of a shape.
+shape - input shape.
+~~~~
+
+@subsubsection occt_draw_makeconnected_cclearrepetitions cclearrepetitions
+
+The command clears all previous repetitions of the periodic shape keeping the shape periodic.
+The command should be called after the shapes have been made connected, periodic and the repetitions have been applied to the periodic shape, i.e. after the commands **makeconnected**, **cmakeperiodic** and **crepeatshape**.
+Otherwise the command will have no effect.
+
+Syntax:
+~~~~
+cclearrepetitions [result]
+~~~~
+
+
 @subsection occt_draw_7_9  Analysis of topology and geometry
 
 Analysis of shapes includes commands to compute length, area, volumes and inertial properties, as well as to compute some aspects impacting shape validity.
 
   * Use **lprops**, **sprops**, **vprops** to compute integral properties.
-  * Use **bounding** to display the bounding box of a shape.
+  * Use **bounding** to compute and to display the bounding box of a shape.
   * Use **distmini** to calculate the minimum distance between two shapes.
+  * Use **isbbinterf** to check if the two shapes are interfered by their bounding boxes. 
   * Use **xdistef**, **xdistcs**, **xdistcc**, **xdistc2dc2dss**, **xdistcc2ds** to check the distance between two objects on even grid.
   * Use **checkshape** to check validity of the shape.
   * Use **tolsphere** to see the tolerance spheres of all vertices in the shape.
@@ -7316,14 +7365,25 @@ Analysis of shapes includes commands to compute length, area, volumes and inerti
 
 Syntax:      
 ~~~~~
-lprops shape 
-sprops shape 
-vprops shape 
+lprops shape  [x y z] [-skip] [-full] [-tri]
+sprops shape [epsilon] [c[losed]] [x y z] [-skip] [-full] [-tri]
+vprops shape [epsilon] [c[losed]] [x y z] [-skip] [-full] [-tri] 
 ~~~~~
 
 * **lprops** computes the mass properties of all edges in the shape with a linear density of 1;
 * **sprops** of all faces with a surface density of 1;
 * **vprops** of all solids with a density of 1. 
+
+For computation of properties of the shape, exact geomery (curves, surfaces) or
+some discrete data (polygons, triangulations) can be used for calculations.
+The epsilon, if given, defines relative precision of computation.
+The **closed** flag, if present, forces computation only closed shells of the shape.
+The centroid coordinates will be put to DRAW variables x y z (if given).
+Shared entities will be taken in account only one time in the **skip** mode.
+All values are output with the full precision in the **full** mode.
+Preferable source of geometry data are triangulations in case if it exists, 
+if the **-tri** key is used, otherwise preferable data is exact geometry.
+If epsilon is given, exact geometry (curves, surfaces) are used for calculations independently of using key **-tri**.
 
 All three commands print the mass, the coordinates of the center of gravity, the matrix of inertia and the moments. Mass is either the length, the area or the volume. The center and the main axis of inertia are displayed. 
 
@@ -7358,20 +7418,135 @@ I.Z = 314159.265357595
 
 Syntax:      
 ~~~~~
-bounding shape 
+bounding {-s shape | -c xmin ymin zmin xmax ymax zmax} [-obb] [-shape name] [-dump] [-notriangulation] [-perfmeter name NbIters] [-save xmin ymin zmin xmax ymax zmax] [-nodraw] [-optimal] [-exttoler]
 ~~~~~
 
-Displays the bounding box of a shape. The bounding box is a cuboid created with faces parallel to the x, y, and z planes. The command returns the dimension values of the the box, *xmin ymin zmin xmax ymax zmax.* 
+Computes and displays the bounding box (BndBox) of a shape. The bounding box is a cuboid that circumscribes the source shape.
+Generaly, bounding boxes can be divided into two main types:
+  - axis-aligned BndBox (AABB). I.e. the box whose edges are parallel to an axis of World Coordinate System (WCS);
+  - oriented BndBox (OBB). I.e. not AABB.
 
-**Example:** 
+Detailed information about this command is availabe in DRAW help-system (enter "help bounding" in DRAW application).
+  
+**Example 1: Creation of AABB with given corners** 
 ~~~~~
-# bounding box of a torus 
+bounding -c 50 100 30 180 200 100 -shape result
+# look at the box
+vdisplay result
+vfit
+vsetdispmode 1
+~~~~~
+
+**Example 2: Compare AABB and OBB** 
+~~~~~
+# Create a torus and rotate it
 ptorus t 20 5 
-bounding t 
-==-27.059805107309852              -27.059805107309852 - 
-5.0000001000000003 
-==27.059805107309852               27.059805107309852 
-5.0000001000000003 
+trotate t 5 10 15 1 1 1 28
+
+# Create AABB from the torus
+bounding -s t -shape ra -dump -save x1 y1 z1 x2 y2 z2
+==Axes-aligned bounding box
+==X-range: -26.888704600189307 23.007685197265488
+==Y-range: -22.237699567214314 27.658690230240481
+==Z-range: -13.813966507560762 12.273995247458407
+
+# Obtain the boundaries
+dump x1 y1 z1 x2 y2 z2
+==*********** Dump of x1 *************
+==-26.8887046001893
+
+==*********** Dump of y1 *************
+==-22.2376995672143
+
+==*********** Dump of z1 *************
+==-13.8139665075608
+
+==*********** Dump of x2 *************
+==23.0076851972655
+
+==*********** Dump of y2 *************
+==27.6586902302405
+
+==*********** Dump of z2 *************
+==12.2739952474584
+
+# Compute the volume of AABB
+vprops ra 1.0e-12
+==Mass :         64949.9
+
+# Let us check this value
+dval (x2-x1)*(y2-y1)*(z2-z1)
+==64949.886543606823
+~~~~~
+
+The same result is obtained.
+
+~~~~~
+# Create OBB from the torus
+bounding -s t -shape ro -dump -obb
+==Oriented bounding box
+==Center: -1.9405097014619073 2.7104953315130857 -0.76998563005117782
+==X-axis: 0.31006700219833244 -0.23203206410428409 0.9219650619059514
+==Y-axis: 0.098302309139513336 -0.95673739537318336 -0.27384340837854165
+==Z-axis: 0.94561890324040099 0.17554109923901748 -0.27384340837854493
+==Half X: 5.0000002000000077
+==Half Y: 26.783728747002169
+==Half Z: 26.783728747002165
+
+# Compute the volume of OBB
+vprops ro 1.0e-12
+==Mass :         28694.7
+~~~~~
+
+As we can see, the volume of OBB is significantly less than the volume of AABB.
+
+@subsubsection occt_draw_7_9_2a   isbbinterf
+
+Syntax:      
+~~~~~
+isbbinterf shape1 shape2 [-o]
+~~~~~
+
+Checks whether the bounding boxes created from the given shapes are interfered. If "-o"-option is switched on then the oriented boxes will be checked. Otherwise, axis-aligned boxes will be checked.
+
+**Example 1: Not interfered AABB** 
+~~~~~
+box b1 100 60 140 20 10 80
+box b2 210 200 80 120 60 90
+isbbinterf b1 b2
+==The shapes are NOT interfered by AABB.
+~~~~~
+
+**Example 2: Interfered AABB** 
+~~~~~
+box b1 300 300 300
+box b2 100 100 100 50 50 50
+isbbinterf b1 b2
+==The shapes are interfered by AABB.
+~~~~~
+
+**Example 3: Not interfered OBB** 
+~~~~~
+box b1 100 150 200
+copy b1 b2
+trotate b1 -150 -150 -150 1 2 3 -40
+trotate b2 -150 -150 -150 1 5 2 60
+
+# Check of interference
+isbbinterf b1 b2 -o
+==The shapes are NOT interfered by OBB.
+~~~~~
+
+**Example 4: Interfered OBB** 
+~~~~~
+box b1 100 150 200
+copy b1 b2
+trotate b1 -50 -50 -50 1 1 1 -40
+trotate b2 -50 -50 -50 1 1 1 60
+
+# Check of interference
+isbbinterf b1 b2 -o
+==The shapes are interfered by OBB.
 ~~~~~
 
 @subsubsection occt_draw_7_9_3  distmini
@@ -7381,7 +7556,7 @@ Syntax:
 distmini name Shape1 Shape2 
 ~~~~~
 
-Calculates the minimum distance between two shapes. The calculation returns the number of solutions, If more than one solution exists. The options are displayed in the viewer(red) and the results are listed in the shell window. The *distmini* lines are considered as shapes which have a value v. 
+Calculates the minimum distance between two shapes. The calculation returns the number of solutions, if more than one solution exists. The options are displayed in the viewer in red and the results are listed in the shell window. The *distmini* lines are considered as shapes which have a value v. 
 
 **Example:** 
 ~~~~~
@@ -7451,8 +7626,8 @@ checkshape [-top] shape [result] [-short]
 
 Where: 
 * *top* -- optional parameter, which allows checking only topological validity of a shape. 
-* *shape* -- the only required parameter which represents the name of the shape to check. 
-* *result* -- optional parameter which is the prefix of the output shape names. 
+* *shape* -- the only required parameter, defines the name of the shape to check. 
+* *result* -- optional parameter, defines custom prefix for the output shape names.
 * *short* -- a short description of the check. 
 
 **checkshape** examines the selected object for topological and geometric coherence. The object should be a three dimensional shape. 
@@ -7497,9 +7672,9 @@ validrange edge [(out) u1 u2]
 
 Where: 
 * *edge* -- the name of the edge to analyze. 
-* *u1*, *u2* -- optional names of variables to put the range into.
+* *u1*, *u2* -- optional names of variables to put into the range.
 
-**validrange** computes valid range of the edge. If *u1* and *u2* are not given it returns first and last parameters. Otherwise, it sets the variables u1 and u2.
+**validrange** computes valid range of the edge. If *u1* and *u2* are not given, it returns the first and the last parameters. Otherwise, it sets variables *u1* and *u2*.
 
 **Example:** 
 ~~~~~
@@ -7873,6 +8048,204 @@ Options:
  * -a AngTol - angular tolerance used for distinguishing the planar faces;
  * -s Shared(0/1) - boolean flag which defines whether the input edges are already shared or have to be intersected.
 
+@subsection occt_draw_hist History commands
+
+Draw module for @ref occt_modalg_hist "History Information support" includes the command to save history of modifications performed by Boolean operation or sibling commands into a drawable object and the actual history commands:
+
+* **setfillhistory**;
+* **savehistory**;
+* **isdeleted**;
+* **modified**;
+* **generated**.
+
+@subsubsection occt_draw_hist_set setfillhistory
+
+*setfillhistory* command controls if the history is needed to be filled in the supported algorithms and saved into the session after the algorithm is done.
+By default it is TRUE, i.e. the history is filled and saved.
+
+Syntax:
+~~~~
+setfillhistory  : Controls the history collection by the algorithms and its saving into the session after algorithm is done.
+                Usage: setfillhistory [flag]
+                w/o arguments prints the current state of the option;
+                flag == 0 - history will not be collected and saved;
+                flag != 0 - history will be collected and saved into the session (default).
+~~~~
+
+Example:
+~~~~
+box b1 10 10 10
+box b2 10 10 10
+setfillhistory 0
+bfuse r b1 b2
+savehistory h
+# No history has been prepared yet.
+setfillhistory 1
+bfuse r b1 b2
+savehistory h
+dump h
+# *********** Dump of h *************
+# History contains:
+#  - 2 Deleted shapes;
+#  - 52 Modified shapes;
+#  - 0 Generated shapes.
+~~~~
+
+@subsubsection occt_draw_hist_save savehistory
+
+*savehistory* command saves the history from the session into a drawable object with the given name.
+
+Syntax:
+~~~~
+savehistory     : savehistory name
+~~~~
+
+If the history of shape modifications performed during an operation is needed, the *savehistory* command should be called after the command performing the operation.
+If another operation supporting history will be performed before the history of the first operation is saved it will be overwritten with the new history.
+
+Example:
+~~~~
+box b1 10 10 10
+box b2 5 0 0 10 10 15
+bfuse r b1 b2
+savehistory fuse_hist
+
+dump fuse_hist
+#*********** Dump of fuse_hist *************
+# History contains:
+# - 4 Deleted shapes;
+# - 20 Modified shapes;
+# - 6 Generated shapes.
+
+unifysamedom ru r
+savehistory usd_hist
+dump usd_hist
+#*********** Dump of usd_hist *************
+#History contains:
+# - 14 Deleted shapes;
+# - 28 Modified shapes;
+# - 0 Generated shapes.
+~~~~
+
+@subsubsection occt_draw_hist_isdel isdeleted
+
+*isdeleted* command checks if the given shape has been deleted in the given history.
+
+Syntax:
+~~~~
+isdeleted       : isdeleted history shape
+~~~~
+
+Example:
+~~~~
+box b1 4 4 4 2 2 2
+box b2 10 10 10
+bcommon r b1 b2
+
+savehistory com_hist
+# all vertices, edges and faces of the b2 are deleted
+foreach s [join [list [explode b2 v] [explode b2 e] [explode b2 f] ] ] {
+  isdeleted com_hist $s
+  # Deleted
+}
+~~~~
+
+@subsubsection occt_draw_hist_mod modified
+
+*modified* command returns the shapes Modified from the given shape in the given history. All modified shapes are put into a compound. If the shape has not been modified, the resulting compound will be empty. Note that if the shape has been modified into a single shape only, it will be returned without enclosure into the compound.
+
+Syntax:
+~~~~
+modified        : modified modified_shapes history shape
+~~~~
+
+Example:
+~~~~
+box b 10 10 10
+explode b e
+fillet r b 2 b_1
+
+savehistory fillet_hist
+
+explode b f
+
+modified m3 fillet_hist b_3
+modified m5 fillet_hist b_5
+~~~~
+
+@subsubsection occt_draw_hist_gen generated
+
+*generated* command returns the shapes Generated from the given shape in the given history. All generated shapes are put into a compound. If no shapes have been generated from the shape, the resulting compound will be empty. Note that; if the shape has generated a single shape only, it will be returned without enclosure into the compound.
+
+Syntax:
+~~~~
+generated       : generated generated_shapes history shape
+~~~~
+
+Example:
+~~~~
+polyline w1 0 0 0 10 0 0 10 10 0
+polyline w2 5 1 10 9 1 10 9 5 10
+
+thrusections r 0 0 w1 w2
+
+savehistory loft_hist
+
+explode w1 e
+explode w2 e
+
+generated g11 loft_hist w1_1
+generated g12 loft_hist w1_2
+generated g21 loft_hist w2_1
+generated g22 loft_hist w2_2
+
+compare g11 g21
+# equal shapes
+
+compare g12 g22
+# equal shapes
+~~~~
+
+@subsubsection occt_draw_hist_extension Enabling Draw history support for the algorithms
+
+Draw History mechanism allows fast and easy enabling of the Draw history support for the OCCT algorithms supporting standard history methods.
+To enable History commands for the algorithm it is necessary to save the history of the algorithm into the session.
+For that, it is necessary to put the following code into the command implementation just after the command is done:
+~~~~
+BRepTest_Objects::SetHistory(ListOfArguments, Algorithm);
+~~~~
+
+Here is the example of how it is done in the command performing Split operation (see implementation of the *bapisplit* command):
+~~~~
+BRepAlgoAPI_Splitter aSplitter;
+// setting arguments
+aSplitter.SetArguments(BOPTest_Objects::Shapes());
+// setting tools
+aSplitter.SetTools(BOPTest_Objects::Tools());
+
+// setting options
+aSplitter.SetRunParallel(BOPTest_Objects::RunParallel());
+aSplitter.SetFuzzyValue(BOPTest_Objects::FuzzyValue());
+aSplitter.SetNonDestructive(BOPTest_Objects::NonDestructive());
+aSplitter.SetGlue(BOPTest_Objects::Glue());
+aSplitter.SetCheckInverted(BOPTest_Objects::CheckInverted());
+aSplitter.SetUseOBB(BOPTest_Objects::UseOBB());
+aSplitter.SetToFillHistory(BRepTest_Objects::IsHistoryNeeded());
+
+// performing operation
+aSplitter.Build();
+
+if (BRepTest_Objects::IsHistoryNeeded())
+{
+  // Store the history for the Objects (overwrites the history in the session)
+  BRepTest_Objects::SetHistory(BOPTest_Objects::Shapes(), aSplitter);
+  // Add the history for the Tools
+  BRepTest_Objects::AddHistory(BOPTest_Objects::Tools(), aSplitter);
+}
+~~~~
+
+The method *BRepTest_Objects::IsHistoryNeeded()* controls if the history is needed to be filled in the algorithm and saved into the session after the algorithm is done (*setfillhistory* command controls this option in DRAW).
+
 
 @subsection occt_draw_7_12  Texture Mapping to a Shape
 
@@ -7945,39 +8318,523 @@ The defaults are:
  * *UScale = VScale = 1*  texture covers 100% of the face 
  
  
-@section occt_draw_20 General Fuse Algorithm commands
+@section occt_draw_bop Boolean Operations Commands
 
-This chapter describes existing commands of Open CASCADE Draw Test Harness that are used for debugging of General Fuse Algorithm (GFA). It is also applicable for all General Fuse based algorithms such as Boolean Operations Algorithm (BOA), Splitter Algorithm (SPA), Cells Builder Algorithm etc.
-
+This chapter describes existing commands of Open CASCADE Draw Test Harness that are used for performing, analyzing, debugging the algorithm in Boolean Component.
 See @ref occt_user_guides__boolean_operations "Boolean operations" user's guide for the description of these algorithms.
 
-@subsection occt_draw_20_1 Definitions
+@subsection occt_draw_bop_two Boolean Operations on two operands
 
-The following terms and definitions are used in this document:
-* **Objects** -- list of shapes that are arguments of the algorithm.
-* **Tools** -- list of shapes that are arguments of the algorithm. Difference between Objects and Tools is defined by specific requirements of the operations (Boolean Operations, Splitting Operation).
+All commands in this section perform Boolean operations on two shapes. One of them is considered as object, and the other as a tool.
+
+@subsubsection occt_draw_bop_two_bop bop, bopfuse, bopcut, boptuc, bopcommon, bopsection
+
+These commands perform Boolean operations on two shapes:
+* **bop** performs intersection of given shapes and stores the intersection results into internal Data Structure.
+* **bopfuse** creates a new shape representing the union of two shapes.
+* **bopcut** creates a new shape representing a subtraction of a second argument from the first one.
+* **boptuc** creates a new shape representing a subtraction of a first argument from the second one.
+* **bopcommon** creates a new shape representing the intersection of two shapes.
+* **bopsection** creates a new shape representing the intersection edges and vertices between shapes.
+
+These commands allow intersecting the shapes only once for building all types of Boolean operations. After *bop* command is done, the other commands in this category use the intersection results prepared by *bop*.
+It may be very useful as the intersection part is usually most time-consuming part of the operation.
+
+Syntax:      
+~~~~~
+bop shape1 shape2 
+bopcommon result 
+bopfuse result 
+bopcut result 
+boptuc result 
+~~~~~
+
+**Example:** 
+
+Let's produce all four boolean operations on a box and a cylinder performing intersection only once:
+~~~~~
+box b 0 -10 5 20 20 10 
+pcylinder c 5 20 
+
+# intersect the shape, storing results into data structure 
+bop b c 
+
+# fuse operation
+bopfuse s1 
+
+# cut operation
+bopcut s2 
+
+# opposite cut operation
+boptuc s3 
+
+# common operation
+bopcommon s4 
+
+# section operation
+bopsection s5
+~~~~~
+
+
+@subsubsection occt_draw_bop_two_bapi bfuse, bcut, btuc, bcommon, bsection
+
+These commands also perform Boolean operations on two shapes. These are the short variants of the bop* commands.
+Each of these commands performs both intersection and building the result and may be useful if you need only the result of a single boolean operation.
+
+Syntax:
+~~~~~
+bcommon result shape1 shape2 
+bfuse result shape1 shape2 
+bcut result shape1 shape2 
+btuc result shape1 shape2 
+~~~~~
+
+**bection** command has some additional options for faces intersection:
+~~~~
+bsection result shape1 shape2 [-n2d/-n2d1/-n2d2] [-na]
+
+Where:
+result - result of the operation
+shape1, shape2 - arguments of the operation
+-n2d - disables PCurve construction on both objects
+-n2d1 - disables PCurve construction on first object
+-n2d2 - disables PCurve construction on second object
+-na - disables approximation of the section curves
+~~~~
+
+@subsection occt_draw_bop_multi Boolean Operations on multiple arguments
+
+The modern Boolean Operations algorithm available in Open CASCADE Technology is capable of performing a Boolean Operations not only on two shapes, but on arbitrary number of shapes.
+In terms of Boolean Operations these arguments are divided on two groups **Objects** and **Tools**. The meaning of these groups is similar to the single object and tool of Boolean Operations on two shapes.
+
+The Boolean operations are based on the General Fuse operation (see @ref occt_algorithms_7 "General Fuse algorithm") which splits all input shapes basing on the intersection results.
+Depending on the type of Boolean operation the BOP algorithm choses the necessary splits of the arguments.
+
+@subsection occt_draw_bop_general_com General commands for working with multiple arguments
+
+The algorithms based on General Fuse operation are using the same commands for adding and clearing the arguments list and for performing intersection of these arguments.
+
+@subsubsection occt_draw_bop_general_com_add Adding arguments of operation
+
+The following commands are used to add the objects and tools for Boolean operations:
+* **baddobjects** *S1 S2...Sn*	-- adds shapes *S1, S2, ... Sn* as Objects;
+* **baddtools** *S1 S2...Sn* -- adds shapes *S1, S2, ... Sn* as Tools;
+
+The following commands are used to clear the objects and tools:
+* **bclearobjects** -- clears the list of Objects;
+* **bcleartools**	-- clears the list of Tools;
+
+So, when running subsequent operation in one Draw session, make sure you cleared the Objects and Tools from previous operation. Otherwise, the new arguments will be added to the current ones.
+
+@subsubsection occt_draw_bop_general_com_fill Intersection of the arguments
+
+The command **bfillds** performs intersection of the arguments (**Objects** and **Tools**) and stores the intersection results into internal Data Structure.
+
+
+@subsection occt_draw_bop_build Building the result of operations
+
+@subsubsection occt_draw_bop_build_BOP Boolean operation
+
+The command **bbop** is used for building the result of Boolean Operation. It has to be used after **bfillds** command.
+
+Syntax:
+~~~~
+bbop result iOp
+
+Where:
+result - result of the operation
+iOp - type of Boolean Operation. It could have the following values:
+0 - COMMON operation
+1 - FUSE operation
+2 - CUT operation
+3 - CUT21 (opposite CUT, i.e. objects and tools are swapped) operation
+4 - SECTION operation
+~~~~
+
+**Example**
+~~~~
+box b1 10 10 10
+box b2 5 5 5 10 10 10
+box b3 -5 -5 -5 10 10 10
+
+# Clear objects and tools from previous runs
+bclearobjects
+bcleartools
+# add b1 as object
+baddobjects b1
+# add b2 and b3 as tools
+baddtools b2 b3
+# perform intersection
+bfillds
+# build result
+bbop rcom 0
+bbop rfuse 1
+bbop rcut 2
+bbop rtuc 3
+bbop rsec 4
+~~~~
+
+@subsubsection occt_draw_bop_build_GF General Fuse operation
+
+The command **bbuild** is used for building the result of General Fuse Operation. It has to be used after **bfillds** command.
+General Fuse operation does not make the difference between Objects and Tools considering both as objects.
+
+Syntax:
+~~~~
+bbuild result
+~~~~
+**Example**
+~~~~
+box b1 10 10 10
+box b2 5 5 5 10 10 10
+box b3 -5 -5 -5 10 10 10
+
+# Clear objects and tools from previous runs
+bclearobjects
+bcleartools
+# add b1 as object
+baddobjects b1
+# add b2 and b3 as tools
+baddtools b2 b3
+# perform intersection
+bfillds
+# build result
+bbuild result
+~~~~
+
+@subsubsection occt_draw_bop_build_Split Split operation
+
+Split operation splits the **Objects** by the **Tools**.
+The command **bsplit** is used for building the result of Split operation. It has to be used after **bfillds** command.
+
+**Example**
+~~~~
+box b1 10 10 10
+box b2 5 5 5 10 10 10
+box b3 -5 -5 -5 10 10 10
+
+# Clear objects and tools from previous runs
+bclearobjects
+bcleartools
+# add b1 as object
+baddobjects b1
+# add b2 and b3 as tools
+baddtools b2 b3
+# perform intersection
+bfillds
+# build result
+bsplit result
+~~~~
+
+@subsubsection occt_draw_bop_build_BOP_opensolids Alternative command for BOP
+
+There is an alternative way to build the result of Boolean operation using the **buildbop** command, which should be run after any other building command, such as **bbuild** or **bbop** or **bsplit**.
+The command has the following features:
+* It is designed to work on open solids and thus uses the alternative approach for building the results (see @ref occt_algorithms_bop_on_opensolids "BOP on open solids" chapter of Boolean operations user guide).
+* It allows changing the groups of Objects and Tools of the operation (even excluding some of the arguments is possible).
+* History information for solids will be lost.
+
+Syntax:
+~~~~
+buildbop result -o s1 [s2 ...] -t s3 [s4 ...] -op operation (common/fuse/cut/tuc)
+Where:
+result      - result shape of the operation
+s1 s2 s3 s4 - arguments (solids) of the GF operation
+operation   - type of boolean operation
+~~~~
+
+**Example**
+~~~~
+box b1 10 10 10
+box b2 5 5 5 10 10 10
+box b3 -5 -5 -5 10 10 10
+
+bclearobjects
+bcleartools
+baddobjects b1 b2 b3
+bfillds
+bbuild r
+
+# bbop command will not be available as the tools are not set
+# but buildbop is available
+
+# fuse of two
+buildbop r1 -o b1 -t b2 -op fuse
+buildbop r2 -o b2 -t b3 -op fuse
+
+# fuse of all - it does not matter how the groups are formed
+buildbop r3 -o b1 b2 -t b3 -op fuse
+buildbop r4 -o b2 -t b1 b3 -op fuse
+buildbop r5 -o b1 b2 b3 -op fuse
+buildbop r6 -t b1 b2 b3 -op fuse
+
+# common of two
+buildbop r7 -o b2 -t b1 -op common
+buildbop r8 -o b1 -t b3 -op common
+
+# common
+buildbop r9 -o b1 -t b2 b3 -op common
+
+# cut
+buildbop r10 -o b1 -t b2 b3 -op cut
+
+# opposite cut
+buildbop r11 -o b1 -t b2 b3 -op tuc
+~~~~
+
+@subsubsection occt_draw_bop_build_CB Cells Builder
+
+See the @ref occt_algorithms_10c_Cells_1 "Cells Builder Usage" for the Draw usage of Cells Builder algorithm.
+
+
+@subsubsection occt_draw_bop_build_API Building result through API
+
+The following commands are used to perform the operation using API implementation of the algorithms:
+* **bapibuild** -- to perform API general fuse operation.
+* **bapibop** -- to perform API Boolean operation.
+* **bapisplit** -- to perform API Split operation.
+
+These commands have the same syntax as the analogical commands described above.
+
+
+@subsection occt_draw_bop_options Setting options for the operation
+
+The algorithms in Boolean component have a wide range of options.
+To see the current state of all option the command **boptions** should be used.
+It has the following syntax:
+~~~~
+boptions [-default]
+
+-default - allows to set all options to default state.
+~~~~
+
+To have an effect the options should be set before the operation (before *bfillds* command).
+
+@subsubsection occt_draw_bop_options_par Parallel processing mode
+
+**brunparallel** command enables/disables the parallel processing mode of the operation.
+
+Syntax:
+~~~~
+brunparallel flag
+
+Where:
+flag is the boolean flag controlling the mode:
+flag == 0 - parallel processing mode is off.
+flag != 0 - parallel processing mode is on.
+~~~~
+
+The command is applicable for all commands in the component.
+
+@subsubsection occt_draw_bop_options_safe Safe processing mode
+
+**bnondestructive** command enables/disables the safe processing mode in which the input arguments are protected from modification.
+
+Syntax:
+~~~~
+bnondestructive flag
+
+Where:
+flag is the boolean flag controlling the mode:
+flag == 0 - safe processing mode is off.
+flag != 0 - safe processing mode is on.
+~~~~
+
+The command is applicable for all commands in the component.
+
+@subsubsection occt_draw_bop_options_fuzzy Fuzzy option
+
+**bfuzzyvalue** command sets the additional tolerance for operations.
+
+Syntax:
+~~~~
+bfuzzyvalue value
+~~~~
+
+The command is applicable for all commands in the component.
+
+@subsubsection occt_draw_bop_options_glue Gluing option
+
+**bglue** command sets the gluing mode for the BOP algorithms.
+
+Syntax:
+~~~~
+bglue 0/1/2
+
+Where:
+0 - disables gluing mode.
+1 - enables the Shift gluing mode.
+2 - enables the Full gluing mode.
+~~~~
+
+The command is applicable for all commands in the component.
+
+@subsubsection occt_draw_bop_options_checkinv Check inversion of input solids
+
+**bcheckinverted** command enables/disables the check of the input solids on inverted status in BOP algorithms.
+
+Syntax:
+~~~~
+bcheckinverted 0 (off) / 1 (on)
+~~~~
+
+The command is applicable for all commands in the component.
+
+@subsubsection occt_draw_bop_options_obb OBB usage
+
+**buseobb** commannd enables/disables the usage of OBB in BOP algorithms.
+
+Syntax:
+~~~~
+buseobb 0 (off) / 1 (on)
+~~~~
+
+The command is applicable for all commands in the component.
+
+@subsubsection occt_draw_bop_options_simplify Result simplification
+
+**bsimplify** command enables/disables the result simplification after BOP. The command is applicable only to the API variants of GF, BOP and Split operations.
+
+Syntax:
+~~~~
+bsimplify [-e 0/1] [-f 0/1] [-a tol]
+
+Where:
+-e 0/1 - enables/disables edges unification
+-f 0/1 - enables/disables faces unification
+-a tol - changes default angular tolerance of unification algo.
+~~~~
+
+@subsubsection occt_draw_bop_options_warn Drawing warning shapes
+
+**bdrawwarnshapes** command enables/disables drawing of warning shapes of BOP algorithms.
+
+Syntax:
+~~~~
+bdrawwarnshapes 0 (do not draw) / 1 (draw warning shapes)
+~~~~
+
+The command is applicable for all commands in the component.
+
+
+@subsection occt_draw_bop_check Check commands
+
+The following commands are analyzing the given shape on the validity of Boolean operation.
+
+@subsubsection occt_draw_bop_check_1 bopcheck
+
+Syntax:
+~~~~
+bopcheck shape [level of check: 0 - 9]
+~~~~
+
+It checks the given shape for self-interference. The optional level of check allows limiting the check to certain intersection types. Here are the types of interferences that will be checked for given level of check:
+* 0 - only V/V;
+* 1 - V/V and V/E;
+* 2 - V/V, V/E and E/E;
+* 3 - V/V, V/E, E/E and V/F;
+* 4 - V/V, V/E, E/E, V/F and E/F;
+* 5 - V/V, V/E, E/E, V/F, E/F and F/F;
+* 6 - V/V, V/E, E/E, V/F, E/F, F/F and V/S;
+* 7 - V/V, V/E, E/E, V/F, E/F, F/F, V/S and E/S;
+* 8 - V/V, V/E, E/E, V/F, E/F, F/F, V/S, E/S and F/S;
+* 9 - V/V, V/E, E/E, V/F, E/F, F/F, V/S, E/S, F/S and S/S - all interferences (Default value)
+
+**Example:**
+~~~~
+box b1 10 10 10
+box b2 3 3 3 4 4 4
+compound b1 b2 c
+bopcheck c
+~~~~
+
+In this example one box is completely included into other box. So the output shows that all sub-shapes of b2 interfering with the solid b1.
+**bopcheck** command does not modifies the input shape, thus can be safely used.
+
+
+@subsubsection occt_draw_bop_check_2 bopargcheck
+
+**bopargcheck** syntax:
+~~~~
+bopargcheck Shape1 [[Shape2] [-F/O/C/T/S/U] [/R|F|T|V|E|I|P|C|S]] [#BF]
+
+ -<Boolean Operation>
+ F (fuse)
+ O (common)
+ C (cut)
+ T (cut21)
+ S (section)
+ U (unknown)
+ For example: "bopargcheck s1 s2 -F" enables checking for Fuse operation
+ default - section
+
+ /<Test Options>
+ R (disable small edges (shrank range) test)
+ F (disable faces verification test)
+ T (disable tangent faces searching test)
+ V (disable test possibility to merge vertices)
+ E (disable test possibility to merge edges)
+ I (disable self-interference test)
+ P (disable shape type test)
+ C (disable test for shape continuity)
+ S (disable curve on surface check)
+ For example: "bopargcheck s1 s2 /RI" disables small edge detection and self-intersection detection
+ default - all options are enabled
+
+ #<Additional Test Options>
+ B (stop test on first faulty found); default OFF
+ F (full output for faulty shapes); default - output in a short format
+
+ NOTE: <Boolean Operation> and <Test Options> are used only for couple of argument shapes, except I and P options that are always used for couple of shapes as well as for single shape test.
+~~~~
+
+As you can see *bopargcheck* performs more extended check of the given shapes than *bopcheck*.
+
+**Example:**
+Let's make an edge with big vertices:
+~~~~
+vertex v1 0 0 0
+settolerance v1 0.5
+vertex v2 1 0 0
+settolerance v2 0.5
+edge e v1 v2
+top; don e; fit
+tolsphere e
+
+bopargcheck e
+~~~~
+Here is the output of this command:
+~~~~
+Made faulty shape: s1si_1
+Made faulty shape: s1se_1
+Faulties for FIRST  shape found : 2
+---------------------------------
+Shapes are not suppotrted by BOP: NO
+Self-Intersections              : YES  Cases(1)  Total shapes(2)
+Check for SI has been aborted   : NO
+Too small edges                 : YES  Cases(1)  Total shapes(1)
+Bad faces                       : NO
+Too close vertices              : DISABLED
+Too close edges                 : DISABLED
+Shapes with Continuity C0       : NO
+Invalid Curve on Surface        : NO
+
+Faulties for SECOND  shape found : 0
+~~~~
+
+@subsection occt_draw_bop_debug Debug commands
+
+The following terms and definitions are used in this chapter:
 * **DS** -- internal data structure used by the algorithm (*BOPDS_DS* object).
 * **PaveFiller** -- intersection part of the algorithm (*BOPAlgo_PaveFiller* object).
 * **Builder** -- builder part of the algorithm (*BOPAlgo_Builder* object).
 * **IDS Index** -- the index of the vector *myLines*.
 
-@subsection occt_draw_20_2 General commands
-
-* **bclearobjects** -- clears the list of Objects;	
-* **bcleartools**	-- clears the list of Tools;	
-* **baddobjects** *S1 S2...Sn*	-- adds shapes *S1, S2, ... Sn* as Objects;	
-* **baddtools** *S1 S2...Sn* -- adds shapes *S1, S2, ... Sn* as Tools;
-* **bfillds** -- performs the Intersection Part of the Algorithm;	
-* **bbuild** *r* -- performs the Building Part of the Algorithm (General Fuse operation); *r* is the resulting shape;
-* **bsplit** *r* -- performs the Splitting operation; *r* is the resulting shape;
-* **bbop** *r* *iOp* -- performs the Boolean operation; *r* is the resulting shape; *iOp* - type of the operation (0 - COMMON; 1 - FUSE; 2 - CUT; 3 - CUT21; 4 - SECTION);
-* **bcbuild** *rx* -- performs initialization of the *Cells Builder* algorithm (see @ref occt_algorithms_10c_Cells_1 "Usage of the Cells Builder algorithm" for more details).
-
-@subsection occt_draw_20_3 Commands for Intersection Part
+@subsubsection occt_draw_bop_debug_int Intersection Part commands
 
 All commands listed below  are available when the Intersection Part of the algorithm is done (i.e. after the command *bfillds*).
 
-@subsubsection occt_draw_20_3_1 bopds
+**bopds**
 	
 Syntax: 
 ~~~~
@@ -7990,12 +8847,11 @@ Displays:
 * <i>-e</i> : only edges of arguments that are in the DS;
 * <i>-f</i> : only faces of arguments that are in the DS.
 
-@subsubsection occt_draw_20_3_2 bopdsdump
+**bopdsdump**
 
 Prints contents of the DS. 
 
 Example:
-
 ~~~~
  Draw[28]> bopdsdump
  *** DS ***
@@ -8019,7 +8875,8 @@ Example:
 * *SOLID* -- type of the shape;
 * <i>{ 1 }</i> -- a DS index of the successors.
 
-@subsubsection occt_draw_20_3_3 bopindex
+
+**bopindex**
 
 Syntax:
 ~~~~
@@ -8027,7 +8884,8 @@ bopindex S
 ~~~~
 Prints DS index of shape *S*.
 
-@subsubsection occt_draw_20_3_4 bopiterator
+
+**bopiterator**
 
 Syntax:
 ~~~~~
@@ -8056,7 +8914,7 @@ Example:
 * *z58 z12* -- DS indices of intersecting edge and face.
 
 
-@subsubsection occt_draw_20_3_5 bopinterf
+**bopinterf**
 
 Syntax: 
 ~~~~
@@ -8081,7 +8939,8 @@ Here, record <i>(58, 12, 68)</i> means:
 * *12* -- a DS index of the face;
 * *68* -- a DS index of the new vertex.
 
-@subsubsection occt_draw_20_3_6 bopsp	
+
+**bopsp**
 
 Displays split edges. 
 
@@ -8099,7 +8958,7 @@ Example:
 * *edge 58* -- 58 is a DS index of the original edge.
 * *z58_74 z58_75* -- split edges, where 74, 75 are DS indices of the split edges.
 
-@subsubsection occt_draw_20_3_7 bopcb
+**bopcb**
 
 Syntax:
 ~~~~
@@ -8128,10 +8987,9 @@ This command dumps common blocks for the source edge with index 17.
 * *Faces: 36* -- 36 is a DS index of the face the common block belongs to. 
 
 
-@subsubsection occt_draw_20_3_8 bopfin
+**bopfin**
 
 Syntax:
-
 ~~~~
 bopfin nF	
 ~~~~
@@ -8151,7 +9009,7 @@ Example:
 * <i>PB:{ E:71 orE:17 Pave1: { 68 3.000 } Pave2: { 18 10.000 } }</i> -- information about the Pave Block; 
 * <i>vrts In ... 18 </i> -- a DS index of the vertex IN the face.
 
-@subsubsection occt_draw_20_3_9 bopfon
+**bopfon**
 
 Syntax:
 ~~~~
@@ -8174,7 +9032,7 @@ Example:
 * <i>PB:{ E:72 orE:38 Pave1: { 69 0.000 } Pave2: { 68 10.000 } }</i> -- information about the Pave Block; 
 * <i>vrts On: ... 68 69 70 71</i> -- DS indices of the vertices ON the face.
 
-@subsubsection occt_draw_20_3_10 bopwho
+**bopwho**
 
 Syntax:
 ~~~~
@@ -8205,7 +9063,7 @@ This means that shape 68 is a result of the following interferences:
 * *FF curves: (12, 56)* -- edge from the intersection curve between faces 12 and 56
 * *FF curves: (12, 64)* -- edge from the intersection curve between faces 12 and 64
 
-@subsubsection occt_draw_20_3_11 bopnews
+**bopnews**
 
 Syntax:
 ~~~~
@@ -8215,14 +9073,13 @@ bopnews -v [-e]
 * <i>-v</i> -- displays all new vertices produced during the operation;
 * <i>-e</i> -- displays all new edges produced during the operation.
 
-@subsection occt_draw_20_4	Commands for the Building Part
+@subsubsection occt_draw_bop_debug_build Building Part commands
 
 The commands listed below are available when the Building Part of the algorithm is done (i.e. after the command *bbuild*).
 
-@subsubsection occt_draw_20_4_1 bopim
+**bopim**
 
 Syntax: 
-
 ~~~~
 bopim S
 ~~~~
@@ -10704,24 +11561,24 @@ tinspector [-plugins {name1 ... [nameN] | all}]
            [-select {object | name1 ... [nameN]}]
            [-show {0|1} = 1]
 ~~~~~
-Starts tool of inspection.
+Starts inspection tool.
 Options:
 * *plugins* enters plugins that should be added in the inspector.
-Available names are: dfbrowser, vinspector and shapeview.
-Plugins order will be the same as defined in arguments.
+Available names are: *dfbrowser*, *vinspector* and *shapeview*.
+Plugins order will be the same as defined in the arguments.
 'all' adds all available plugins in the order:
 DFBrowser, VInspector and ShapeView.
-If at the first call this option is not used, 'all' option is applyed;
+If at the first call this option is not used, 'all' option is applied;
 * *activate* activates the plugin in the tool view.
 If at the first call this option is not used, the first plugin is activated;
-* *shape* initializes plugin/s by the shape object. If 'name' is empty, initializes all plugins;
-* *open* gives the file to the plugin/s. If the plugin is active, after open, update content will be done;
+* *shape* initializes plugin(s) by the shape object. If 'name' is empty, initializes all plugins;
+* *open* gives the file to the plugin(s). If the plugin is active after open, the content will be updated;
 * *update* updates content of the active plugin;
 * *select* sets the parameter that should be selected in an active tool view.
-Depending on active tool the parameter is:
-ShapeView: 'object' is an instance of TopoDS_Shape TShape,
-DFBrowser: 'name' is an entry of TDF_Label and name2(optionaly) for TDF_Attribute type name,
-VInspector: 'object' is an instance of AIS_InteractiveObject;
+Depending on the active tool the parameter is:
+ShapeView: 'object' is an instance of *TopoDS_Shape TShape*,
+DFBrowser: 'name' is an entry of *TDF_Label* and 'name2' (optionally) for *TDF_Attribute* type name,
+VInspector: 'object' is an instance of *AIS_InteractiveObject*;
 * *show* sets Inspector view visible or hidden. The first call of this command will show it.
 
 **Example:** 

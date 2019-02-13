@@ -20,7 +20,6 @@
 #include <Approx_FitAndDivide.hxx>
 #include <BiTgte_Blend.hxx>
 #include <BiTgte_CurveOnEdge.hxx>
-#include <BiTgte_DataMapOfShapeBox.hxx>
 #include <Bnd_Box.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
@@ -694,6 +693,7 @@ static TopoDS_Edge FindCreatedEdge
   return E1;
 }
 
+#ifdef DRAW
 //=======================================================================
 //function : Bubble
 //purpose  : Sets in increasing order the sequence of vertices. 
@@ -827,6 +827,8 @@ static void CutEdge (const TopoDS_Edge&          E,
     V1 = V2;
   }
 }
+#endif
+
 //======================== END OF STATIC FUNCTIONS ============
 
 
@@ -1491,7 +1493,7 @@ void BiTgte_Blend::ComputeCenters()
   if (myRadius < 0.) Side = TopAbs_OUT;
   BRepOffset_Inter3d Inter(myAsDes,Side,myTol);
 
-  BiTgte_DataMapOfShapeBox         MapSBox;
+  TopTools_DataMapOfShapeBox         MapSBox;
   TopTools_MapOfShape              Done;
   //TopTools_MapIteratorOfMapOfShape it;
 
@@ -2318,25 +2320,6 @@ void BiTgte_Blend::ComputeShape()
 #endif
   // end debug
 
-  //
-  // modify the tubes on edge for partition of edges.
-  //
-  Standard_Integer NbS = NbSurfaces();
-  for (Standard_Integer i = 1; i <= NbS; i++) {
-    const TopoDS_Shape& S1 = SupportShape1(i);
-
-    if ( S1.ShapeType() == TopAbs_EDGE) {
-      const TopoDS_Edge& E1   = TopoDS::Edge(S1);
-      // it is required to replace in F the cut edges of E1, that
-      // represent CutE
-      const TopTools_ListOfShape& VonE = myCutEdges(E1);
-      TopTools_ListOfShape NewE;
-      CutEdge(E1,VonE,NewE);
-      
-    }
-  }
-
-
   TopTools_DataMapOfShapeShape Created;
 
   TopTools_ListOfShape Empty;
@@ -2574,7 +2557,7 @@ void BiTgte_Blend::ComputeShape()
 Standard_Boolean BiTgte_Blend::Intersect
 (const TopoDS_Shape&             Init,
  const TopoDS_Face&              Face,
- const BiTgte_DataMapOfShapeBox& MapSBox,
+ const TopTools_DataMapOfShapeBox& MapSBox,
  const BRepOffset_Offset&        OF1,
        BRepOffset_Inter3d&       Inter) 
 {

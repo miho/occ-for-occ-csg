@@ -73,6 +73,13 @@ public:
                              const unsigned int        thePointSize,
                              const unsigned int        theResolution);
 
+  //! Return TRUE if this is single-stroke (one-line) font, FALSE by default.
+  //! Such fonts define single-line glyphs instead of closed contours, so that they are rendered incorrectly by normal software.
+  bool IsSingleStrokeFont() const { return myIsSingleLine; }
+
+  //! Set if this font should be rendered as single-stroke (one-line).
+  void SetSingleStrokeFont (bool theIsSingleLine) { myIsSingleLine = theIsSingleLine; }
+
   //! Release currently loaded font.
   Standard_EXPORT virtual void Release();
 
@@ -100,23 +107,36 @@ public:
     return myPointSize;
   }
 
-  //! Compute advance to the next character with kerning applied when applicable.
+  //! Setup glyph scaling along X-axis.
+  //! By default glyphs are not scaled (scaling factor = 1.0)
+  void SetWidthScaling (const float theScaleFactor)
+  {
+    myWidthScaling = theScaleFactor;
+  }
+
+  //! Compute horizontal advance to the next character with kerning applied when applicable.
   //! Assuming text rendered horizontally.
-  Standard_EXPORT float AdvanceX (const Standard_Utf32Char theUCharNext);
+  //! @param theUCharNext the next character to compute advance from current one
+  Standard_EXPORT float AdvanceX (Standard_Utf32Char theUCharNext) const;
 
-  //! Compute advance to the next character with kerning applied when applicable.
+  //! Compute horizontal advance to the next character with kerning applied when applicable.
   //! Assuming text rendered horizontally.
-  Standard_EXPORT float AdvanceX (const Standard_Utf32Char theUChar,
-                                  const Standard_Utf32Char theUCharNext);
+  //! @param theUChar     the character to be loaded as current one
+  //! @param theUCharNext the next character to compute advance from current one
+  Standard_EXPORT float AdvanceX (Standard_Utf32Char theUChar,
+                                  Standard_Utf32Char theUCharNext);
 
-  //! Compute advance to the next character with kerning applied when applicable.
+  //! Compute vertical advance to the next character with kerning applied when applicable.
   //! Assuming text rendered vertically.
-  Standard_EXPORT float AdvanceY (const Standard_Utf32Char theUCharNext);
+  //! @param theUCharNext the next character to compute advance from current one
+  Standard_EXPORT float AdvanceY (Standard_Utf32Char theUCharNext) const;
 
-  //! Compute advance to the next character with kerning applied when applicable.
+  //! Compute vertical advance to the next character with kerning applied when applicable.
   //! Assuming text rendered vertically.
-  Standard_EXPORT float AdvanceY (const Standard_Utf32Char theUChar,
-                                  const Standard_Utf32Char theUCharNext);
+  //! @param theUChar     the character to be loaded as current one
+  //! @param theUCharNext the next character to compute advance from current one
+  Standard_EXPORT float AdvanceY (Standard_Utf32Char theUChar,
+                                  Standard_Utf32Char theUCharNext);
 
   //! @return glyphs number in this font.
   Standard_EXPORT Standard_Integer GlyphsNumber() const;
@@ -152,17 +172,23 @@ protected:
   //! Load glyph without rendering it.
   Standard_EXPORT bool loadGlyph (const Standard_Utf32Char theUChar);
 
+  //! Wrapper for FT_Get_Kerning - retrieve kerning values.
+  Standard_EXPORT bool getKerning (FT_Vector& theKern,
+                                   Standard_Utf32Char theUCharCurr,
+                                   Standard_Utf32Char theUCharNext) const;
+
 protected:
 
-  Handle(Font_FTLibrary) myFTLib;       //!< handle to the FT library object
-  FT_Face                myFTFace;      //!< FT face object
-  NCollection_String     myFontPath;    //!< font path
-  unsigned int           myPointSize;   //!< point size set by FT_Set_Char_Size
-  int32_t                myLoadFlags;   //!< default load flags
+  Handle(Font_FTLibrary) myFTLib;        //!< handle to the FT library object
+  FT_Face                myFTFace;       //!< FT face object
+  NCollection_String     myFontPath;     //!< font path
+  unsigned int           myPointSize;    //!< point size set by FT_Set_Char_Size
+  float                  myWidthScaling; //!< scale glyphs along X-axis
+  int32_t                myLoadFlags;    //!< default load flags
+  bool                   myIsSingleLine; //!< single stroke font flag, FALSE by default
 
-  Image_PixMap           myGlyphImg;    //!< cached glyph plane
-  FT_Vector*             myKernAdvance; //!< buffer variable
-  Standard_Utf32Char     myUChar;       //!< currently loaded unicode character
+  Image_PixMap           myGlyphImg;     //!< cached glyph plane
+  Standard_Utf32Char     myUChar;        //!< currently loaded unicode character
 
 public:
 

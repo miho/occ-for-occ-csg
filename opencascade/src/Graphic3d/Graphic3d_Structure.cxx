@@ -26,9 +26,7 @@
 #include <Graphic3d_StructureDefinitionError.hxx>
 #include <Graphic3d_StructureManager.hxx>
 #include <Graphic3d_TransformError.hxx>
-#include <Graphic3d_Vector.hxx>
 #include <Quantity_Color.hxx>
-#include <Standard_Type.hxx>
 
 #include "Graphic3d_Structure.pxx"
 
@@ -262,7 +260,7 @@ void Graphic3d_Structure::Highlight (const Handle(Graphic3d_PresentationAttribut
 
   SetDisplayPriority (Structure_MAX_PRIORITY - 1);
 
-  myCStructure->GraphicHighlight (theStyle, this);
+  myCStructure->GraphicHighlight (theStyle);
 
   if (!theToUpdateMgr)
   {

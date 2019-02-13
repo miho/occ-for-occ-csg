@@ -28,6 +28,7 @@
 #include <OpenGl_ArbTexBindless.hxx>
 #include <OpenGl_GlCore44.hxx>
 #include <OpenGl_FrameBuffer.hxx>
+#include <OpenGl_FrameStats.hxx>
 #include <OpenGl_Sampler.hxx>
 #include <OpenGl_ShaderManager.hxx>
 #include <OpenGl_Workspace.hxx>
@@ -61,14 +62,6 @@ IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Context,Standard_Transient)
 #else
   #include <GL/glx.h> // glXGetProcAddress()
 #endif
-
-#ifdef HAVE_GL2PS
-  #include <gl2ps.h>
-  #ifdef _MSC_VER
-    #pragma comment (lib, "gl2ps.lib")
-  #endif
-#endif
-
 
 namespace
 {
@@ -121,10 +114,12 @@ OpenGl_Context::OpenGl_Context (const Handle(OpenGl_Caps)& theCaps)
   hasHighp   (Standard_False),
   hasUintIndex(Standard_False),
   hasTexRGBA8(Standard_False),
+  hasFlatShading (OpenGl_FeatureNotAvailable),
 #else
   hasHighp   (Standard_True),
   hasUintIndex(Standard_True),
   hasTexRGBA8(Standard_True),
+  hasFlatShading (OpenGl_FeatureInCore),
 #endif
   hasDrawBuffers     (OpenGl_FeatureNotAvailable),
   hasFloatBuffer     (OpenGl_FeatureNotAvailable),
@@ -152,6 +147,7 @@ OpenGl_Context::OpenGl_Context (const Handle(OpenGl_Caps)& theCaps)
   atiMem (Standard_False),
   nvxMem (Standard_False),
   oesSampleVariables (Standard_False),
+  oesStdDerivatives (Standard_False),
   mySharedResources (new OpenGl_ResourcesMap()),
   myDelayed         (new OpenGl_DelayReleaseMap()),
   myUnusedResources (new OpenGl_ResourcesStack()),
@@ -162,6 +158,8 @@ OpenGl_Context::OpenGl_Context (const Handle(OpenGl_Caps)& theCaps)
   myTexClamp   (GL_CLAMP_TO_EDGE),
   myMaxTexDim  (1024),
   myMaxTexCombined (1),
+  myMaxDumpSizeX (1024),
+  myMaxDumpSizeY (1024),
   myMaxClipPlanes (6),
   myMaxMsaaSamples(0),
   myMaxDrawBuffers (1),
@@ -174,6 +172,7 @@ OpenGl_Context::OpenGl_Context (const Handle(OpenGl_Caps)& theCaps)
   myHasRayTracing (Standard_False),
   myHasRayTracingTextures (Standard_False),
   myHasRayTracingAdaptiveSampling (Standard_False),
+  myFrameStats (new OpenGl_FrameStats()),
 #if !defined(GL_ES_VERSION_2_0)
   myPointSpriteOrig (GL_UPPER_LEFT),
   myRenderMode (GL_RENDER),
@@ -185,8 +184,10 @@ OpenGl_Context::OpenGl_Context (const Handle(OpenGl_Caps)& theCaps)
 #endif
   myToCullBackFaces (false),
   myReadBuffer (0),
-  myDrawBuffers (1),
+  myDrawBuffers (0, 7),
   myDefaultVao (0),
+  myColorMask (true),
+  myAlphaToCoverage (false),
   myIsGlDebugCtx (Standard_False),
   myResolution (Graphic3d_RenderingParams::THE_DEFAULT_RESOLUTION),
   myResolutionRatio (1.0f),
@@ -202,6 +203,10 @@ OpenGl_Context::OpenGl_Context (const Handle(OpenGl_Caps)& theCaps)
   myViewportVirt[1] = 0;
   myViewportVirt[2] = 0;
   myViewportVirt[3] = 0;
+
+  myPolygonOffset.Mode   = Aspect_POM_Off;
+  myPolygonOffset.Factor = 0.0f;
+  myPolygonOffset.Units  = 0.0f;
 
   // system-dependent fields
 #if defined(HAVE_EGL)
@@ -409,12 +414,8 @@ void OpenGl_Context::SetDrawBuffer (const Standard_Integer theDrawBuffer)
   }
   ::glDrawBuffer (aDrawBuffer);
 
-  myDrawBuffers.Clear();
-
-  if (aDrawBuffer != GL_NONE)
-  {
-    myDrawBuffers.SetValue (0, aDrawBuffer);
-  }
+  myDrawBuffers.Init (GL_NONE);
+  myDrawBuffers.SetValue (0, aDrawBuffer);
 #else
   (void )theDrawBuffer;
 #endif
@@ -428,23 +429,23 @@ void OpenGl_Context::SetDrawBuffers (const Standard_Integer theNb, const Standar
 {
   Standard_ASSERT_RETURN (hasDrawBuffers, "Multiple draw buffers feature is not supported by the context", Standard_ASSERT_DO_NOTHING());
 
-  myDrawBuffers.Clear();
+  if (myDrawBuffers.Length() < theNb)
+  {
+    // should actually never happen here
+    myDrawBuffers.Resize (0, theNb - 1, false);
+  }
+  myDrawBuffers.Init (GL_NONE);
 
   Standard_Boolean useDefaultFbo = Standard_False;
   for (Standard_Integer anI = 0; anI < theNb; ++anI)
   {
-#if !defined(GL_ES_VERSION_2_0)
-    const Standard_Integer aDrawBuffer = !myIsStereoBuffers ? stereoToMonoBuffer (theDrawBuffers[anI]) : theDrawBuffers[anI];
-#else
-    const Standard_Integer aDrawBuffer = theDrawBuffers[anI];
-#endif
-    if (aDrawBuffer < GL_COLOR_ATTACHMENT0 && aDrawBuffer != GL_NONE)
+    if (theDrawBuffers[anI] < GL_COLOR_ATTACHMENT0 && theDrawBuffers[anI] != GL_NONE)
     {
       useDefaultFbo = Standard_True;
     }
-    else if (aDrawBuffer != GL_NONE)
+    else
     {
-      myDrawBuffers.SetValue (anI, aDrawBuffer);
+      myDrawBuffers.SetValue (anI, theDrawBuffers[anI]);
     }
   }
   if (arbFBO != NULL && useDefaultFbo)
@@ -495,31 +496,24 @@ void OpenGl_Context::FetchState()
   ::glGetIntegerv (GL_READ_BUFFER, &myReadBuffer);
 
   // cache draw buffers state
-  myDrawBuffers.Clear();
+  if (myDrawBuffers.Length() < myMaxDrawBuffers)
+  {
+    myDrawBuffers.Resize (0, myMaxDrawBuffers - 1, false);
+  }
+  myDrawBuffers.Init (GL_NONE);
 
+  Standard_Integer aDrawBuffer = GL_NONE;
   if (myMaxDrawBuffers == 1)
   {
-    Standard_Integer aDrawBuffer;
-
     ::glGetIntegerv (GL_DRAW_BUFFER, &aDrawBuffer);
-
-    if (aDrawBuffer != GL_NONE)
-    {
-      myDrawBuffers.SetValue (0, aDrawBuffer);
-    }
+    myDrawBuffers.SetValue (0, aDrawBuffer);
   }
   else
   {
-    Standard_Integer aDrawBuffer;
-
     for (Standard_Integer anI = 0; anI < myMaxDrawBuffers; ++anI)
     {
       ::glGetIntegerv (GL_DRAW_BUFFER0 + anI, &aDrawBuffer);
-
-      if (aDrawBuffer != GL_NONE)
-      {
-        myDrawBuffers.SetValue (anI, aDrawBuffer);
-      }
+      myDrawBuffers.SetValue (anI, aDrawBuffer);
     }
   }
 #endif
@@ -550,7 +544,6 @@ Standard_Boolean OpenGl_Context::IsCurrent() const
 {
 #if defined(HAVE_EGL)
   if ((EGLDisplay )myDisplay  == EGL_NO_DISPLAY
-   || (EGLSurface )myWindow   == EGL_NO_SURFACE
    || (EGLContext )myGContext == EGL_NO_CONTEXT)
   {
     return Standard_False;
@@ -586,7 +579,6 @@ Standard_Boolean OpenGl_Context::MakeCurrent()
 {
 #if defined(HAVE_EGL)
   if ((EGLDisplay )myDisplay  == EGL_NO_DISPLAY
-   || (EGLSurface )myWindow   == EGL_NO_SURFACE
    || (EGLContext )myGContext == EGL_NO_CONTEXT)
   {
     Standard_ProgramError_Raise_if (myIsInitialized, "OpenGl_Context::Init() should be called before!");
@@ -1200,6 +1192,7 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
   myMaxColorAttachments = 1;
   ReadGlVersion (myGlVerMajor, myGlVerMinor);
   myVendor = (const char* )::glGetString (GL_VENDOR);
+  myVendor.LowerCase();
   if (!caps->ffpEnable
    && !IsGlGreaterEqual (2, 0))
   {
@@ -1220,7 +1213,7 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
   const bool isCoreProfile = false;
 #else
 
-  if (myVendor.Search ("NVIDIA") != -1)
+  if (myVendor.Search ("nvidia") != -1)
   {
     // Buffer detailed info: Buffer object 1 (bound to GL_ARRAY_BUFFER_ARB, usage hint is GL_STATIC_DRAW)
     // will use VIDEO memory as the source for buffer object operations.
@@ -1412,9 +1405,22 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
                                                                          : OpenGl_FeatureNotAvailable;
 
   oesSampleVariables = CheckExtension ("GL_OES_sample_variables");
+  oesStdDerivatives  = CheckExtension ("GL_OES_standard_derivatives");
   hasSampleVariables = IsGlGreaterEqual (3, 2) ? OpenGl_FeatureInCore :
                        oesSampleVariables ? OpenGl_FeatureInExtensions
                                           : OpenGl_FeatureNotAvailable;
+  // without hasHighp, dFdx/dFdy precision is considered too low for flat shading (visual artifacts)
+  hasFlatShading = IsGlGreaterEqual (3, 0)
+                 ? OpenGl_FeatureInCore
+                  : (oesStdDerivatives && hasHighp
+                   ? OpenGl_FeatureInExtensions
+                   : OpenGl_FeatureNotAvailable);
+  if (!IsGlGreaterEqual (3, 1)
+    && myVendor.Search("qualcomm") != -1)
+  {
+    // dFdx/dFdy are completely broken on tested Adreno devices with versions below OpenGl ES 3.1
+    hasFlatShading = OpenGl_FeatureNotAvailable;
+  }
 #else
 
   myTexClamp = IsGlGreaterEqual (1, 2) ? GL_CLAMP_TO_EDGE : GL_CLAMP;
@@ -1455,6 +1461,10 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
   {
     glGetIntegerv (GL_MAX_DRAW_BUFFERS,      &myMaxDrawBuffers);
     glGetIntegerv (GL_MAX_COLOR_ATTACHMENTS, &myMaxColorAttachments);
+    if (myDrawBuffers.Length() < myMaxDrawBuffers)
+    {
+      myDrawBuffers.Resize (0, myMaxDrawBuffers - 1, false);
+    }
   }
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &myMaxTexDim);
@@ -1463,12 +1473,22 @@ void OpenGl_Context::init (const Standard_Boolean theIsCoreProfile)
     glGetIntegerv (GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &myMaxTexCombined);
   }
 
+  GLint aMaxVPortSize[2] = {0, 0};
+  glGetIntegerv (GL_MAX_VIEWPORT_DIMS, aMaxVPortSize);
+  myMaxDumpSizeX = Min (aMaxVPortSize[0], myMaxTexDim);
+  myMaxDumpSizeY = Min (aMaxVPortSize[1], myMaxTexDim);
+  if (myVendor == "intel")
+  {
+    // Intel drivers have known bug with empty dump for images with width>=5462
+    myMaxDumpSizeX = Min (myMaxDumpSizeX, 4096);
+  }
+
   if (extAnis)
   {
     glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &myAnisoMax);
   }
 
-  myClippingState.Init (myMaxClipPlanes);
+  myClippingState.Init();
 
 #if !defined(GL_ES_VERSION_2_0)
 
@@ -2774,12 +2794,12 @@ void OpenGl_Context::DiagnosticInformation (TColStd_IndexedDataMapOfStringString
   if ((theFlags & Graphic3d_DiagnosticInfo_NativePlatform) != 0)
   {
   #if defined(HAVE_EGL)
-    addInfo (theDict, "EGLVersion",    ::eglQueryString ((Aspect_Display)myDisplay, EGL_VERSION));
-    addInfo (theDict, "EGLVendor",     ::eglQueryString ((Aspect_Display)myDisplay, EGL_VENDOR));
-    addInfo (theDict, "EGLClientAPIs", ::eglQueryString ((Aspect_Display)myDisplay, EGL_CLIENT_APIS));
+    addInfo (theDict, "EGLVersion",    ::eglQueryString ((EGLDisplay )myDisplay, EGL_VERSION));
+    addInfo (theDict, "EGLVendor",     ::eglQueryString ((EGLDisplay )myDisplay, EGL_VENDOR));
+    addInfo (theDict, "EGLClientAPIs", ::eglQueryString ((EGLDisplay )myDisplay, EGL_CLIENT_APIS));
     if ((theFlags & Graphic3d_DiagnosticInfo_Extensions) != 0)
     {
-      addInfo (theDict, "EGLExtensions", ::eglQueryString ((Aspect_Display)myDisplay, EGL_EXTENSIONS));
+      addInfo (theDict, "EGLExtensions", ::eglQueryString ((EGLDisplay )myDisplay, EGL_EXTENSIONS));
     }
   #elif defined(_WIN32)
     if ((theFlags & Graphic3d_DiagnosticInfo_Extensions) != 0
@@ -2816,7 +2836,10 @@ void OpenGl_Context::DiagnosticInformation (TColStd_IndexedDataMapOfStringString
     addInfo (theDict, "GLvendor",    (const char*)::glGetString (GL_VENDOR));
     addInfo (theDict, "GLdevice",    (const char*)::glGetString (GL_RENDERER));
     addInfo (theDict, "GLversion",   (const char*)::glGetString (GL_VERSION));
-    addInfo (theDict, "GLSLversion", (const char*)::glGetString (GL_SHADING_LANGUAGE_VERSION));
+    if (IsGlGreaterEqual (2, 0))
+    {
+      addInfo (theDict, "GLSLversion", (const char*)::glGetString (GL_SHADING_LANGUAGE_VERSION));
+    }
     if (myIsGlDebugCtx)
     {
       addInfo (theDict, "GLdebug", "ON");
@@ -2826,6 +2849,7 @@ void OpenGl_Context::DiagnosticInformation (TColStd_IndexedDataMapOfStringString
   if ((theFlags & Graphic3d_DiagnosticInfo_Limits) != 0)
   {
     addInfo (theDict, "Max texture size", TCollection_AsciiString(myMaxTexDim));
+    addInfo (theDict, "Max FBO dump size", TCollection_AsciiString() + myMaxDumpSizeX + "x" + myMaxDumpSizeY);
     addInfo (theDict, "Max combined texture units", TCollection_AsciiString(myMaxTexCombined));
     addInfo (theDict, "Max MSAA samples", TCollection_AsciiString(myMaxMsaaSamples));
   }
@@ -2904,7 +2928,7 @@ void OpenGl_Context::ReleaseResource (const TCollection_AsciiString& theKey,
   {
     return;
   }
-  auto& aRes = mySharedResources->Find (theKey);
+  const Handle(OpenGl_Resource)& aRes = mySharedResources->Find (theKey);
   if (aRes->GetRefCount() > 1)
   {
     return;
@@ -2952,7 +2976,7 @@ void OpenGl_Context::ReleaseDelayed()
       continue;
     }
 
-    auto& aRes = mySharedResources->ChangeFind (aKey);
+    const Handle(OpenGl_Resource)& aRes = mySharedResources->ChangeFind (aKey);
     if (aRes->GetRefCount() > 1)
     {
       // should be only 1 instance in mySharedResources
@@ -3186,20 +3210,27 @@ void OpenGl_Context::SetShadingMaterial (const OpenGl_AspectFace* theAspect,
 
   // do not update material properties in case of zero reflection mode,
   // because GL lighting will be disabled by OpenGl_PrimitiveArray::DrawArray() anyway.
-  if (theAspect->IsNoLighting())
+  const OpenGl_MaterialState& aMatState = myShaderManager->MaterialState();
+  const float anAlphaCutoff = anAspect->AlphaMode() == Graphic3d_AlphaMode_Mask
+                            ? anAspect->AlphaCutoff()
+                            : ShortRealLast();
+  if (theAspect->ShadingModel() == Graphic3d_TOSM_UNLIT)
+  {
+    if (anAlphaCutoff == aMatState.AlphaCutoff())
+    {
+      return;
+    }
+  }
+  else if (myMatFront    == aMatState.FrontMaterial()
+        && myMatBack     == aMatState.BackMaterial()
+        && toDistinguish == aMatState.ToDistinguish()
+        && toMapTexture  == aMatState.ToMapTexture()
+        && anAlphaCutoff == aMatState.AlphaCutoff())
   {
     return;
   }
 
-  if (myMatFront    == myShaderManager->MaterialState().FrontMaterial()
-   && myMatBack     == myShaderManager->MaterialState().BackMaterial()
-   && toDistinguish == myShaderManager->MaterialState().ToDistinguish()
-   && toMapTexture  == myShaderManager->MaterialState().ToMapTexture())
-  {
-    return;
-  }
-
-  myShaderManager->UpdateMaterialStateTo (myMatFront, myMatBack, toDistinguish, toMapTexture);
+  myShaderManager->UpdateMaterialStateTo (myMatFront, myMatBack, anAlphaCutoff, toDistinguish, toMapTexture);
 }
 
 // =======================================================================
@@ -3234,9 +3265,12 @@ Standard_Boolean OpenGl_Context::CheckIsTransparent (const OpenGl_AspectFace* th
     theAlphaBack  = aMatBackSrc .Alpha();
   }
 
-  const bool isTransparent = theAlphaFront < 1.0f
-                          || theAlphaBack  < 1.0f;
-  return isTransparent;
+  if (anAspect->AlphaMode() == Graphic3d_AlphaMode_BlendAuto)
+  {
+    return theAlphaFront < 1.0f
+        || theAlphaBack  < 1.0f;
+  }
+  return anAspect->AlphaMode() == Graphic3d_AlphaMode_Blend;
 }
 
 // =======================================================================
@@ -3305,13 +3339,6 @@ void OpenGl_Context::SetTypeOfLine (const Aspect_TypeOfLine  theType,
 #if !defined(GL_ES_VERSION_2_0)
   if (aPattern != 0xFFFF)
   {
-  #ifdef HAVE_GL2PS
-    if (IsFeedback())
-    {
-      gl2psEnable (GL2PS_LINE_STIPPLE);
-    }
-  #endif
-
     if (core11 != NULL)
     {
       core11fwd->glEnable (GL_LINE_STIPPLE);
@@ -3326,13 +3353,6 @@ void OpenGl_Context::SetTypeOfLine (const Aspect_TypeOfLine  theType,
     {
       core11fwd->glDisable (GL_LINE_STIPPLE);
     }
-
-  #ifdef HAVE_GL2PS
-    if (IsFeedback())
-    {
-      gl2psDisable (GL2PS_LINE_STIPPLE);
-    }
-  #endif
   }
 #endif
 }
@@ -3348,12 +3368,6 @@ void OpenGl_Context::SetLineWidth (const Standard_ShortReal theWidth)
     // glLineWidth() is still defined within Core Profile, but has no effect with values != 1.0f
     core11fwd->glLineWidth (theWidth * myLineWidthScale);
   }
-#ifdef HAVE_GL2PS
-  if (IsFeedback())
-  {
-    gl2psLineWidth (theWidth);
-  }
-#endif
 }
 
 // =======================================================================
@@ -3375,12 +3389,16 @@ void OpenGl_Context::SetTextureMatrix (const Handle(Graphic3d_TextureParams)& th
     }
 
     // pack transformation parameters
-    OpenGl_Vec4 aTrsf[2];
-    aTrsf[0].x()  = -theParams->Translation().x();
-    aTrsf[0].y()  = -theParams->Translation().y();
-    aTrsf[0].zw() = theParams->Scale();
-    aTrsf[1].x()  = std::sin (-theParams->Rotation() * static_cast<float> (M_PI / 180.0));
-    aTrsf[1].y()  = std::cos (-theParams->Rotation() * static_cast<float> (M_PI / 180.0));
+    OpenGl_Vec4 aTrsf[2] =
+    {
+      OpenGl_Vec4 (-theParams->Translation().x(),
+                   -theParams->Translation().y(),
+                    theParams->Scale().x(),
+                    theParams->Scale().y()),
+      OpenGl_Vec4 (static_cast<float> (std::sin (-theParams->Rotation() * M_PI / 180.0)),
+                   static_cast<float> (std::cos (-theParams->Rotation() * M_PI / 180.0)),
+                   0.0f, 0.0f)
+    };
     myActiveProgram->SetUniform (this, aUniLoc, 2, aTrsf);
     return;
   }
@@ -3551,6 +3569,64 @@ Standard_Integer OpenGl_Context::SetPolygonHatchStyle (const Handle(Graphic3d_Ha
 }
 
 // =======================================================================
+// function : SetPolygonOffset
+// purpose  :
+// =======================================================================
+void OpenGl_Context::SetPolygonOffset (const Graphic3d_PolygonOffset& theOffset)
+{
+  const bool toFillOld = (myPolygonOffset.Mode & Aspect_POM_Fill) == Aspect_POM_Fill;
+  const bool toFillNew = (theOffset.Mode       & Aspect_POM_Fill) == Aspect_POM_Fill;
+  if (toFillNew != toFillOld)
+  {
+    if (toFillNew)
+    {
+      glEnable (GL_POLYGON_OFFSET_FILL);
+    }
+    else
+    {
+      glDisable (GL_POLYGON_OFFSET_FILL);
+    }
+  }
+
+#if !defined(GL_ES_VERSION_2_0)
+  const bool toLineOld = (myPolygonOffset.Mode & Aspect_POM_Line) == Aspect_POM_Line;
+  const bool toLineNew = (theOffset.Mode       & Aspect_POM_Line) == Aspect_POM_Line;
+  if (toLineNew != toLineOld)
+  {
+    if (toLineNew)
+    {
+      glEnable (GL_POLYGON_OFFSET_LINE);
+    }
+    else
+    {
+      glDisable (GL_POLYGON_OFFSET_LINE);
+    }
+  }
+
+  const bool toPointOld = (myPolygonOffset.Mode & Aspect_POM_Point) == Aspect_POM_Point;
+  const bool toPointNew = (theOffset.Mode       & Aspect_POM_Point) == Aspect_POM_Point;
+  if (toPointNew != toPointOld)
+  {
+    if (toPointNew)
+    {
+      glEnable (GL_POLYGON_OFFSET_POINT);
+    }
+    else
+    {
+      glDisable (GL_POLYGON_OFFSET_POINT);
+    }
+  }
+#endif
+
+  if (myPolygonOffset.Factor != theOffset.Factor
+   || myPolygonOffset.Units  != theOffset.Units)
+  {
+    glPolygonOffset (theOffset.Factor, theOffset.Units);
+  }
+  myPolygonOffset = theOffset;
+}
+
+// =======================================================================
 // function : ApplyModelWorldMatrix
 // purpose  :
 // =======================================================================
@@ -3672,4 +3748,47 @@ void OpenGl_Context::DisableFeatures() const
       glDisable(GL_TEXTURE_3D_EXT);
   }
 #endif
+}
+
+// =======================================================================
+// function : SetColorMask
+// purpose  :
+// =======================================================================
+bool OpenGl_Context::SetColorMask (bool theToWriteColor)
+{
+  const GLboolean toWrite = theToWriteColor ? GL_TRUE : GL_FALSE;
+  glColorMask (toWrite, toWrite, toWrite, toWrite);
+
+  const bool anOldValue = myColorMask;
+  myColorMask = theToWriteColor;
+  return anOldValue;
+}
+
+// =======================================================================
+// function : SetSampleAlphaToCoverage
+// purpose  :
+// =======================================================================
+bool OpenGl_Context::SetSampleAlphaToCoverage (bool theToEnable)
+{
+  if (myAlphaToCoverage == theToEnable)
+  {
+    return myAlphaToCoverage;
+  }
+
+  if (core15fwd != NULL)
+  {
+    if (theToEnable)
+    {
+      //core15fwd->core15fwd->glSampleCoverage (1.0f, GL_FALSE);
+      core15fwd->glEnable (GL_SAMPLE_ALPHA_TO_COVERAGE);
+    }
+    else
+    {
+      core15fwd->glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);
+    }
+  }
+
+  const bool anOldValue = myAlphaToCoverage;
+  myAlphaToCoverage = theToEnable;
+  return anOldValue;
 }

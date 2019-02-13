@@ -23,55 +23,16 @@
 #include <OpenGl_FrameBuffer.hxx>
 #include <OpenGl_Material.hxx>
 #include <OpenGl_Matrix.hxx>
-#include <OpenGl_RenderFilter.hxx>
 #include <OpenGl_ShaderObject.hxx>
 #include <OpenGl_ShaderProgram.hxx>
 #include <OpenGl_TextParam.hxx>
 #include <OpenGl_TextureBufferArb.hxx>
+#include <OpenGl_RenderFilter.hxx>
 #include <OpenGl_Vec.hxx>
 #include <OpenGl_Window.hxx>
 
 class OpenGl_View;
 class Image_PixMap;
-
-class OpenGl_RaytraceFilter;
-DEFINE_STANDARD_HANDLE (OpenGl_RaytraceFilter, OpenGl_RenderFilter)
-
-//! Graphical ray-tracing filter.
-//! Filters out all raytracable structures.
-class OpenGl_RaytraceFilter : public OpenGl_RenderFilter
-{
-public:
-
-  //! Default constructor.
-  OpenGl_RaytraceFilter() {}
-
-  //! Returns the previously set filter.
-  const Handle(OpenGl_RenderFilter)& PrevRenderFilter()
-  {
-    return myPrevRenderFilter;
-  }
-
-  //! Remembers the previously set filter.
-  void SetPrevRenderFilter (const Handle(OpenGl_RenderFilter)& theFilter)
-  {
-    myPrevRenderFilter = theFilter;
-  }
-
-  //! Checks whether the element can be rendered or not.
-  //! @param theElement [in] the element to check.
-  //! @return True if element can be rendered.
-  virtual Standard_Boolean ShouldRender (const Handle(OpenGl_Workspace)& theWorkspace,
-                                         const OpenGl_Element*           theElement) Standard_OVERRIDE;
-
-private:
-
-  Handle(OpenGl_RenderFilter) myPrevRenderFilter;
-
-public:
-
-  DEFINE_STANDARD_RTTIEXT(OpenGl_RaytraceFilter,OpenGl_RenderFilter)
-};
 
 class OpenGl_Workspace;
 DEFINE_STANDARD_HANDLE(OpenGl_Workspace,Standard_Transient)
@@ -122,8 +83,12 @@ public:
   //! @return true if depth writing is enabled.
   Standard_Boolean& UseDepthWrite() { return myUseDepthWrite; }
 
-  //! @return true if clipping algorithm enabled
+  //! @return true if frustum culling algorithm is enabled
   Standard_EXPORT Standard_Boolean IsCullingEnabled() const;
+
+  //! Configure default polygon offset parameters.
+  //! Return previous settings.
+  Standard_EXPORT Graphic3d_PolygonOffset SetDefaultPolygonOffset (const Graphic3d_PolygonOffset& theOffset);
 
   //// RELATED TO STATUS ////
 
@@ -133,7 +98,12 @@ public:
   //! Allow or disallow face culling.
   //! This call does NOT affect current state of back face culling;
   //! ApplyAspectFace() should be called to update state.
-  void SetAllowFaceCulling (bool theToAllow) { myToAllowFaceCulling = theToAllow; }
+  bool SetAllowFaceCulling (bool theToAllow)
+  {
+    const bool wasAllowed = myToAllowFaceCulling;
+    myToAllowFaceCulling = theToAllow;
+    return wasAllowed;
+  }
 
   //! Return true if following structures should apply highlight color.
   bool ToHighlight() const { return !myHighlightStyle.IsNull(); }
@@ -235,21 +205,26 @@ public:
   //! Clear the applied aspect state to default values.
   void ResetAppliedAspect();
 
-  //! Set filter for restricting rendering of particular elements.
-  //! Filter can be applied for rendering passes used by recursive
-  //! rendering algorithms for rendering elements of groups.
-  //! @param theFilter [in] the filter instance.
-  inline void SetRenderFilter (const Handle(OpenGl_RenderFilter)& theFilter)
-  {
-    myRenderFilter = theFilter;
-  }
-
   //! Get rendering filter.
-  //! @return filter instance.
-  inline const Handle(OpenGl_RenderFilter)& GetRenderFilter() const
-  {
-    return myRenderFilter;
-  }
+  //! @sa ShouldRender()
+  Standard_Integer RenderFilter() const { return myRenderFilter; }
+
+  //! Set filter for restricting rendering of particular elements.
+  //! @sa ShouldRender()
+  void SetRenderFilter (Standard_Integer theFilter) { myRenderFilter = theFilter; }
+
+  //! Checks whether the element can be rendered or not.
+  //! @param theElement [in] the element to check
+  //! @return True if element can be rendered
+  bool ShouldRender (const OpenGl_Element* theElement);
+
+  //! Return the number of skipped transparent elements within active OpenGl_RenderFilter_OpaqueOnly filter.
+  //! @sa OpenGl_LayerList::Render()
+  Standard_Integer NbSkippedTransparentElements() { return myNbSkippedTranspElems; }
+
+  //! Reset skipped transparent elements counter.
+  //! @sa OpenGl_LayerList::Render()
+  void ResetSkippedCounter() { myNbSkippedTranspElems = 0; }
 
   //! @return applied view matrix.
   inline const OpenGl_Matrix* ViewMatrix() const { return ViewMatrix_applied; }
@@ -257,29 +232,14 @@ public:
   //! @return applied model structure matrix.
   inline const OpenGl_Matrix* ModelMatrix() const { return StructureMatrix_applied; }
 
-  //! Sets and applies current polygon offset.
-  void SetPolygonOffset (const Graphic3d_PolygonOffset& theParams);
-
-  //! Returns currently applied polygon offset parameters.
-  const Graphic3d_PolygonOffset& AppliedPolygonOffset() { return myPolygonOffsetApplied; }
-
-  //! Returns capping algorithm rendering filter.
-  const Handle(OpenGl_CappingAlgoFilter)& DefaultCappingAlgoFilter() const
-  {
-    return myDefaultCappingAlgoFilter;
-  }
+  //! Returns face aspect for textured font rendering.
+  const OpenGl_AspectFace& FontFaceAspect() const { return myFontFaceAspect; }
 
   //! Returns face aspect for none culling mode.
-  const OpenGl_AspectFace& NoneCulling() const
-  {
-    return myNoneCulling;
-  }
+  const OpenGl_AspectFace& NoneCulling() const { return myNoneCulling; }
 
   //! Returns face aspect for front face culling mode.
-  const OpenGl_AspectFace& FrontCulling() const
-  {
-    return myFrontCulling;
-  }
+  const OpenGl_AspectFace& FrontCulling() const { return myFrontCulling; }
 
   //! Sets a new environment texture.
   void SetEnvironmentTexture (const Handle(OpenGl_TextureSet)& theTexture) { myEnvironmentTexture = theTexture; }
@@ -294,13 +254,20 @@ protected: //! @name protected fields
   Handle(OpenGl_Context)           myGlContext;
   Standard_Boolean                 myUseZBuffer;
   Standard_Boolean                 myUseDepthWrite;
-  Handle(OpenGl_CappingAlgoFilter) myDefaultCappingAlgoFilter;
   OpenGl_AspectFace                myNoneCulling;
   OpenGl_AspectFace                myFrontCulling;
+  OpenGl_AspectFace                myFontFaceAspect;
 
 protected: //! @name fields related to status
 
-  Handle(OpenGl_RenderFilter) myRenderFilter;
+  Standard_Integer myNbSkippedTranspElems; //!< counter of skipped transparent elements for OpenGl_LayerList two rendering passes method
+  Standard_Integer myRenderFilter;         //!< active filter for skipping rendering of elements by some criteria (multiple render passes)
+
+  OpenGl_AspectLine   myDefaultAspectLine;
+  OpenGl_AspectFace   myDefaultAspectFace;
+  OpenGl_AspectMarker myDefaultAspectMarker;
+  OpenGl_AspectText   myDefaultAspectText;
+
   const OpenGl_AspectLine*   myAspectLineSet;
   const OpenGl_AspectFace*   myAspectFaceSet;
   Handle(Graphic3d_AspectFillArea3d) myAspectFaceApplied;
@@ -316,8 +283,6 @@ protected: //! @name fields related to status
   Handle(Graphic3d_PresentationAttributes) myHighlightStyle; //!< active highlight style
 
   OpenGl_Matrix myModelViewMatrix; //!< Model matrix with applied structure transformations
-
-  Graphic3d_PolygonOffset myPolygonOffsetApplied; //!< currently applied polygon offset
 
   OpenGl_AspectFace myAspectFaceHl; //!< Hiddenline aspect
 

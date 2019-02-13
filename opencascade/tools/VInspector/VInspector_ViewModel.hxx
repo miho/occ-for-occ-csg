@@ -23,10 +23,12 @@
 #include <inspector/TreeModel_ModelBase.hxx>
 #include <inspector/VInspector_ItemBase.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QByteArray>
 #include <QHash>
 #include <QMap>
 #include <QObject>
+#include <Standard_WarningsRestore.hxx>
 
 class OCAFSampleAPI_Module;
 class OCAFSampleModel_DocumentMgr;
@@ -49,8 +51,8 @@ public:
 
   //! Initialize the model by the given context
   //! \param theContext viewer context
-  Standard_EXPORT const Handle(AIS_InteractiveContext)& GetContext() const;
-
+  Standard_EXPORT Handle(AIS_InteractiveContext) GetContext() const;
+  
   //! Initialize the model by the given context
   //! \param theContext viewer context
   Standard_EXPORT void SetContext (const Handle(AIS_InteractiveContext)& theContext);
@@ -68,28 +70,23 @@ public:
   //! Returns root item by column
   //! \param theColumn an index of the column
   //! \return root item instance
-  Standard_EXPORT virtual TreeModel_ItemBasePtr RootItem (const int theColumn) const Standard_OVERRIDE
+  virtual TreeModel_ItemBasePtr RootItem (const int theColumn) const Standard_OVERRIDE
   { return myRootItems[theColumn]; }
-
-  //! Returns count of columns in the model
-  //! \param theParent an index of the parent item
-  //! \return integer value
-  Standard_EXPORT virtual int columnCount (const QModelIndex& theParent = QModelIndex()) const Standard_OVERRIDE
-  { (void)theParent; return 9; }
-
-  //! Returns the header data for the given role and section in the header with the specified orientation.
-  //! \param theSection the header section. For horizontal headers - column number, for vertical headers - row number.
-  //! \param theOrientation a header orientation
-  //! \param theRole a data role
-  //! \return the header data
-  Standard_EXPORT virtual QVariant headerData (int theSection, Qt::Orientation theOrientation,
-                                               int theRole = Qt::DisplayRole ) const Standard_OVERRIDE;
 
   //! Returns select owners for tree view selected items
   //! \param theSelectionModel a selection model
   //! \param theOwners an output list of owners
   Standard_EXPORT static void GetSelectedOwners (QItemSelectionModel* theSelectionModel,
                                                  NCollection_List<Handle(SelectBasics_EntityOwner)>& theOwners);
+
+  //! Updates tree model
+  Standard_EXPORT void UpdateTreeModel();
+
+protected:
+
+  //! Creates root item
+  //! \param theColumnId index of a column
+  virtual void createRootItem (const int theColumnId) Standard_OVERRIDE;
 
 private:
 

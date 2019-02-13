@@ -24,14 +24,11 @@
 #include <TopLoc_Location.hxx>
 #include <TopoDS_Shape.hxx>
 
-#ifdef _MSC_VER
-#pragma warning(disable : 4127) // conditional expression is constant
-#endif
-#include <QApplication>
+#include <Standard_WarningsDisable.hxx>
 #include <QString>
-#include <QStyle>
 #include <QString>
 #include <QVariant>
+#include <Standard_WarningsRestore.hxx>
 
 #define PROPERTY_TABLE_ROW_COUNT 200
 
@@ -45,10 +42,6 @@ public:
   //! \param theColumnId a column index
   //! \returns value
   Standard_EXPORT static int DefaultPanelColumnWidth (const int theColumnId);
-
-  //! Returns header margin, defined in style settings of application
-  //! \return integer value
-  Standard_EXPORT static int HeaderSectionMargin() { return qApp->style()->pixelMetric (QStyle::PM_HeaderMargin); }
 
   //! Returns a string presentation of the label
   //! \param theLabel a label object

@@ -62,6 +62,12 @@
 #include <HLRBRep_PolyHLRToShape.hxx>
 #include <HLRBRep_PolyAlgo.hxx>
 
+#include <Standard_Failure.hxx>
+
+#include <Bnd_OBB.hxx>
+#include <BRepBndLib.hxx>
+#include <OSD_Timer.hxx>
+
 #include <limits>
 
 //=======================================================================
@@ -1429,20 +1435,20 @@ static Standard_Integer OCC27021(Draw_Interpretor& theDI,
   std::pair<gp_Pnt, gp_Pnt> vertices;
   clock_t t = clock();
 
-  theDI << "\nRetrieving " << iterations << " vertices using approach A)...";
+  theDI << "\nRetrieving " << iterations << " vertices using approach A)...\n";
   for (int i = 0; i < iterations; ++i)
   {
     vertices = getVerticesA(edge);
   }
-  theDI << "done in " << (clock() - t) / (double)CLOCKS_PER_SEC << " seconds\n";
+  theDI << "COUNTER RetrievingVertA" << ": " << (clock() - t) / (double)CLOCKS_PER_SEC << "\n";
   t = clock();
 
-  theDI << "\nRetrieving " << iterations << " vertices using approach B)...";
+  theDI << "\nRetrieving " << iterations << " vertices using approach B)...\n";
   for (int i = 0; i < iterations; ++i)
   {
     vertices = getVerticesB(edge);
   }
-  theDI << "done in " << (clock() - t) / (double)CLOCKS_PER_SEC << " seconds\n";
+  theDI << "COUNTER RetrievingVertB" << ": " << (clock() - t) / (double)CLOCKS_PER_SEC << "\n";
 
   return 0;
 }
@@ -2530,6 +2536,529 @@ static Standard_Integer OCC28131 (Draw_Interpretor&, Standard_Integer theNbArgs,
 */
   return 0;
 }
+#include <math_NewtonFunctionRoot.hxx>
+#include <math_TrigonometricFunctionRoots.hxx>
+#include <math_TrigonometricEquationFunction.hxx>
+#include <gp_Elips2d.hxx>
+#include <Geom2d_Ellipse.hxx>
+#include <Geom2dAPI_InterCurveCurve.hxx>
+static Standard_Integer OCC29289(Draw_Interpretor&, Standard_Integer , const char** )
+{
+  gp_Elips2d e1(gp_Ax2d(gp_Pnt2d(0., 0.), gp_Dir2d(1., 0)), 2., 1.);
+  Handle(Geom2d_Ellipse) Ge1 = new Geom2d_Ellipse(e1);
+  gp_Elips2d e2(gp_Ax2d(gp_Pnt2d(0.5, 0.5), gp_Dir2d(1., 1.)), 2., 1.);
+  Handle(Geom2d_Ellipse) Ge2 = new Geom2d_Ellipse(e2);
+
+  Standard_Integer err = 0;
+  Geom2dAPI_InterCurveCurve Intersector;
+  Intersector.Init(Ge1, Ge2, 1.e-7);
+  if (Intersector.NbPoints() == 0)
+  {
+    std::cout << "Error: intersector is not done  \n";
+    err = 1;
+  }
+
+
+  Standard_Real A, B, C, D, E;
+  A = 1.875;
+  B = -.75;
+  C = -.5;
+  D = -.25;
+  E = -.25;
+  math_TrigonometricEquationFunction MyF(A, B, C, D, E);
+  Standard_Real X, Tol1, Eps, Teta, TetaNewton;
+  Tol1 = 1.e-15;
+  Eps = 1.5e-12;
+  Standard_Integer Nit[] = { 5, 6, 7, 6 };
+
+  Standard_Real TetaPrev = 0.;
+  Standard_Integer i;
+  for (i = 1; i <= Intersector.NbPoints(); i++) {
+    Teta = Intersector.Intersector().Point(i).ParamOnFirst();
+    X = Teta - 0.1 * (Teta - TetaPrev);
+    TetaPrev = Teta;
+    math_NewtonFunctionRoot Resol(MyF, X, Tol1, Eps, Nit[i-1]);
+    if (Resol.IsDone()) {
+      TetaNewton = Resol.Root();
+      if (Abs(Teta - TetaNewton) > 1.e-7)
+      {
+        std::cout << "Error: Newton root is wrong for " << Teta << " \n";
+        err = 1;
+      }
+    }
+    else
+    {
+      std::cout << "Error: Newton is not done for " << Teta << " \n";
+      err = 1;
+    }
+  }
+
+  return err;
+}
+
+//===============================================================================================
+Standard_Boolean IsSameGuid (const Standard_GUID& aGuidNull, const Standard_GUID& aGuid2)
+{
+  Standard_Boolean isSame (Standard_False);
+  if(Standard_GUID::IsEqual(aGuidNull, aGuid2)) {
+    aGuid2.ShallowDump(cout);
+    isSame = Standard_True;
+  } else {
+    aGuid2.ShallowDump(cout);
+    cout <<endl;
+  }
+  return isSame;
+}
+
+#include <TDataStd_AsciiString.hxx>
+#include <TDataStd_BooleanArray.hxx>
+#include <TDataStd_BooleanList.hxx>
+#include <TDataStd_ByteArray.hxx>
+#include <TDataStd_ExtStringArray.hxx>
+#include <TDataStd_ExtStringList.hxx>
+#include <TDataStd_Integer.hxx>
+#include <TDataStd_IntegerArray.hxx>
+#include <TDataStd_IntegerList.hxx>
+#include <TDataStd_Name.hxx>
+#include <TDataStd_Real.hxx>
+#include <TDataStd_RealArray.hxx>
+#include <TDataStd_RealList.hxx>
+#include <TDataStd_ReferenceArray.hxx>
+#include <TDataStd_ReferenceList.hxx>
+
+#define QCOMPARE(val1, val2) \
+  di << "Checking " #val1 " == " #val2 << \
+        ((val1) == (val2) ? ": OK\n" : ": Error\n")
+
+static Standard_Integer OCC29371 (Draw_Interpretor& di, Standard_Integer n, const char** a)
+{
+  if (n != 1)
+  {
+    std::cout << "Usage : " << a[0] << "\n";
+    return 1;
+  }
+
+  Handle(TDocStd_Application) anApp = DDocStd::GetApplication();
+  Handle(TDocStd_Document) aDoc;
+  anApp->NewDocument ("BinOcaf", aDoc);
+  TDF_Label aLab = aDoc->Main();
+  Standard_GUID aNullGuid("00000000-0000-0000-0000-000000000000");
+  Standard_Boolean IsNullGuid(Standard_False);
+
+  try {
+    //1. Set TDataStd_AsciiString
+    Handle(TDataStd_AsciiString) aStrAtt = new TDataStd_AsciiString();
+    aLab.AddAttribute(aStrAtt);
+    if(!aStrAtt.IsNull()) {
+      Standard_GUID aGuid = aStrAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //2. Set TDataStd_BooleanArray
+    Handle(TDataStd_BooleanArray) aBArAtt = new TDataStd_BooleanArray();
+    aLab.AddAttribute(aBArAtt);
+    if(!aBArAtt.IsNull()) {
+      Standard_GUID aGuid = aBArAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //3. Set TDataStd_BooleanList
+    Handle(TDataStd_BooleanList) aBListAtt = new TDataStd_BooleanList();
+    aLab.AddAttribute(aBListAtt);
+    if(!aBListAtt.IsNull()) {
+      Standard_GUID aGuid = aBListAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //4. Set TDataStd_ByteArray
+    Handle(TDataStd_ByteArray) aByteArAtt = new TDataStd_ByteArray();
+    aLab.AddAttribute(aByteArAtt);
+    if(!aByteArAtt.IsNull()) {
+      Standard_GUID aGuid = aByteArAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //5. Set TDataStd_ExtStringArray
+    Handle(TDataStd_ExtStringArray) anExtStrArAtt = new TDataStd_ExtStringArray();
+    aLab.AddAttribute(anExtStrArAtt);
+    if(!anExtStrArAtt.IsNull()) {
+      Standard_GUID aGuid = anExtStrArAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //6. Set TDataStd_ExtStringList
+    Handle(TDataStd_ExtStringList) anExtStrListAtt = new TDataStd_ExtStringList();
+    aLab.AddAttribute(anExtStrListAtt);
+    if(!anExtStrListAtt.IsNull()) {
+      Standard_GUID aGuid = anExtStrListAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //7. Set TDataStd_Integer
+    Handle(TDataStd_Integer) anIntAtt = new TDataStd_Integer();
+    aLab.AddAttribute(anIntAtt);
+    if(!anIntAtt.IsNull()) {
+      Standard_GUID aGuid = anIntAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //8. Set TDataStd_IntegerArray
+    Handle(TDataStd_IntegerArray) anIntArrAtt = new TDataStd_IntegerArray();
+    aLab.AddAttribute(anIntArrAtt);
+    if(!anIntArrAtt.IsNull()) {
+      Standard_GUID aGuid = anIntArrAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //9. Set TDataStd_IntegerList
+    Handle(TDataStd_IntegerList) anIntListAtt = new TDataStd_IntegerList();
+    aLab.AddAttribute(anIntListAtt);
+    if(!anIntListAtt.IsNull()) {
+      Standard_GUID aGuid = anIntListAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //10. Set TDataStd_Name
+    Handle(TDataStd_Name) aNameAtt = new TDataStd_Name();
+    aLab.AddAttribute(aNameAtt);
+    if(!aNameAtt.IsNull()) {
+      Standard_GUID aGuid = aNameAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //11. Set TDataStd_Real
+    Handle(TDataStd_Real) aRealAtt = new TDataStd_Real();
+    aLab.AddAttribute(aRealAtt);
+    if(!aRealAtt.IsNull()) {
+      Standard_GUID aGuid = aRealAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //12. Set TDataStd_RealArray
+    Handle(TDataStd_RealArray) aRealArrAtt = new TDataStd_RealArray();
+    aLab.AddAttribute(aRealArrAtt);
+    if(!aRealArrAtt.IsNull()) {
+      Standard_GUID aGuid = aRealArrAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //13. Set TDataStd_RealList
+    Handle(TDataStd_RealList) aRealListAtt = new TDataStd_RealList();
+    aLab.AddAttribute(aRealListAtt);
+    if(!aRealListAtt.IsNull()) {
+      Standard_GUID aGuid = aRealListAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //14. Set TDataStd_ReferenceArray
+    Handle(TDataStd_ReferenceArray) aRefArrAtt = new TDataStd_ReferenceArray();
+    aLab.AddAttribute(aRefArrAtt);
+    if(!aRefArrAtt.IsNull()) {
+      Standard_GUID aGuid = aRefArrAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+
+    //15. Set TDataStd_ReferenceList
+    Handle(TDataStd_ReferenceList) aRefListAtt = new TDataStd_ReferenceList();
+    aLab.AddAttribute(aRefListAtt);
+    if(!aRefListAtt.IsNull()) {
+      Standard_GUID aGuid = aRefListAtt->ID();
+      IsNullGuid = IsSameGuid(aNullGuid, aGuid);
+    }
+  } catch (...)
+  {
+    IsNullGuid = Standard_True;
+  }
+  QCOMPARE (IsNullGuid, Standard_False);
+  anApp->Close(aDoc);
+  return 0;
+}
+
+#include <NCollection_DoubleMap.hxx>
+#include <NCollection_IndexedMap.hxx>
+#include <NCollection_DataMap.hxx>
+#include <NCollection_IndexedDataMap.hxx>
+#include <OSD_MemInfo.hxx>
+
+// check that copying of empty maps does not allocate extra memory
+template<typename T> void AllocDummyArr (Draw_Interpretor& theDI, int theN1, int theN2)
+{
+  NCollection_Array1<T> aMapArr1(0, theN1), aMapArr2(0, theN2);
+
+  OSD_MemInfo aMemTool;
+  Standard_Size aMem0 = aMemTool.Value (OSD_MemInfo::MemHeapUsage);
+
+  for (int i = 1; i < theN1; i++)
+    aMapArr1(i) = aMapArr1(i-1);
+  for (int i = 1; i < theN2; i++)
+    aMapArr2(i) = aMapArr2(0);
+
+  aMemTool.Update();
+  Standard_Size aMem1 = aMemTool.Value (OSD_MemInfo::MemHeapUsage);
+
+  theDI << "Heap usage before copy = " << (int)aMem0 << ", after = " << (int)aMem1 << "\n";
+  
+  if (aMem1 > aMem0)
+    theDI << "Error: memory increased by " << (int)(aMem1 - aMem0) << " bytes\n";
+};
+
+static Standard_Integer OCC29064 (Draw_Interpretor& theDI, Standard_Integer theArgc, const char** theArgv)
+{
+  if (theArgc < 2)
+  {
+    cout << "Error: give argument indicating type of map (map, doublemap, datamap, indexedmap, indexeddatamap)" << endl;
+    return 1;
+  }
+
+  const int nbm1 = 10000, nbm2 = 10000;
+  if (strcasecmp (theArgv[1], "map") == 0)
+    AllocDummyArr<NCollection_Map<int> > (theDI, nbm1, nbm2);
+  else if (strcasecmp (theArgv[1], "doublemap") == 0)
+    AllocDummyArr<NCollection_DoubleMap<int, int> > (theDI, nbm1, nbm2);
+  else if (strcasecmp (theArgv[1], "datamap") == 0)
+    AllocDummyArr<NCollection_DataMap<int, int> > (theDI, nbm1, nbm2);
+  else if (strcasecmp (theArgv[1], "indexedmap") == 0)
+    AllocDummyArr<NCollection_IndexedMap<int> > (theDI, nbm1, nbm2);
+  else if (strcasecmp (theArgv[1], "indexeddatamap") == 0)
+    AllocDummyArr<NCollection_IndexedDataMap<int, int> > (theDI, nbm1, nbm2);
+  else
+  {
+    cout << "Error: unrecognized argument " << theArgv[1] << endl;
+    return 1;
+  }
+  return 0;
+}
+
+#include <BRepOffsetAPI_MakePipeShell.hxx>
+#include <GC_MakeArcOfCircle.hxx>
+#include <BRepAdaptor_CompCurve.hxx>
+#include <gp_Circ.hxx>
+//=======================================================================
+//function : OCC29430
+//purpose  : 
+//=======================================================================
+static Standard_Integer OCC29430(Draw_Interpretor& theDI,
+                                 Standard_Integer /*theNArg*/,
+                                 const char** theArgVal)
+{
+  const Standard_Real r45 = M_PI / 4.0, r225 = 3.0*M_PI / 4.0;
+
+  GC_MakeArcOfCircle arcMaker(gp_Circ(gp_Ax2(gp_Pnt(0.0, 0.0, 0.0), gp_Dir(0.0, 0.0, 1.0), gp_Dir(1.0, 0.0, 0.0)), 1.0), r45, r225, Standard_True);
+  BRepBuilderAPI_MakeEdge edgeMaker(arcMaker.Value());
+  BRepBuilderAPI_MakeWire wireMaker(edgeMaker.Edge());
+  const TopoDS_Wire circle = wireMaker.Wire();
+
+  DBRep::Set(theArgVal[1], circle);
+
+  BRepAdaptor_CompCurve curve(circle);
+  theDI << "Curve.FirstParameter() = " << curve.FirstParameter() << "\n";
+  theDI << "Curve.LastParameter() = " << curve.LastParameter() << "\n";
+  theDI << "Curve.Period() = " << (curve.IsPeriodic()? curve.Period() : 0.0) << "\n";
+  const gp_Pnt aStartPt = curve.Value(curve.FirstParameter());
+  const gp_Pnt anEndPt = curve.Value(curve.LastParameter());
+
+  DrawTrSurf::Set(theArgVal[2], aStartPt);
+  DrawTrSurf::Set(theArgVal[3], anEndPt);
+
+  return 0;
+}
+
+#include <STEPCAFControl_Reader.hxx>
+
+//=======================================================================
+//function : OCC29531
+//purpose  : 
+//=======================================================================
+static Standard_Integer OCC29531(Draw_Interpretor&, Standard_Integer, const char** theArgV)
+{
+  Handle(TDocStd_Application) anApp = DDocStd::GetApplication();
+  Handle(TDocStd_Document) aDoc;
+  anApp->NewDocument("BinOcaf", aDoc);
+  aDoc->SetUndoLimit(1);
+
+  STEPCAFControl_Reader Reader;
+  Reader.ReadFile(theArgV[1]);
+  Reader.Transfer(aDoc);
+  TDF_Label aShL, aDL;
+  TDF_Tool::Label(aDoc->GetData(), "0:1:1:2:672", aShL);
+  TDF_Tool::Label(aDoc->GetData(), "0:1:4:10", aDL);
+
+  aDoc->OpenCommand();
+
+  Handle(XCAFDoc_DimTolTool) aDimTolTool = XCAFDoc_DocumentTool::DimTolTool(aDoc->Main());
+  aDimTolTool->SetDimension(aShL, aDL);
+
+  aDoc->CommitCommand();
+
+  aDoc->Undo();
+  aDoc->Redo();
+  return 0;
+}
+
+//=======================================================================
+//function : OCC29807
+//purpose  : 
+//=======================================================================
+#include <GeomAdaptor_HSurface.hxx>
+#include <IntPatch_PointLine.hxx>
+#include <IntSurf_PntOn2S.hxx>
+static Standard_Integer OCC29807(Draw_Interpretor& theDI, Standard_Integer theNArg, const char** theArgV)
+{
+  if (theNArg != 7)
+  {
+    theDI << "Use: " << theArgV[0] << "surface1 surface2 u1 v1 u2 v2\n";
+    return 1;
+  }
+
+  const Handle(Geom_Surface) aS1 = DrawTrSurf::GetSurface(theArgV[1]);
+  const Handle(Geom_Surface) aS2 = DrawTrSurf::GetSurface(theArgV[2]);
+
+  if (aS1.IsNull() || aS2.IsNull())
+  {
+    theDI << "Error. Null surface is not supported.\n";
+    return 1;
+  }
+
+  const Standard_Real aU1 = Draw::Atof(theArgV[3]);
+  const Standard_Real aV1 = Draw::Atof(theArgV[4]);
+  const Standard_Real aU2 = Draw::Atof(theArgV[5]);
+  const Standard_Real aV2 = Draw::Atof(theArgV[6]);
+
+  const Handle(GeomAdaptor_HSurface) anAS1 = new GeomAdaptor_HSurface(aS1);
+  const Handle(GeomAdaptor_HSurface) anAS2 = new GeomAdaptor_HSurface(aS2);
+
+  const gp_Pnt aP1 = anAS1->Value(aU1, aV1);
+  const gp_Pnt aP2 = anAS2->Value(aU2, aV2);
+
+  if (aP1.SquareDistance(aP2) > Precision::SquareConfusion())
+  {
+    theDI << "Error. True intersection point must be specified. "
+             "Please check parameters: u1 v1 u2 v2.\n";
+    return 1;
+  }
+
+  IntSurf_PntOn2S aPOn2S;
+  aPOn2S.SetValue(0.5*(aP1.XYZ() + aP2.XYZ()), aU1, aV1, aU2, aV2);
+
+  const Standard_Real aCurvatureRadius = IntPatch_PointLine::CurvatureRadiusOfIntersLine(anAS1, anAS2, aPOn2S);
+  theDI << "Radius of curvature is " << aCurvatureRadius << "\n";
+  return 0;
+}
+
+//=======================================================================
+//function : OCC29925
+//purpose  : check safety of functions like IsSpace(), LowerCase(), etc. for all chars
+//=======================================================================
+static Standard_Integer OCC29925 (Draw_Interpretor& theDI, Standard_Integer, const char**)
+{
+  // iterate by all valid ASCII chars (including extended)
+  for (int i = 0; i < 256; i++)
+  {
+    Standard_Character c = (char)(unsigned char)i;
+//    if (c != i) theDI << c << " != " << i << "\n";
+    const char* anOp = "";
+    try {
+      anOp = "IsAlphabetic";
+      IsAlphabetic (c);
+      anOp = "IsDigit";
+      IsDigit (c);
+      anOp = "IsXDigit";
+      IsXDigit (c);
+      anOp = "IsAlphanumeric";
+      IsAlphanumeric (c);
+      anOp = "IsControl";
+      IsControl (c);
+      anOp = "IsGraphic";
+      IsGraphic (c);
+      anOp = "IsLowerCase";
+      IsLowerCase (c);
+      anOp = "IsPrintable";
+      IsPrintable (c);
+      anOp = "IsPunctuation";
+      IsPunctuation (c);
+      anOp = "IsSpace";
+      IsSpace (c);
+      anOp = "IsUpperCase";
+      IsUpperCase (c);
+      anOp = "LowerCase";
+      LowerCase (c);
+      anOp = "UpperCase";
+      UpperCase (c);
+    }
+    catch (const Handle(Standard_Failure)& e)
+    {
+      theDI << anOp << "() fails for " << c << " (" << e->DynamicType()->Name() << ")\n";
+    }
+  }
+
+  return 0;
+}
+
+//=======================================================================
+//function : OCC29311
+//purpose  : check performance of OBB calculations
+//=======================================================================
+static Standard_Integer OCC29311 (Draw_Interpretor& theDI, Standard_Integer theArgc, const char** theArgv)
+{
+  if (theArgc < 4)
+  {
+    std::cerr << "Use: " << theArgv[0] << " shape counter_name nb_iterations" << std::endl;
+    return 1;
+  }
+
+  TopoDS_Shape aShape = DBRep::Get (theArgv[1]);
+  Standard_Integer aNbIter = Draw::Atoi (theArgv[3]);
+
+  Bnd_OBB anOBB;
+  OSD_Timer aTimer;
+  aTimer.Start ();
+  for (Standard_Integer aN = aNbIter; aN > 0; --aN)
+  {
+    anOBB.SetVoid ();
+    BRepBndLib::AddOBB (aShape, anOBB, Standard_False, Standard_False, Standard_False);
+  }
+  aTimer.Stop ();
+
+  theDI << "COUNTER " << theArgv[2] << ": " << aTimer.ElapsedTime() << "\n";
+
+  return 0;
+}
+
+//=======================================================================
+//function : OCC30391
+//purpose  : 
+//=======================================================================
+#include <BRepOffset_Tool.hxx>
+static Standard_Integer OCC30391(Draw_Interpretor& theDI,
+                                 Standard_Integer theNArg,
+                                 const char** theArgV)
+{
+  if (theNArg < 7)
+  {
+    theDI << "Use: " << theArgV[0] << "result face LenBeforeUfirst LenAfterUlast LenBeforeVfirst LenAfterVlast\n";
+    return 1;
+  }
+
+  TopoDS_Shape aShape = DBRep::Get(theArgV[2], TopAbs_FACE);
+  if (aShape.IsNull())
+    return 1;
+
+  const TopoDS_Face& aFace = TopoDS::Face(aShape);
+
+  Standard_Real aLenBeforeUfirst = atof(theArgV[3]);
+  Standard_Real aLenAfterUlast   = atof(theArgV[4]);
+  Standard_Real aLenBeforeVfirst = atof(theArgV[5]);
+  Standard_Real aLenAfterVlast   = atof(theArgV[6]);
+
+  TopoDS_Face Result;
+  BRepOffset_Tool::EnLargeFace(aFace, Result,
+                               Standard_True,Standard_True,Standard_True,Standard_True,Standard_True,1,
+                               aLenBeforeUfirst, aLenAfterUlast,
+                               aLenBeforeVfirst, aLenAfterVlast);
+
+  DBRep::Set(theArgV[1], Result);
+  return 0;
+}
 
 void QABugs::Commands_20(Draw_Interpretor& theCommands) {
   const char *group = "QABugs";
@@ -2559,6 +3088,18 @@ void QABugs::Commands_20(Draw_Interpretor& theCommands) {
                   "\n\t\t: Check interface for reading BRep from memory.",
                   __FILE__, OCC28887, group);
   theCommands.Add("OCC28131", "OCC28131 name: creates face problematic for offset", __FILE__, OCC28131, group);
+  theCommands.Add("OCC29289", "OCC29289 : searching trigonometric root by Newton iterations", __FILE__, OCC29289, group);
+  theCommands.Add ("OCC29371", "OCC29371", __FILE__, OCC29371, group);
+  theCommands.Add("OCC29430", "OCC29430 <result wire> "
+                              "<result first point> <result last point>",
+                              __FILE__, OCC29430, group);
+  theCommands.Add("OCC29531", "OCC29531 <step file name>", __FILE__, OCC29531, group);
+
+  theCommands.Add ("OCC29064", "OCC29064: test memory usage by copying empty maps", __FILE__, OCC29064, group);
+  theCommands.Add ("OCC29925", "OCC29925: check safety of character classification functions", __FILE__, OCC29925, group);
+  theCommands.Add("OCC29807", "OCC29807 surface1 surface2 u1 v1 u2 v2", __FILE__, OCC29807, group);
+  theCommands.Add("OCC29311", "OCC29311 shape counter nbiter: check performance of OBB calculation", __FILE__, OCC29311, group);
+  theCommands.Add("OCC30391", "OCC30391 result face LenBeforeUfirst LenAfterUlast LenBeforeVfirst LenAfterVlast", __FILE__, OCC30391, group);
 
   return;
 }

@@ -17,6 +17,7 @@
 #define TInspector_Communicator_H
 
 #include <inspector/TInspector_Window.hxx>
+#include <inspector/TInspectorAPI_PluginParameters.hxx>
 
 #include <NCollection_List.hxx>
 #include <Standard.hxx>
@@ -86,12 +87,31 @@ public:
   Standard_EXPORT void SetSelected (const NCollection_List<Handle(Standard_Transient)>& theObjects)
     { myWindow->SetSelected (theObjects); }
 
+  //! Sets path to a directory for temporary plugin files
+  //! \param thePath a path
+  void SetTemporaryDirectory (const TCollection_AsciiString& thePath) { myWindow->SetTemporaryDirectory (thePath); }
+
+  //! Returns path to a directory for temporary plugin files
+  //! \return path
+  TCollection_AsciiString GetTemporaryDirectory() const { return myWindow->GetTemporaryDirectory(); }
+
   //! Change window visibility
   //! \param theVisible boolean state
   Standard_EXPORT virtual void SetVisible (const bool theVisible);
 
-private:
+  //! Change window position
+  //! \param theX X pixel position of top left corner of the window
+  //! \param theY Y pixel position
+  Standard_EXPORT virtual void Move (const int theXPosition, const int theYPosition);
 
+  //! Puts in the stream information about communicator
+  //! \param theStream stream for output
+  void Dump (Standard_OStream& theStream) const { return myWindow->Dump (theStream); }
+
+  //! Returns plugins parameters container
+  Handle(TInspectorAPI_PluginParameters) const GetPluginParameters() { return myWindow->GetPluginParameters(); }
+
+private:
   TInspector_Window* myWindow; //!< current window
 };
 

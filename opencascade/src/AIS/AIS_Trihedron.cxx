@@ -103,6 +103,8 @@ void AIS_Trihedron::setOwnDatumAspect()
   if (myDrawer->Link().IsNull())
     return;
 
+  myDrawer->DatumAspect()->SetDrawArrows (myDrawer->Link()->DatumAspect()->ToDrawArrows());
+  myDrawer->DatumAspect()->SetDrawLabels (myDrawer->Link()->DatumAspect()->ToDrawLabels());
   *myDrawer->DatumAspect()->TextAspect()->Aspect() =
                                      *myDrawer->Link()->DatumAspect()->TextAspect()->Aspect();
   *myDrawer->DatumAspect()->PointAspect()->Aspect() =
@@ -333,6 +335,10 @@ void AIS_Trihedron::HilightOwnerWithColor (const Handle(PrsMgr_PresentationManag
   }
   aGroup->AddPrimitiveArray (arrayOfPrimitives(aPart));
 
+  if (aPresentation->GetZLayer() != theStyle->ZLayer())
+  {
+    aPresentation->SetZLayer (theStyle->ZLayer());
+  }
   aPresentation->Highlight (theStyle);
   thePM->AddToImmediateList (aPresentation);
 }
@@ -493,14 +499,14 @@ void AIS_Trihedron::computePresentation (const Handle(PrsMgr_PresentationManager
       anAxisGroup->AddPrimitiveArray (arrayOfPrimitives (aPart));
 
       // draw arrow
-      Handle(Graphic3d_Group) anArrowGroup = Prs3d_Root::NewGroup (thePrs);
-      anArrowGroup->SetPrimitivesAspect (anAspect->ArrowAspect()->Aspect());
-
       Prs3d_DatumParts anArrowPart = anAspect->ArrowPartForAxis (aPart);
       if (!anAspect->DrawDatumPart (anArrowPart))
       {
         continue;
       }
+
+      Handle(Graphic3d_Group) anArrowGroup = Prs3d_Root::NewGroup (thePrs);
+      anArrowGroup->SetGroupPrimitivesAspect (anAspect->ArrowAspect()->Aspect());
       anArrowGroup->AddPrimitiveArray (arrayOfPrimitives (anArrowPart));
     }
   }
@@ -712,6 +718,25 @@ void AIS_Trihedron::UnsetColor()
     SetArrowColor (aDefaultColor);
     myHasOwnArrowColor = Standard_False;
   }
+}
+
+//=======================================================================
+//function : ToDrawArrows
+//purpose  :
+//=======================================================================
+Standard_Boolean AIS_Trihedron::ToDrawArrows() const
+{
+  return myDrawer->DatumAspect()->ToDrawArrows();
+}
+
+//=======================================================================
+//function : SetDrawArrows
+//purpose  :
+//=======================================================================
+void AIS_Trihedron::SetDrawArrows (const Standard_Boolean theToDraw)
+{
+  setOwnDatumAspect();
+  myDrawer->DatumAspect()->SetDrawArrows (theToDraw);
 }
 
 //=======================================================================

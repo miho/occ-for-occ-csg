@@ -45,6 +45,7 @@ AIS_RubberBand::AIS_RubberBand()
   myDrawer->SetShadingAspect (new Prs3d_ShadingAspect());
   myDrawer->ShadingAspect()->SetMaterial (Graphic3d_NOM_PLASTIC);
   myDrawer->ShadingAspect()->Aspect()->SetInteriorStyle (Aspect_IS_EMPTY);
+  myDrawer->ShadingAspect()->Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Blend);
   myDrawer->ShadingAspect()->SetTransparency (1.0);
   myDrawer->ShadingAspect()->SetColor (Quantity_NOC_WHITE);
 
@@ -66,6 +67,7 @@ AIS_RubberBand::AIS_RubberBand (const Quantity_Color& theLineColor,
   myDrawer->SetShadingAspect (new Prs3d_ShadingAspect());
   myDrawer->ShadingAspect()->SetMaterial (Graphic3d_NOM_PLASTIC);
   myDrawer->ShadingAspect()->Aspect()->SetInteriorStyle (Aspect_IS_EMPTY);
+  myDrawer->ShadingAspect()->Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Blend);
   myDrawer->ShadingAspect()->SetTransparency (1.0);
   myDrawer->ShadingAspect()->SetColor (Quantity_NOC_WHITE);
 
@@ -90,6 +92,7 @@ AIS_RubberBand::AIS_RubberBand (const Quantity_Color& theLineColor,
   myDrawer->ShadingAspect()->SetMaterial (Graphic3d_NOM_PLASTIC);
   myDrawer->ShadingAspect()->SetColor (theFillColor);
   myDrawer->ShadingAspect()->Aspect()->SetInteriorStyle (Aspect_IS_SOLID);
+  myDrawer->ShadingAspect()->Aspect()->SetAlphaMode (Graphic3d_AlphaMode_Blend);
   myDrawer->ShadingAspect()->SetTransparency (theTransparency);
 
   SetTransformPersistence (new Graphic3d_TransformPers (Graphic3d_TMF_2d, Aspect_TOTP_LEFT_LOWER));
@@ -296,13 +299,13 @@ Standard_Boolean AIS_RubberBand::fillTriangles()
   Handle(BRepMesh_DataStructureOfDelaun) aMeshStructure = new BRepMesh_DataStructureOfDelaun(anAllocator);
   Standard_Integer aPtsLower = myPoints.Lower();
   Standard_Integer aPtsUpper = myPoints.Upper();
-  BRepMesh::Array1OfInteger anIndexes (0, myPoints.Length() - 1);
+  IMeshData::VectorOfInteger anIndexes (myPoints.Length(), anAllocator);
   for (Standard_Integer aPtIdx = aPtsLower; aPtIdx <= aPtsUpper; ++aPtIdx)
   {
     gp_XY aP ((Standard_Real)myPoints.Value (aPtIdx).x(),
               (Standard_Real)myPoints.Value (aPtIdx).y());
     BRepMesh_Vertex aVertex (aP, aPtIdx, BRepMesh_Frontier);
-    anIndexes.ChangeValue (aPtIdx - aPtsLower) = aMeshStructure->AddNode (aVertex);
+    anIndexes.Append (aMeshStructure->AddNode (aVertex));
   }
 
   Standard_Real aPtSum = 0;
@@ -325,7 +328,7 @@ Standard_Boolean AIS_RubberBand::fillTriangles()
   }
 
   BRepMesh_Delaun aTriangulation (aMeshStructure, anIndexes);
-  const BRepMesh::MapOfInteger& aTriangles = aMeshStructure->ElementsOfDomain();
+  const IMeshData::MapOfInteger& aTriangles = aMeshStructure->ElementsOfDomain();
   if (aTriangles.Extent() < 1)
     return Standard_False;
 
@@ -338,7 +341,7 @@ Standard_Boolean AIS_RubberBand::fillTriangles()
   }
 
   Standard_Integer aVertexIndex = 1;
-  BRepMesh::MapOfInteger::Iterator aTriangleIt (aTriangles);
+  IMeshData::IteratorOfMapOfInteger aTriangleIt (aTriangles);
   for (; aTriangleIt.More(); aTriangleIt.Next())
   {
     const Standard_Integer aTriangleId = aTriangleIt.Key();

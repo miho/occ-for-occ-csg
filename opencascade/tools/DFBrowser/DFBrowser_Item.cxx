@@ -26,10 +26,10 @@
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QIcon>
 #include <QObject>
-
-const int INFO_LENGHT = 60;
+#include <Standard_WarningsRestore.hxx>
 
 // =======================================================================
 // function : hasAttribute
@@ -134,8 +134,8 @@ QVariant DFBrowser_Item::initValue (const int theItemRole) const
                                                                     DFBrowser_ItemRole_AdditionalInfo, Column()).toString();
     if (!anAdditionalInfo.isEmpty())
     {
-      if (theItemRole == DFBrowserPane_ItemRole_DisplayExtended && anAdditionalInfo.length() > INFO_LENGHT)
-        anAdditionalInfo = anAdditionalInfo.mid (0, INFO_LENGHT - 3) + "...";
+      if (theItemRole == DFBrowserPane_ItemRole_DisplayExtended)
+        anAdditionalInfo = TreeModel_Tools::CutString (anAdditionalInfo);
       if (!anAdditionalInfo.isEmpty())
         aValue = QVariant (aValue.toString() + QString (" [%1]").arg (anAdditionalInfo));
       //if (aRole == Qt::ToolTipRole)

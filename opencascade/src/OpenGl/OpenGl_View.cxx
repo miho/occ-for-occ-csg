@@ -38,10 +38,6 @@
 
 IMPLEMENT_STANDARD_RTTIEXT(OpenGl_View,Graphic3d_CView)
 
-#ifdef HAVE_GL2PS
-#include <gl2ps.h>
-#endif
-
 // =======================================================================
 // function : Constructor
 // purpose  :
@@ -54,20 +50,16 @@ OpenGl_View::OpenGl_View (const Handle(Graphic3d_StructureManager)& theMgr,
   myDriver         (theDriver.operator->()),
   myCaps           (theCaps),
   myWasRedrawnGL   (Standard_False),
-  myCulling        (Standard_True),
-  myShadingModel   (Graphic3d_TOSM_FACET),
   myBackfacing     (Graphic3d_TOBM_AUTOMATIC),
   myBgColor        (Quantity_NOC_BLACK),
   myCamera         (new Graphic3d_Camera()),
   myToShowGradTrihedron  (false),
   myZLayers        (Structure_MAX_PRIORITY - Structure_MIN_PRIORITY + 1),
   myStateCounter         (theCounter),
+  myCurrLightSourceState (theCounter->Increment()),
+  myLightsRevision       (0),
   myLastLightSourceState (0, 0),
-#if !defined(GL_ES_VERSION_2_0)
   myFboColorFormat       (GL_RGBA8),
-#else
-  myFboColorFormat       (GL_RGBA),
-#endif
   myFboDepthFormat       (GL_DEPTH24_STENCIL8),
   myToFlipOutput         (Standard_False),
   myFrameCounter         (0),
@@ -98,15 +90,12 @@ OpenGl_View::OpenGl_View (const Handle(Graphic3d_StructureManager)& theMgr,
 {
   myWorkspace = new OpenGl_Workspace (this, NULL);
 
-  OpenGl_Light       aLight;
-  aLight.Type        = Graphic3d_TOLS_AMBIENT;
-  aLight.IsHeadlight = Standard_False;
-  aLight.Color.r()   = 1.;
-  aLight.Color.g()   = 1.;
-  aLight.Color.b()   = 1.;
-  myNoShadingLight.Append (aLight);
+  Handle(Graphic3d_CLight) aLight = new Graphic3d_CLight (Graphic3d_TOLS_AMBIENT);
+  aLight->SetHeadlight (false);
+  aLight->SetColor (Quantity_NOC_WHITE);
+  myNoShadingLight = new Graphic3d_LightSet();
+  myNoShadingLight->Add (aLight);
 
-  myCurrLightSourceState     = myStateCounter->Increment();
   myMainSceneFbos[0]         = new OpenGl_FrameBuffer();
   myMainSceneFbos[1]         = new OpenGl_FrameBuffer();
   myMainSceneFbosOit[0]      = new OpenGl_FrameBuffer();
@@ -142,6 +131,7 @@ OpenGl_View::~OpenGl_View()
 void OpenGl_View::ReleaseGlResources (const Handle(OpenGl_Context)& theCtx)
 {
   myGraduatedTrihedron.Release (theCtx.operator->());
+  myFrameStatsPrs.Release (theCtx.operator->());
 
   if (!myTextureEnv.IsNull())
   {
@@ -746,112 +736,6 @@ void OpenGl_View::FBOChangeViewport (const Handle(Standard_Transient)& theFbo,
   aFrameBuffer->ChangeViewport (theWidth, theHeight);
 }
 
-// =======================================================================
-// function : Export
-// purpose  :
-// =======================================================================
-#ifdef HAVE_GL2PS
-Standard_Boolean OpenGl_View::Export (const Standard_CString theFileName,
-                                      const Graphic3d_ExportFormat theFormat,
-                                      const Graphic3d_SortType theSortType)
-{
-  // gl2psBeginPage() will call OpenGL functions
-  // so we should activate correct GL context before redraw scene call
-  if (!myWorkspace->Activate())
-  {
-    return Standard_False;
-  }
-
-  Standard_Integer aFormat = -1;
-  Standard_Integer aSortType = Graphic3d_ST_BSP_Tree;
-  switch (theFormat)
-  {
-    case Graphic3d_EF_PostScript:
-      aFormat = GL2PS_PS;
-      break;
-    case Graphic3d_EF_EnhPostScript:
-      aFormat = GL2PS_EPS;
-      break;
-    case Graphic3d_EF_TEX:
-      aFormat = GL2PS_TEX;
-      break;
-    case Graphic3d_EF_PDF:
-      aFormat = GL2PS_PDF;
-      break;
-    case Graphic3d_EF_SVG:
-      aFormat = GL2PS_SVG;
-      break;
-    case Graphic3d_EF_PGF:
-      aFormat = GL2PS_PGF;
-      break;
-    case Graphic3d_EF_EMF:
-      //aFormat = GL2PS_EMF;
-      aFormat = GL2PS_PGF + 1; // 6
-      break;
-    default:
-      // unsupported format
-      return Standard_False;
-  }
-
-  switch (theSortType)
-  {
-    case Graphic3d_ST_Simple:
-      aSortType = GL2PS_SIMPLE_SORT;
-      break;
-    case Graphic3d_ST_BSP_Tree:
-      aSortType = GL2PS_BSP_SORT;
-      break;
-  }
-
-  GLint aViewport[4];
-  aViewport[0] = 0;
-  aViewport[1] = 0;
-  aViewport[2] = myWindow->Width();
-  aViewport[3] = myWindow->Height();
-
-  GLint aBufferSize = 1024 * 1024;
-  GLint anErrCode = GL2PS_SUCCESS;
-
-  // gl2ps uses standard write functions and do not check locale
-  Standard_CLocaleSentry aLocaleSentry;
-
-  while (aBufferSize > 0)
-  {
-    // current patch for EMF support in gl2ps uses WinAPI functions to create file
-    FILE* aFileH = (theFormat != Graphic3d_EF_EMF) ? fopen (theFileName, "wb") : NULL;
-    anErrCode = gl2psBeginPage ("", "", aViewport, aFormat, aSortType,
-                    GL2PS_DRAW_BACKGROUND | GL2PS_OCCLUSION_CULL | GL2PS_BEST_ROOT/* | GL2PS_SIMPLE_LINE_OFFSET*/,
-                    GL_RGBA, 0, NULL,
-                    0, 0, 0, aBufferSize, aFileH, theFileName);
-    if (anErrCode != GL2PS_SUCCESS)
-    {
-      // initialization failed
-      if (aFileH != NULL)
-        fclose (aFileH);
-      break;
-    }
-    Redraw();
-
-    anErrCode = gl2psEndPage();
-    if (aFileH != NULL)
-      fclose (aFileH);
-
-    if (anErrCode == GL2PS_OVERFLOW)
-      aBufferSize *= 2;
-    else
-      break;
-  }
-  return anErrCode == GL2PS_SUCCESS;
-}
-#else
-Standard_Boolean OpenGl_View::Export (const Standard_CString /*theFileName*/,
-                                      const Graphic3d_ExportFormat /*theFormat*/,
-                                      const Graphic3d_SortType /*theSortType*/)
-{
-    return Standard_False;
-}
-#endif
-
 //=======================================================================
 //function : displayStructure
 //purpose  :
@@ -920,4 +804,33 @@ void OpenGl_View::DiagnosticInformation (TColStd_IndexedDataMapOfStringString& t
     TCollection_AsciiString aResRatio (myRenderParams.ResolutionRatio());
     theDict.ChangeFromIndex (theDict.Add ("ResolutionRatio", aResRatio)) = aResRatio;
   }
+}
+
+//=======================================================================
+//function : StatisticInformation
+//purpose  :
+//=======================================================================
+void OpenGl_View::StatisticInformation (TColStd_IndexedDataMapOfStringString& theDict) const
+{
+  if (const Handle(OpenGl_Context)& aCtx = myWorkspace->GetGlContext())
+  {
+    const Handle(OpenGl_FrameStats)& aStats = aCtx->FrameStats();
+    const Graphic3d_RenderingParams& aRendParams = myWorkspace->View()->RenderingParams();
+    aStats->FormatStats (theDict, aRendParams.CollectedStats);
+  }
+}
+
+//=======================================================================
+//function : StatisticInformation
+//purpose  :
+//=======================================================================
+TCollection_AsciiString OpenGl_View::StatisticInformation() const
+{
+  if (const Handle(OpenGl_Context)& aCtx = myWorkspace->GetGlContext())
+  {
+    const Handle(OpenGl_FrameStats)& aStats = aCtx->FrameStats();
+    const Graphic3d_RenderingParams& aRendParams = myWorkspace->View()->RenderingParams();
+    return aStats->FormatStats (aRendParams.CollectedStats);
+  }
+  return TCollection_AsciiString();
 }

@@ -59,29 +59,56 @@ namespace {
     const SelectMgr_IndexedDataMapOfOwnerCriterion&  myMapOfCriterion;
   };
 
-  //! Compute 3d position for detected entity.
-  inline void updatePoint3d (SelectMgr_SortCriterion& theCriterion,
-                             const gp_GTrsf& theInversedTrsf,
-                             SelectMgr_SelectingVolumeManager& theMgr)
-  {
-    if (theMgr.GetActiveSelectionType() != SelectMgr_SelectingVolumeManager::Point)
-    {
-      return;
-    }
+  static const Graphic3d_Mat4d SelectMgr_ViewerSelector_THE_IDENTITY_MAT;
+}
 
-    theCriterion.Point = theMgr.DetectedPoint (theCriterion.Depth);
-    gp_GTrsf anInvTrsf = theInversedTrsf;
-    if (theCriterion.Entity->HasInitLocation())
-    {
-      anInvTrsf = theCriterion.Entity->InvInitLocation() * anInvTrsf;
-    }
-    if (anInvTrsf.Form() != gp_Identity)
-    {
-      anInvTrsf.Inverted().Transforms (theCriterion.Point.ChangeCoord());
-    }
+//=======================================================================
+// function : updatePoint3d
+// purpose  :
+//=======================================================================
+void SelectMgr_ViewerSelector::updatePoint3d (SelectMgr_SortCriterion& theCriterion,
+                                              const SelectBasics_PickResult& thePickResult,
+                                              const Handle(SelectBasics_SensitiveEntity)& theEntity,
+                                              const gp_GTrsf& theInversedTrsf,
+                                              const SelectMgr_SelectingVolumeManager& theMgr) const
+{
+  if (theMgr.GetActiveSelectionType() != SelectMgr_SelectingVolumeManager::Point)
+  {
+    return;
   }
 
-  static const Graphic3d_Mat4d SelectMgr_ViewerSelector_THE_IDENTITY_MAT;
+  if (thePickResult.HasPickedPoint())
+  {
+    theCriterion.Point = thePickResult.PickedPoint();
+  }
+  else
+  {
+    theCriterion.Point = theMgr.DetectedPoint (theCriterion.Depth);
+  }
+
+  gp_GTrsf anInvTrsf = theInversedTrsf;
+  if (theCriterion.Entity->HasInitLocation())
+  {
+    anInvTrsf = theCriterion.Entity->InvInitLocation() * anInvTrsf;
+  }
+  if (anInvTrsf.Form() != gp_Identity)
+  {
+    anInvTrsf.Inverted().Transforms (theCriterion.Point.ChangeCoord());
+  }
+
+  if (mySelectingVolumeMgr.Camera().IsNull())
+  {
+    theCriterion.Tolerance = theEntity->SensitivityFactor() / 33.0;
+  }
+  else if (mySelectingVolumeMgr.Camera()->IsOrthographic())
+  {
+    theCriterion.Tolerance = myCameraScale * theEntity->SensitivityFactor();
+  }
+  else
+  {
+    const Standard_Real aDistFromEye = (theCriterion.Point.XYZ() - myCameraEye.XYZ()).Dot (myCameraDir.XYZ());
+    theCriterion.Tolerance = aDistFromEye * myCameraScale * theEntity->SensitivityFactor();
+  }
 }
 
 //==================================================
@@ -91,6 +118,7 @@ namespace {
 SelectMgr_ViewerSelector::SelectMgr_ViewerSelector():
 preferclosest(Standard_True),
 myToUpdateTolerance (Standard_True),
+myCameraScale (1.0),
 myCurRank (0),
 myIsLeftChildQueuedFirst (Standard_False),
 myEntityIdx (0)
@@ -104,15 +132,18 @@ myEntityIdx (0)
 //==================================================
 void SelectMgr_ViewerSelector::Activate (const Handle(SelectMgr_Selection)& theSelection)
 {
-  for (theSelection->Init(); theSelection->More(); theSelection->Next())
+  for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (theSelection->Entities()); aSelEntIter.More(); aSelEntIter.Next())
   {
-    theSelection->Sensitive()->SetActiveForSelection();
+    aSelEntIter.Value()->SetActiveForSelection();
   }
 
-  theSelection->SetSelectionState (SelectMgr_SOS_Activated);
+  if (theSelection->GetSelectionState() != SelectMgr_SOS_Activated)
+  {
+    theSelection->SetSelectionState (SelectMgr_SOS_Activated);
 
-  myTolerances.Add (theSelection->Sensitivity());
-  myToUpdateTolerance = Standard_True;
+    myTolerances.Add (theSelection->Sensitivity());
+    myToUpdateTolerance = Standard_True;
+  }
 }
 
 //==================================================
@@ -121,15 +152,18 @@ void SelectMgr_ViewerSelector::Activate (const Handle(SelectMgr_Selection)& theS
 //==================================================
 void SelectMgr_ViewerSelector::Deactivate (const Handle(SelectMgr_Selection)& theSelection)
 {
-  for (theSelection->Init(); theSelection->More(); theSelection->Next())
+  for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (theSelection->Entities()); aSelEntIter.More(); aSelEntIter.Next())
   {
-    theSelection->Sensitive()->ResetSelectionActiveStatus();
+    aSelEntIter.Value()->ResetSelectionActiveStatus();
   }
 
-  theSelection->SetSelectionState (SelectMgr_SOS_Deactivated);
+  if (theSelection->GetSelectionState() == SelectMgr_SOS_Activated)
+  {
+    theSelection->SetSelectionState (SelectMgr_SOS_Deactivated);
 
-  myTolerances.Decrement (theSelection->Sensitivity());
-  myToUpdateTolerance = Standard_True;
+    myTolerances.Decrement (theSelection->Sensitivity());
+    myToUpdateTolerance = Standard_True;
+  }
 }
 
 //==================================================
@@ -177,6 +211,9 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(SelectBasics_Sensitive
   if (!anOwner.IsNull())
   {
     aSelectable = anOwner->Selectable();
+  }
+  if (!aSelectable.IsNull())
+  {
     if (!aSelectable->ClipPlanes().IsNull()
       && aSelectable->ClipPlanes()->ToOverrideGlobal())
     {
@@ -203,9 +240,8 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(SelectBasics_Sensitive
             continue;
           }
 
-          const Graphic3d_Vec4d& aPlaneEquation = aPlane->GetEquation();
-          const Graphic3d_Vec4d  aCheckPnt (anAnchor.X(), anAnchor.Y(), anAnchor.Z(), 1.0);
-          if (aPlaneEquation.Dot (aCheckPnt) < 0.0) // vertex is outside the half-space
+          const Graphic3d_Vec4d aCheckPnt (anAnchor.X(), anAnchor.Y(), anAnchor.Z(), 1.0);
+          if (aPlane->ProbePoint (aCheckPnt) == Graphic3d_ClipState_Out)
           {
             return;
           }
@@ -231,6 +267,7 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(SelectBasics_Sensitive
   }
 
   if (HasDepthClipping (anOwner)
+  && !aSelectable.IsNull()
   &&  theMgr.GetActiveSelectionType() == SelectMgr_SelectingVolumeManager::Point)
   {
     Standard_Boolean isClipped = mySelectingVolumeMgr.IsClipped (*aSelectable->ClipPlanes(),
@@ -240,30 +277,30 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(SelectBasics_Sensitive
   }
 
   SelectMgr_SortCriterion aCriterion;
-  myZLayerOrderMap.Find (aSelectable->ZLayer(), aCriterion.ZLayerPosition);
+  myZLayerOrderMap.Find (!aSelectable.IsNull() ? aSelectable->ZLayer() : Graphic3d_ZLayerId_Default, aCriterion.ZLayerPosition);
   aCriterion.Entity    = theEntity;
   aCriterion.Priority  = anOwner->Priority();
   aCriterion.Depth     = aPickResult.Depth();
   aCriterion.MinDist   = aPickResult.DistToGeomCenter();
-  aCriterion.Tolerance = theEntity->SensitivityFactor() / 33.0;
   aCriterion.ToPreferClosest = preferclosest;
 
-  const Standard_Integer aPrevStoredIndex = mystored.FindIndex (anOwner);
-  if (aPrevStoredIndex != 0)
+  if (SelectMgr_SortCriterion* aPrevCriterion = mystored.ChangeSeek (anOwner))
   {
+    ++aPrevCriterion->NbOwnerMatches;
+    aCriterion.NbOwnerMatches = aPrevCriterion->NbOwnerMatches;
     if (theMgr.GetActiveSelectionType() != SelectBasics_SelectingVolumeManager::Box)
     {
-      SelectMgr_SortCriterion& aPrevCriterion = mystored.ChangeFromIndex (aPrevStoredIndex);
-      if (aCriterion > aPrevCriterion)
+      if (aCriterion > *aPrevCriterion)
       {
-        updatePoint3d (aCriterion, theInversedTrsf, theMgr);
-        aPrevCriterion = aCriterion;
+        updatePoint3d (aCriterion, aPickResult, theEntity, theInversedTrsf, theMgr);
+        *aPrevCriterion = aCriterion;
       }
     }
   }
   else
   {
-    updatePoint3d (aCriterion, theInversedTrsf, theMgr);
+    aCriterion.NbOwnerMatches = 1;
+    updatePoint3d (aCriterion, aPickResult, theEntity, theInversedTrsf, theMgr);
     mystored.Add (anOwner, aCriterion);
   }
 }
@@ -362,6 +399,9 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
   {
     return;
   }
+
+  const Standard_Integer aFirstStored = mystored.Extent() + 1;
+
   Standard_Integer aStack[BVH_Constants_MaxTreeDepth];
   Standard_Integer aHead = -1;
   for (;;)
@@ -403,8 +443,7 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
       Standard_Integer anEndIdx = aSensitivesTree->EndPrimitive (aNode);
       for (Standard_Integer anIdx = aStartIdx; anIdx <= anEndIdx; ++anIdx)
       {
-        const Handle(SelectMgr_SensitiveEntity)& aSensitive =
-          anEntitySet->GetSensitiveById (anIdx);
+        const Handle(SelectMgr_SensitiveEntity)& aSensitive = anEntitySet->GetSensitiveById (anIdx);
         if (aSensitive->IsActiveForSelection())
         {
           const Handle(SelectBasics_SensitiveEntity)& anEnt = aSensitive->BaseSensitive();
@@ -420,6 +459,35 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
 
       aNode = aStack[aHead];
       --aHead;
+    }
+  }
+
+  // in case of Box/Polyline selection - keep only Owners having all Entities detected
+  if (mySelectingVolumeMgr.IsOverlapAllowed()
+  || (theMgr.GetActiveSelectionType() != SelectBasics_SelectingVolumeManager::Box
+   && theMgr.GetActiveSelectionType() != SelectBasics_SelectingVolumeManager::Polyline))
+  {
+    return;
+  }
+
+  for (Standard_Integer aStoredIter = mystored.Extent(); aStoredIter >= aFirstStored; --aStoredIter)
+  {
+    const SelectMgr_SortCriterion& aCriterion = mystored.FindFromIndex (aStoredIter);
+    const Handle(SelectBasics_EntityOwner)& anOwner = aCriterion.Entity->OwnerId();
+    Standard_Integer aNbOwnerEntities = 0;
+    for (SelectMgr_IndexedMapOfHSensitive::Iterator aSensIter (anEntitySet->Sensitives()); aSensIter.More(); aSensIter.Next())
+    {
+      if (aSensIter.Value()->BaseSensitive()->OwnerId() == anOwner)
+      {
+        if (++aNbOwnerEntities > aCriterion.NbOwnerMatches)
+        {
+          // Remove from index map.
+          // Considering NCollection_IndexedDataMap implementation, the values for lower indexes will not be modified.
+          // Hence, just keep iterating in backward direction.
+          mystored.RemoveFromIndex (aStoredIter);
+          break;
+        }
+      }
     }
   }
 }
@@ -441,6 +509,17 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
                                  mySelectingVolumeMgr.WorldViewMatrix(),
                                  mySelectingVolumeMgr.WorldViewProjState(),
                                  aWidth, aHeight);
+  const Handle(Graphic3d_Camera)& aCamera = mySelectingVolumeMgr.Camera();
+  if (!aCamera.IsNull())
+  {
+    myCameraEye = aCamera->Eye().XYZ();
+    myCameraDir = aCamera->Direction().XYZ();
+    myCameraScale = aCamera->IsOrthographic()
+                  ? aCamera->Scale()
+                  : 2.0 * Tan (aCamera->FOVy() * M_PI / 360.0);
+    const double aPixelSize = Max (1.0 / aWidth, 1.0 / aHeight);
+    myCameraScale *= aPixelSize;
+  }
 
   for (Standard_Integer aBVHSetIt = 0; aBVHSetIt < SelectMgr_SelectableObjectSet::BVHSubsetNb; ++aBVHSetIt)
   {
@@ -485,7 +564,6 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
       aMgr = mySelectingVolumeMgr;
     }
 
-    const Handle(Graphic3d_Camera)& aCamera = mySelectingVolumeMgr.Camera();
     const Graphic3d_Mat4d& aProjectionMat   = mySelectingVolumeMgr.ProjectionMatrix();
     const Graphic3d_Mat4d& aWorldViewMat    = aBVHSubset != SelectMgr_SelectableObjectSet::BVHSubset_2dPersistent
                                             ? mySelectingVolumeMgr.WorldViewMatrix()
@@ -557,6 +635,15 @@ void SelectMgr_ViewerSelector::TraverseSensitives()
   }
 
   SortResult();
+}
+
+//==================================================
+// Function: ClearPicked
+// Purpose :
+//==================================================
+void SelectMgr_ViewerSelector::ClearPicked()
+{
+  mystored.Clear();
 }
 
 //==================================================
@@ -638,16 +725,16 @@ Standard_Boolean SelectMgr_ViewerSelector::Modes (const Handle(SelectMgr_Selecta
                                                   const SelectMgr_StateOfSelection theWantedState) const
 {
   Standard_Boolean hasActivatedStates = Contains (theSelectableObject);
-  for (theSelectableObject->Init(); theSelectableObject->More(); theSelectableObject->Next())
+  for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theSelectableObject->Selections()); aSelIter.More(); aSelIter.Next())
   {
-      if (theWantedState == SelectMgr_SOS_Any)
-      {
-        theModeList.Append (theSelectableObject->CurrentSelection()->Mode());
-      }
-      else if (theWantedState == theSelectableObject->CurrentSelection()->GetSelectionState())
-      {
-        theModeList.Append (theSelectableObject->CurrentSelection()->Mode());
-      }
+    if (theWantedState == SelectMgr_SOS_Any)
+    {
+      theModeList.Append (aSelIter.Value()->Mode());
+    }
+    else if (theWantedState == aSelIter.Value()->GetSelectionState())
+    {
+      theModeList.Append (aSelIter.Value()->Mode());
+    }
   }
 
   return hasActivatedStates;
@@ -663,15 +750,9 @@ Standard_Boolean SelectMgr_ViewerSelector::IsActive (const Handle(SelectMgr_Sele
   if (!Contains (theSelectableObject))
     return Standard_False;
 
-  for (theSelectableObject->Init(); theSelectableObject->More(); theSelectableObject->Next())
-  {
-    if (theMode == theSelectableObject->CurrentSelection()->Mode())
-    {
-      return theSelectableObject->CurrentSelection()->GetSelectionState() == SelectMgr_SOS_Activated;
-    }
-  }
-
-  return Standard_False;
+  const Handle(SelectMgr_Selection)& aSel = theSelectableObject->Selection (theMode);
+  return !aSel.IsNull()
+       && aSel->GetSelectionState() == SelectMgr_SOS_Activated;
 }
 
 //==================================================
@@ -684,15 +765,9 @@ Standard_Boolean SelectMgr_ViewerSelector::IsInside (const Handle(SelectMgr_Sele
   if (!Contains (theSelectableObject))
     return Standard_False;
 
-  for (theSelectableObject->Init(); theSelectableObject->More(); theSelectableObject->Next())
-  {
-    if (theMode == theSelectableObject->CurrentSelection()->Mode())
-    {
-      return theSelectableObject->CurrentSelection()->GetSelectionState() != SelectMgr_SOS_Unknown;
-    }
-  }
-
-  return Standard_False;
+  const Handle(SelectMgr_Selection)& aSel = theSelectableObject->Selection (theMode);
+  return !aSel.IsNull()
+       && aSel->GetSelectionState() != SelectMgr_SOS_Unknown;
 }
 
 
@@ -714,22 +789,12 @@ SelectMgr_StateOfSelection SelectMgr_ViewerSelector::Status (const Handle(Select
 TCollection_AsciiString SelectMgr_ViewerSelector::Status (const Handle(SelectMgr_SelectableObject)& theSelectableObject) const
 {
   TCollection_AsciiString aStatus ("Status Object :\n\t");
-
-  for (theSelectableObject->Init(); theSelectableObject->More(); theSelectableObject->Next())
+  for (SelectMgr_SequenceOfSelection::Iterator aSelIter (theSelectableObject->Selections()); aSelIter.More(); aSelIter.Next())
   {
-    if (theSelectableObject->CurrentSelection()->GetSelectionState() != SelectMgr_SOS_Unknown)
+    if (aSelIter.Value()->GetSelectionState() != SelectMgr_SOS_Unknown)
     {
-      aStatus = aStatus + "Mode " +
-        TCollection_AsciiString (theSelectableObject->CurrentSelection()->Mode()) +
-        " present - ";
-      if (theSelectableObject->CurrentSelection()->GetSelectionState() == SelectMgr_SOS_Activated)
-      {
-        aStatus = aStatus + " Active \n\t";
-      }
-      else
-      {
-        aStatus = aStatus + " Inactive \n\t";
-      }
+      aStatus = aStatus + "Mode " + TCollection_AsciiString (aSelIter.Value()->Mode()) + " present - "
+              + (aSelIter.Value()->GetSelectionState() == SelectMgr_SOS_Activated ? " Active \n\t" : " Inactive \n\t");
     }
   }
 

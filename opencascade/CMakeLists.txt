@@ -32,7 +32,6 @@ if ("${BUILD_LIBRARY_TYPE}" STREQUAL "Shared")
   endif()
 else()
   unset (BUILD_SHARED_LIBS)
-  message (STATUS "Info: Only 3rdparty's header files are used for building of static OCCT libraries")
   unset (BUILD_SHARED_LIBRARY_NAME_POSTFIX)
 endif()
 
@@ -64,7 +63,7 @@ set (BUILD_RESOURCES OFF CACHE BOOL "${BUILD_RESOURCES_DESCR}")
 
 # single-configuration generator
 set (SINGLE_GENERATOR OFF)
-if (CMAKE_BUILD_TYPE)
+if (DEFINED CMAKE_BUILD_TYPE)
   set (SINGLE_GENERATOR ON)
 endif()
 
@@ -344,8 +343,9 @@ set (BUILD_ADDITIONAL_TOOLKITS "" CACHE STRING "${BUILD_ADDITIONAL_TOOLKITS_DESC
 separate_arguments (BUILD_ADDITIONAL_TOOLKITS)
 
 if (MSVC)
-  set (BUILD_MODULE_MfcSamples OFF CACHE BOOL "${BUILD_MODULE_MfcSamples_DESCR}")
+  set (BUILD_SAMPLES_MFC OFF CACHE BOOL "${BUILD_SAMPLES_MFC_DESCR}")
 endif()
+set (BUILD_SAMPLES_QT OFF CACHE BOOL "${BUILD_SAMPLES_QT_DESCR}")
 
 set (BUILD_Inspector OFF CACHE BOOL "${BUILD_Inspector_DESCR}")
 
@@ -381,7 +381,7 @@ endif()
 # include the patched or original list of modules
 # list <MODULENAME>_TOOLKITS is created foreach module and contains its toolkits
 # list <OCCT_MODULES> will contain all modules
-OCCT_MODULES_AND_TOOLKITS (OCCT_MODULES)
+OCCT_MODULES_AND_TOOLKITS (MODULES "TOOLKITS" OCCT_MODULES)
 
 foreach (OCCT_MODULE ${OCCT_MODULES})
   BUILD_MODULE (${OCCT_MODULE})
@@ -481,7 +481,6 @@ OCCT_IS_PRODUCT_REQUIRED (CSF_FreeImagePlus CAN_USE_FREEIMAGE)
 OCCT_IS_PRODUCT_REQUIRED (CSF_TclLibs USE_TCL)
 OCCT_IS_PRODUCT_REQUIRED (CSF_FREETYPE USE_FREETYPE)
 OCCT_IS_PRODUCT_REQUIRED (CSF_OpenGlLibs CAN_USE_GLES2)
-OCCT_IS_PRODUCT_REQUIRED (CSF_GL2PS CAN_USE_GL2PS)
 OCCT_IS_PRODUCT_REQUIRED (CSF_TBB CAN_USE_TBB)
 OCCT_IS_PRODUCT_REQUIRED (CSF_EIGEN CAN_USE_EIGEN)
 
@@ -583,7 +582,7 @@ else()
 endif()
 
 # OpenGL ES 2.0
-if (WIN32 AND CAN_USE_GLES2)
+if (CAN_USE_GLES2)
   if ("${CMAKE_SYSTEM_NAME}" STREQUAL "WindowsStore")
     set (USE_GLES2 ON)
   else()
@@ -607,24 +606,6 @@ else()
   OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_GLES2")
   OCCT_CHECK_AND_UNSET ("INSTALL_EGL")
   OCCT_CHECK_AND_UNSET ("INSTALL_GLES2")
-endif()
-
-# GL2PS
-if (NOT DEFINED ANDROID AND CAN_USE_GL2PS)
-  set (USE_GL2PS OFF CACHE BOOL "${USE_GL2PS_DESCR}")
-
-  if (USE_GL2PS)
-    add_definitions (-DHAVE_GL2PS)
-    OCCT_INCLUDE_CMAKE_FILE ("adm/cmake/gl2ps")
-  else()
-    OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_GL2PS")
-    OCCT_CHECK_AND_UNSET ("INSTALL_GL2PS")
-  endif()
-else()
-  OCCT_CHECK_AND_UNSET ("USE_GL2PS")
-
-  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_GL2PS")
-  OCCT_CHECK_AND_UNSET ("INSTALL_GL2PS")
 endif()
 
 # TBB
@@ -702,11 +683,10 @@ else()
   OCCT_CHECK_AND_UNSET ("3RDPARTY_FLEX_EXECUTABLE")
 endif()
 
+# check all 3rdparty include paths
 string (REGEX REPLACE ";" " " 3RDPARTY_NOT_INCLUDED "${3RDPARTY_NOT_INCLUDED}")
-
-# check all 3rdparty paths
 if (3RDPARTY_NOT_INCLUDED)
-  message (FATAL_ERROR "NOT FOUND: ${3RDPARTY_NOT_INCLUDED}" )
+  message (FATAL_ERROR "Could not find headers of used third-party products: ${3RDPARTY_NOT_INCLUDED}" )
 endif()
 
 if (3RDPARTY_INCLUDE_DIRS)
@@ -719,11 +699,26 @@ endif()
 # include <cmake binary folder>/inc
 include_directories (${CMAKE_BINARY_DIR}/${INSTALL_DIR_INCLUDE})
 
-if (3RDPARTY_LIBRARY_DIRS AND BUILD_SHARED_LIBS)
+# check all 3rdparty library paths
+string (REGEX REPLACE ";" " " 3RDPARTY_NO_LIBS "${3RDPARTY_NO_LIBS}")
+if (3RDPARTY_NO_LIBS)
+  if (BUILD_SHARED_LIBS)
+    message (SEND_ERROR "Could not find libraries of used third-party products: ${3RDPARTY_NO_LIBS}" )
+  else()
+    message (WARNING "Could not find libraries of used third-party products: ${3RDPARTY_NO_LIBS}" )
+  endif()
+endif()
+if (3RDPARTY_LIBRARY_DIRS)
   list (REMOVE_DUPLICATES 3RDPARTY_LIBRARY_DIRS)
   string (REGEX REPLACE ";" "\n\t" 3RDPARTY_LIBRARY_DIRS_WITH_ENDS "${3RDPARTY_LIBRARY_DIRS}")
   message (STATUS "Info: The directories of 3rdparty libraries: \n\t${3RDPARTY_LIBRARY_DIRS_WITH_ENDS}")
   link_directories (${3RDPARTY_LIBRARY_DIRS})
+endif()
+
+# report not found 3rdparty dll paths
+string (REGEX REPLACE ";" " " 3RDPARTY_NO_DLLS "${3RDPARTY_NO_DLLS}")
+if (3RDPARTY_NO_DLLS)
+  message (WARNING "Could not find DLLs of used third-party products: ${3RDPARTY_NO_DLLS}" )
 endif()
 
 # build directories
@@ -775,30 +770,33 @@ else()
   set (SCRIPT_EXT sh)
 endif()
 
-# OCCT tools
-# include the patched or original list of tools
-# list <TOOLNAME>_TOOLKITS is created foreach tool and contains its toolkits
-# list <OCCT_TOOLS> will contain all tools
-if (NOT BUILD_Inspector)
-  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_QT")
-  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_TQTMALLOC")
-  OCCT_CHECK_AND_UNSET ("INSTALL_QT")
-else()
-  OCCT_TOOLS_AND_TOOLKITS (OCCT_TOOLS)
-  foreach (OCCT_TOOL ${OCCT_TOOLS})
-    list (APPEND BUILD_TOOL_TOOLKITS ${${OCCT_TOOL}_TOOL_TOOLKITS})
-  endforeach()
-
-  # collect all the headers to <binary dir>/inc folder
-  string(TIMESTAMP CURRENT_TIME "%H:%M:%S")
-  message (STATUS "\nInfo: \(${CURRENT_TIME}\) Start collecting all OCCT tool header files into ${CMAKE_BINARY_DIR}/tools/inc ...")
-  COLLECT_AND_INSTALL_OCCT_HEADER_FILES ("${CMAKE_BINARY_DIR}" "${BUILD_TOOL_TOOLKITS}" "${CMAKE_SOURCE_DIR}/tools" "${INSTALL_DIR_INCLUDE}/inspector")
-
-
+if (BUILD_Inspector OR BUILD_SAMPLES_QT)
   # check qt 3rdparty path
   add_definitions (-DHAVE_QT)
   OCCT_INCLUDE_CMAKE_FILE ("adm/cmake/qt")
   message (STATUS "Info: Qt is used by OCCT")
+else()
+  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_QT")
+  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_TQTMALLOC")
+  OCCT_CHECK_AND_UNSET ("INSTALL_QT")
+endif()
+
+# OCCT tools
+# include the patched or original list of tools
+# list <TOOLNAME>_TOOLKITS is created foreach tool and contains its toolkits
+# list <OCCT_TOOLS> will contain all tools
+if (BUILD_Inspector)
+  add_definitions (-DHAVE_Inspector)
+
+  OCCT_MODULES_AND_TOOLKITS (TOOLS "TOOL_TOOLKITS" OCCT_TOOLS)
+  foreach (OCCT_TOOL ${OCCT_TOOLS})
+    list (APPEND BUILD_TOOL_TOOLKITS ${${OCCT_TOOL}_TOOL_TOOLKITS})
+  endforeach()
+
+  # collect all the headers to <binary dir>/inc/inspector folder
+  string(TIMESTAMP CURRENT_TIME "%H:%M:%S")
+  message (STATUS "\nInfo: \(${CURRENT_TIME}\) Start collecting all OCCT tool header files into ${CMAKE_BINARY_DIR}/inc/inspector ...")
+  COLLECT_AND_INSTALL_OCCT_HEADER_FILES ("${CMAKE_BINARY_DIR}" "${BUILD_TOOL_TOOLKITS}" "${CMAKE_SOURCE_DIR}/tools" "${INSTALL_DIR_INCLUDE}/inspector")
 endif()
 
 # OCCT samples
@@ -896,16 +894,24 @@ OCCT_CONFIGURE_AND_INSTALL ("adm/templates/custom.install.${SCRIPT_EXT}.in" "${S
 # write current custom.bat/sh (for build directory)
 OCCT_CONFIGURE ("adm/templates/custom.build.${SCRIPT_EXT}.in" "${SUB_CUSTOM_NAME}")
 
-if (BUILD_MODULE_MfcSamples)
-  OCCT_INSTALL_FILE_OR_DIR ("adm/templates/sample.bat" "${INSTALL_DIR_SCRIPT}")
-  OCCT_COPY_FILE_OR_DIR    ("adm/templates/sample.bat" "${CMAKE_BINARY_DIR}")
+if (BUILD_SAMPLES_MFC OR BUILD_SAMPLES_QT)
+  OCCT_INSTALL_FILE_OR_DIR ("adm/templates/sample.${SCRIPT_EXT}" "${INSTALL_DIR_SCRIPT}")
+  OCCT_COPY_FILE_OR_DIR    ("adm/templates/sample.${SCRIPT_EXT}" "${CMAKE_BINARY_DIR}")
 endif()
 
-# env script for draw in building environment
-OCCT_CONFIGURE ("adm/templates/env.${SCRIPT_EXT}.in" "env.${SCRIPT_EXT}")
-
-# install env script
-install (FILES "${CMAKE_BINARY_DIR}/env.${SCRIPT_EXT}" DESTINATION "${INSTALL_DIR_SCRIPT}")
+if (WIN32)
+  # env script for draw in building environment
+  OCCT_CONFIGURE ("adm/templates/env.${SCRIPT_EXT}.in" "env.${SCRIPT_EXT}")
+  # install env script
+  install (FILES "${CMAKE_BINARY_DIR}/env.${SCRIPT_EXT}" DESTINATION "${INSTALL_DIR_SCRIPT}")
+else()
+  set (SUB_ENV_NAME "env.${SCRIPT_EXT}")
+  set (SUB_ENV_BUILD_NAME "env.install.${SCRIPT_EXT}")
+  # install env script
+  OCCT_CONFIGURE_AND_INSTALL ("adm/templates/env.install.${SCRIPT_EXT}.in" "${SUB_ENV_BUILD_NAME}" "${SUB_ENV_NAME}" "${INSTALL_DIR_SCRIPT}")
+  # env script for draw in building environment
+  OCCT_CONFIGURE ("adm/templates/env.build.${SCRIPT_EXT}.in" "env.${SCRIPT_EXT}")
+endif()
 
 # copy DrawAppliInit from OCCT source to build directory
 if (NOT EXISTS "${CMAKE_BINARY_DIR}/DrawAppliInit")
@@ -923,6 +929,15 @@ foreach(RESOURCE ${RESOURCES})
     OCCT_INSTALL_FILE_OR_DIR ("src/${RESOURCE}" "${INSTALL_DIR_RESOURCE}")
   endif()
 endforeach()
+
+if (BUILD_SAMPLES_QT)
+  FILE_TO_LIST ("adm/SAMPLES_RESOURCES" SAMPLES_RESOURCES)
+  foreach(RESOURCE ${SAMPLES_RESOURCES})
+    OCCT_INSTALL_FILE_OR_DIR ("samples/${RESOURCE}" "${INSTALL_DIR_RESOURCE}/samples")
+    #message("Copy Sample resources: samples/${RESOURCE} into ${INSTALL_DIR_RESOURCE}/samples")
+  endforeach()
+endif()
+
 
 # patch installed DrawDefault file if BUILD_SHARED_LIBRARY_NAME_POSTFIX is changed
 if (NOT "${BUILD_SHARED_LIBRARY_NAME_POSTFIX}" STREQUAL "")
@@ -968,9 +983,11 @@ endif()
 
 message (STATUS "Info: \(${CURRENT_TIME}\) OCCT toolkits processed")
 # samples do not support patch usage
-if (BUILD_MODULE_MfcSamples)
+if (BUILD_SAMPLES_MFC OR BUILD_SAMPLES_QT)
   set (OCCT_ROOT ${CMAKE_SOURCE_DIR})
+endif()
 
+if (BUILD_SAMPLES_MFC)
   set (MFC_STANDARD_SAMPLES_DIR ${OCCT_ROOT}/samples/mfc/standard)
   set (COMMON_WINMAIN_FILE      ${MFC_STANDARD_SAMPLES_DIR}/Common/Winmain.cpp)
 
@@ -989,6 +1006,33 @@ if (BUILD_MODULE_MfcSamples)
   message (STATUS "Info: \(${CURRENT_TIME}\) MFC Sample projects added")
 endif()
 
+OCCT_MODULES_AND_TOOLKITS (SAMPLES "SAMPLES_TOOLKITS" OCCT_SAMPLES)
+
+if (BUILD_Inspector OR BUILD_SAMPLES_QT)
+  if (BUILD_SAMPLES_QT)
+    if (NOT Qt5_FOUND OR "${Qt5Gui_EGL_INCLUDE_DIRS}" STREQUAL "" OR NOT WIN32)
+      list (REMOVE_ITEM qt_SAMPLES_TOOLKITS AndroidQt)
+      message (STATUS "Info: AndroidQt sample excluded due to OS is not Windows or Qt is configured without ANGLE")
+    endif()
+  else()
+    list (REMOVE_ITEM OCCT_SAMPLES qt)
+    message (STATUS "Info: qt samples excluded due to BUILD_SAMPLES_QT is disabled")
+  endif()
+
+  foreach (OCCT_SAMPLE ${OCCT_SAMPLES})
+    list (APPEND BUILD_SAMPLE_TOOLKITS ${${OCCT_SAMPLE}_SAMPLES_TOOLKITS})
+
+    # collect all the headers to <binary dir>/inc/samples folder
+    string(TIMESTAMP CURRENT_TIME "%H:%M:%S")
+    message (STATUS "Info: \(${CURRENT_TIME}\) ${OCCT_SAMPLE} Sample projects added")
+
+    # include patched toolkit projects or original ones
+    foreach (BUILD_SAMPLE_TOOLKIT ${${OCCT_SAMPLE}_SAMPLES_TOOLKITS})
+      OCCT_ADD_SUBDIRECTORY ("samples/${OCCT_SAMPLE}/${BUILD_SAMPLE_TOOLKIT}")
+    endforeach()
+  endforeach()
+endif()
+
 if (BUILD_MODULE_UwpSample)
   add_subdirectory(samples/xaml)
 endif()
@@ -1003,13 +1047,9 @@ if (BUILD_TOOL_TOOLKITS)
             PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_WRITE GROUP_EXECUTE WORLD_READ WORLD_WRITE WORLD_EXECUTE)
   endif()
 
-  set (BUILD_SAMPLE_TOOLKITS TInspectorEXE)
-  foreach (BUILD_SAMPLE_TOOL_TOOLKIT ${BUILD_SAMPLE_TOOLKITS})
-    OCCT_ADD_SUBDIRECTORY ("samples/tools/${BUILD_SAMPLE_TOOL_TOOLKIT}")
-  endforeach()
-
+  set (OpenCASCADE_BINARY_DIR "${INSTALL_DIR}/${INSTALL_DIR_BIN}")
   # patch TInspectorEXE
-  OCCT_CONFIGURE ("adm/templates/TInspectorEXE.vcxproj.user.in" "${CMAKE_BINARY_DIR}/samples/tools/TInspectorEXE/TInspectorEXE.vcxproj.user")
+  OCCT_CONFIGURE ("adm/templates/TInspectorEXE.vcxproj.user.in" "${CMAKE_BINARY_DIR}/tools/TInspectorEXE/TInspectorEXE.vcxproj.user")
 endif()
 
 # Prepare variables for configuration of OpenCASCADE cmake config file
@@ -1093,10 +1133,6 @@ if (WIN32)
 endif()
 if (APPLE)
   set (SET_OpenCASCADE_WITH_GLX "set (OpenCASCADE_WITH_GLX       ${USE_GLX})")
-endif()
-
-if (NOT SINGLE_GENERATOR)
-  OCCT_INSERT_CODE_FOR_TARGET()
 endif()
 
 # Configure and install cmake config file

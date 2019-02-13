@@ -20,11 +20,14 @@
 #include <inspector/DFBrowserPane_Tools.hxx>
 #include <inspector/DFBrowser_Module.hxx>
 
+#include <inspector/ViewControl_Tools.hxx>
+
 #include <TDocStd_Application.hxx>
 #include <TDocStd_Document.hxx>
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QStringList>
 #include <QWidget>
 #include <QHBoxLayout>
@@ -35,6 +38,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QStyle>
+#include <Standard_WarningsRestore.hxx>
 
 //! class DFBrowser_LineEdit
 //! Extension of Qt line edit to visualize help text until the line edit control has not been filled yet
@@ -106,7 +110,7 @@ DFBrowser_SearchLine::DFBrowser_SearchLine (QWidget* theParent)
   connect (myLineControl, SIGNAL (returnPressed()), this, SLOT (onReturnPressed()));
   connect (mySearchButton, SIGNAL (clicked()), this, SLOT (onSearchButtonClicked()));
 
-  DFBrowser_Window::SetWhiteBackground (this);
+  ViewControl_Tools::SetWhiteBackground (this);
 }
 
 // =======================================================================

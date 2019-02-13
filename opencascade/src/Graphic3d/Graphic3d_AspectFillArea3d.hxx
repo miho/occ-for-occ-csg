@@ -21,12 +21,14 @@
 #include <Aspect_PolygonOffsetMode.hxx>
 #include <Aspect_InteriorStyle.hxx>
 #include <Aspect_TypeOfLine.hxx>
+#include <Graphic3d_AlphaMode.hxx>
 #include <Graphic3d_HatchStyle.hxx>
 #include <Graphic3d_MaterialAspect.hxx>
 #include <Graphic3d_PolygonOffset.hxx>
 #include <Graphic3d_ShaderProgram.hxx>
 #include <Graphic3d_TextureMap.hxx>
 #include <Graphic3d_TextureSet.hxx>
+#include <Graphic3d_TypeOfShadingModel.hxx>
 #include <Standard.hxx>
 #include <Standard_Boolean.hxx>
 #include <Standard_Integer.hxx>
@@ -76,6 +78,26 @@ public:
 
   //! Modifies the interior type used for rendering
   void SetInteriorStyle (const Aspect_InteriorStyle theStyle) { myInteriorStyle = theStyle; }
+
+  //! Returns shading model (Graphic3d_TOSM_DEFAULT by default, which means that Shading Model set as default for entire Viewer will be used)
+  Graphic3d_TypeOfShadingModel ShadingModel() const { return myShadingModel; }
+
+  //! Sets shading model
+  void SetShadingModel (const Graphic3d_TypeOfShadingModel theShadingModel) { myShadingModel = theShadingModel; }
+
+  //! Returns the way how alpha value should be treated (Graphic3d_AlphaMode_BlendAuto by default, for backward compatibility).
+  Graphic3d_AlphaMode AlphaMode() const { return myAlphaMode; }
+
+  //! Returns alpha cutoff threshold, for discarding fragments within Graphic3d_AlphaMode_Mask mode (0.5 by default).
+  //! If the alpha value is greater than or equal to this value then it is rendered as fully opaque, otherwise, it is rendered as fully transparent.
+  Standard_ShortReal AlphaCutoff() const { return myAlphaCutoff; }
+
+  //! Defines the way how alpha value should be treated.
+  void SetAlphaMode (Graphic3d_AlphaMode theMode, Standard_ShortReal theAlphaCutoff = 0.5f)
+  {
+    myAlphaMode = theMode;
+    myAlphaCutoff = theAlphaCutoff;
+  }
 
   //! Return interior color.
   const Quantity_Color& InteriorColor() const { return myInteriorColor.GetRGB(); }
@@ -191,6 +213,9 @@ public:
 
   //! Returns current polygon offsets settings.
   const Graphic3d_PolygonOffset& PolygonOffset() const { return myPolygonOffset; }
+
+  //! Sets polygon offsets settings.
+  void SetPolygonOffset (const Graphic3d_PolygonOffset& theOffset) { myPolygonOffset = theOffset; }
 
   //! Returns current polygon offsets settings.
   void PolygonOffsets (Standard_Integer&   theMode,
@@ -337,6 +362,9 @@ protected:
   Quantity_ColorRGBA           myBackInteriorColor;
   Quantity_ColorRGBA           myEdgeColor;
   Aspect_InteriorStyle         myInteriorStyle;
+  Graphic3d_TypeOfShadingModel myShadingModel;
+  Graphic3d_AlphaMode          myAlphaMode;
+  Standard_ShortReal           myAlphaCutoff;
   Aspect_TypeOfLine            myEdgeType;
   Standard_ShortReal           myEdgeWidth;
   Handle(Graphic3d_HatchStyle) myHatchStyle;

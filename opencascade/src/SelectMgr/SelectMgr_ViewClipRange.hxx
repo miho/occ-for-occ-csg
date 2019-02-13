@@ -16,58 +16,57 @@
 #ifndef _SelectMgr_ViewClipRange_HeaderFile
 #define _SelectMgr_ViewClipRange_HeaderFile
 
+#include <Bnd_Range.hxx>
 #include <Standard_TypeDef.hxx>
 
 //! Class for handling depth clipping range.
 //! It is used to perform checks in case if global (for the whole view)
-//! clipping planes are defined inside of SelectMgr_RectangularFrustum
-//! class methods.
+//! clipping planes are defined inside of SelectMgr_RectangularFrustum class methods.
 class SelectMgr_ViewClipRange
 {
 public:
-  //! Creates new empty view clip range
+  //! Creates an empty clip range.
   SelectMgr_ViewClipRange()
   {
-    Clear();
+    SetVoid();
   }
 
-  //! Sets boundaries and validates view clipping range
-  void Set (const Standard_Real theDepthMin, const Standard_Real theDepthMax)
+  //! Check if the given depth is not within clipping range(s),
+  //! e.g. TRUE means depth is clipped.
+  Standard_Boolean IsClipped (const Standard_Real theDepth) const
   {
-    myMin = theDepthMin;
-    myMax = theDepthMax;
-    myIsValid = Standard_True;
+    if (myUnclipRange.IsOut (theDepth))
+    {
+      return Standard_True;
+    }
+    for (size_t aRangeIter = 0; aRangeIter < myClipRanges.size(); ++aRangeIter)
+    {
+      if (!myClipRanges[aRangeIter].IsOut (theDepth))
+      {
+        return Standard_True;
+      }
+    }
+    return Standard_False;
   }
 
-  //! Returns true if clip range is set and depth of each matched
-  //! primitive must be tested for satisfying the defined interval
-  Standard_Boolean IsValid() const
+  //! Clears clipping range.
+  void SetVoid()
   {
-    return myIsValid;
+    myClipRanges.resize (0);
+    myUnclipRange = Bnd_Range (RealFirst(), RealLast());
   }
 
-  //! Returns the upper bound of valid depth range
-  Standard_Real MaxDepth() const
-  {
-    return myMax;
-  }
+  //! Returns the main unclipped range; [-inf, inf] by default.
+  Bnd_Range& ChangeUnclipRange() { return myUnclipRange; }
 
-  //! Returns the lower bound of valid depth range
-  Standard_Real MinDepth() const
-  {
-    return myMin;
-  }
-
-  //! Invalidates view clipping range
-  void Clear()
-  {
-    myIsValid = Standard_False;
-  }
+  //! Adds a clipping sub-range (for clipping chains).
+  void AddClipSubRange (const Bnd_Range& theRange) { myClipRanges.push_back (theRange); }
 
 private:
-  Standard_Real    myMin;      //!< Lower bound of valid depth range
-  Standard_Real    myMax;      //!< Upper bound of valid depth range
-  Standard_Boolean myIsValid;  //!< The flag is set to true when range boundaries are set and depth check must be performed
+
+  std::vector<Bnd_Range> myClipRanges;
+  Bnd_Range myUnclipRange;
+
 };
 
 #endif // _SelectMgr_ViewClipRange_HeaderFile

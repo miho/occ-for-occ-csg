@@ -298,9 +298,25 @@ static Standard_Integer checksection(Draw_Interpretor& di,
 				     Standard_Integer narg, const char** a)
 {
   if (narg < 2) {
+    di << a[0] << " shape [-r <ref_val>]\n";
     return 1;
   }
+
+  Standard_Integer aCompareValue = -1;
   TopoDS_Shape S = DBRep::Get(a[1]);
+
+  for (Standard_Integer anAI = 2; anAI < narg; anAI++)
+  {
+    if (!strcmp(a[anAI], "-r"))
+    {
+      aCompareValue = Draw::Atoi(a[++anAI]);
+    }
+    else
+    {
+      di << "Error: Wrong option" << a[anAI] << "\n";
+    }
+  }
+
   TopTools_MapOfShape theVertices;
   TopExp_Explorer exp;
   for (exp.Init(S, TopAbs_VERTEX); exp.More(); exp.Next()) {
@@ -309,6 +325,20 @@ static Standard_Integer checksection(Draw_Interpretor& di,
   }
   //cout << " nb alone Vertices : " << theVertices.Extent() << endl;
   di << " nb alone Vertices : " << theVertices.Extent() << "\n";
+
+  if (aCompareValue >= 0)
+  {
+    if (theVertices.Extent() == aCompareValue)
+    {
+      di << "Section is OK\n";
+    }
+    else
+    {
+      di << "Error: "<< aCompareValue << " vertices are expected but " <<
+                        theVertices.Extent() << " are found.\n";
+    }
+  }
+
   char Name[32];
   Standard_Integer ipp=0;
   TopTools_MapIteratorOfMapOfShape itvx;
@@ -1091,12 +1121,16 @@ static Standard_Integer shapeG1continuity (Draw_Interpretor& di, Standard_Intege
   nbeval = (Standard_Integer ) Draw::Atof( a[3]);
 
   switch(n)
-    { case 7  : epsG1 = Draw::Atof(a[6]);
-      case 6  : epsC0   = Draw::Atof(a[5]);
-      case 5  : epsnl    = Draw::Atof(a[4]);
-      case 4  : {} break;
-      default : return 1;
-    }
+  { 
+  case 7  : epsG1 = Draw::Atof(a[6]);
+    Standard_FALLTHROUGH
+  case 6  : epsC0 = Draw::Atof(a[5]);
+    Standard_FALLTHROUGH
+  case 5  : epsnl = Draw::Atof(a[4]);
+    Standard_FALLTHROUGH
+  case 4  : break;
+  default : return 1;
+  }
 
 
   Standard_Real pard1, parf1, U, Uf, deltaU, nb = 0;
@@ -1216,12 +1250,14 @@ static Standard_Integer shapeG0continuity (Draw_Interpretor& di, Standard_Intege
   nbeval = (Standard_Integer ) Draw::Atof( a[3]);
 
   switch(n)
-    { case 6  : epsC0   = Draw::Atof(a[5]);
-      case 5  : epsnl    = Draw::Atof(a[4]);
-      case 4  : {} break;
-      default : return 1;
-    }
-
+  { 
+  case 6  : epsC0   = Draw::Atof(a[5]);
+    Standard_FALLTHROUGH
+  case 5  : epsnl    = Draw::Atof(a[4]);
+    Standard_FALLTHROUGH
+  case 4  : break;
+  default : return 1;
+  }
 
   Standard_Real pard1, parf1, U, Uf, deltaU, nb = 0;
   Standard_Boolean isconti = Standard_True;
@@ -1337,15 +1373,20 @@ static Standard_Integer shapeG2continuity (Draw_Interpretor& di, Standard_Intege
   nbeval = (Standard_Integer ) Draw::Atof( a[3]);
 
   switch(n)
-    { 
-      case 9  :  maxlen   = Draw::Atof(a[8]);
-      case 8   : percent   = Draw::Atof(a[7]);      
-      case 7   : epsG1 = Draw::Atof(a[6]);
-      case 6  :  epsC0   = Draw::Atof(a[5]);
-      case 5  :  epsnl   = Draw::Atof(a[4]);
-      case 4  : {} break;
-      default : return 1;
-    }
+  { 
+  case 9  :  maxlen = Draw::Atof(a[8]);
+    Standard_FALLTHROUGH
+  case 8   : percent = Draw::Atof(a[7]);      
+    Standard_FALLTHROUGH
+  case 7   : epsG1 = Draw::Atof(a[6]);
+    Standard_FALLTHROUGH
+  case 6  :  epsC0 = Draw::Atof(a[5]);
+    Standard_FALLTHROUGH
+  case 5  :  epsnl = Draw::Atof(a[4]);
+    Standard_FALLTHROUGH
+  case 4  : break;
+  default : return 1;
+  }
 
 
   Standard_Real pard1, parf1, U, Uf, deltaU, nb = 0;
@@ -1687,7 +1728,8 @@ void BRepTest::CheckCommands(Draw_Interpretor& theCommands)
 //  Modified by skv - Tue Apr 27 13:35:39 2004 End
 
   theCommands.Add("checksection", 
-		  "checks the closure of a section : checksection name",
+		  "checks the closure of a section : checksection name [-r <RefVal>]\n"
+                  "\"-r\" - allowed number of allone vertices.",
 		  __FILE__,
 		  checksection,
 		  g);

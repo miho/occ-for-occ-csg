@@ -22,15 +22,12 @@
 #include <OpenGl_Text.hxx>
 #include <OpenGl_Workspace.hxx>
 #include <OpenGl_View.hxx>
+#include <OpenGl_VertexBufferCompat.hxx>
 
 #include <Font_FontMgr.hxx>
 #include <Font_FTFont.hxx>
 #include <Graphic3d_TransformUtils.hxx>
 #include <TCollection_HAsciiString.hxx>
-
-#ifdef HAVE_GL2PS
-  #include <gl2ps.h>
-#endif
 
 namespace
 {
@@ -42,100 +39,37 @@ namespace
     0.0, 0.0, 0.0, 1.0
   };
 
-#ifdef HAVE_GL2PS
-  static char const* TheFamily[] = {"Helvetica", "Courier", "Times"};
-  static char const* TheItalic[] = {"Oblique",   "Oblique", "Italic"};
-  static char const* TheBase[]   = {"", "", "-Roman"};
-
-  //! Convert font name used for rendering to some "good" font names
-  //! that produce good vector text.
-  static void getGL2PSFontName (const char* theSrcFont,
-                                char*       thePsFont)
+  //! Auxiliary tool for setting polygon offset temporarily.
+  struct BackPolygonOffsetSentry
   {
-    if (strstr (theSrcFont, "Symbol"))
+    BackPolygonOffsetSentry (const Handle(OpenGl_Context)& theCtx)
+    : myCtx (theCtx),
+      myOffsetBack (!theCtx.IsNull() ? theCtx->PolygonOffset() : Graphic3d_PolygonOffset())
     {
-      sprintf (thePsFont, "%s", "Symbol");
-      return;
-    }
-    else if (strstr (theSrcFont, "ZapfDingbats"))
-    {
-      sprintf (thePsFont, "%s", "WingDings");
-      return;
-    }
-
-    int  aFontId  = 0;
-    bool isBold   = false;
-    bool isItalic = false;
-    if (strstr (theSrcFont, "Courier"))
-    {
-      aFontId = 1;
-    }
-    else if (strstr (theSrcFont, "Times"))
-    {
-      aFontId = 2;
-    }
-
-    if (strstr (theSrcFont, "Bold"))
-    {
-      isBold = true;
-    }
-    if (strstr (theSrcFont, "Italic")
-     || strstr (theSrcFont, "Oblique"))
-    {
-      isItalic = true;
-    }
-
-    if (isBold)
-    {
-      if (isItalic)
+      if (!theCtx.IsNull())
       {
-        sprintf (thePsFont, "%s-Bold%s", TheFamily[aFontId], TheItalic[aFontId]);
-      }
-      else
-      {
-        sprintf (thePsFont, "%s-Bold", TheFamily[aFontId]);
+        Graphic3d_PolygonOffset aPolyOffset = myOffsetBack;
+        aPolyOffset.Mode = Aspect_POM_Fill;
+        aPolyOffset.Units += 1.0f;
+        theCtx->SetPolygonOffset (aPolyOffset);
       }
     }
-    else if (isItalic)
-    {
-      sprintf (thePsFont, "%s-%s", TheFamily[aFontId], TheItalic[aFontId]);
-    }
-    else
-    {
-      sprintf (thePsFont, "%s%s", TheFamily[aFontId], TheBase[aFontId]);
-    }
-  }
 
-  static void exportText (const NCollection_String& theText,
-                          const Standard_Boolean    theIs2d,
-                          const OpenGl_AspectText&  theAspect,
-                          const Standard_Integer    theHeight)
-  {
-
-    char aPsFont[64];
-    getGL2PSFontName (theAspect.Aspect()->Font().ToCString(), aPsFont);
-
-    (void)theIs2d;
-  #if !defined(GL_ES_VERSION_2_0)
-    if (theIs2d)
+    ~BackPolygonOffsetSentry()
     {
-      glRasterPos2f (0.0f, 0.0f);
-    }
-    else
-    {
-      glRasterPos3f (0.0f, 0.0f, 0.0f);
+      if (!myCtx.IsNull())
+      {
+        myCtx->SetPolygonOffset (myOffsetBack);
+      }
     }
 
-    GLubyte aZero = 0;
-    glBitmap (1, 1, 0, 0, 0, 0, &aZero);
-  #endif
-
-    // Standard GL2PS's alignment isn't used, because it doesn't work correctly
-    // for all formats, therefore alignment is calculated manually relative
-    // to the bottom-left corner, which corresponds to the GL2PS_TEXT_BL value
-    gl2psTextOpt (theText.ToCString(), aPsFont, (GLshort)theHeight, GL2PS_TEXT_BL, (float )theAspect.Aspect()->GetTextAngle());
-  }
-#endif
+  private:
+    BackPolygonOffsetSentry (const BackPolygonOffsetSentry& );
+    BackPolygonOffsetSentry& operator= (const BackPolygonOffsetSentry& );
+  private:
+    const Handle(OpenGl_Context)& myCtx;
+    const Graphic3d_PolygonOffset myOffsetBack;
+  };
 
 } // anonymous namespace
 
@@ -285,8 +219,7 @@ void OpenGl_Text::Init (const Handle(OpenGl_Context)&     theCtx,
   }
   myIs2d       = true;
   myParams     = theParams;
-  myPoint.xy() = thePoint;
-  myPoint.z()  = 0.0f;
+  myPoint.SetValues (thePoint, 0.0f);
   myString.FromUnicode (theText.ToExtString());
 }
 
@@ -420,13 +353,11 @@ void OpenGl_Text::StringSize (const Handle(OpenGl_Context)& theCtx,
 // =======================================================================
 void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
 {
+  theWorkspace->SetAspectFace (&theWorkspace->FontFaceAspect());
+  theWorkspace->ApplyAspectFace();
   const OpenGl_AspectText*      aTextAspect  = theWorkspace->ApplyAspectText();
   const Handle(OpenGl_Context)& aCtx         = theWorkspace->GetGlContext();
   const Handle(OpenGl_TextureSet) aPrevTexture = aCtx->BindTextures (Handle(OpenGl_TextureSet)());
-#if !defined(GL_ES_VERSION_2_0)
-  const Standard_Integer aPrevPolygonMode  = aCtx->SetPolygonMode (GL_FILL);
-  const bool             aPrevHatchingMode = aCtx->SetPolygonHatchEnabled (false);
-#endif
 
   // Bind custom shader program or generate default version
   aCtx->ShaderManager()->BindFontProgram (aTextAspect->ShaderProgramRes (aCtx));
@@ -446,10 +377,6 @@ void OpenGl_Text::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
   {
     aCtx->BindTextures (aPrevTexture);
   }
-#if !defined(GL_ES_VERSION_2_0)
-  aCtx->SetPolygonMode         (aPrevPolygonMode);
-  aCtx->SetPolygonHatchEnabled (aPrevHatchingMode);
-#endif
 
   // restore Z buffer settings
   if (theWorkspace->UseZBuffer())
@@ -579,17 +506,7 @@ void OpenGl_Text::setupMatrix (const Handle(OpenGl_Context)& theCtx,
 void OpenGl_Text::drawText (const Handle(OpenGl_Context)& theCtx,
                             const OpenGl_AspectText&      theTextAspect) const
 {
-#ifdef HAVE_GL2PS
-  if (theCtx->IsFeedback())
-  {
-    // position of the text and alignment is calculated by transformation matrix
-    exportText (myString, myIs2d, theTextAspect, (Standard_Integer )myExportHeight);
-    return;
-  }
-#else
   (void )theTextAspect;
-#endif
-
   if (myVertsVbo.Length() != myTextures.Length()
    || myTextures.IsEmpty())
   {
@@ -650,17 +567,16 @@ Handle(OpenGl_Font) OpenGl_Text::FindFont (const Handle(OpenGl_Context)& theCtx,
   if (!theCtx->GetResource (theKey, aFont))
   {
     Handle(Font_FontMgr) aFontMgr = Font_FontMgr::GetInstance();
-    const Handle(TCollection_HAsciiString) aFontName = new TCollection_HAsciiString (theAspect.Aspect()->Font());
-    const Font_FontAspect anAspect = theAspect.Aspect()->GetTextFontAspect() != Font_FA_Undefined
-                                   ? theAspect.Aspect()->GetTextFontAspect()
-                                   : Font_FA_Regular;
-    Handle(Font_SystemFont) aRequestedFont = aFontMgr->FindFont (aFontName, anAspect, theHeight);
+    const TCollection_AsciiString& aFontName = theAspect.Aspect()->Font();
+    Font_FontAspect anAspect = theAspect.Aspect()->GetTextFontAspect() != Font_FA_Undefined
+                             ? theAspect.Aspect()->GetTextFontAspect()
+                             : Font_FA_Regular;
     Handle(Font_FTFont) aFontFt;
-    if (!aRequestedFont.IsNull())
+    if (Handle(Font_SystemFont) aRequestedFont = aFontMgr->FindFont (aFontName, anAspect))
     {
       aFontFt = new Font_FTFont (Handle(Font_FTLibrary)());
 
-      if (aFontFt->Init (aRequestedFont->FontPath()->ToCString(), theHeight, theResolution))
+      if (aFontFt->Init (aRequestedFont->FontPathAny (anAspect).ToCString(), theHeight, theResolution))
       {
         aFont = new OpenGl_Font (aFontFt, theKey);
         if (!aFont->Init (theCtx))
@@ -681,7 +597,7 @@ Handle(OpenGl_Font) OpenGl_Text::FindFont (const Handle(OpenGl_Context)& theCtx,
         aMsg += "Font '";
         aMsg += theAspect.Aspect()->Font();
         aMsg += "' is broken or has incompatible format! File path: ";
-        aMsg += aRequestedFont->FontPath()->ToCString();
+        aMsg += aRequestedFont->FontPathAny (anAspect);
         theCtx->PushMessage (GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, aMsg);
         aFontFt.Nullify();
         aFont = new OpenGl_Font (aFontFt, theKey);
@@ -720,12 +636,21 @@ void OpenGl_Text::drawRect (const Handle(OpenGl_Context)& theCtx,
       OpenGl_Vec2(myBndBox.Left,  myBndBox.Bottom),
       OpenGl_Vec2(myBndBox.Left,  myBndBox.Top)
     };
-    myBndVertsVbo = new OpenGl_VertexBuffer();
+    if (theCtx->ToUseVbo())
+    {
+      myBndVertsVbo = new OpenGl_VertexBuffer();
+    }
+    else
+    {
+      myBndVertsVbo = new OpenGl_VertexBufferCompat();
+    }
     myBndVertsVbo->Init (theCtx, 2, 4, aQuad[0].GetData());
   }
 
-  // bind flat program
-  theCtx->ShaderManager()->BindFaceProgram (Handle(OpenGl_TextureSet)(), Standard_False, Standard_False, Standard_False, Handle(OpenGl_ShaderProgram)());
+  // bind unlit program
+  theCtx->ShaderManager()->BindFaceProgram (Handle(OpenGl_TextureSet)(), Graphic3d_TOSM_UNLIT,
+                                            Graphic3d_AlphaMode_Opaque, Standard_False, Standard_False,
+                                            Handle(OpenGl_ShaderProgram)());
 
 #if !defined(GL_ES_VERSION_2_0)
   if (theCtx->core11 != NULL
@@ -735,7 +660,7 @@ void OpenGl_Text::drawRect (const Handle(OpenGl_Context)& theCtx,
   }
 #endif
   theCtx->SetColor4fv (theColorSubs);
-  setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (0.0f, 0.0f, 0.00001f));
+  setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (0.0f, 0.0f, 0.0f));
   myBndVertsVbo->BindAttribute (theCtx, Graphic3d_TOA_POS);
 
   theCtx->core20fwd->glDrawArrays (GL_TRIANGLE_STRIP, 0, 4);
@@ -841,15 +766,20 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   myExportHeight = aPointSize / myExportHeight;
 
 #if !defined(GL_ES_VERSION_2_0)
-  if (theCtx->core11 != NULL)
+  if (theCtx->core11 != NULL
+   && theCtx->caps->ffpEnable)
   {
     glDisable (GL_LIGHTING);
   }
+
+  const Standard_Integer aPrevPolygonMode  = theCtx->SetPolygonMode (GL_FILL);
+  const bool             aPrevHatchingMode = theCtx->SetPolygonHatchEnabled (false);
 #endif
 
   // setup depth test
-  if (myIs2d
-   || theTextAspect.Aspect()->Style() == Aspect_TOST_ANNOTATION)
+  const bool hasDepthTest = !myIs2d
+                         && theTextAspect.Aspect()->Style() != Aspect_TOST_ANNOTATION;
+  if (!hasDepthTest)
   {
     glDisable (GL_DEPTH_TEST);
   }
@@ -863,10 +793,6 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   GLint aTexEnvParam = GL_REPLACE;
   if (theCtx->core11 != NULL)
   {
-    // setup alpha test
-    glAlphaFunc (GL_GEQUAL, 0.285f);
-    glEnable (GL_ALPHA_TEST);
-
     glDisable (GL_TEXTURE_1D);
     glEnable  (GL_TEXTURE_2D);
     glGetTexEnviv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, &aTexEnvParam);
@@ -880,6 +806,7 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
   // setup blending
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  const bool anAlphaToCoverageOld = theCtx->SetSampleAlphaToCoverage (false);
 
   // extra drawings
   switch (theTextAspect.Aspect()->DisplayType())
@@ -894,19 +821,29 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
     }
     case Aspect_TODT_SUBTITLE:
     {
+      BackPolygonOffsetSentry aPolygonOffsetTmp (hasDepthTest ? theCtx : Handle(OpenGl_Context)());
       drawRect (theCtx, theTextAspect, theColorSubs);
       break;
     }
     case Aspect_TODT_DEKALE:
     {
+      BackPolygonOffsetSentry aPolygonOffsetTmp (hasDepthTest ? theCtx : Handle(OpenGl_Context)());
       theCtx->SetColor4fv (theColorSubs);
-      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, +1.0f, 0.00001f));
+      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, +1.0f, 0.0f));
       drawText    (theCtx, theTextAspect);
-      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (-1.0f, -1.0f, 0.00001f));
+      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (-1.0f, -1.0f, 0.0f));
       drawText    (theCtx, theTextAspect);
-      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (-1.0f, +1.0f, 0.00001f));
+      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (-1.0f, +1.0f, 0.0f));
       drawText    (theCtx, theTextAspect);
-      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, -1.0f, 0.00001f));
+      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, -1.0f, 0.0f));
+      drawText    (theCtx, theTextAspect);
+      break;
+    }
+    case Aspect_TODT_SHADOW:
+    {
+      BackPolygonOffsetSentry aPolygonOffsetTmp (hasDepthTest ? theCtx : Handle(OpenGl_Context)());
+      theCtx->SetColor4fv (theColorSubs);
+      setupMatrix (theCtx, theTextAspect, OpenGl_Vec3 (+1.0f, -1.0f, 0.0f));
       drawText    (theCtx, theTextAspect);
       break;
     }
@@ -946,10 +883,9 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
     if (theCtx->core11 != NULL)
     {
       glDisable (GL_TEXTURE_2D);
-      glDisable (GL_ALPHA_TEST);
     }
   #endif
-    glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    const bool aColorMaskBack = theCtx->SetColorMask (false);
 
     glClear (GL_STENCIL_BUFFER_BIT);
     glEnable (GL_STENCIL_TEST);
@@ -960,19 +896,19 @@ void OpenGl_Text::render (const Handle(OpenGl_Context)& theCtx,
 
     glStencilFunc (GL_ALWAYS, 0, 0xFF);
 
-    glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    theCtx->SetColorMask (aColorMaskBack);
   }
 
   // reset OpenGL state
   glDisable (GL_BLEND);
   glDisable (GL_STENCIL_TEST);
 #if !defined(GL_ES_VERSION_2_0)
-  if (theCtx->core11 != NULL)
-  {
-    glDisable (GL_ALPHA_TEST);
-  }
   glDisable (GL_COLOR_LOGIC_OP);
+
+  theCtx->SetPolygonMode         (aPrevPolygonMode);
+  theCtx->SetPolygonHatchEnabled (aPrevHatchingMode);
 #endif
+  theCtx->SetSampleAlphaToCoverage (anAlphaToCoverageOld);
 
   // model view matrix was modified
   theCtx->WorldViewState.Pop();

@@ -24,9 +24,11 @@
 #include <TDF_Label.hxx>
 #include <TDocStd_Application.hxx>
 
+#include <Standard_WarningsDisable.hxx>
 #include <QByteArray>
 #include <QHash>
 #include <QObject>
+#include <Standard_WarningsRestore.hxx>
 
 class DFBrowser_Module;
 class DFBrowser_TreeModel;
@@ -93,11 +95,10 @@ public:
   Standard_EXPORT virtual QVariant data (const QModelIndex& theIndex,
                                          int theRole = Qt::DisplayRole) const Standard_OVERRIDE;
 
-  //! Returns count of columns in the model
-  //! \param theParent an index of the parent item
-  //! \return integer value
-  virtual int columnCount (const QModelIndex& theParent = QModelIndex()) const Standard_OVERRIDE
-  { (void)theParent; return 1; }
+protected:
+  //! Creates root item
+  //! \param theColumnId index of a column
+  virtual void createRootItem (const int theColumnId);
 
 private:
 

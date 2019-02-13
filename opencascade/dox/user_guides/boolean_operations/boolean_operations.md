@@ -548,7 +548,8 @@ The class *BOPAlgo_Options* provides the following options for the algorithms:
 * Check the presence of the Errors and Warnings;
 * Turn on/off the parallel processing;
 * Set the additional tolerance for the operation;
-* Break the operations by user request.
+* Break the operations by user request;
+* Usage of Oriented Bounding boxes in the operation.
 
 @subsection occt_algorithms_root_classes_2 Class BOPAlgo_Algo
 
@@ -785,9 +786,121 @@ The types of resulting shapes depend on the type of the corresponding argument p
 | 7	| EDGE	| Set of split EDGEs	| |
 | 8	| VERTEX | VERTEX | |
 
+@subsection occt_algorithms_7_3a Options
+
+The General Fuse algorithm has a set of options, which allow speeding-up the operation and improving the quality of the result:
+* Parallel processing option allows running the algorithm in parallel mode;
+* Fuzzy option allows setting the additional tolerance for the operation;
+* Safe input shapes option allows preventing modification of the input shapes;
+* Gluing option allows speeding-up the intersection of the arguments;
+* Possibility to disable the check for the inverted solids among input shapes;
+* Usage of Oriented Bounding Boxes in the operation;
+* History support.
+
+For more detailed information on these options, see the @ref occt_algorithms_11a "Advanced options" section.
+
+@subsection occt_algorithms_7_3b Usage
+
+The following example illustrates how to use the GF algorithm:
+
+#### Usage of the GF algorithm on C++ level
+
+~~~~
+BOPAlgo_Builder aBuilder;
+// Setting arguments
+TopTools_ListOfShape aLSObjects = …; // Objects
+aBuilder.SetArguments(aLSObjects);
+
+// Setting options for GF
+
+// Set parallel processing mode (default is false)
+Standard_Boolean bRunParallel = Standard_True;
+aBuilder.SetRunParallel(bRunParallel);
+
+// Set Fuzzy value (default is Precision::Confusion())
+Standard_Real aFuzzyValue = 1.e-5;
+aBuilder.SetFuzzyValue(aFuzzyValue);
+
+// Set safe processing mode (default is false)
+Standard_Boolean bSafeMode = Standard_True;
+aBuilder.SetNonDestructive(bSafeMode);
+
+// Set Gluing mode for coinciding arguments (default is off)
+BOPAlgo_GlueEnum aGlue = BOPAlgo_GlueShift;
+aBuilder.SetGlue(aGlue);
+
+// Disabling/Enabling the check for inverted solids (default is true)
+Standard Boolean bCheckInverted = Standard_False;
+aBuilder.SetCheckInverted(bCheckInverted);
+
+// Set OBB usage (default is false)
+Standard_Boolean bUseOBB = Standard_True;
+aBuilder.SetUseOBB(buseobb);
+
+// Perform the operation
+aBuilder.Perform();
+
+// Check for the errors
+if (aBuilder.HasErrors())
+{
+  return;
+}
+
+// Check for the warnings
+if (aBuilder.HasWarnings())
+{
+  // treatment of the warnings
+  ...
+}
+
+// result of the operation
+const TopoDS_Shape& aResult = aBuilder.Shape();
+~~~~
+
+#### Usage of the GF algorithm on Tcl level
+
+~~~~
+# prepare the arguments
+box b1 10 10 10 
+box b2 3 4 5 10 10 10 
+box b3 5 6 7 10 10 10 
+
+# clear inner contents
+bclearobjects; bcleartools;
+
+# set the arguments
+baddobjects b1 b2 b3
+
+# setting options for GF
+
+# set parallel processing mode (default is 0)
+brunparallel 1
+
+# set Fuzzy value
+bfuzzyvalue 1.e-5
+
+# set safe processing mode (default is 0)
+bnondestructive 1
+
+# set gluing mode (default is 0)
+bglue 1
+
+# set check for inverted (default is 1)
+bcheckinverted 0
+
+# set obb usage (default is 0)
+buseobb 1
+
+# perform intersection
+bfillds
+
+# perform GF operaton
+bbuild result
+~~~~
+
 @subsection occt_algorithms_7_3 Examples
 
-Please, have a look at the examples, which can help to better understand the definitions.
+Have a look at the examples to better understand the definitions.
 
 @subsubsection occt_algorithms_7_3_1	Case 1: Three edges intersecting at a point 
 
@@ -1061,7 +1174,7 @@ The input data for this step is a *BOPAlgo_Builder* object after building result
 @section occt_algorithms_8  Splitter Algorithm
 
 The Splitter algorithm allows splitting a group of arbitrary shapes by another group of arbitrary shapes.<br>
-It is based on the General Fuse  algorithm, thus all options of the General Fuse such as Fuzzy mode, safe processing mode, parallel mode, gluing mode and history support are also available in this algorithm.
+It is based on the General Fuse  algorithm, thus all options of the General Fuse (see @ref occt_algorithms_7_3a "GF Options") are also available in this algorithm.
 
 @subsection occt_algorithms_8_1 Arguments
 
@@ -1082,22 +1195,18 @@ It is based on the General Fuse  algorithm, thus all options of the General Fuse
 On the low level the Splitter algorithm is implemented in class *BOPAlgo_Splitter*. The usage of this algorithm looks as follows:
 ~~~~~
 BOPAlgo_Splitter aSplitter;
-BOPCol_ListOfShape aLSObjects = …; // Objects
-BOPCol_ListOfShape aLSTools = …; // Tools
-Standard_Boolean bRunParallel = Standard_False; /* parallel or single mode (the default value is FALSE)*/
-Standard_Real aTol = 0.0; /* fuzzy option (default value is 0)*/
-Standard_Boolean bSafeMode = Standard_False; /* protect or not the arguments from modification*/
-BOPAlgo_Glue aGlue = BOPAlgo_GlueOff; /* Glue option to speed up intersection of the arguments*/
-// setting arguments
+// Setting arguments and tools
+TopTools_ListOfShape aLSObjects = …; // Objects
+TopTools_ListOfShape aLSTools = …; // Tools
 aSplitter.SetArguments(aLSObjects);
 aSplitter.SetTools(aLSTools);
-// setting options
-aSplitter.SetRunParallel(bRunParallel);
-aSplitter.SetFuzzyValue(aTol);
-aSplitter.SetNonDestructive(bSafeMode);
-aSplitter.SetGlue(aGlue);
-//
-aSplitter.Perform(); //perform the operation
+
+// Set options for the algorithm
+// setting options for this algorithm is similar to setting options for GF algorithm (see "GF Usage" chapter)
+...
+
+// Perform the operation
+aSplitter.Perform();
 if (aSplitter.HasErrors()) { //check error status
   return;
 }
@@ -1782,6 +1891,21 @@ The input data for this step is as follows:
 | 2.3 |	Build solids <i>(SDi)</i> from *SFS*. |	*BOPAlgo_BuilderSolid* |
 | 2.4 |	Add the solids <i>(SDi)</i> to the result	| |
 
+@subsection occt_algorithms_bop_on_opensolids Boolean operations on open solids
+
+The Boolean operations on open solids are tricky enough that the standard approach of Boolean operations for building the result, based on the splits of solids does not work.
+It happens because the algorithm for splitting solids (*BOPAlgo_BuilderSolid*) always tries to create the closed loops (shells) and make solids from them. But if the input solid is not closed, what can be expected from its splits?
+For performing Boolean Operations on open solids another approach is used, which does not rely on the splits of the solids to be correct, but tries to select the splits of faces, which are necessary for the given type of operation.
+The point here is that the type of Boolean operation clearly defines the states for the faces to be taken into result:
+- For **COMMON** operation all the faces from the arguments located inside any solid of the opposite group must be taken;
+- For **FUSE** operation all the faces from the arguments located outside of all solids of the opposite group must be taken;
+- For **CUT** operation all the faces from the Objects located outside of all solids of the Tools and all faces from the Tools located inside any solid of the Objects must be taken;
+- For **CUT21** operation all the faces from the Objects located inside any solid of the Tools and all faces from the Tools located outside of all solids of the Objects must be taken.
+From the selected faces the result solids are built. Please note, that the result may contain as normal (closed) solids as the open ones.
+
+Even with this approach, the correct result of Boolean operation on open solids cannot be always guaranteed.
+This is explained by non-manifold nature of open solids: in some cases classification of a face depends on the point of the face chosen for classification.
+
 @section occt_algorithms_10a Section Algorithm 
 
 @subsection occt_algorithms_10a_1 Arguments
@@ -2041,7 +2165,7 @@ The algorithm creates only closed solids. In general case the result solids are 
 But the algorithm allows preventing the addition of the internal for solids parts into result. In this case the result solids will be manifold and not contain any internal parts. However, this option does not prevent from the occurrence of the internal edges or vertices in the faces.<br>
 Non-closed faces, free wires etc. located outside of any solid are always excluded from the result.
 
-The Volume Maker algorithm is implemented in the class BOPAlgo_MakerVolume. It is based on the General Fuse (GF) algorithm. All the options of the GF algorithm such as possibility to run algorithm in parallel mode, fuzzy option, safe mode, glue options and history support are also available in this algorithm.
+The Volume Maker algorithm is implemented in the class BOPAlgo_MakerVolume. It is based on the General Fuse (GF) algorithm. All the options of the GF algorithm (see @ref occt_algorithms_7_3a "GF Options") are also available in this algorithm.
 
 The requirements for the arguments are the same as for the arguments of GF algorithm - they could be of any type, but each argument should be valid and not self-interfered.
 
@@ -2054,23 +2178,19 @@ This option is useful e.g. for building a solid from the faces of one shell or f
 The usage of the algorithm on the API level:
 ~~~~
 BOPAlgo_MakerVolume aMV;
-BOPCol_ListOfShape aLS = …; // arguments
-Standard_Boolean bRunParallel = Standard_False; /* parallel or single mode (the default value is FALSE)*/
-Standard_Boolean bIntersect = Standard_True; /* intersect or not the arguments (the default value is TRUE)*/
-Standard_Real aTol = 0.0; /* fuzzy option (default value is 0)*/
-Standard_Boolean bSafeMode = Standard_False; /* protect or not the arguments from modification*/
-BOPAlgo_Glue aGlue = BOPAlgo_GlueOff; /* Glue option to speed up intersection of the arguments*/
-Standard_Boolean bAvoidInternalShapes = Standard_False; /* Avoid or not the internal for solids shapes in the result*/
-//
+// Set the arguments
+TopTools_ListOfShape aLS = …; // arguments
 aMV.SetArguments(aLS);
-aMV.SetRunParallel(bRunParallel);
-aMV.SetIntersect(bIntersect);
-aMV.SetFuzzyValue(aTol);
-aMV.SetNonDestructive(bSafeMode);
-aMV.SetGlue(aGlue);
+
+// Set options for the algorithm
+// setting options for this algorithm is similar to setting options for GF algorithm (see "GF Usage" chapter)
+...
+// Additional option of the algorithm
+Standard_Boolean bAvoidInternalShapes = Standard_False; // Set to True to exclude from the result any shapes internal to the solids
 aMV.SetAvoidInternalShapes(bAvoidInternalShapes);
-//
-aMV.Perform(); //perform the operation
+
+// Perform the operation
+aMV.Perform();
 if (aMV.HasErrors()) { //check error status
   return;
 }
@@ -2128,7 +2248,7 @@ The algorithm can also create containers from the connected Cells added into res
 
 The algorithm has been implemented in the *BOPAlgo_CellsBuilder* class.
 
-Cells Builder is based on the General Fuse algorithm. Thus all options of the General Fuse algorithm, such as parallel processing mode, fuzzy mode, safe processing mode, gluing mode and history support are also available in this algorithm.
+Cells Builder is based on the General Fuse algorithm. Thus all options of the General Fuse algorithm (see @ref occt_algorithms_7_3a "GF Options") are also available in this algorithm.
 
 The requirements for the input shapes are the same as for General Fuse - each argument should be valid in terms of *BRepCheck_Analyzer* and *BOPAlgo_ArgumentAnalyzer*.
 
@@ -2148,18 +2268,14 @@ It is possible to create typed Containers from the parts added into result by us
 Here is the example of the algorithm use on the API level:
 ~~~~
 BOPAlgo_CellsBuilder aCBuilder;
-BOPCol_ListOfShape aLS = …; // arguments
-Standard_Boolean bRunParallel = Standard_False; /* parallel or single mode (the default value is FALSE)*/
-Standard_Real aTol = 0.0; /* fuzzy option (the default value is 0)*/
-Standard_Boolean bSafeMode = Standard_False; /* protect or not the arguments from modification*/
-BOPAlgo_Glue aGlue = BOPAlgo_GlueOff; /* Glue option to speed up the intersection of arguments*/
-//
+// Set the arguments
+TopTools_ListOfShape aLS = …; // arguments
 aCBuilder.SetArguments(aLS);
-aCBuilder.SetRunParallel(bRunParallel);
-aCBuilder.SetFuzzyValue(aTol);
-aCBuilder.SetNonDestructive(bSafeMode);
-aCBuilder.SetGlue(aGlue);
-//
+
+// Set options for the algorithm
+// setting options for this algorithm is similar to setting options for GF algorithm (see "GF Usage" chapter)
+...
+
 aCBuilder.Perform(); // build splits of all arguments (GF)
 if (aCBuilder.HasErrors()) { // check error status
   return;
@@ -2169,8 +2285,8 @@ if (aCBuilder.HasErrors()) { // check error status
 const TopoDS_Shape& anEmptyRes = aCBuilder.Shape(); // empty result, as nothing has been added yet 
 const TopoDS_Shape& anAllCells = aCBuilder.GetAllParts(); //all split parts 
 //
-BOPCol_ListOfShape aLSToTake = ...; // parts of these arguments will be taken into result
-BOPCol_ListOfShape aLSToAvoid = ...; // parts of these arguments will not be taken into result
+TopTools_ListOfShape aLSToTake = ...; // parts of these arguments will be taken into result
+TopTools_ListOfShape aLSToAvoid = ...; // parts of these arguments will not be taken into result
 //
 Standard_Integer iMaterial = 1; // defines the material for the cells
 Standard_Boolean bUpdate = Standard_False; // defines whether to update the result right now or not
@@ -2327,7 +2443,7 @@ A lot of failures of GFA algorithm can be caused by bugs in low-level algorithms
 * The Projection Algorithm is used at the Intersection step. The purpose of Projection Algorithm is to compute 2D curves on surfaces. Wrong results here lead to incorrect or missing faces in the final GFA result. 
 * The Classification Algorithm is used at the Building step. The bugs in the Classification Algorithm lead to errors in selecting shape parts (edges, faces, solids) and ultimately to a wrong final GFA result.
 
-The description below illustrates some known GFA limitations. It does not enumerate exhaustively all problems that can arise in practice. Please, address cases of Algorithm failure to the OCCT Maintenance Service.
+The description below illustrates some known GFA limitations. It does not enumerate exhaustively all problems that can arise in practice. Please address cases of Algorithm failure to the OCCT Maintenance Service.
 
 
 @subsection occt_algorithms_10_1	Arguments
@@ -2423,7 +2539,7 @@ Let us also consider a cylinder-based *Face 2* with radii *R=3000* and *H=6000* 
 
 @figure{/user_guides/boolean_operations/images/operations_image047.png,"P-Curves for Face 2",230}
 
-Please, pay attention to the Zoom value of the Figures.
+Pay attention to the Zoom value of the Figures.
 
 It is obvious that starting with some value of *ScF*, e.g. *ScF>1000000*, all sloped p-Curves on *Face 2*  will be almost vertical. At least, there will be no difference between the values of angles computed by standard C Run-Time Library functions, such as *double acos(double x)*. The loss of accuracy in computation of angles can cause failure of some BP sub-algorithms, such as building faces from a set of edges or building solids from a set of faces.
 
@@ -2718,6 +2834,63 @@ To enable the safe processing mode for the operation in DRAW, it is necessary to
 bnondestructive 1
 ~~~~
 
+@subsection occt_algorithms_11a_4 How to disable check of input solids for inverted status
+
+By default, all input solids are checked for inverted status, i.e. the solids are classified to understand if they are holes in the space (negative volumes) or normal solids (positive volumes). The possibility to disable the check of the input solids for inverted status is the advanced option in Boolean Operation component. This option can be applied to all Basic operations, such as General Fuse, Splitting, Boolean, Section, Maker Volume and Cells building.
+This option allows avoiding time-consuming classification of the input solids and processing them in the same way as positive volumes, saving up to 10 percent of time on the cases with a big number of input solids.
+
+The classification should be disabled only if the user is sure that there are no negative volumes among the input solids, otherwise the result may be invalid.
+
+@subsubsection occt_algorithms_11a_4_1 Usage
+
+#### API level
+
+To enable/disable the classification of the input solids it is necessary to call *SetCheckInverted()* method with the appropriate value:
+~~~~
+BOPAlgo_Builder aGF;
+//
+....
+// disabling the classification of the input solid
+aGF.SetCheckInverted(Standard_False);
+//
+....
+~~~~
+
+#### TCL level
+To enable/disable the classification of the solids in DRAW, it is necessary to call *bcheckinverted* command with the appropriate value:
+* 0 - disabling the classification;
+* 1 - default value, enabling the classification.
+
+~~~~
+bcheckinverted 0
+~~~~
+
+@subsection occt_algorithms_11a_5_obb Usage of Oriented Bounding Boxes
+
+Since Oriented Bounding Boxes are usually much tighter than Axes Aligned Bounding Boxes (for more information on OBB see the @ref occt_modat_6 "Bounding boxes" chapter of Modeling data User guide) its usage can significantly speed-up the intersection stage of the operation by reducing the number of interfering objects.
+
+@subsubsection occt_algorithms_11a_5_obb_1 Usage
+
+#### API level
+To enable/disable the usage of OBB in the operation it is necessary to call the *SetUseOBB()* method with the approriate value:
+~~~~
+BOPAlgo_Builder aGF;
+//
+....
+// Enabling the usage of OBB in the operation
+aGF.SetUseOBB(Standard_True);
+//
+....
+~~~~
+
+#### TCL level
+To enable/disable the usage of OBB in the operation in DRAW it is necessary to call the *buseobb* command with the approriate value: 
+* 0 - disabling the usage of OBB;
+* 1 - enabling the usage of OBB.
+~~~~
+buseobb 1
+~~~~
+
 @section occt_algorithms_ers Errors and warnings reporting system
 
 The chapter describes the Error/Warning reporting system of the algorithms in the Boolean Component.
@@ -2771,6 +2944,192 @@ Warning: The positioning of the shapes leads to creation of small edges without 
 ~~~~
 
 
+@section occt_algorithms_history History Information
+
+All operations in Boolean Component support @ref occt_modalg_hist "History information". This chapter describes how the History is filled for these operations.
+
+Additionally to Vertices, Edges and Faces the history is also available for the Solids.
+
+The rules for filling the History information about Deleted and Modified shapes are the same as for the API algorithms.
+
+Only the rules for Generated shapes require clarification.
+In terms of the algorithms in Boolean Component the shape from the arguments can have Generated shapes only if these new shapes 
+have been obtained as a result of pure intersection (not overlapping) of this shape with any other shapes from arguments. Thus, the Generated shapes are always:
+* VERTICES created from the intersection points and may be Generated from edges and faces only;
+* EDGES created from the intersection edges and may be Generated from faces only.
+
+So, only EDGES and FACES could have information about Generated shapes. For all other types of shapes the list of Generated shapes will be empty.
+
+@subsection occt_algorithms_history_ex Examples
+
+Here are some examples illustrating the History information.
+
+@subsubsection occt_algorithms_history_ex_del Deleted shapes
+
+The result of CUT operation of two overlapping planar faces (see the example below) does not contain any parts from the tool face. Thus, the tool face is considered as Deleted.
+If the faces are not fully coinciding, the result must contain some parts of the object face. In this case object face will be considered as not deleted.
+But if the faces are fully coinciding, the result must be empty, and both faces will be considered as Deleted.
+
+Example of the overlapping faces:
+
+~~~~
+plane p 0 0 0 0 0 1
+mkface f1 p -10 10 -10 10
+mkface f2 p 0 20 -10 10
+
+bclearobjects
+bcleartools
+baddobjects f1
+baddtools f2
+bfillds
+bbop r 2
+
+savehistory cut_hist
+isdeleted cut_hist f1
+# Not deleted
+
+isdeleted cut_hist f2
+# Deleted
+~~~~
+
+@subsubsection occt_algorithms_history_ex_modif Modified shapes
+
+In the FUSE operation of two edges intersecting in one point (see the example below), both edges will be split by the intersection point. All these splits will be contained in the result.
+Thus, each of the input edges will be Modified into its two splits.
+But in the CUT operation on the same edges, the tool edge will be Deleted from the result and, thus, will not have any Modified shapes.
+
+Example of the intersecting edges:
+~~~~
+line l1 0 0 0 1 0 0
+mkedge e1 l1 -10 10
+
+line l2 0 0 0 0 1 0
+mkedge e2 l2 -10 10
+
+bclearobjects
+bcleartools
+baddobjects e1
+baddtools e2
+bfillds
+
+# fuse operation
+bbop r 1
+
+savehistory fuse_hist
+
+modified m1 fuse_hist e1
+nbshapes m1
+# EDGES: 2
+
+modified m2 fuse_hist e2
+nbshapes m2
+# EDGES: 2
+
+# cut operation
+bbop r 2
+
+savehistory cut_hist
+
+modified m1 cut_hist e1
+nbshapes m1
+# EDGES: 2
+
+modified m2 cut_hist e2
+# The shape has not been modified
+~~~~
+
+
+@subsubsection occt_algorithms_history_gen Generated shapes
+
+Two intersecting edges will both have the intersection vertices Generated from them.
+
+As for the operation with intersecting faces, consider the following example:
+
+~~~~
+plane p1 0 0 0 0 0 1
+mkface f1 p1 -10 10 -10 10
+
+plane p2 0 0 0 1 0 0
+mkface f2 p2 -10 10 -10 10
+
+bclearobjects
+bcleartools
+baddobjects f1
+baddtools f2
+bfillds
+
+# fuse operation
+bbop r 1
+
+savehistory fuse_hist
+
+generated gf1 fuse_hist f1
+nbshapes gf1
+# EDGES: 1
+
+generated gf2 fuse_hist f2
+nbshapes gf2
+# EDGES: 1
+
+
+# common operation - result is empty
+bbop r 0
+
+savehistory com_hist
+
+generated gf1 com_hist f1
+# No shapes were generated from the shape
+
+generated gf2 com_hist f2
+# No shapes were generated from the shape
+
+~~~~
+
+@section occt_algorithms_simplification BOP result simplification
+
+The API algorithms implementing Boolean Operations provide possibility to simplify the result shape by unification of the connected tangential edges and faces.
+This simplification is performed by the method *SimplifyResult* which is implemented in the class *BRepAlgoAPI_BuilderAlgo* (General Fuse operation).
+It makes it available for users of the classes *BRepAlgoAPI_BooleanOperation* (all Boolean Operations) and *BRepAlgoAPI_Splitter* (split operation).
+
+The simplification is performed by the means of *ShapeUpgrade_UnifySameDom* algorithm. The result of operation is overwritten with the simplified result.
+
+The simplification is performed without creation of the Internal shapes, i.e. shapes connections will never be broken. It is performed on the whole result shape.
+Thus, if the input shapes contained connected tangent edges or faces unmodified during the operation they will also be unified.
+
+History of the simplification is merged into the main history of operation, thus it will be accounted when asking for Modified, Generated and Deleted shapes.
+
+Some options of the main operation are passed into the Unifier:
+- Fuzzy tolerance of the operation is given to the Unifier as the linear tolerance.
+- Non destructive mode here controls the safe input mode in Unifier.
+
+For controlling this possibility in DRAW the command **bsimplify** has been implemented. See the @ref occt_draw_bop_options "Boolean Operations options" chapter in draw user guide.
+
+
+@subsection occt_algorithms_simplification_examples Examples
+
+Here is the simple example of simplification of the result of Fuse operation of two boxes:
+
+~~~~
+bsimplify -f 1
+
+box b1 10 10 15
+box b2 3 7 0 10 10 15
+bclearobjects
+bcleartools
+baddobjects b1
+baddtools b2
+bfillds
+bapibop r 1
+~~~~
+
+<table align="center">
+  <tr>
+    <td>@figure{/user_guides/boolean_operations/images/bop_simple_001.png, "Not simplified result", 420}</td>
+    <td>@figure{/user_guides/boolean_operations/images/bop_simple_002.png, "Simplified result", 420}</td>
+  </tr>
+</table>
+
+
 @section occt_algorithms_11b Usage 
 
 The chapter contains some examples of the OCCT Boolean Component usage. The usage is possible on two levels: C++ and Tcl. 
@@ -2813,41 +3172,18 @@ The following example illustrates how to use General Fuse operator:
 #include <TopTools_ListOfShape.hxx>
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
  {…
-  Standard_Boolean bRunParallel;
-  Standard_Real aFuzzyValue;
   BRepAlgoAPI_BuilderAlgo aBuilder;
   //
   // prepare the arguments
   TopTools_ListOfShape& aLS=…;
   //
-  bRunParallel=Standard_True;
-  aFuzzyValue=2.1e-5;
-  //
   // set the arguments	
   aBuilder.SetArguments(aLS);
-  // set parallel processing mode 
-  // if  bRunParallel= Standard_True :  the parallel processing is switched on
-  // if  bRunParallel= Standard_False :  the parallel processing is switched off
-  aBuilder.SetRunParallel(bRunParallel);
-  //
-  // set Fuzzy value
-  // if aFuzzyValue=0.: the Fuzzy option is off
-  //  if aFuzzyValue>0.: the Fuzzy option is on
-  aBuilder.SetFuzzyValue(aFuzzyValue);
-  //
-  // safe mode - avoid modification of the arguments
-  Standard_Boolean bSafeMode = Standard_True;
-  // if bSafeMode == Standard_True  - the safe mode is switched on
-  // if bSafeMode == Standard_False - the safe mode is switched off
-  aBuilder.SetNonDestructive(bSafeMode);
-  //
-  // gluing options - for coinciding arguments
-  BOPAlgo_GlueEnum aGlueOpt = BOPAlgo_GlueFull;
-  // if aGlueOpt == BOPAlgo_GlueOff   - the gluing mode is switched off
-  // if aGlueOpt == BOPAlgo_GlueShift - the gluing mode is switched on
-  // if aGlueOpt == BOPAlgo_GlueFull  - the gluing mode is switched on
-  aBuilder.SetGlue(aGlueOpt);
-  //
+  
+  // Set options for the algorithm
+  // setting options on this level is similar to setting options to GF algorithm on low level (see "GF Usage" chapter)
+  ...
+
   // run the algorithm 
   aBuilder.Build(); 
   if (aBuilder.HasErrors()) {
@@ -2874,28 +3210,10 @@ bclearobjects; bcleartools;
 #
 # set the arguments
 baddobjects b1 b2 b3
-# set parallel processing mode
-# 1:  the parallel processing is switched on
-# 0:  the parallel processing is switched off
-brunparallel 1 
-#
-# set Fuzzy value
-# 0.    : the Fuzzy option is off
-# >0. : the Fuzzy option is on
-bfuzzyvalue 0.
-#
-# set safe processing mode
-bnondestructive 1
-# set safe mode
-# 1 - the safe processing mode is switched on
-# 0 - the safe processing mode is switched off
-#
-# set gluing mode
-bglue 1
-# set the gluing mode
-# 1 or 2 - the gluing mode is switched on
-# 0 - the gluing mode is switched off
-#
+
+# set options for the algorithm (see "GF Usage" chapter)
+...
+
 # run the algorithm
 # r is the result of the operation
 bapibuild r 
@@ -2924,31 +3242,9 @@ TopTools_ListOfShape& aLSTools = … ;
 aSplitter.SetArguments(aLSObjects);
 aSplitter.SetTools(aLSTools);
 //
-// set options
-// parallel processing mode 
-Standard_Boolean bRunParallel = Standard_True;
-// bRunParallel == Standard_True  - the parallel processing is switched on
-// bRunParallel == Standard_False - the parallel processing is switched off
-aSplitter.SetRunParallel();
-//
-// fuzzy value - additional tolerance for the operation
-Standard_Real aFuzzyValue = 1.e-5;
-// if aFuzzyValue == 0. - the Fuzzy option is off
-// if aFuzzyValue > 0.  - the Fuzzy option is on
-aSplitter.SetFuzzyValue(aFuzzyValue);
-//
-// safe mode - avoid modification of the arguments
-Standard_Boolean bSafeMode = Standard_True;
-// if bSafeMode == Standard_True  - the safe mode is switched on
-// if bSafeMode == Standard_False - the safe mode is switched off
-aSplitter.SetNonDestructive(bSafeMode);
-//
-// gluing options - for coinciding arguments
-BOPAlgo_GlueEnum aGlueOpt = BOPAlgo_GlueFull;
-// if aGlueOpt == BOPAlgo_GlueOff   - the gluing mode is switched off
-// if aGlueOpt == BOPAlgo_GlueShift - the gluing mode is switched on
-// if aGlueOpt == BOPAlgo_GlueFull  - the gluing mode is switched on
-aSplitter.SetGlue(aGlueOpt);
+// Set options for the algorithm
+// setting options for this algorithm is similar to setting options for GF algorithm (see "GF Usage" chapter)
+...
 //
 // run the algorithm 
 aSplitter.Build(); 
@@ -2981,27 +3277,8 @@ baddobjects b1 b2
 # set the tools
 baddtools f
 #
-# set parallel processing mode
-# 1:  the parallel processing is switched on
-# 0:  the parallel processing is switched off
-brunparallel 1 
-#
-# set Fuzzy value
-# 0.  : the Fuzzy option is off
-# >0. : the Fuzzy option is on
-bfuzzyvalue 0.
-#
-# set safe processing mode
-bnondestructive 1
-# set safe mode
-# 1 - the safe processing mode is switched on
-# 0 - the safe processing mode is switched off
-#
-# set gluing mode
-bglue 1
-# set the gluing mode
-# 1 or 2 - the gluing mode is switched on
-# 0 - the gluing mode is switched off
+# set options for the algorithm (see "GF Usage" chapter)
+...
 #
 # run the algorithm
 # r is the result of the operation
@@ -3034,28 +3311,9 @@ The following example illustrates how to use Common operation:
   aBuilder.SetArguments(aLS);
   aBuilder.SetTools(aLT);
   //	
-  // set parallel processing mode 
-  // if  bRunParallel= Standard_True :  the parallel processing is switched on
-  // if  bRunParallel= Standard_False :  the parallel processing is switched off
-  aBuilder.SetRunParallel(bRunParallel);
-  //
-  // set Fuzzy value
-  // if aFuzzyValue=0.: the Fuzzy option is off
-  //  if aFuzzyValue>0.: the Fuzzy option is on
-  aBuilder.SetFuzzyValue(aFuzzyValue);
-  //
-  // safe mode - avoid modification of the arguments
-  Standard_Boolean bSafeMode = Standard_True;
-  // if bSafeMode == Standard_True  - the safe mode is switched on
-  // if bSafeMode == Standard_False - the safe mode is switched off
-  aBuilder.SetNonDestructive(bSafeMode);
-  //
-  // gluing options - for coinciding arguments
-  BOPAlgo_GlueEnum aGlueOpt = BOPAlgo_GlueFull;
-  // if aGlueOpt == BOPAlgo_GlueOff   - the gluing mode is switched off
-  // if aGlueOpt == BOPAlgo_GlueShift - the gluing mode is switched on
-  // if aGlueOpt == BOPAlgo_GlueFull  - the gluing mode is switched on
-  aBuilder.SetGlue(aGlueOpt);
+  // Set options for the algorithm
+  // setting options for this algorithm is similar to setting options for GF algorithm (see "GF Usage" chapter)
+  ...
   //
   // run the algorithm 
   aBuilder.Build(); 
@@ -3085,27 +3343,8 @@ bclearobjects; bcleartools;
 baddobjects b1 b3
 baddtools b2
 #
-# set parallel processing mode
-# 1:  the parallel processing is switched on
-# 0:  the parallel processing is switched off
-brunparallel 1
-#
-# set Fuzzy value
-# 0.    : the Fuzzy option is off
-# >0. : the Fuzzy option is on
-bfuzzyvalue 0.
-#
-# set safe processing mode
-bnondestructive 1
-# set safe mode
-# 1 - the safe processing mode is switched on
-# 0 - the safe processing mode is switched off
-#
-# set gluing mode
-bglue 1
-# set the gluing mode
-# 1 or 2 - the gluing mode is switched on
-# 0 - the gluing mode is switched off
+# set options for the algorithm (see "GF Usage" chapter)
+...
 #
 # run the algorithm
 # r is the result of the operation
@@ -3139,28 +3378,9 @@ The following example illustrates how to use Fuse operation:
   aBuilder.SetArguments(aLS);
   aBuilder.SetTools(aLT);
   //	
-  // set parallel processing mode 
-  // if  bRunParallel= Standard_True :  the parallel processing is switched on
-  // if  bRunParallel= Standard_False :  the parallel processing is switched off
-  aBuilder.SetRunParallel(bRunParallel);
-  //
-  // set Fuzzy value
-  // if aFuzzyValue=0.: the Fuzzy option is off
-  //  if aFuzzyValue>0.: the Fuzzy option is on
-  aBuilder.SetFuzzyValue(aFuzzyValue);
-  //
-  // safe mode - avoid modification of the arguments
-  Standard_Boolean bSafeMode = Standard_True;
-  // if bSafeMode == Standard_True  - the safe mode is switched on
-  // if bSafeMode == Standard_False - the safe mode is switched off
-  aBuilder.SetNonDestructive(bSafeMode);
-  //
-  // gluing options - for coinciding arguments
-  BOPAlgo_GlueEnum aGlueOpt = BOPAlgo_GlueFull;
-  // if aGlueOpt == BOPAlgo_GlueOff   - the gluing mode is switched off
-  // if aGlueOpt == BOPAlgo_GlueShift - the gluing mode is switched on
-  // if aGlueOpt == BOPAlgo_GlueFull  - the gluing mode is switched on
-  aBuilder.SetGlue(aGlueOpt);
+  // Set options for the algorithm
+  // setting options for this algorithm is similar to setting options for GF algorithm (see "GF Usage" chapter)
+  ...
   //
   // run the algorithm 
   aBuilder.Build(); 
@@ -3190,27 +3410,8 @@ bclearobjects; bcleartools;
 baddobjects b1 b3
 baddtools b2
 #
-# set parallel processing mode
-# 1:  the parallel processing is switched on
-# 0:  the parallel processing is switched off
-brunparallel 1
-#
-# set Fuzzy value
-# 0.    : the Fuzzy option is off
-# >0. : the Fuzzy option is on
-bfuzzyvalue 0.
-#
-# set safe processing mode
-bnondestructive 1
-# set safe mode
-# 1 - the safe processing mode is switched on
-# 0 - the safe processing mode is switched off
-#
-# set gluing mode
-bglue 1
-# set the gluing mode
-# 1 or 2 - the gluing mode is switched on
-# 0 - the gluing mode is switched off
+# set options for the algorithm (see "GF Usage" chapter)
+...
 #
 # run the algorithm
 # r is the result of the operation
@@ -3244,28 +3445,9 @@ The following example illustrates how to use Cut operation:
   aBuilder.SetArguments(aLS);
   aBuilder.SetTools(aLT);
   //	
-  // set parallel processing mode 
-  // if  bRunParallel= Standard_True :  the parallel processing is switched on
-  // if  bRunParallel= Standard_False :  the parallel processing is switched off
-  aBuilder.SetRunParallel(bRunParallel);
-  //
-  // set Fuzzy value
-  // if aFuzzyValue=0.: the Fuzzy option is off
-  //  if aFuzzyValue>0.: the Fuzzy option is on
-  aBuilder.SetFuzzyValue(aFuzzyValue);
-  //
-  // safe mode - avoid modification of the arguments
-  Standard_Boolean bSafeMode = Standard_True;
-  // if bSafeMode == Standard_True  - the safe mode is switched on
-  // if bSafeMode == Standard_False - the safe mode is switched off
-  aBuilder.SetNonDestructive(bSafeMode);
-  //
-  // gluing options - for coinciding arguments
-  BOPAlgo_GlueEnum aGlueOpt = BOPAlgo_GlueFull;
-  // if aGlueOpt == BOPAlgo_GlueOff   - the gluing mode is switched off
-  // if aGlueOpt == BOPAlgo_GlueShift - the gluing mode is switched on
-  // if aGlueOpt == BOPAlgo_GlueFull  - the gluing mode is switched on
-  aBuilder.SetGlue(aGlueOpt);
+  // Set options for the algorithm
+  // setting options for this algorithm is similar to setting options for GF algorithm (see "GF Usage" chapter)
+  ...
   //
   // run the algorithm 
   aBuilder.Build(); 
@@ -3295,27 +3477,8 @@ bclearobjects; bcleartools;
 baddobjects b1 b3
 baddtools b2
 #
-# set parallel processing mode
-# 1:  the parallel processing is switched on
-# 0:  the parallel processing is switched off
-brunparallel 1
-#
-# set Fuzzy value
-# 0.    : the Fuzzy option is off
-# >0. : the Fuzzy option is on
-bfuzzyvalue 0.
-#
-# set safe processing mode
-bnondestructive 1
-# set safe mode
-# 1 - the safe processing mode is switched on
-# 0 - the safe processing mode is switched off
-# set gluing mode
-#
-bglue 1
-# set the gluing mode
-# 1 or 2 - the gluing mode is switched on
-# 0 - the gluing mode is switched off
+# set options for the algorithm (see "GF Usage" chapter)
+...
 #
 # run the algorithm
 # r is the result of the operation
@@ -3350,28 +3513,9 @@ The following example illustrates how to use Section operation:
   aBuilder.SetArguments(aLS);
   aBuilder.SetTools(aLT);
   //	
-  // set parallel processing mode 
-  // if  bRunParallel= Standard_True :  the parallel processing is switched on
-  // if  bRunParallel= Standard_False :  the parallel processing is switched off
-  aBuilder.SetRunParallel(bRunParallel);
-  //
-  // set Fuzzy value
-  // if aFuzzyValue=0.: the Fuzzy option is off
-  //  if aFuzzyValue>0.: the Fuzzy option is on
-  aBuilder.SetFuzzyValue(aFuzzyValue);
-  //
-  // safe mode - avoid modification of the arguments
-  Standard_Boolean bSafeMode = Standard_True;
-  // if bSafeMode == Standard_True  - the safe mode is switched on
-  // if bSafeMode == Standard_False - the safe mode is switched off
-  aBuilder.SetNonDestructive(bSafeMode);
-  //
-  // gluing options - for coinciding arguments
-  BOPAlgo_GlueEnum aGlueOpt = BOPAlgo_GlueFull;
-  // if aGlueOpt == BOPAlgo_GlueOff   - the gluing mode is switched off
-  // if aGlueOpt == BOPAlgo_GlueShift - the gluing mode is switched on
-  // if aGlueOpt == BOPAlgo_GlueFull  - the gluing mode is switched on
-  aBuilder.SetGlue(aGlueOpt);
+  // Set options for the algorithm
+  // setting options for this algorithm is similar to setting options for GF algorithm (see "GF Usage" chapter)
+  ...
   //
   // run the algorithm 
   aBuilder.Build(); 
@@ -3401,27 +3545,8 @@ bclearobjects; bcleartools;
 baddobjects b1 b3
 baddtools b2
 #
-# set parallel processing mode
-# 1:  the parallel processing is switched on
-# 0:  the parallel processing is switched off
-brunparallel 1
-#
-# set Fuzzy value
-# 0.    : the Fuzzy option is off
-# >0. : the Fuzzy option is on
-bfuzzyvalue 0.
-#
-# set safe processing mode
-bnondestructive 1
-# set safe mode
-# 1 - the safe processing mode is switched on
-# 0 - the safe processing mode is switched off
-#
-# set gluing mode
-bglue 1
-# set the gluing mode
-# 1 or 2 - the gluing mode is switched on
-# 0 - the gluing mode is switched off
+# set options for the algorithm (see "GF Usage" chapter)
+...
 #
 # run the algorithm
 # r is the result of the operation

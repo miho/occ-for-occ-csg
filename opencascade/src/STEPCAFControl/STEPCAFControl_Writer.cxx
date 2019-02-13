@@ -34,6 +34,8 @@
 #include <StepAP214_Protocol.hxx>
 #include <StepAP242_DraughtingModelItemAssociation.hxx>
 #include <StepAP242_GeometricItemSpecificUsage.hxx>
+#include <StepBasic_ConversionBasedUnitAndLengthUnit.hxx>
+#include <StepBasic_ConversionBasedUnitAndPlaneAngleUnit.hxx>
 #include <StepBasic_DerivedUnit.hxx>
 #include <StepBasic_DerivedUnitElement.hxx>
 #include <StepBasic_HArray1OfDerivedUnitElement.hxx>
@@ -233,7 +235,7 @@
 #include <XCAFDoc_Volume.hxx>
 #include <XCAFPrs.hxx>
 #include <XCAFPrs_DataMapIteratorOfDataMapOfStyleShape.hxx>
-#include <XCAFPrs_DataMapOfShapeStyle.hxx>
+#include <XCAFPrs_IndexedDataMapOfShapeStyle.hxx>
 #include <XCAFPrs_DataMapOfStyleShape.hxx>
 #include <XCAFPrs_Style.hxx>
 #include <XSControl_TransferWriter.hxx>
@@ -512,26 +514,26 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
   TDF_LabelSequence sublabels;
   for ( Standard_Integer i=1; i <= labels.Length(); i++ ) {
     TDF_Label L = labels.Value(i);
-    TopoDS_Shape dummy;
     if ( myLabels.IsBound ( L ) ) continue; // already processed
 
     TopoDS_Shape shape = XCAFDoc_ShapeTool::GetShape ( L );
     if ( shape.IsNull() ) continue;
-    
+
     // write shape either as a whole, or as multifile (with extern refs)
     if ( ! multi  ) {
       Actor->SetStdMode ( Standard_False );
 
       TDF_LabelSequence comp;
 
-      //for case when only part of assemby structure should be written in the document
+      //For case when only part of assemby structure should be written in the document
       //if specified label is component of the assembly then
       //in order to save location of this component in the high-level assembly
       //and save name of high-level assembly it is necessary to represent structure of high-level assembly 
       //as assembly with one component specified by current label. 
       //For that compound containing only specified component is binded to the label of the high-level assembly.
       //The such way full structure of high-level assembly was replaced on the assembly contaning one component.
-      if ( XCAFDoc_ShapeTool::IsComponent ( L ) )
+      //For case when free shape reference is (located root) also create an auxiliary assembly.
+      if ( XCAFDoc_ShapeTool::IsReference ( L ) )
       {
         TopoDS_Compound aComp;
         BRep_Builder aB;
@@ -545,7 +547,8 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
           if(XCAFDoc_ShapeTool::IsAssembly ( ref))
             XCAFDoc_ShapeTool::GetComponents ( ref, comp, Standard_True );
         }
-        L = L.Father();
+        if ( !XCAFDoc_ShapeTool::IsFree ( L ) )
+          L = L.Father();
       }
       else
       {
@@ -568,7 +571,8 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
       }
       myLabels.Bind ( L, shape );
       sublabels.Append ( L );
-      if ( XCAFDoc_ShapeTool::IsAssembly ( L ) )
+
+      if ( XCAFDoc_ShapeTool::IsAssembly ( L ) || XCAFDoc_ShapeTool::IsReference ( L ) )
         Actor->RegisterAssembly ( shape );
 
       writer.Transfer(shape,mode,Standard_False);
@@ -671,9 +675,9 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
     const Handle(XSControl_TransferWriter) &TW = this->ChangeWriter().WS()->TransferWriter();
     const Handle(Transfer_FinderProcess) &FP = TW->FinderProcess();
 
-    for ( int i = 1; i <= labels.Length(); i++ )
+    for ( int i = 1; i <= sublabels.Length(); i++ )
     {
-      TDF_Label L = labels.Value(i);
+      TDF_Label L = sublabels.Value(i);
 
       for ( TDF_ChildIterator it(L, Standard_True); it.More(); it.Next() )
       {
@@ -937,7 +941,9 @@ static Standard_Boolean getStyledItem(const TopoDS_Shape& S,
     // search for PSA of Monifold solid
     if ( !anSelItmHArr.IsNull() )
     {
-      for (Standard_Integer si = 1; si <= anSelItmHArr->Length(); si++) {
+      TColStd_SequenceOfTransient aNewseqRI;
+      Standard_Boolean isFilled = Standard_False;
+      for (Standard_Integer si = 1; si <= anSelItmHArr->Length() && !found; si++) {
         Handle(StepVisual_StyledItem) aSelItm =
           Handle(StepVisual_StyledItem)::DownCast(anSelItmHArr->Value(si));
 
@@ -945,13 +951,16 @@ static Standard_Boolean getStyledItem(const TopoDS_Shape& S,
           continue;
 
         // check that it is a stiled item for monifold solid brep
-        TopLoc_Location Loc;
-        TColStd_SequenceOfTransient aNewseqRI;
-        FindEntities ( Styles.FinderProcess(), aTopLevSh, Loc, aNewseqRI );
+        if (!isFilled)
+        {
+          TopLoc_Location Loc;
+          FindEntities(Styles.FinderProcess(), aTopLevSh, Loc, aNewseqRI);
+          isFilled = Standard_True;
+        }
         if ( aNewseqRI.Length() > 0 )
         {
           
-          Handle(StepRepr_RepresentationItem) anItem = aSelItm->Item();
+          const Handle(StepRepr_RepresentationItem)& anItem = aSelItm->Item();
           Standard_Boolean isSameMonSolBR = Standard_False;
           for (Standard_Integer mi = 1; mi <= aNewseqRI.Length(); mi++) {
             if ( !anItem.IsNull() && anItem == aNewseqRI.Value( mi ) ) {
@@ -965,7 +974,7 @@ static Standard_Boolean getStyledItem(const TopoDS_Shape& S,
         
         
         for (Standard_Integer jsi = 1; jsi <= aSelItm->NbStyles() && !found; jsi++) {
-          Handle(StepVisual_PresentationStyleAssignment) aFatherPSA = aSelItm->StylesValue(jsi);
+          const Handle(StepVisual_PresentationStyleAssignment)& aFatherPSA = aSelItm->StylesValue(jsi);
           // check for PSA for top-level (not Presentation style by contex for NAUO)
           if (aFatherPSA.IsNull() || aFatherPSA->IsKind(STANDARD_TYPE(StepVisual_PresentationStyleByContext)))
             continue;
@@ -1031,7 +1040,7 @@ static Standard_Boolean setDefaultInstanceColor (const Handle(StepVisual_StyledI
 //=======================================================================
 static void MakeSTEPStyles (STEPConstruct_Styles &Styles,
 			    const TopoDS_Shape &S,
-			    const XCAFPrs_DataMapOfShapeStyle &settings,
+			    const XCAFPrs_IndexedDataMapOfShapeStyle &settings,
 			    Handle(StepVisual_StyledItem) &override,
 			    TopTools_MapOfShape &Map,
                             const MoniTool_DataMapOfShapeTransient& myMapCompMDGPR,
@@ -1047,8 +1056,8 @@ static void MakeSTEPStyles (STEPConstruct_Styles &Styles,
   // check if shape has its own style (r inherits from ancestor)
   XCAFPrs_Style style;
   if ( inherit ) style = *inherit;
-  if ( settings.IsBound(S) ) {
-    XCAFPrs_Style own = settings.Find(S);
+  if ( settings.Contains(S) ) {
+    XCAFPrs_Style own = settings.FindFromKey(S);
     if ( !own.IsVisible() ) style.SetVisibility ( Standard_False );
     if ( own.IsSetColorCurv() ) style.SetColorCurv ( own.GetColorCurv() );
     if ( own.IsSetColorSurf() ) style.SetColorSurf ( own.GetColorSurf() );
@@ -1199,7 +1208,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteColors (const Handle(XSControl_Work
         continue;
     
     // collect settings set on that label
-    XCAFPrs_DataMapOfShapeStyle settings;
+    XCAFPrs_IndexedDataMapOfShapeStyle settings;
     TDF_LabelSequence seq;
     seq.Append ( L );
     XCAFDoc_ShapeTool::GetSubShapes ( L, seq );
@@ -1232,7 +1241,11 @@ Standard_Boolean STEPCAFControl_Writer::WriteColors (const Handle(XSControl_Work
       if ( ! style.IsSetColorCurv() && ! style.IsSetColorSurf() && isVisible ) continue;
 
       TopoDS_Shape sub = XCAFDoc_ShapeTool::GetShape ( lab );
-      settings.Bind ( sub, style );
+      XCAFPrs_Style* aMapStyle = settings.ChangeSeek (sub);
+      if (aMapStyle == NULL)
+        settings.Add ( sub, style );
+      else
+        *aMapStyle = style;
     }
     
     if ( settings.Extent() <=0 ) continue;
@@ -2168,62 +2181,65 @@ static StepBasic_Unit GetUnit(const Handle(StepRepr_RepresentationContext)& theR
                               const Standard_Boolean isAngle = Standard_False)
 {
   StepBasic_Unit aUnit;
+  Handle(StepBasic_NamedUnit) aCurrentUnit;
   if (isAngle) {
-    Handle(StepBasic_SiUnitAndPlaneAngleUnit) aSiPAU;
     Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext) aCtx =
       Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext)::DownCast(theRC);
     if(!aCtx.IsNull()) {
       for(Standard_Integer j = 1; j <= aCtx->NbUnits(); j++) {
-        if(aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndPlaneAngleUnit))) {
-          aSiPAU = Handle(StepBasic_SiUnitAndPlaneAngleUnit)::DownCast(aCtx->UnitsValue(j));
+        if (aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndPlaneAngleUnit)) ||
+            aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_ConversionBasedUnitAndPlaneAngleUnit))) {
+          aCurrentUnit = aCtx->UnitsValue(j);
           break;
         }
       }
     }
-    if(aSiPAU.IsNull()) {
+    if (aCurrentUnit.IsNull()) {
       Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx) aCtx1 =
         Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx)::DownCast(theRC);
       if(!aCtx1.IsNull()) {
         for(Standard_Integer j = 1; j <= aCtx1->NbUnits(); j++) {
-          if(aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndPlaneAngleUnit))) {
-            aSiPAU = Handle(StepBasic_SiUnitAndPlaneAngleUnit)::DownCast(aCtx1->UnitsValue(j));
+          if (aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndPlaneAngleUnit)) ||
+              aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_ConversionBasedUnitAndPlaneAngleUnit))) {
+            aCurrentUnit = aCtx1->UnitsValue(j);
             break;
           }
         }
       }
     }
-    if(aSiPAU.IsNull())
-      aSiPAU = new StepBasic_SiUnitAndPlaneAngleUnit;
-    aUnit.SetValue(aSiPAU);
+    if (aCurrentUnit.IsNull())
+      aCurrentUnit = new StepBasic_SiUnitAndPlaneAngleUnit;
   }
   else {
-    Handle(StepBasic_SiUnitAndLengthUnit) aSiLU;
     Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext) aCtx =
       Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext)::DownCast(theRC);
     if(!aCtx.IsNull()) {
       for(Standard_Integer j = 1; j <= aCtx->NbUnits(); j++) {
-        if(aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit))) {
-          aSiLU = Handle(StepBasic_SiUnitAndLengthUnit)::DownCast(aCtx->UnitsValue(j));
+        if (aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit)) ||
+            aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_ConversionBasedUnitAndLengthUnit))) {
+          aCurrentUnit = aCtx->UnitsValue(j);
           break;
         }
       }
     }
-    if(aSiLU.IsNull()) {
+    if (aCurrentUnit.IsNull()) {
       Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx) aCtx1 =
         Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx)::DownCast(theRC);
       if(!aCtx1.IsNull()) {
         for(Standard_Integer j = 1; j <= aCtx1->NbUnits(); j++) {
-          if(aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit))) {
-            aSiLU = Handle(StepBasic_SiUnitAndLengthUnit)::DownCast(aCtx1->UnitsValue(j));
+          if (aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit)) ||
+              aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_ConversionBasedUnitAndLengthUnit))) {
+            aCurrentUnit = aCtx1->UnitsValue(j);
             break;
           }
         }
       }
     }
-    if(aSiLU.IsNull())
-      aSiLU = new StepBasic_SiUnitAndLengthUnit;
-    aUnit.SetValue(aSiLU);
+    if (aCurrentUnit.IsNull())
+      aCurrentUnit = new StepBasic_SiUnitAndLengthUnit;
   }
+
+  aUnit.SetValue(aCurrentUnit);
   return aUnit;
 }
 
@@ -3513,33 +3529,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSe
     Model->AddWithRefs(SDR);
     // define aUnit for creation LengthMeasureWithUnit (common for all)
     StepBasic_Unit aUnit;
-    Handle(StepBasic_SiUnitAndLengthUnit) SLU;
-    Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext) Ctx =
-      Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext)::DownCast(RC);
-    if(!Ctx.IsNull()) {
-      for(Standard_Integer j=1; j<=Ctx->NbUnits(); j++) {
-        if(Ctx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit))) {
-          SLU = Handle(StepBasic_SiUnitAndLengthUnit)::DownCast(Ctx->UnitsValue(j));
-          break;
-        }
-      }
-    }
-    if(SLU.IsNull()) {
-      Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx) Ctx1 =
-        Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx)::DownCast(RC);
-      if(!Ctx1.IsNull()) {
-        for(Standard_Integer j=1; j<=Ctx1->NbUnits(); j++) {
-          if(Ctx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit))) {
-            SLU = Handle(StepBasic_SiUnitAndLengthUnit)::DownCast(Ctx1->UnitsValue(j));
-            break;
-          }
-        }
-      }
-    }
-    if(SLU.IsNull()) {
-      SLU = new StepBasic_SiUnitAndLengthUnit;
-    }
-    aUnit.SetValue(SLU);
+    aUnit = GetUnit(RC);
 
     // specific part of writing D&GT entities
     if(kind<20) { //dimension

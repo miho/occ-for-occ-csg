@@ -90,7 +90,7 @@ script:
     
     - if [ "$BUILD_SUCCESS" != true ]; then echo ">> skipping build until ccache and compilation of occ works. restart task or schedule new task."; else echo ">> all good. BUILD_SUCCESS=true"; fi
     
-    - echo "PWD: $(pwd)"
+    - echo "PWD:" && pwd
     
     - echo "HOME:" && ls $OUR_DIR
     

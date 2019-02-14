@@ -88,19 +88,17 @@ script:
     - touch install_out.txt
     - tail -n 30 install_out.txt
     
-    - if [ "$BUILD_SUCCESS" != true ]; then echo ">> skipping build until ccache and compilation of occ works. restart task or schedule new task."; fi
-    
-    - echo "BUILD_SUCCESS: $BUILD_SUCCESS"
+    - if [ "$BUILD_SUCCESS" != true ]; then echo ">> skipping build until ccache and compilation of occ works. restart task or schedule new task."; else echo ">> all good. BUILD_SUCCESS=true"; fi
     
     - echo "PWD: $(pwd)"
     
     - echo "HOME:" && ls $OUR_DIR
     
-    - echo "INSTALL (!!!):"
-    - ls $OUR_DIR/opencascade-installation/*
-    
-    - echo "INSTALL:"
+    - echo "INSTALL 1/2:"
     - ls $OUR_DIR/opencascade-installation/
+    
+    - echo "INSTALL 2/2:"
+    - ls $OUR_DIR/opencascade-installation/*
     
     
     # finally build and test occ-csg
@@ -129,6 +127,7 @@ deploy:
     
       on:
         condition: $TRAVIS_OS_NAME = linux
+        condition: $BUILD_SUCCESS = true
         tags: true
         #repo: miho/OCC-CSG
         
@@ -143,5 +142,6 @@ deploy:
     
       on:
         condition: $TRAVIS_OS_NAME = osx
+        condition: $BUILD_SUCCESS = true
         tags: true
         #repo: miho/OCC-CSG     

@@ -90,7 +90,14 @@ script:
     
     - if [ "$BUILD_SUCCESS" != true ]; then echo ">> skipping build until ccache and compilation of occ works. restart task or schedule new task."; fi
     
+    - echo "BUILD_SUCCESS: $BUILD_SUCCESS"
+    
+    - echo "PWD: $(pwd)"
+    
     - echo "HOME:" && ls $OUR_DIR
+    
+    - echo "INSTALL (!!!):"
+    - ls $OUR_DIR/opencascade-installation/*
     
     - echo "INSTALL:"
     - ls $OUR_DIR/opencascade-installation/

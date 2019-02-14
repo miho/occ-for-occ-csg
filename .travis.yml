@@ -94,11 +94,8 @@ script:
     
     - echo "HOME:" && ls $OUR_DIR
     
-    - echo "INSTALL 1/2:"
+    - echo "INSTALL:"
     - ls $OUR_DIR/opencascade-installation/
-    
-    - echo "INSTALL 2/2:"
-    - ls $OUR_DIR/opencascade-installation/*
     
     
     # finally build and test occ-csg

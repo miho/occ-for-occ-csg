@@ -253,7 +253,7 @@ void XCAFPrs::CollectStyleSettings (const TDF_Label& theLabel,
 
         // set style for all component from Next Usage Occurrence.
       #ifdef OCCT_DEBUG
-        cout << "Set the style for SHUO next_usage-occurrance" << endl;
+        std::cout << "Set the style for SHUO next_usage-occurrance" << std::endl;
       #endif
         /* 
         // may be work, but static it returns excess shapes. It is more faster to use OLD version.
@@ -303,8 +303,7 @@ void XCAFPrs::CollectStyleSettings (const TDF_Label& theLabel,
     TopoDS_Shape aSubshape = XCAFDoc_ShapeTool::GetShape (aLabel);
     if (aSubshape.ShapeType() == TopAbs_COMPOUND)
     {
-      const TopoDS_Iterator aShapeIter (aSubshape);
-      if (!aShapeIter.More())
+      if (aSubshape.NbChildren() == 0)
       {
         continue;
       }

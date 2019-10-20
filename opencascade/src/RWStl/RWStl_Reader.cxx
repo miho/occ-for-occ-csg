@@ -75,9 +75,13 @@ namespace
       return (thePnt1 - thePnt2).SquareModulus() < Precision::SquareConfusion();
     }
 
-    static Standard_Integer HashCode (const gp_XYZ& thePnt, Standard_Integer theUpper)
+    //! Computes a hash code for the point, in the range [1, theUpperBound]
+    //! @param thePoint the point which hash code is to be computed
+    //! @param theUpperBound the upper bound of the range a computing hash code must be within
+    //! @return a computed hash code, in the range [1, theUpperBound]
+    static Standard_Integer HashCode (const gp_XYZ& thePoint, const Standard_Integer theUpperBound)
     {
-      return ::HashCode (thePnt.X() * M_LN10 + thePnt.Y() * M_PI + thePnt.Z() * M_E, theUpper);
+      return ::HashCode (thePoint.X() * M_LN10 + thePoint.Y() * M_PI + thePoint.Z() * M_E, theUpperBound);
     }
 
   private:
@@ -222,17 +226,24 @@ Standard_Boolean RWStl_Reader::IsAscii (Standard_IStream& theStream)
   #define sscanf_l(theBuffer, theLocale, theFormat, ...) sscanf(theBuffer, theFormat, __VA_ARGS__)
 #endif
 
-// Macro to get 64-bit position of the file from streampos
-#if defined(_MSC_VER)
+// Macro to get 64-bit position of the file from std::streampos
+#if defined(_MSC_VER) && _MSC_VER < 1700
+  // In MSVC 2010, cast of std::streampos to 64-bit int is implemented incorrectly;
+  // work-around (relevant for files larger than 4 GB) is to use internal function seekpos(). 
+  // Since MSVC 15.8, seekpos() is deprecated and is said to always return 0.
   #define GETPOS(aPos) aPos.seekpos()
 #else
   #define GETPOS(aPos) ((int64_t)aPos)
 #endif
 
+# if defined(_MSC_VER) && ! defined(strncasecmp)
+#  define strncasecmp _strnicmp
+# endif
+
 static inline bool str_starts_with (const char* theStr, const char* theWord, int theN)
 {
   while (isspace (*theStr) && *theStr != '\0') theStr++;
-  return !strncmp (theStr, theWord, theN);
+  return !strncasecmp (theStr, theWord, theN); 
 }
 
 static bool ReadVertex (const char* theStr, double& theX, double& theY, double& theZ)
@@ -416,7 +427,7 @@ Standard_Boolean RWStl_Reader::ReadBinary (Standard_IStream& theStream,
       const std::streamsize aDataToRead = aNbFacesInBuffer * aFaceDataLen;
       if (theStream.read (aBuffer, aDataToRead).gcount() != aDataToRead)
       {
-        Message::DefaultMessenger()->Send ("Error: read filed", Message_Fail);
+        Message::DefaultMessenger()->Send ("Error: binary STL read failed", Message_Fail);
         return false;
       }
       aBufferPtr = aBuffer;

@@ -55,6 +55,9 @@
 #include <Draw_Marker3D.hxx>
 #include <Draw_MarkerShape.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
+
+#include <Standard_Dump.hxx>
+
 #include <stdio.h>
 
 Standard_IMPORT Draw_Viewer dout;
@@ -66,6 +69,12 @@ Standard_IMPORT Draw_Viewer dout;
 static void ConvertBndToShape(const Bnd_OBB& theBox,
                               const char* const theName)
 {
+  if (theBox.IsVoid())
+  {
+    DBRep::Set (theName, TopoDS_Shape());
+    return;
+  }
+
   const gp_Pnt &aBaryCenter = theBox.Center();
   const gp_XYZ &aXDir = theBox.XDirection(),
                &aYDir = theBox.YDirection(),
@@ -216,7 +225,7 @@ static Standard_Integer deform(Draw_Interpretor& di,Standard_Integer n,const cha
   //    TopoDS_Shape S = DBRep::Get(a[i]);
   TopoDS_Shape S = DBRep::Get(a[2]);    
   if (S.IsNull()) {
-    //cout << a[2] << " is not a valid shape" << endl;
+    //std::cout << a[2] << " is not a valid shape" << std::endl;
     di << a[2] << " is not a valid shape\n";
   }
   else {
@@ -262,9 +271,9 @@ static Standard_Integer tcopy(Draw_Interpretor& di,Standard_Integer n,const char
   }
 
   if (n < 3 || (n - iFirst) % 2) {
-    cout << "Use: " << a[0] << " [-n(ogeom)] [-m(esh)] shape1 copy1 [shape2 copy2 [...]]" << endl;
-    cout << "Option -n forbids copying of geometry (it will be shared)" << endl;
-    cout << "Option -m forces copying of mesh (disabled by default)" << endl;
+    std::cout << "Use: " << a[0] << " [-n(ogeom)] [-m(esh)] shape1 copy1 [shape2 copy2 [...]]" << std::endl;
+    std::cout << "Option -n forbids copying of geometry (it will be shared)" << std::endl;
+    std::cout << "Option -m forces copying of mesh (disabled by default)" << std::endl;
     return 1;
   }
 
@@ -291,7 +300,7 @@ static Standard_Integer nurbsconvert(Draw_Interpretor& di,Standard_Integer n,con
   for (Standard_Integer i=0; i<(n-1)/2; i++) {
     TopoDS_Shape S = DBRep::Get(a[2*i+2]);
     if (S.IsNull()) {
-      //cout << a[2*i+2] << " is not a valid shape" << endl;
+      //std::cout << a[2*i+2] << " is not a valid shape" << std::endl;
       di << a[2*i+2] << " is not a valid shape\n";
     }
     else {
@@ -455,6 +464,29 @@ static Standard_Integer getcoords(Draw_Interpretor& di,Standard_Integer n,const 
   return 0;
 }
 
+//! Parse 6 real values for defining AABB.
+static Standard_Boolean parseMinMax (const char** theArgVec, Bnd_Box& theBox)
+{
+  const TCollection_AsciiString aMin[3] = { theArgVec[0], theArgVec[1], theArgVec[2] };
+  const TCollection_AsciiString aMax[3] = { theArgVec[3], theArgVec[4], theArgVec[5] };
+  if (!aMin[0].IsRealValue()
+   || !aMin[1].IsRealValue()
+   || !aMin[2].IsRealValue()
+   || !aMax[0].IsRealValue()
+   || !aMax[1].IsRealValue()
+   || !aMax[2].IsRealValue())
+  {
+    return Standard_False;
+  }
+
+  const gp_Pnt aPntMin (aMin[0].RealValue(), aMin[1].RealValue(), aMin[2].RealValue());
+  const gp_Pnt aPntMax (aMax[0].RealValue(), aMax[1].RealValue(), aMax[2].RealValue());
+  theBox.SetVoid();
+  theBox.Add (aPntMin);
+  theBox.Add (aPntMax);
+  return Standard_True;
+}
+
 //=======================================================================
 //function : BoundBox
 //purpose  : 
@@ -463,200 +495,143 @@ static Standard_Integer BoundBox(Draw_Interpretor& theDI,
                                  Standard_Integer theNArg,
                                  const char** theArgVal)
 {
-  if(theNArg < 2)
-  {
-    theDI << "Use: " << theArgVal[0] << " {-s shape | -c xmin ymin zmin xmax ymax zmax} "
-             "[-obb]\n\t\t[-shape name] [-dump] [-notriangulation]\n\t\t"
-             "[-perfmeter name NbIters] [-nodraw] [-optimal] [-exttoler]\n\t\t"
-             "[-save xmin ymin zmin xmax ymax zmax]\n\n\n";
-
-    theDI << "Computes a bounding box (BndBox). Two types of the source data are supported:\n";
-    theDI << "  * \"-s\"-option sets the shape, which will be circumscribed by the BndBox;\n";
-    theDI << "  * \"-c\"-option sets two opposite corners (having (xmin, ymin, zmin) and\n\t"
-             "(xmax, ymax, zmax) coordinates) of the resulting\n\taxis-aligned BndBox (AABB).\n";
-    theDI << "\nThe following options are supported:\n";
-    theDI << "  * \"-obb\". If it is switched on then the oriented BndBox (OBB) will "
-             "be\n\tcreated. Otherwise, AABB will be created.\n";
-    theDI << "  * \"-shape\". If it is switched on then the resulting BndBox will be "
-             "stored\n\tas a shape (solid) with specified name.\n";
-    theDI << "  * \"-nodraw\". If it is switched on then the resulting BndBox will not be\n\t"
-             "drawn as DRAW-object.\n";
-    theDI << "  * \"-dump\". Prints the information about the created BndBox.\n";
-    theDI << "  * \"-notriangulation\". By default, AABB is built from existing mesh.\n\t"
-             "This option allows ignoring triangulation.\n";
-    theDI << "  * \"-save\". Stores the information about created AABB in "
-             "specified variables.\n";
-    theDI << "  * \"-optimal\". If it is switched on then the AABB will be optimal.\n\t"
-             "This option is useful for OBB, too. It allows constructing\n\toptimal "
-             "initial AABB.\n";
-    theDI << "  * \"-exttoler\". If it is switched on then the resulting box will be "
-             "extended\n\ton the tolerance of the source shape.\n";
-    theDI << "  * \"-perfmeter\" - Auxiliary option. It provides compatibility "
-             "with\n\tOCCT-test system. \"name\" is the counter name for "
-             "\"chrono\"-TCL-command.\n\tNbIters is the number of iterations.\n";
-    return 1;
-  }
+  // 1. Parse arguments
 
   TopoDS_Shape aShape;
-  
+  Bnd_Box anAABB;
+
+  Standard_Boolean doPrint = Standard_False;
+  Standard_Boolean doDumpJson = Standard_False;
+  Standard_Boolean useOldSyntax = Standard_False;
   Standard_Boolean isOBB = Standard_False;
-  Standard_Boolean hasToPrint = Standard_False,
-                   isTriangulationReq = Standard_True,
-                   isOptimal = Standard_False,
-                   isTolerUsed = Standard_False,
-                   hasToDraw = Standard_True;
-  Standard_Integer aNbIters = 1;
-  Standard_Integer aStartIdxToSave = -1,
-                   aStartIdxToCreate = -1,
-                   aNameToShape = -1,
-                   anIdxCounterName = -1;
-
-  for(Standard_Integer anAIdx = 1; anAIdx < theNArg; anAIdx++)
+  Standard_Boolean isTriangulationReq = Standard_True;
+  Standard_Boolean isOptimal = Standard_False;
+  Standard_Boolean isTolerUsed = Standard_False;
+  Standard_Boolean isFinitePart = Standard_False;
+  Standard_Boolean hasToDraw = Standard_True;
+  
+  TCollection_AsciiString anOutVars[6];
+  TCollection_AsciiString aResShapeName;
+  for (Standard_Integer anArgIter = 1; anArgIter < theNArg; ++anArgIter)
   {
-    if(theArgVal[anAIdx][0] != '-')
-    {
-      theDI << "Error: Wrong option \"" << theArgVal[anAIdx] << 
-               "\". Please use \'-\' symbol\n";
-      return 1;
-    }
-
-    if(!strcmp(theArgVal[anAIdx], "-s"))
-    {
-      aShape = DBRep::Get(theArgVal[++anAIdx]);
-      if(aShape.IsNull())
-      {
-        theDI << "Error: Argument " << theArgVal[anAIdx] << " is not a shape.\n";
-        return 1;
-      }
-    }
-    else if(!strcmp(theArgVal[anAIdx], "-c"))
-    {
-      aStartIdxToCreate = anAIdx + 1;
-      anAIdx += 6;
-    }
-    else if(!strncmp(theArgVal[anAIdx], "-obb", 4))
+    TCollection_AsciiString anArgCase (theArgVal[anArgIter]);
+    anArgCase.LowerCase();
+    if (anArgCase == "-obb")
     {
       isOBB = Standard_True;
     }
-    else if(!strncmp(theArgVal[anAIdx], "-shape", 4))
+    else if (anArgCase == "-aabb")
     {
-      aNameToShape = ++anAIdx;
+      isOBB = Standard_False;
     }
-    else if(!strncmp(theArgVal[anAIdx], "-dump", 4))
+    else if (anArgCase == "-shape"
+          && anArgIter + 1 < theNArg
+          && aResShapeName.IsEmpty())
     {
-      hasToPrint = Standard_True;
+      aResShapeName = theArgVal[++anArgIter];
+      hasToDraw = Standard_False;
     }
-    else if(!strncmp(theArgVal[anAIdx], "-save", 4))
+    else if (anArgCase == "-dump"
+          || anArgCase == "-print")
     {
-      aStartIdxToSave = anAIdx+1;
-      anAIdx += 6;
+      doPrint = Standard_True;
     }
-    else if(!strncmp(theArgVal[anAIdx], "-notriangulation", 9))
+    else if (anArgCase == "-dumpjson")
+    {
+      doDumpJson = Standard_True;
+    }
+    else if (anArgCase == "-save"
+          && anArgIter + 6 < theNArg
+          && anOutVars[0].IsEmpty())
+    {
+      for (int aCompIter = 0; aCompIter < 6; ++aCompIter)
+      {
+        anOutVars[aCompIter] = theArgVal[anArgIter + aCompIter + 1];
+      }
+      anArgIter += 6;
+    }
+    else if (anArgCase == "-notriangulation")
     {
       isTriangulationReq = Standard_False;
     }
-    else if(!strncmp(theArgVal[anAIdx], "-perfmeter", 8))
-    {
-      anIdxCounterName = ++anAIdx;
-      aNbIters = Draw::Atoi(theArgVal[++anAIdx]);
-    }
-    else if(!strncmp(theArgVal[anAIdx], "-optimal", 4))
+    else if (anArgCase == "-optimal")
     {
       isOptimal = Standard_True;
     }
-    else if(!strcmp(theArgVal[anAIdx], "-exttoler"))
+    else if (anArgCase == "-exttoler")
     {
       isTolerUsed = Standard_True;
     }
-    else if(!strcmp(theArgVal[anAIdx], "-nodraw"))
+    else if (anArgCase == "-nodraw")
     {
       hasToDraw = Standard_False;
     }
+    else if (anArgCase == "-finite"
+          || anArgCase == "-finitepart")
+    {
+      isFinitePart = Standard_True;
+    }
+    else if (aShape.IsNull()
+         && !DBRep::Get (theArgVal[anArgIter]).IsNull())
+    {
+      aShape = DBRep::Get (theArgVal[anArgIter]);
+    }
+    else if (anAABB.IsVoid()
+          && anArgIter + 5 < theNArg
+          && parseMinMax (theArgVal + anArgIter, anAABB))
+    {
+      anArgIter += 5;
+    }
     else
     {
-      theDI << "Error: Unknown option  \"" << theArgVal[anAIdx] << "\".\n";
+      std::cout << "Syntax error at argument '" << theArgVal[anArgIter] << "'.\n";
       return 1;
     }
   }
 
-  if(aShape.IsNull() && (aStartIdxToCreate < 0))
+  if (anAABB.IsVoid()
+   && aShape.IsNull())
   {
-    theDI << "Error: One of the options \'-s\' or \'-c\' must be set necessarily.\n";
+    std::cout << "Syntax error: input is not specified (neither shape nor coordinates)\n";
+    return 1;
+  }
+  else if (!anAABB.IsVoid()
+        && (isOBB || isOptimal || isTolerUsed))
+  {
+    std::cout << "Syntax error: Options -obb, -optimal and -extToler cannot be used for explicitly defined AABB.\n";
+    return 1;
+  }
+  else if (isOBB
+       && !anOutVars[0].IsEmpty())
+  {
+    std::cout << "Error: Option -save works only with axes-aligned boxes.\n";
     return 1;
   }
 
-  if(aStartIdxToCreate > 0)
+  // enable printing (old syntax) if neither saving to shape nor to DRAW variables is requested
+  if (! doPrint && ! doDumpJson && anOutVars[0].IsEmpty() && aResShapeName.IsEmpty())
   {
-    if(!aShape.IsNull())
-    {
-      theDI << "Error: Options \'-s\' and \'-c\' are fail for using simultaneously.\n";
-      return 1;
-    }
-    else if(isOBB)
-    {
-      theDI << "Error: Options \'-c\' and \"-obb\" are fail for using simultaneously.\n";
-      return 1;
-    }
+    doPrint = Standard_True;
+    useOldSyntax = Standard_True;
   }
 
-  if(isOptimal)
-  {
-    if(aShape.IsNull())
-    {
-      theDI << "Error: Options \"-optimal\" is used without any shape. "
-               "Use \'-s\'-option.\n";
-      return 1;
-    }
-  }
-
-  if(isTolerUsed)
-  {
-    if(aShape.IsNull())
-    {
-      theDI << "Error: Option \"-exttoler\" is used without any shape. "
-        "Use \'-s\'-option.\n";
-      return 1;
-    }
-  }
-
+  // 2. Compute box and save results
   Handle(Draw_Box) aDB;
-  OSD_Timer aTimer;
-
-  if(isOBB)
+  if (isOBB)
   {
-    if(aStartIdxToSave > 0)
-    {
-      theDI << "Error: Option \"-save\" work only with axes-aligned boxes.\n";
-      return 1;
-    }
-
     Bnd_OBB anOBB;
-    Standard_Integer aN = aNbIters;
+    BRepBndLib::AddOBB(aShape, anOBB, isTriangulationReq, isOptimal, isTolerUsed);
 
-    aTimer.Start();
-    while(aN-- > 0)
-    {
-      anOBB.SetVoid();
-      BRepBndLib::AddOBB(aShape, anOBB, isTriangulationReq, isOptimal, isTolerUsed);
-    }
-    aTimer.Stop();
-
-    if(anOBB.IsVoid())
+    if (anOBB.IsVoid())
     {
       theDI << "Void box.\n";
-      hasToPrint = Standard_False;
     }
-
-    const gp_Pnt &aBaryCenter= anOBB.Center();
-    const gp_XYZ &aXDir = anOBB.XDirection(),
-                 &aYDir = anOBB.YDirection(),
-                 &aZDir = anOBB.ZDirection();
-    Standard_Real aHalfX = anOBB.XHSize(), 
-                  aHalfY = anOBB.YHSize(),
-                  aHalfZ = anOBB.ZHSize();
-
-    if(hasToPrint)
+    else if (doPrint)
     {
+      const gp_Pnt &aBaryCenter= anOBB.Center();
+      const gp_XYZ &aXDir = anOBB.XDirection(),
+                   &aYDir = anOBB.YDirection(),
+                   &aZDir = anOBB.ZDirection();
       theDI << "Oriented bounding box\n";
       theDI << "Center: " << aBaryCenter.X() << " " << 
                              aBaryCenter.Y() << " " <<
@@ -664,116 +639,125 @@ static Standard_Integer BoundBox(Draw_Interpretor& theDI,
       theDI << "X-axis: " << aXDir.X() << " " << aXDir.Y() << " " << aXDir.Z() << "\n";
       theDI << "Y-axis: " << aYDir.X() << " " << aYDir.Y() << " " << aYDir.Z() << "\n";
       theDI << "Z-axis: " << aZDir.X() << " " << aZDir.Y() << " " << aZDir.Z() << "\n";
-      theDI << "Half X: " << aHalfX << "\n" << 
-               "Half Y: " << aHalfY << "\n" << "Half Z: " << aHalfZ << "\n";
+      theDI << "Half X: " << anOBB.XHSize() << "\n"
+            << "Half Y: " << anOBB.YHSize() << "\n"
+            << "Half Z: " << anOBB.ZHSize() << "\n";
     }
-    
-    if(hasToDraw)
-      aDB = new Draw_Box(anOBB, Draw_orange);
 
-    if(aNameToShape > 0)
+    if (doDumpJson)
     {
-      ConvertBndToShape(anOBB, theArgVal[aNameToShape]);
+      Standard_SStream aStream;
+      anOBB.DumpJson (aStream);
+
+      theDI << "Oriented bounding box\n";
+      theDI << Standard_Dump::FormatJson (aStream);
+    }
+
+    if (hasToDraw
+    && !anOBB.IsVoid())
+    {
+      aDB = new Draw_Box (anOBB, Draw_orange);
+    }
+
+    if (!aResShapeName.IsEmpty())
+    {
+      ConvertBndToShape (anOBB, aResShapeName.ToCString());
     }
   }
   else // if(!isOBB)
   {
-    Standard_Real aXmin = RealFirst(), aYmin = RealFirst(), aZmin = RealFirst(),
-                  aXMax = RealLast(), aYMax = RealLast(), aZMax = RealLast();
-
-    Bnd_Box anAABB;
-
-    if(aStartIdxToCreate < 0)
+    if (!aShape.IsNull())
     {
-      Standard_Integer aN = aNbIters;
+      anAABB.SetVoid ();
       if(isOptimal)
       {
-        aTimer.Start();
-        while(aN-- > 0)
-        {
-          anAABB.SetVoid();
-          BRepBndLib::AddOptimal(aShape, anAABB, isTriangulationReq, isTolerUsed);
-        }
-        aTimer.Stop();
+        BRepBndLib::AddOptimal (aShape, anAABB, isTriangulationReq, isTolerUsed);
       }
       else
       {
-        aTimer.Start();
-        while(aN-- > 0)
-        {
-          anAABB.SetVoid();
-          BRepBndLib::Add(aShape, anAABB, isTriangulationReq);
-        }
-        aTimer.Stop();
+        BRepBndLib::Add (aShape, anAABB, isTriangulationReq);
       }
+    }
+
+    if (anAABB.IsVoid())
+    {
+      theDI << "Void box.\n";
     }
     else
     {
-      if(anIdxCounterName > 0)
+      if (isFinitePart && anAABB.IsOpen())
       {
-        theDI << "Error: Option \"-perfmeter\"does not work if the option \'-c\' "
-                 "is switched on.\n";
-        return 1;
+        anAABB = anAABB.FinitePart();
+      }
+      const gp_Pnt aMin = anAABB.CornerMin();
+      const gp_Pnt aMax = anAABB.CornerMax();
+
+      // print to DRAW
+      if (doPrint)
+      {
+        if (useOldSyntax)
+        {
+          theDI << aMin.X() << " " << aMin.Y() << " " << aMin.Z() << " "
+                << aMax.X() << " " << aMax.Y() << " " << aMax.Z() << "\n";
+        }
+        else
+        {
+          theDI << "Axes-aligned bounding box\n";
+          theDI << "X-range: " << aMin.X() << " " << aMax.X() << "\n"
+                << "Y-range: " << aMin.Y() << " " << aMax.Y() << "\n"
+                << "Z-range: " << aMin.Z() << " " << aMax.Z() << "\n";
+          if (anAABB.IsOpen()
+           && anAABB.HasFinitePart())
+          {
+            Bnd_Box aFinitAabb = anAABB.FinitePart();
+            const gp_Pnt aFinMin = aFinitAabb.CornerMin();
+            const gp_Pnt aFinMax = aFinitAabb.CornerMax();
+            theDI << "Finite part\n";
+            theDI << "X-range: " << aFinMin.X() << " " << aFinMax.X() << "\n"
+                  << "Y-range: " << aFinMin.Y() << " " << aFinMax.Y() << "\n"
+                  << "Z-range: " << aFinMin.Z() << " " << aFinMax.Z() << "\n";
+          }
+        }
       }
 
-      Standard_Integer anIdx = aStartIdxToCreate;
-      aXmin = Draw::Atof(theArgVal[anIdx++]);
-      aYmin = Draw::Atof(theArgVal[anIdx++]);
-      aZmin = Draw::Atof(theArgVal[anIdx++]);
-      aXMax = Draw::Atof(theArgVal[anIdx++]);
-      aYMax = Draw::Atof(theArgVal[anIdx++]);
-      aZMax = Draw::Atof(theArgVal[anIdx++]);
-
-      anAABB.Add(gp_Pnt(aXmin, aYmin, aZmin));
-      anAABB.Add(gp_Pnt(aXMax, aYMax, aZMax));
-    }
-
-    if(anAABB.IsVoid())
-    {
-      theDI << "Void box.\n";
-      hasToPrint = Standard_False;
-    }
-
-    if(hasToPrint || (aStartIdxToSave>0))
-    {
-      anAABB.Get(aXmin, aYmin, aZmin, aXMax, aYMax, aZMax);
-
-      if(hasToPrint)
+      if (doDumpJson)
       {
-        theDI << "Axes-aligned bounding box\n";
-        theDI << "X-range: " << aXmin << " " << aXMax << "\n" <<
-                 "Y-range: " << aYmin << " " << aYMax << "\n" <<
-                 "Z-range: " << aZmin << " " << aZMax << "\n";
+        Standard_SStream aStream;
+        anAABB.DumpJson (aStream);
+
+        theDI << "Bounding box\n";
+        theDI << Standard_Dump::FormatJson (aStream);
       }
 
-      if(aStartIdxToSave > 0)
+      // save DRAW variables
+      if (!anOutVars[0].IsEmpty())
       {
-        Draw::Set(theArgVal[aStartIdxToSave++], aXmin);
-        Draw::Set(theArgVal[aStartIdxToSave++], aYmin);
-        Draw::Set(theArgVal[aStartIdxToSave++], aZmin);
-        Draw::Set(theArgVal[aStartIdxToSave++], aXMax);
-        Draw::Set(theArgVal[aStartIdxToSave++], aYMax);
-        Draw::Set(theArgVal[aStartIdxToSave++], aZMax);
+        Draw::Set (anOutVars[0].ToCString(), aMin.X());
+        Draw::Set (anOutVars[1].ToCString(), aMin.Y());
+        Draw::Set (anOutVars[2].ToCString(), aMin.Z());
+        Draw::Set (anOutVars[3].ToCString(), aMax.X());
+        Draw::Set (anOutVars[4].ToCString(), aMax.Y());
+        Draw::Set (anOutVars[5].ToCString(), aMax.Z());
+      }
+
+      // add presentation to DRAW viewer
+      if (hasToDraw)
+      {
+        aDB = new Draw_Box (anAABB, Draw_orange);
       }
     }
 
-    if(hasToDraw)
-      aDB = new Draw_Box(anAABB, Draw_orange);
-
-    if(aNameToShape > 0)
+    // save as shape
+    if (!aResShapeName.IsEmpty())
     {
-      ConvertBndToShape(anAABB, theArgVal[aNameToShape]);
+      ConvertBndToShape (anAABB, aResShapeName.ToCString());
     }
   }
 
-  if(hasToDraw)
-    dout << aDB;
-
-  if(anIdxCounterName > 0)
+  if (!aDB.IsNull())
   {
-    theDI << "COUNTER " << theArgVal[anIdxCounterName] << ": " << aTimer.ElapsedTime() << "\n";
+    dout << aDB;
   }
-
   return 0;
 }
 
@@ -941,7 +925,7 @@ static Standard_Integer findplane(Draw_Interpretor& di,Standard_Integer n,const 
   BRepBuilderAPI_FindPlane a_plane_finder(S,
 				   tolerance) ;
   if (a_plane_finder.Found()) {
-    //cout << " a plane is found "   ;
+    //std::cout << " a plane is found "   ;
     di << " a plane is found \n";
     const Handle(Geom_Geometry)& aSurf = a_plane_finder.Plane(); // to avoid ambiguity
     DrawTrSurf::Set(a[2],aSurf) ;
@@ -958,7 +942,7 @@ static Standard_Integer precision(Draw_Interpretor& di,Standard_Integer n,const 
   n--;
 
   if ( n == 0) {
-    //cout << " Current Precision = " << BRepBuilderAPI::Precision() << endl;
+    //std::cout << " Current Precision = " << BRepBuilderAPI::Precision() << std::endl;
     di << " Current Precision = " << BRepBuilderAPI::Precision() << "\n";
   }
   else {
@@ -983,7 +967,7 @@ static Standard_Integer reperageshape(Draw_Interpretor& di, Standard_Integer nar
   const char *id1 = a[1];
   TopoDS_Shape TheShape1 = DBRep::Get(id1);
   
-  //cout << "Pick positions with button "<<endl;
+  //std::cout << "Pick positions with button "<<std::endl;
   di << "Pick positions with button \n";
   Standard_Integer id,X,Y,b;
   gp_Trsf T;
@@ -1005,7 +989,7 @@ static Standard_Integer reperageshape(Draw_Interpretor& di, Standard_Integer nar
   
   Inter.Perform(Axe,-RealLast(),RealLast());
   
-  //cout<<"\n --> ";
+  //std::cout<<"\n --> ";
   di <<"\n --> ";
   if(Inter.NbPnt()) { 
     for(Standard_Integer i=1; i<=Inter.NbPnt(); i++) { 
@@ -1016,7 +1000,7 @@ static Standard_Integer reperageshape(Draw_Interpretor& di, Standard_Integer nar
 	  ExF.Next(),numface++) { 
 	TopoDS_Face Face=TopoDS::Face(ExF.Current());
 	if(Face.IsEqual(Inter.Face(i))) { 
-	  //cout<<" "<<a[1]<<"_"<<numface;
+	  //std::cout<<" "<<a[1]<<"_"<<numface;
 	  di<<" "<<a[1]<<"_"<<numface;
 	  continue;	  
 	}
@@ -1024,7 +1008,7 @@ static Standard_Integer reperageshape(Draw_Interpretor& di, Standard_Integer nar
       const gp_Pnt& P = Inter.Pnt(i);
       Standard_Real PMin = Inter.WParameter(i);
       if(details) { 
-	//cout<<" w:"<<PMin<<endl;
+	//std::cout<<" w:"<<PMin<<std::endl;
 	di<<" w:"<<PMin<< "\n";
       }
       if(Inter.Transition(i) == IntCurveSurface_In) { 
@@ -1051,7 +1035,7 @@ static Standard_Integer reperageshape(Draw_Interpretor& di, Standard_Integer nar
       }
     }
   }
-  //cout<<endl;
+  //std::cout<<std::endl;
   di << "\n";
   return(0);
 }
@@ -1113,10 +1097,10 @@ static Standard_Integer maxtolerance(Draw_Interpretor& theCommands,
   sss << "\n## Tolerances on the shape " << a[1] << "  (nbFaces:" << nbF
       << "  nbEdges:" << nbE << " nbVtx:" << nbV << ")\n" ;
   sss.precision(5);
-  sss.setf(ios::scientific);
-  if(TmF<=TMF) sss << "\n    Face   : Min " << setw(8) << TmF <<"    Max  " << setw(8) << TMF << " \n ";
-  if(TmE<=TME) sss << "\n    Edge   : Min " << setw(8) << TmE <<"    Max  " << setw(8) << TME << " \n ";
-  if(TmV<=TMV) sss << "\n    Vertex : Min " << setw(8) << TmV <<"    Max  " << setw(8) << TMV << " \n ";
+  sss.setf(std::ios::scientific);
+  if(TmF<=TMF) sss << "\n    Face   : Min " << std::setw(8) << TmF <<"    Max  " << std::setw(8) << TMF << " \n ";
+  if(TmE<=TME) sss << "\n    Edge   : Min " << std::setw(8) << TmE <<"    Max  " << std::setw(8) << TME << " \n ";
+  if(TmV<=TMV) sss << "\n    Vertex : Min " << std::setw(8) << TmV <<"    Max  " << std::setw(8) << TMV << " \n ";
   theCommands << sss;
 
   return 0;
@@ -1124,7 +1108,7 @@ static Standard_Integer maxtolerance(Draw_Interpretor& theCommands,
 
 
 static Standard_Integer vecdc(Draw_Interpretor& di,Standard_Integer ,const char** ) {
-  //cout << "Pick positions with button "<<endl;
+  //std::cout << "Pick positions with button "<<std::endl;
   di << "Pick positions with button \n";
 
   Standard_Integer id,X,Y,b;
@@ -1175,16 +1159,16 @@ static Standard_Integer vecdc(Draw_Interpretor& di,Standard_Integer ,const char*
   Handle(Draw_Segment3D) d = new Draw_Segment3D(P1,PP1,Draw_blanc);
   dout << d;
   dout.Flush();
-  //cout<<"\nttran   "<<PP1.X()-P1.X()<<" "<<PP1.Y()-P1.Y()<<" "<<PP1.Z()-P1.Z()<<endl;
+  //std::cout<<"\nttran   "<<PP1.X()-P1.X()<<" "<<PP1.Y()-P1.Y()<<" "<<PP1.Z()-P1.Z()<<std::endl;
   di <<"\nttran   "<<PP1.X()-P1.X()<<" "<<PP1.Y()-P1.Y()<<" "<<PP1.Z()-P1.Z()<< "\n";
 
   static Standard_Integer nboxvecdp=0;
-  //cout<<"\nbox  b"<<++nboxvecdp<<" "<<Min(P1.X(),PP1.X())<<" "<<Min(P1.Y(),PP1.Y())<<" "<<Min(PP1.Z(),P1.Z());
-  //cout<<"  "<<Abs(PP1.X()-P1.X())<<" "<<Abs(PP1.Y()-P1.Y())<<" "<<Abs(PP1.Z()-P1.Z())<<endl;
+  //std::cout<<"\nbox  b"<<++nboxvecdp<<" "<<Min(P1.X(),PP1.X())<<" "<<Min(P1.Y(),PP1.Y())<<" "<<Min(PP1.Z(),P1.Z());
+  //std::cout<<"  "<<Abs(PP1.X()-P1.X())<<" "<<Abs(PP1.Y()-P1.Y())<<" "<<Abs(PP1.Z()-P1.Z())<<std::endl;
 
-  //cout<<"\nDistance :"<<sqrt( (PP1.X()-P1.X())*(PP1.X()-P1.X())
+  //std::cout<<"\nDistance :"<<sqrt( (PP1.X()-P1.X())*(PP1.X()-P1.X())
 	//		     +(PP1.Y()-P1.Y())*(PP1.Y()-P1.Y())
-	//		     +(PP1.Z()-P1.Z())*(PP1.Z()-P1.Z()))<<endl;
+	//		     +(PP1.Z()-P1.Z())*(PP1.Z()-P1.Z()))<<std::endl;
 
   di <<"\nbox  b"<<++nboxvecdp<<" "<<Min(P1.X(),PP1.X())<<" "<<Min(P1.Y(),PP1.Y())<<" "<<Min(PP1.Z(),P1.Z());
   di <<"  "<<Abs(PP1.X()-P1.X())<<" "<<Abs(PP1.Y()-P1.Y())<<" "<<Abs(PP1.Z()-P1.Z())<< "\n";
@@ -1262,7 +1246,7 @@ static Standard_Integer vecdc(Draw_Interpretor& di,Standard_Integer ,const char*
   TopTools_ListOfShape Wire;
   Standard_Boolean IsWire=OrtProj.BuildWire(Wire);
   if (IsWire) {
-    //cout << " BuildWire OK " << endl;
+    //std::cout << " BuildWire OK " << std::endl;
     di << " BuildWire OK \n";
   }
   DBRep::Set(a[1], OrtProj.Shape());
@@ -1514,7 +1498,35 @@ void  BRepTest::BasicCommands(Draw_Interpretor& theCommands)
     __FILE__,
     getcoords,g);
   
-  theCommands.Add("bounding", "enter the comand w/o any arguments to obtain the help.",
+  theCommands.Add ("bounding",
+                   "bounding {shape | xmin ymin zmin xmax ymax zmax}"
+         "\n\t\t:            [-obb] [-noTriangulation] [-optimal] [-extToler]"
+         "\n\t\t:            [-dump] [-print] [-dumpJson] [-shape name] [-nodraw] [-finitePart]"
+         "\n\t\t:            [-save xmin ymin zmin xmax ymax zmax]"
+         "\n\t\t:"
+         "\n\t\t: Computes a bounding box. Two types of the source data are supported:"
+         "\n\t\t: a shape or AABB corners (xmin, ymin, zmin, xmax, ymax, zmax)."
+         "\n\t\t:"
+         "\n\t\t: Calculation options (applicable only if input is a shape):"
+         "\n\t\t:  -obb     Compute Oriented Bounding Box (OBB) instead of AABB."
+         "\n\t\t:  -noTriangulation Force use of exact geometry for calculation"
+         "\n\t\t:                   even if triangulation is present."
+         "\n\t\t:  -optimal Force calculation of optimal (more tight) AABB."
+         "\n\t\t:           In case of OBB:"
+         "\n\t\t:           - for PCA approach applies to initial AABB used in OBB calculation"
+         "\n\t\t:           - for DiTo approach modifies the DiTo algorithm to check more axes."
+         "\n\t\t:  -extToler Include tolerance of the shape in the resulting box."
+         "\n\t\t:"
+         "\n\t\t: Output options:"
+         "\n\t\t:  -dump    Prints the information about computed Bounding Box."
+         "\n\t\t:  -print   Prints the information about computed Bounding Box."
+         "\n\t\t:           It is enabled by default (with plain old syntax for AABB)"
+         "\n\t\t:           if neither -shape nor -save is specified."
+         "\n\t\t:  -dumpJson Prints DumpJson information about Bounding Box."
+         "\n\t\t:  -shape   Stores computed box as solid in DRAW variable with specified name."
+         "\n\t\t:  -save    Stores min and max coordinates of AABB in specified variables."
+         "\n\t\t:  -noDraw  Avoid drawing resulting Bounding Box in DRAW viewer."
+         "\n\t\t:  -finite  Return finite part of infinite box.",
                   __FILE__, BoundBox, g);
 
  //

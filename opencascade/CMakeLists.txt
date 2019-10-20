@@ -63,7 +63,7 @@ set (BUILD_RESOURCES OFF CACHE BOOL "${BUILD_RESOURCES_DESCR}")
 
 # single-configuration generator
 set (SINGLE_GENERATOR OFF)
-if (CMAKE_BUILD_TYPE)
+if (DEFINED CMAKE_BUILD_TYPE)
   set (SINGLE_GENERATOR ON)
 endif()
 
@@ -84,6 +84,11 @@ endif()
 
 if (BUILD_WITH_DEBUG)
   set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:DEBUG>:OCCT_DEBUG>)
+endif()
+
+# option disabling OCCT exceptions in Release builds (No_Exception)
+if (NOT DEFINED BUILD_RELEASE_DISABLE_EXCEPTIONS)
+  set (BUILD_RELEASE_DISABLE_EXCEPTIONS ON CACHE BOOL "${BUILD_RELEASE_DISABLE_EXCEPTIONS_DESCR}")
 endif()
 
 # option to enable or disable use of precompiled headers
@@ -481,7 +486,6 @@ OCCT_IS_PRODUCT_REQUIRED (CSF_FreeImagePlus CAN_USE_FREEIMAGE)
 OCCT_IS_PRODUCT_REQUIRED (CSF_TclLibs USE_TCL)
 OCCT_IS_PRODUCT_REQUIRED (CSF_FREETYPE USE_FREETYPE)
 OCCT_IS_PRODUCT_REQUIRED (CSF_OpenGlLibs CAN_USE_GLES2)
-OCCT_IS_PRODUCT_REQUIRED (CSF_GL2PS CAN_USE_GL2PS)
 OCCT_IS_PRODUCT_REQUIRED (CSF_TBB CAN_USE_TBB)
 OCCT_IS_PRODUCT_REQUIRED (CSF_EIGEN CAN_USE_EIGEN)
 
@@ -609,24 +613,6 @@ else()
   OCCT_CHECK_AND_UNSET ("INSTALL_GLES2")
 endif()
 
-# GL2PS
-if (NOT DEFINED ANDROID AND CAN_USE_GL2PS)
-  set (USE_GL2PS OFF CACHE BOOL "${USE_GL2PS_DESCR}")
-
-  if (USE_GL2PS)
-    add_definitions (-DHAVE_GL2PS)
-    OCCT_INCLUDE_CMAKE_FILE ("adm/cmake/gl2ps")
-  else()
-    OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_GL2PS")
-    OCCT_CHECK_AND_UNSET ("INSTALL_GL2PS")
-  endif()
-else()
-  OCCT_CHECK_AND_UNSET ("USE_GL2PS")
-
-  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_GL2PS")
-  OCCT_CHECK_AND_UNSET ("INSTALL_GL2PS")
-endif()
-
 # TBB
 if (NOT DEFINED ANDROID AND CAN_USE_TBB)
   set (USE_TBB OFF CACHE BOOL "${USE_TBB_DESCR}")
@@ -645,6 +631,26 @@ else()
   OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_TBB")
   OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_TBBMALLOC")
   OCCT_CHECK_AND_UNSET ("INSTALL_TBB")
+endif()
+
+# RapidJSON
+# search for CSF_RapidJSON variable in EXTERNLIB of each being used toolkit
+OCCT_IS_PRODUCT_REQUIRED (CSF_RapidJSON CAN_USE_RAPIDJSON)
+if (CAN_USE_RAPIDJSON)
+  set (USE_RAPIDJSON OFF CACHE BOOL "${USE_RAPIDJSON_DESCR}")
+
+  if (USE_RAPIDJSON)
+    add_definitions (-DHAVE_RAPIDJSON)
+    OCCT_INCLUDE_CMAKE_FILE ("adm/cmake/rapidjson")
+  else()
+    OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_RAPIDJSON")
+    OCCT_CHECK_AND_UNSET ("INSTALL_RAPIDJSON")
+  endif()
+else()
+  OCCT_CHECK_AND_UNSET ("USE_RAPIDJSON")
+
+  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_RAPIDJSON")
+  OCCT_CHECK_AND_UNSET ("INSTALL_RAPIDJSON")
 endif()
 
 # EIGEN
@@ -700,6 +706,18 @@ if (BUILD_YACCLEX)
   OCCT_INCLUDE_CMAKE_FILE ("adm/cmake/flex")
 else()
   OCCT_CHECK_AND_UNSET ("3RDPARTY_FLEX_EXECUTABLE")
+endif()
+
+# qt for inspector and samples
+if (BUILD_Inspector OR BUILD_SAMPLES_QT)
+  # check qt 3rdparty path
+  add_definitions (-DHAVE_QT)
+  OCCT_INCLUDE_CMAKE_FILE ("adm/cmake/qt")
+  message (STATUS "Info: Qt is used by OCCT")
+else()
+  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_QT")
+  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_TQTMALLOC")
+  OCCT_CHECK_AND_UNSET ("INSTALL_QT")
 endif()
 
 # check all 3rdparty include paths
@@ -787,17 +805,6 @@ if (WIN32)
   set (SCRIPT_EXT bat)
 else()
   set (SCRIPT_EXT sh)
-endif()
-
-if (BUILD_Inspector OR BUILD_SAMPLES_QT)
-  # check qt 3rdparty path
-  add_definitions (-DHAVE_QT)
-  OCCT_INCLUDE_CMAKE_FILE ("adm/cmake/qt")
-  message (STATUS "Info: Qt is used by OCCT")
-else()
-  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_QT")
-  OCCT_CHECK_AND_UNSET_GROUP ("3RDPARTY_TQTMALLOC")
-  OCCT_CHECK_AND_UNSET ("INSTALL_QT")
 endif()
 
 # OCCT tools
@@ -918,11 +925,19 @@ if (BUILD_SAMPLES_MFC OR BUILD_SAMPLES_QT)
   OCCT_COPY_FILE_OR_DIR    ("adm/templates/sample.${SCRIPT_EXT}" "${CMAKE_BINARY_DIR}")
 endif()
 
-# env script for draw in building environment
-OCCT_CONFIGURE ("adm/templates/env.${SCRIPT_EXT}.in" "env.${SCRIPT_EXT}")
-
-# install env script
-install (FILES "${CMAKE_BINARY_DIR}/env.${SCRIPT_EXT}" DESTINATION "${INSTALL_DIR_SCRIPT}")
+if (WIN32)
+  # env script for draw in building environment
+  OCCT_CONFIGURE ("adm/templates/env.${SCRIPT_EXT}.in" "env.${SCRIPT_EXT}")
+  # install env script
+  install (FILES "${CMAKE_BINARY_DIR}/env.${SCRIPT_EXT}" DESTINATION "${INSTALL_DIR_SCRIPT}")
+else()
+  set (SUB_ENV_NAME "env.${SCRIPT_EXT}")
+  set (SUB_ENV_BUILD_NAME "env.install.${SCRIPT_EXT}")
+  # install env script
+  OCCT_CONFIGURE_AND_INSTALL ("adm/templates/env.install.${SCRIPT_EXT}.in" "${SUB_ENV_BUILD_NAME}" "${SUB_ENV_NAME}" "${INSTALL_DIR_SCRIPT}")
+  # env script for draw in building environment
+  OCCT_CONFIGURE ("adm/templates/env.build.${SCRIPT_EXT}.in" "env.${SCRIPT_EXT}")
+endif()
 
 # copy DrawAppliInit from OCCT source to build directory
 if (NOT EXISTS "${CMAKE_BINARY_DIR}/DrawAppliInit")

@@ -21,10 +21,12 @@
 
 #include <gp_Pnt.hxx>
 
+#include <OSD_Path.hxx>
 #include <Precision.hxx>
 #include <Standard_Overflow.hxx>
 
 #include <NCollection_Vector.hxx>
+#include <NCollection_IncAllocator.hxx>
 
 #define ItemType gp_Pnt
 #define Key1Type Standard_Real
@@ -72,9 +74,14 @@ DEFINE_SEQUENCE(QANCollection_SequenceFunc,QANCollection_BaseColFunc,ItemType)
 DEFINE_HSEQUENCE(QANCollection_HSequenceFunc,QANCollection_SequenceFunc)
 
 // HashCode and IsEquel must be defined for key types of maps
-Standard_Integer HashCode(const gp_Pnt thePnt, int theUpper)
+
+//! Computes a hash code for the point, in the range [1, theUpperBound]
+//! @param thePoint the point which hash code is to be computed
+//! @param theUpperBound the upper bound of the range a computing hash code must be within
+//! @return a computed hash code, in the range [1, theUpperBound]
+Standard_Integer HashCode (const gp_Pnt& thePoint, int theUpperBound)
 {
-  return HashCode(thePnt.X(),theUpper);
+  return HashCode (thePoint.X(), theUpperBound);
 }
 
 Standard_Boolean IsEqual(const gp_Pnt& theP1, const gp_Pnt& theP2)
@@ -238,6 +245,23 @@ static void TestList (QANCollection_ListFunc&     theL)
   // Assign
   AssignCollection (theL, aL);
 
+  // Different allocators
+  {
+    // The joining of list having different allocator can cause memory error
+    // if the fact of different allocator is not taken into account.
+    Handle(NCollection_IncAllocator) anAlloc = new NCollection_IncAllocator;
+    QANCollection_ListFunc aS2(anAlloc);
+    aS2.Append(anItem);
+    theL.Prepend(aS2);
+    aS2.Append(anItem);
+    theL.Append(aS2);
+    aS2.Append(anItem);
+    QANCollection_ListFunc::Iterator anIter(theL);
+    theL.InsertBefore(aS2, anIter);
+    aS2.Append(anItem);
+    theL.InsertAfter(aS2, anIter);
+  }
+
   // Clear
   aL.Clear();
 }
@@ -294,6 +318,22 @@ static void TestSequence (QANCollection_SequenceFunc& theS)
   // Assign
   AssignCollection (theS, aS);
 
+  // Different allocators
+  {
+    // The joining of sequence having different allocator can cause memory error
+    // if the fact of different allocator is not taken into account.
+    Handle(NCollection_IncAllocator) anAlloc = new NCollection_IncAllocator;
+    QANCollection_SequenceFunc aS2(anAlloc);
+    aS2.Append(anItem);
+    theS.Prepend(aS2);
+    aS2.Append(anItem);
+    theS.Append(aS2);
+    aS2.Append(anItem);
+    theS.InsertBefore(1, aS2);
+    aS2.Append(anItem);
+    theS.InsertAfter(1, aS2);
+  }
+
   // Clear
   aS.Clear();
 }
@@ -308,11 +348,11 @@ static void TestMap(QANCollection_MapFunc& theM, Draw_Interpretor& theDI)
     Standard_Integer i;
 
     printf ("Info: testing Map(l=%d)\n", iExt);
-    theM.Statistics(cout);
+    theM.Statistics(std::cout);
     // Resize
     theM.ReSize(8);
-    theM.Statistics(cout);
-    cout.flush();
+    theM.Statistics(std::cout);
+    std::cout.flush();
     // Constructor
     ////////////////////////////////QANCollection_Map aM;
     QANCollection_MapFunc aM;
@@ -331,7 +371,7 @@ static void TestMap(QANCollection_MapFunc& theM, Draw_Interpretor& theDI)
     else
     {
       aM.Remove(aKey);
-      cout << "      successfully removed item, l=%d\n" << aM.Size() << "\n";
+      std::cout << "      successfully removed item, l=%d\n" << aM.Size() << "\n";
     }
     // Copy constructor (including operator=)
     ////////////////////////////////QANCollection_Map aM2 = QANCollection_Map(aM);
@@ -376,11 +416,11 @@ static void TestDataMap  (QANCollection_DataMapFunc& theM)
   Standard_Integer i;
 
   printf ("Info: testing DataMap(l=%d)\n", iExt);
-  theM.Statistics(cout);
+  theM.Statistics(std::cout);
   // Resize
   theM.ReSize(8);
-  theM.Statistics(cout);
-  cout.flush();
+  theM.Statistics(std::cout);
+  std::cout.flush();
   // Constructor
   ////////////////////////////////QANCollection_DataMap aM;
   QANCollection_DataMapFunc aM;
@@ -427,11 +467,11 @@ static void TestDoubleMap  (QANCollection_DoubleMapFunc& theM)
   Standard_Integer i;
 
   printf ("Info: testing DoubleMap(l=%d)\n", iExt);
-  theM.Statistics(cout);
+  theM.Statistics(std::cout);
   // Resize
   theM.ReSize(8);
-  theM.Statistics(cout);
-  cout.flush();
+  theM.Statistics(std::cout);
+  std::cout.flush();
   // Constructor
   ////////////////////////////////QANCollection_DoubleMap aM;
   QANCollection_DoubleMapFunc aM;
@@ -490,11 +530,11 @@ static void TestIndexedMap  (QANCollection_IndexedMapFunc& theM)
   Standard_Integer i;
 
   printf ("Info: testing IndexedMap(l=%d)\n", iExt);
-  theM.Statistics(cout);
+  theM.Statistics(std::cout);
   // Resize
   theM.ReSize(8);
-  theM.Statistics(cout);
-  cout.flush();
+  theM.Statistics(std::cout);
+  std::cout.flush();
   // Constructor
   ////////////////////////////////QANCollection_IndexedMap aM;
   QANCollection_IndexedMapFunc aM;
@@ -551,11 +591,11 @@ static void TestIndexedDataMap  (QANCollection_IDMapFunc& theM)
   Standard_Integer i;
 
   printf ("Info: testing IndexedDataMap(l=%d)\n", iExt);
-  theM.Statistics(cout);
+  theM.Statistics(std::cout);
   // Resize
   theM.ReSize(8);
-  theM.Statistics(cout);
-  cout.flush();
+  theM.Statistics(std::cout);
+  std::cout.flush();
   // Constructor
   ////////////////////////////////QANCollection_IDMap aM;
   QANCollection_IDMapFunc aM;
@@ -682,6 +722,42 @@ static Standard_Integer QANColTestArray2(Draw_Interpretor& di, Standard_Integer 
   }
   QANCollection_Array2Func anArr2(LowerRow, UpperRow, LowerCol, UpperCol);
   TestArray2(anArr2);
+
+  // check resize
+  for (int aPass = 0; aPass <= 5; ++aPass)
+  {
+    Standard_Integer aNewLowerRow = LowerRow, aNewUpperRow = UpperRow, aNewLowerCol = LowerCol, aNewUpperCol = UpperCol;
+    switch (aPass)
+    {
+      case 0: aNewLowerRow -= 1; break;
+      case 1: aNewLowerCol -= 1; break;
+      case 2: aNewLowerRow -= 1; aNewLowerCol -= 1; break;
+      case 3: aNewUpperRow += 1; break;
+      case 4: aNewUpperCol += 1; break;
+      case 5: aNewUpperRow += 1; aNewUpperCol += 1; break;
+    }
+    QANCollection_Array2Func anArr2Copy = anArr2;
+    anArr2Copy.Resize (aNewLowerRow, aNewUpperRow, aNewLowerCol, aNewUpperCol, true);
+    const Standard_Integer aNbRowsMin = Min (anArr2.NbRows(),    anArr2Copy.NbRows());
+    const Standard_Integer aNbColsMin = Min (anArr2.NbColumns(), anArr2Copy.NbColumns());
+    for (Standard_Integer aRowIter = 0; aRowIter < aNbRowsMin; ++aRowIter)
+    {
+      for (Standard_Integer aColIter = 0; aColIter < aNbColsMin; ++aColIter)
+      {
+        const gp_Pnt& aPnt1 = anArr2    .Value (aRowIter +     anArr2.LowerRow(), aColIter +     anArr2.LowerCol());
+        const gp_Pnt& aPnt2 = anArr2Copy.Value (aRowIter + anArr2Copy.LowerRow(), aColIter + anArr2Copy.LowerCol());
+        if (!aPnt1.IsEqual (aPnt2, gp::Resolution()))
+        {
+          std::cerr << "Error: 2D array is not properly resized\n";
+          return 1;
+        }
+      }
+    }
+  }
+
+  QANCollection_Array2Func anArr2Copy2 = anArr2;
+  anArr2Copy2.Resize (LowerRow - 1, UpperRow - 1, LowerCol + 1, UpperCol + 1, false);
+
   return 0;
 }
 
@@ -789,14 +865,14 @@ static Standard_Integer QANColTestVector (Draw_Interpretor&, Standard_Integer, c
 
   aVec.Append(5);
   if (aVec(0) != 5)
-    std::cout << "Error: wrong value in original vector!" << endl;
+    std::cout << "Error: wrong value in original vector!" << std::endl;
   aVec2.Append(5);
   if (aVec2(0) != 5)
-    std::cout << "Error: wrong value in copy-constructed vector!" << endl;
+    std::cout << "Error: wrong value in copy-constructed vector!" << std::endl;
   aVec3.Append(5);
   if (aVec3(0) != 5)
-    std::cout << "Error: wrong value in copied vector!" << endl;
-  std::cout << "Test OK" << endl;
+    std::cout << "Error: wrong value in copied vector!" << std::endl;
+  std::cout << "Test OK" << std::endl;
 
   return 0;
 }
@@ -1109,12 +1185,161 @@ static Standard_Integer QATestAtof (Draw_Interpretor& di, Standard_Integer argc,
   return 0;
 }
 
+// Test operations with NCollection_Vec4 that caused generation of invalid code by GCC
+// due to reinterpret_cast conversions of Vec4 internal buffer to Vec3 (see #29825)
+static Standard_Integer QANColTestVec4 (Draw_Interpretor& theDI, Standard_Integer /*theNbArgs*/, const char** /*theArgVec*/)
+{
+  NCollection_Mat4<float> aMatrix;
+  aMatrix.Translate (NCollection_Vec3<float> (4.0f, 3.0f, 1.0f));
+
+  NCollection_Vec4<float> aPoints1[8];
+  for (int aX = 0; aX < 2; ++aX)
+  {
+    for (int aY = 0; aY < 2; ++aY)
+    {
+      for (int aZ = 0; aZ < 2; ++aZ)
+      {
+        aPoints1[aX * 2 * 2 + aY * 2 + aZ] = NCollection_Vec4<float> (-1.0f + 2.0f * float(aX),
+                                                                      -1.0f + 2.0f * float(aY),
+                                                                      -1.0f + 2.0f * float(aZ),
+                                                                       1.0f);
+      }
+    }
+  }
+
+  NCollection_Vec3<float> aPoints2[8];
+  for (int aPntIdx = 0; aPntIdx < 8; ++aPntIdx)
+  {
+    // NB: the evaluation of line below could be dropped by GCC optimizer
+    // while retrieving xyz() value the line after
+    aPoints1[aPntIdx] = aMatrix * aPoints1[aPntIdx];
+    aPoints2[aPntIdx] = aPoints1[aPntIdx].xyz() / aPoints1[aPntIdx].w();
+    //aPoints2[aPntIdx] = NCollection_Vec3<float> (aPoints1[aPntIdx].x(), aPoints1[aPntIdx].y(), aPoints1[aPntIdx].z()) / aPoints1[aPntIdx].w();
+  }
+
+  for (int aPntIter = 0; aPntIter < 8; ++aPntIter) { theDI << aPoints2[aPntIter].SquareModulus() << " "; }
+  if ((int )(aPoints2[7].SquareModulus() + 0.5f) != 45)
+  {
+    theDI << "Error: method 'NCollection_Vec4::xyz()' failed.";
+  }
+  return 0;
+}
+
+//! Print file path flags deduced from path string.
+static Standard_Integer QAOsdPathType (Draw_Interpretor& theDI, Standard_Integer theNbArgs, const char** theArgVec)
+{
+  if (theNbArgs != 2)
+  {
+    std::cout << "Syntax error: wrong number of arguments\n";
+    return 1;
+  }
+
+  TCollection_AsciiString aPath (theArgVec[1]);
+  if (OSD_Path::IsAbsolutePath (aPath.ToCString()))
+  {
+    theDI << "absolute ";
+  }
+  if (OSD_Path::IsRelativePath (aPath.ToCString()))
+  {
+    theDI << "relative ";
+  }
+  if (OSD_Path::IsUnixPath (aPath.ToCString()))
+  {
+    theDI << "unix ";
+  }
+  if (OSD_Path::IsDosPath (aPath.ToCString()))
+  {
+    theDI << "dos ";
+  }
+  if (OSD_Path::IsUncPath (aPath.ToCString()))
+  {
+    theDI << "unc ";
+  }
+  if (OSD_Path::IsNtExtendedPath (aPath.ToCString()))
+  {
+    theDI << "ntextended ";
+  }
+  if (OSD_Path::IsUncExtendedPath (aPath.ToCString()))
+  {
+    theDI << "uncextended ";
+  }
+  if (OSD_Path::IsRemoteProtocolPath (aPath.ToCString()))
+  {
+    theDI << "protocol ";
+  }
+  if (OSD_Path::IsContentProtocolPath (aPath.ToCString()))
+  {
+    theDI << "content ";
+  }
+  return 0;
+}
+
+//! Print file path part deduced from path string.
+static Standard_Integer QAOsdPathPart (Draw_Interpretor& theDI, Standard_Integer theNbArgs, const char** theArgVec)
+{
+  TCollection_AsciiString aPath;
+  enum PathPart
+  {
+    PathPart_NONE,
+    PathPart_Folder,
+    PathPart_FileName,
+  };
+  PathPart aPart = PathPart_NONE;
+  for (Standard_Integer anArgIter = 1; anArgIter < theNbArgs; ++anArgIter)
+  {
+    TCollection_AsciiString anArgCase (theArgVec[anArgIter]);
+    anArgCase.LowerCase();
+    if (aPart == PathPart_NONE
+     && anArgCase == "-folder")
+    {
+      aPart = PathPart_Folder;
+    }
+    else if (aPart == PathPart_NONE
+          && anArgCase == "-filename")
+    {
+      aPart = PathPart_FileName;
+    }
+    else if (aPath.IsEmpty())
+    {
+      aPath = theArgVec[anArgIter];
+    }
+    else
+    {
+      std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+      return 1;
+    }
+  }
+  if (aPath.IsEmpty()
+   || aPart == PathPart_NONE)
+  {
+    std::cout << "Syntax error: wrong number of arguments\n";
+    return 1;
+  }
+
+  TCollection_AsciiString aFolder, aFileName;
+  OSD_Path::FolderAndFileFromPath (aPath, aFolder, aFileName);
+  switch (aPart)
+  {
+    case PathPart_Folder:
+      theDI << aFolder;
+      return 0;
+    case PathPart_FileName:
+      theDI << aFileName;
+      return 0;
+    case PathPart_NONE:
+    default:
+      return 1;
+  }
+}
+
+
 void QANCollection::CommandsTest(Draw_Interpretor& theCommands) {
   const char *group = "QANCollection";
 
-  // from agvCollTest/src/CollectionEXE/FuncTestEXE.cxx
-  theCommands.Add("QANColTestArray1",         "QANColTestArray1",         __FILE__, QANColTestArray1,         group);  
-  theCommands.Add("QANColTestArray2",         "QANColTestArray2",         __FILE__, QANColTestArray2,         group);  
+  theCommands.Add("QANColTestArray1",         "QANColTestArray1 Lower Upper",
+    __FILE__, QANColTestArray1, group);
+  theCommands.Add("QANColTestArray2",         "QANColTestArray2 LowerRow UpperRow LowerCol UpperCol",
+    __FILE__, QANColTestArray2, group);  
   theCommands.Add("QANColTestMap",            "QANColTestMap",            __FILE__, QANColTestMap,            group);  
   theCommands.Add("QANColTestDataMap",        "QANColTestDataMap",        __FILE__, QANColTestDataMap,        group);  
   theCommands.Add("QANColTestDoubleMap",      "QANColTestDoubleMap",      __FILE__, QANColTestDoubleMap,      group);  
@@ -1124,5 +1349,8 @@ void QANCollection::CommandsTest(Draw_Interpretor& theCommands) {
   theCommands.Add("QANColTestSequence",       "QANColTestSequence",       __FILE__, QANColTestSequence,       group);  
   theCommands.Add("QANColTestVector",         "QANColTestVector",         __FILE__, QANColTestVector,         group);  
   theCommands.Add("QANColTestArrayMove",      "QANColTestArrayMove (is expected to give error)", __FILE__, QANColTestArrayMove, group);  
+  theCommands.Add("QANColTestVec4",           "QANColTestVec4 test Vec4 implementation", __FILE__, QANColTestVec4, group);
   theCommands.Add("QATestAtof", "QATestAtof [nbvalues [nbdigits [min [max]]]]", __FILE__, QATestAtof, group);
+  theCommands.Add("QAOsdPathType",  "QAOsdPathType path : Print file path flags deduced from path string", __FILE__, QAOsdPathType, group);
+  theCommands.Add("QAOsdPathPart",  "QAOsdPathPart path [-folder][-fileName] : Print file path part", __FILE__, QAOsdPathPart, group);
 }

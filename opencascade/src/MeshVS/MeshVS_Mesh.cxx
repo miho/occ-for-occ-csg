@@ -44,13 +44,12 @@
 #include <Prs3d_Presentation.hxx>
 #include <Prs3d_Root.hxx>
 #include <Prs3d_ShadingAspect.hxx>
-#include <PrsMgr_ModedPresentation.hxx>
 #include <PrsMgr_PresentationManager3d.hxx>
 #include <Select3D_SensitiveBox.hxx>
 #include <Select3D_SensitiveGroup.hxx>
 #include <Select3D_SensitivePoint.hxx>
 #include <Select3D_SensitiveTriangle.hxx>
-#include <SelectBasics_SensitiveEntity.hxx>
+#include <Select3D_SensitiveEntity.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_Selection.hxx>
 #include <SelectMgr_SequenceOfOwner.hxx>
@@ -543,7 +542,7 @@ void MeshVS_Mesh::ComputeSelection (const Handle(SelectMgr_Selection)& theSelect
               }
               else //if ( aType == MeshVS_ET_0D )   // Custom : not only 0D-elements !!!
               {
-                Handle(SelectBasics_SensitiveEntity) anEnt = myHilighter->CustomSensitiveEntity (anOwner, aKey);
+                Handle(Select3D_SensitiveEntity) anEnt = myHilighter->CustomSensitiveEntity (anOwner, aKey);
                 if (!anEnt.IsNull())
                 {
                   theSelection->Add (anEnt);
@@ -636,7 +635,7 @@ void MeshVS_Mesh::ComputeSelection (const Handle(SelectMgr_Selection)& theSelect
               }
               else //if ( aType == MeshVS_ET_0D )   // Custom : not only 0D-elements !!!
               {
-                Handle(SelectBasics_SensitiveEntity) anEnt = myHilighter->CustomSensitiveEntity (anOwner, aKey);
+                Handle(Select3D_SensitiveEntity) anEnt = myHilighter->CustomSensitiveEntity (anOwner, aKey);
                 if (!anEnt.IsNull())
                 {
                   theSelection->Add (anEnt);
@@ -1064,11 +1063,11 @@ void MeshVS_Mesh::HilightSelected ( const Handle(PrsMgr_PresentationManager3d)& 
     Standard_Integer min, hour;
 
     gTimer.Show ( sec, min, hour, cpu );
-    cout << "HilightSelected : " << endl;
-    cout << aSelNodes.Extent() << " nodes " << endl;
-    cout << aSelElements.Extent() << " elements " << endl;
-    cout << "Time : " << sec << " sec" << endl;
-    cout << "CPU time : " << cpu << " sec" << endl << endl;
+    std::cout << "HilightSelected : " << std::endl;
+    std::cout << aSelNodes.Extent() << " nodes " << std::endl;
+    std::cout << aSelElements.Extent() << " elements " << std::endl;
+    std::cout << "Time : " << sec << " sec" << std::endl;
+    std::cout << "CPU time : " << cpu << " sec" << std::endl << std::endl;
     gTimer.Stop();
 #endif
 }

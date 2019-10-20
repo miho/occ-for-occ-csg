@@ -26,6 +26,7 @@
 #include <DrawTrSurf_Curve2d.hxx>
 #include <Geom2dAPI_ProjectPointOnCurve.hxx>
 #include <Geom2dAPI_ExtremaCurveCurve.hxx>
+#include <Geom2dAPI_Interpolate.hxx>
 #include <Geom2dAPI_PointsToBSpline.hxx>
 #include <Geom2dAPI_InterCurveCurve.hxx>
 #include <Geom2d_Line.hxx>
@@ -178,7 +179,6 @@ static Standard_Integer appro(Draw_Interpretor& di, Standard_Integer n, const ch
 
     else {
       // test points ou ordonnees
-      hasPoints = Standard_False;
       Standard_Integer nc = n - 3;
       if (nc == 2 * Nb) {
 	// points
@@ -190,6 +190,7 @@ static Standard_Integer appro(Draw_Interpretor& di, Standard_Integer n, const ch
       }
       else if (nc - 2 == Nb) {
 	// YValues
+        hasPoints = Standard_False;
 	nc = 5;
 	X0 = Draw::Atof(a[3]);
 	DX = Draw::Atof(a[4]);
@@ -214,9 +215,44 @@ static Standard_Integer appro(Draw_Interpretor& di, Standard_Integer n, const ch
   
   Handle(Geom2d_BSplineCurve) TheCurve;
   if (hasPoints)
-    TheCurve = Geom2dAPI_PointsToBSpline(Points,Dmin,Dmax,GeomAbs_C2,Tol2d);
+  {
+    if (!strcmp (a[0], "2dinterpole"))
+    {
+      Geom2dAPI_Interpolate anInterpol (new TColgp_HArray1OfPnt2d(Points), Standard_False, Tol2d);
+      anInterpol.Perform();
+      if (!anInterpol.IsDone())
+      {
+        di << "not done";
+        return 1;
+      }
+      TheCurve = anInterpol.Curve();
+    }
+    else
+    {
+      Geom2dAPI_PointsToBSpline anApprox (Points, Dmin, Dmax, GeomAbs_C2, Tol2d);
+      if (!anApprox.IsDone())
+      {
+        di << "not done";
+        return 1;
+      }
+      TheCurve = anApprox.Curve();
+    }
+  }
   else
-    TheCurve = Geom2dAPI_PointsToBSpline(YValues,X0,DX,Dmin,Dmax,GeomAbs_C2,Tol2d);
+  {
+    if (!strcmp (a[0], "2dinterpole"))
+    {
+      di << "incorrect usage";
+      return 1;
+    }
+    Geom2dAPI_PointsToBSpline anApprox (YValues, X0, DX, Dmin, Dmax, GeomAbs_C2, Tol2d);
+    if (!anApprox.IsDone())
+    {
+      di << "not done";
+      return 1;
+    }
+    TheCurve = anApprox.Curve();
+  }
   
   DrawTrSurf::Set(a[1], TheCurve);
   di << a[1];
@@ -406,7 +442,7 @@ static Standard_Integer intersect_ana(Draw_Interpretor& di, Standard_Integer n, 
 {
   if (n < 2)
   {
-    cout << "2dintana circle circle " << endl;
+    std::cout << "2dintana circle circle " << std::endl;
     return 1;
   }
 
@@ -447,21 +483,21 @@ static Standard_Integer intconcon(Draw_Interpretor& di, Standard_Integer n, cons
 {
   if( n < 2) 
   {
-    cout<< "intconcon con1 con2 "<<endl;
+    std::cout<< "intconcon con1 con2 "<<std::endl;
     return 1;
   }
   
   Handle(Geom2d_Curve) C1 = DrawTrSurf::GetCurve2d(a[1]);
   if (C1.IsNull())
   {
-    cout << a[1] << " is Null " << endl;
+    std::cout << a[1] << " is Null " << std::endl;
     return 1;
   }
 
   Handle(Geom2d_Curve) C2 = DrawTrSurf::GetCurve2d(a[2]);
   if (C2.IsNull())
   {
-    cout << a[2] << " is Null " << endl;
+    std::cout << a[2] << " is Null " << std::endl;
     return 1;
   }
 
@@ -500,7 +536,7 @@ static Standard_Integer intconcon(Draw_Interpretor& di, Standard_Integer n, cons
     break;
   }
   default:
-    cout << a[2] << " is not conic " << endl;
+    std::cout << a[2] << " is not conic " << std::endl;
     return 1;
   }
 
@@ -523,7 +559,7 @@ static Standard_Integer intconcon(Draw_Interpretor& di, Standard_Integer n, cons
     Intersector.Perform(AC1.Parabola(), *pCon);
     break;
   default:
-    cout << a[1] << " is not conic " << endl;
+    std::cout << a[1] << " is not conic " << std::endl;
     return 1;
   }
   

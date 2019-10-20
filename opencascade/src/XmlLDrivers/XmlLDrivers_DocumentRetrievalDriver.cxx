@@ -34,7 +34,6 @@
 #include <UTL.hxx>
 #include <XmlLDrivers.hxx>
 #include <XmlLDrivers_DocumentRetrievalDriver.hxx>
-#include <XmlMDataStd.hxx>
 #include <XmlMDF.hxx>
 #include <XmlMDF_ADriver.hxx>
 #include <XmlMDF_ADriverTable.hxx>
@@ -223,7 +222,7 @@ void XmlLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&              t
   if (aParser.parse(theIStream, Standard_False, aWithoutRoot))
   {
     TCollection_AsciiString aData;
-    cout << aParser.GetError(aData) << ": " << aData << endl;
+    std::cout << aParser.GetError(aData) << ": " << aData << std::endl;
     myReaderStatus = PCDM_RS_FormatFailure;
     return;
   }
@@ -280,9 +279,6 @@ void XmlLDrivers_DocumentRetrievalDriver::ReadFromDomDocument
     }
 
     if( aCurDocVersion < 2) aCurDocVersion = 2;
-
-    PropagateDocumentVersion(aCurDocVersion);
-
     Standard_Boolean isRef = Standard_False;
     for (LDOM_Node aNode = anInfoElem.getFirstChild();
          aNode != NULL; aNode = aNode.getNextSibling()) {
@@ -297,8 +293,8 @@ void XmlLDrivers_DocumentRetrievalDriver::ReadFromDomDocument
         Standard_Integer aRefCounter = anInf.Token(" ",2).IntegerValue();
         theNewDocument->SetReferenceCounter(aRefCounter);
       }
-      catch (Standard_Failure) { 
-        //    cout << "warning: could not read the reference counter in " << aFileName << endl;
+      catch (Standard_Failure const&) {
+        //    std::cout << "warning: could not read the reference counter in " << aFileName << std::endl;
         TCollection_ExtendedString aMsg("Warning: ");
         aMsg = aMsg.Cat("could not read the reference counter").Cat("\0");
         if(!aMsgDriver.IsNull()) 
@@ -313,7 +309,7 @@ void XmlLDrivers_DocumentRetrievalDriver::ReadFromDomDocument
         Standard_Integer aModCounter = anInf.Token(" ",2).IntegerValue();
         theNewDocument->SetModifications (aModCounter);
       }
-      catch (Standard_Failure) { 
+      catch (Standard_Failure const&) {
         TCollection_ExtendedString aMsg("Warning: could not read the modification counter\0");
         if(!aMsgDriver.IsNull()) 
           aMsgDriver->Send(aMsg.ToExtString(), Message_Warning);
@@ -347,7 +343,7 @@ void XmlLDrivers_DocumentRetrievalDriver::ReadFromDomDocument
     if(!anAbsolutePath.IsEmpty()) aPath=anAbsolutePath;
         }
         if(!aMsgDriver.IsNull()) {
-    //      cout << "reference found; ReferenceIdentifier: " << theReferenceIdentifier << "; File:" << thePath << ", version:" << theDocumentVersion;
+    //      std::cout << "reference found; ReferenceIdentifier: " << theReferenceIdentifier << "; File:" << thePath << ", version:" << theDocumentVersion;
           TCollection_ExtendedString aMsg("Warning: ");
           aMsg = aMsg.Cat("reference found; ReferenceIdentifier:  ").Cat(aRefId).Cat("; File:").Cat(aPath).Cat(", version:").Cat(aDocumentVersion).Cat("\0");
           aMsgDriver->Send(aMsg.ToExtString(), Message_Warning);
@@ -438,6 +434,12 @@ void XmlLDrivers_DocumentRetrievalDriver::ReadFromDomDocument
   if(!aNSDriver.IsNull())
     ::take_time (0, " +++++ Fin reading Shapes :    ", aMsgDriver);
 
+  // 2.1. Keep document format version in RT
+  Handle(Storage_HeaderData) aHeaderData = new Storage_HeaderData();
+  aHeaderData->SetStorageVersion(aCurDocVersion);
+  myRelocTable.Clear();
+  myRelocTable.SetHeaderData(aHeaderData);
+
   // 5. Read document contents
   try
   {
@@ -477,7 +479,6 @@ Standard_Boolean XmlLDrivers_DocumentRetrievalDriver::MakeDocument
 {
   Standard_Boolean aResult = Standard_False;
   Handle(TDocStd_Document) TDOC = Handle(TDocStd_Document)::DownCast(theTDoc);
-  myRelocTable.Clear();
   if (!TDOC.IsNull()) 
   {
     Handle(TDF_Data) aTDF = new TDF_Data();
@@ -532,16 +533,6 @@ static void take_time (const Standard_Integer isReset, const char * aHeader,
   aMessageDriver -> Write (aMessage.ToExtString());
 }
 #endif
-
-//=======================================================================
-//function : PropagateDocumentVersion
-//purpose  : 
-//=======================================================================
-void XmlLDrivers_DocumentRetrievalDriver::PropagateDocumentVersion(
-                                   const Standard_Integer theDocVersion )
-{
-  XmlMDataStd::SetDocumentVersion(theDocVersion);
-}
 
 //=======================================================================
 //function : ReadShapeSection

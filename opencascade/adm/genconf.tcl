@@ -24,21 +24,44 @@
 # load tools
 source [file join [file dirname [info script]] genconfdeps.tcl]
 
+# proxy variable for implicit file path normalization
+set PRODUCTS_PATH_INPUT "$::PRODUCTS_PATH"
+
 package require Tk
 
 set aRowIter 0
 set aCheckRowIter 0
 frame .myFrame -padx 5 -pady 5
 pack  .myFrame -fill both -expand 1
+frame .myFrame.myPrjFrame
 frame .myFrame.myVsFrame
 frame .myFrame.myHxxChecks
 frame .myFrame.myChecks
+
+# project file format
+set SYS_PRJFMT_LIST {}
+set SYS_PRJNAME_LIST {}
+if { "$::tcl_platform(platform)" == "windows" } {
+  lappend ::SYS_PRJFMT_LIST "vcxproj"
+  lappend ::SYS_PRJNAME_LIST "Visual Studio (.vcxproj)"
+}
+if { "$tcl_platform(os)" == "Darwin" } {
+  lappend ::SYS_PRJFMT_LIST "xcd"
+  lappend ::SYS_PRJNAME_LIST "XCode (.xcd)"
+}
+lappend ::SYS_PRJFMT_LIST "cbp"
+lappend ::SYS_PRJNAME_LIST "Code Blocks (.cbp)"
+lappend ::SYS_PRJFMT_LIST "pro"
+lappend ::SYS_PRJNAME_LIST "Qt Creator (.pro)"
+
+set aPrjIndex [lsearch $::SYS_PRJFMT_LIST $::PRJFMT]
+set ::PRJNAME [lindex $::SYS_PRJNAME_LIST $aPrjIndex]
 
 set SYS_VS_LIST {}
 set SYS_VC_LIST {}
 set SYS_VCVARS_LIST {}
 
-# detect installed Visual Studio 2017 instances by running vswhere.exe
+# detect installed Visual Studio 2017+ instances by running vswhere.exe
 if { ! [catch {exec vswhere.exe -version "\[15.0,15.99\]" -latest -requires Microsoft.VisualStudio.Workload.NativeDesktop -property installationPath} res] } {
   lappend ::SYS_VS_LIST "Visual Studio 2017 (15, toolset v141)"
   lappend ::SYS_VC_LIST "vc141"
@@ -47,6 +70,16 @@ if { ! [catch {exec vswhere.exe -version "\[15.0,15.99\]" -latest -requires Micr
 if { ! [catch {exec vswhere.exe -version "\[15.0,15.99\]" -latest -requires Microsoft.VisualStudio.Workload.Universal -property installationPath} res] } {
   lappend ::SYS_VS_LIST "Visual Studio 2017 (15, toolset v141) UWP"
   lappend ::SYS_VC_LIST "vc141-uwp"
+  lappend ::SYS_VCVARS_LIST "$res\\VC\\vcvarsall.bat"
+}
+if { ! [catch {exec vswhere.exe -version "\[16.0,16.99\]" -latest -requires Microsoft.VisualStudio.Workload.NativeDesktop -property installationPath} res] } {
+  lappend ::SYS_VS_LIST "Visual Studio 2019 (16, toolset v142)"
+  lappend ::SYS_VC_LIST "vc142"
+  lappend ::SYS_VCVARS_LIST "$res\\VC\\vcvarsall.bat"
+}
+if { ! [catch {exec vswhere.exe -version "\[16.0,16.99\]" -latest -requires Microsoft.VisualStudio.Workload.Universal -property installationPath} res] } {
+  lappend ::SYS_VS_LIST "Visual Studio 2019 (16, toolset v142) UWP"
+  lappend ::SYS_VC_LIST "vc142-uwp"
   lappend ::SYS_VCVARS_LIST "$res\\VC\\vcvarsall.bat"
 }
 
@@ -101,6 +134,7 @@ proc wokdep:gui:Close {} {
 }
 
 proc wokdep:gui:SwitchConfig {} {
+  set ::PRJFMT [lindex $::SYS_PRJFMT_LIST [.myFrame.myPrjFrame.myPrjCombo current]]
   set ::VCVER  [lindex $::SYS_VC_LIST     [.myFrame.myVsFrame.myVsCombo current]]
   set ::VCVARS [lindex $::SYS_VCVARS_LIST [.myFrame.myVsFrame.myVsCombo current]]
 
@@ -139,9 +173,6 @@ proc wokdep:gui:UpdateList {} {
   wokdep:SearchFreeType  anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs
   wokdep:SearchX11       anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs
   if { "$::HAVE_GLES2" == "true" } {
-    if { "$::HAVE_GL2PS" == "true" } {
-      lappend anIncErrs "Error: gl2ps can not be used with OpenGL ES"
-    }
     wokdep:SearchEGL     anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs
     wokdep:SearchGLES    anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs
   }
@@ -150,9 +181,6 @@ proc wokdep:gui:UpdateList {} {
   }
   if { "$::HAVE_FFMPEG" == "true" } {
     wokdep:SearchFFmpeg  anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs
-  }
-  if { "$::HAVE_GL2PS" == "true" } {
-    wokdep:SearchStandardLibrary  anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs "gl2ps" "gl2ps.h" "gl2ps" {"gl2ps"}
   }
   if { "$::HAVE_TBB" == "true" } {
     wokdep:SearchTBB     anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs
@@ -173,6 +201,17 @@ proc wokdep:gui:UpdateList {} {
       set aCheckLib "liblzma"
     }
     wokdep:SearchStandardLibrary  anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs "liblzma" "lzma.h" "$aCheckLib" {"lzma" "xz"}
+  }
+  if { "$::HAVE_E57" == "true" } {
+    wokdep:SearchStandardLibrary  anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs "e57" "e57/E57Foundation.h" "E57RefImpl" {"e57"}
+    set aCheckLib "xerces-c"
+    if { "$::tcl_platform(platform)" == "windows" } {
+      set aCheckLib "xerces-c_3"
+    }
+    wokdep:SearchStandardLibrary  anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs "xerces-c" "xercesc/sax2/XMLReaderFactory.hpp" "$aCheckLib" {"xerces"}
+  }
+  if { "$::HAVE_RAPIDJSON" == "true" } {
+    wokdep:SearchRapidJson anIncErrs anLib32Errs anLib64Errs anBin32Errs anBin64Errs
   }
 
   if { "$::CHECK_QT4" == "true" } {
@@ -197,9 +236,9 @@ proc wokdep:gui:BrowseVcVars {} {
 }
 
 proc wokdep:gui:BrowsePartiesRoot {} {
-  set aResult [tk_chooseDirectory -initialdir $::PRODUCTS_PATH -title "Choose a directory"]
+  set aResult [tk_chooseDirectory -initialdir $::PRODUCTS_PATH_INPUT -title "Choose a directory"]
   if { "$aResult" != "" } {
-    set ::PRODUCTS_PATH $aResult
+    set ::PRODUCTS_PATH_INPUT $aResult
     wokdep:gui:UpdateList
   }
 }
@@ -396,6 +435,8 @@ proc wokdep:gui:Show64Bitness { theRowIter } {
 }
 
 # Header
+ttk::label    .myFrame.myPrjFrame.myPrjLbl     -text "Project format:" -padding {5 5 20 5}
+ttk::combobox .myFrame.myPrjFrame.myPrjCombo   -values $SYS_PRJNAME_LIST -state readonly -textvariable PRJNAME -width 40
 ttk::label    .myFrame.myVsFrame.myVsLbl       -text "Visual Studio configuration:" -padding {5 5 20 5}
 ttk::combobox .myFrame.myVsFrame.myVsCombo     -values $SYS_VS_LIST -state readonly -textvariable VSVER -width 40
 ttk::combobox .myFrame.myVsFrame.myArchCombo   -values { {32} {64} } -textvariable ARCH -state readonly -width 6
@@ -411,12 +452,10 @@ ttk::label    .myFrame.myHxxChecks.myScutsLbl     -text "Strategy for filling he
 
 #
 ttk::label    .myFrame.mySrchLbl       -text "3rd-parties search path:" -padding {5 5 80 5}
-entry         .myFrame.mySrchEntry     -textvariable PRODUCTS_PATH -width 80
+entry         .myFrame.mySrchEntry     -textvariable PRODUCTS_PATH_INPUT -width 80
 ttk::button   .myFrame.mySrchBrowseBtn -text "Browse" -command wokdep:gui:BrowsePartiesRoot
 checkbutton   .myFrame.myChecks.myFImageCheck   -offvalue "false" -onvalue "true" -variable HAVE_FREEIMAGE -command wokdep:gui:UpdateList
 ttk::label    .myFrame.myChecks.myFImageLbl     -text "Use FreeImage"
-checkbutton   .myFrame.myChecks.myGl2psCheck    -offvalue "false" -onvalue "true" -variable HAVE_GL2PS     -command wokdep:gui:UpdateList
-ttk::label    .myFrame.myChecks.myGl2psLbl      -text "Use GL2PS"
 checkbutton   .myFrame.myChecks.myTbbCheck      -offvalue "false" -onvalue "true" -variable HAVE_TBB       -command wokdep:gui:UpdateList
 ttk::label    .myFrame.myChecks.myTbbLbl        -text "Use Intel TBB"
 if { "$::tcl_platform(os)" != "Darwin" } {
@@ -431,6 +470,9 @@ checkbutton   .myFrame.myChecks.myFFmpegCheck   -offvalue "false" -onvalue "true
 ttk::label    .myFrame.myChecks.myFFmpegLbl     -text "Use FFmpeg"
 #checkbutton   .myFrame.myChecks.myOpenClCheck   -offvalue "false" -onvalue "true" -variable HAVE_OPENCL    -command wokdep:gui:UpdateList
 #ttk::label    .myFrame.myChecks.myOpenClLbl     -text "Use OpenCL"
+checkbutton   .myFrame.myChecks.myRapidJsonCheck -offvalue "false" -onvalue "true" -variable HAVE_RAPIDJSON -command wokdep:gui:UpdateList
+ttk::label    .myFrame.myChecks.myRapidJsonLbl   -text "Use RapidJSON"
+
 checkbutton   .myFrame.myChecks.myMacGLXCheck   -offvalue "false" -onvalue "true" -variable MACOSX_USE_GLX
 ttk::label    .myFrame.myChecks.myMacGLXLbl     -text "Use X11 for windows drawing"
 ttk::label    .myFrame.myChecks.myVtkLbl        -text "Use VTK"
@@ -440,6 +482,8 @@ checkbutton   .myFrame.myChecks.myZLibCheck     -offvalue "false" -onvalue "true
 ttk::label    .myFrame.myChecks.myZLibLbl       -text "Use zlib"
 checkbutton   .myFrame.myChecks.myLzmaCheck     -offvalue "false" -onvalue "true" -variable HAVE_LIBLZMA   -command wokdep:gui:UpdateList
 ttk::label    .myFrame.myChecks.myLzmaLbl       -text "Use liblzma"
+checkbutton   .myFrame.myChecks.myE57Check      -offvalue "false" -onvalue "true" -variable HAVE_E57       -command wokdep:gui:UpdateList
+ttk::label    .myFrame.myChecks.myE57Lbl        -text "Use E57"
 
 checkbutton   .myFrame.myChecks.myQt4Check      -offvalue "false" -onvalue "true" -variable CHECK_QT4      -command wokdep:gui:UpdateList
 ttk::label    .myFrame.myChecks.myQt4Lbl        -text "Search Qt4"
@@ -502,6 +546,10 @@ ttk::button   .myFrame.myClose -text "Close" -command wokdep:gui:Close
 
 # Create grid
 # Header
+grid .myFrame.myPrjFrame            -row $aRowIter -column 0 -columnspan 10 -sticky w
+grid .myFrame.myPrjFrame.myPrjLbl   -row 0 -column 0
+grid .myFrame.myPrjFrame.myPrjCombo -row 0 -column 1
+incr aRowIter
 if { "$tcl_platform(platform)" == "windows" } {
   grid .myFrame.myVsFrame               -row $aRowIter -column 0 -columnspan 10 -sticky w
   grid .myFrame.myVsFrame.myVsLbl       -row 0 -column 0
@@ -545,11 +593,8 @@ if { "$::tcl_platform(os)" != "Darwin" } {
 grid .myFrame.myChecks.myZLibCheck     -row $aCheckRowIter -column 6 -sticky e
 grid .myFrame.myChecks.myZLibLbl       -row $aCheckRowIter -column 7 -sticky w
 
-grid .myFrame.myChecks.myGl2psCheck    -row $aCheckRowIter -column 8 -sticky e
-grid .myFrame.myChecks.myGl2psLbl      -row $aCheckRowIter -column 9 -sticky w
-
-grid .myFrame.myChecks.myQt4Check      -row $aCheckRowIter -column 10 -sticky e
-grid .myFrame.myChecks.myQt4Lbl        -row $aCheckRowIter -column 11 -sticky w
+grid .myFrame.myChecks.myQt4Check      -row $aCheckRowIter -column 12 -sticky e
+grid .myFrame.myChecks.myQt4Lbl        -row $aCheckRowIter -column 13 -sticky w
 
 incr aCheckRowIter
 grid .myFrame.myChecks.myFFmpegCheck   -row $aCheckRowIter -column 0 -sticky e
@@ -559,18 +604,22 @@ grid .myFrame.myChecks.myVtkLbl        -row $aCheckRowIter -column 3 -sticky w
 if { "$::tcl_platform(platform)" == "windows" } {
   grid .myFrame.myChecks.myD3dCheck    -row $aCheckRowIter -column 4 -sticky e
   grid .myFrame.myChecks.myD3dLbl      -row $aCheckRowIter -column 5 -sticky w
+} elseif { "$::tcl_platform(os)" == "Darwin" } {
+  grid .myFrame.myChecks.myMacGLXCheck -row $aCheckRowIter -column 4 -sticky e
+  grid .myFrame.myChecks.myMacGLXLbl   -row $aCheckRowIter -column 5 -sticky w
 }
 grid .myFrame.myChecks.myLzmaCheck     -row $aCheckRowIter -column 6 -sticky e
 grid .myFrame.myChecks.myLzmaLbl       -row $aCheckRowIter -column 7 -sticky w
-grid .myFrame.myChecks.myJDKCheck      -row $aCheckRowIter -column 10 -sticky e
-grid .myFrame.myChecks.myJDKLbl        -row $aCheckRowIter -column 11 -sticky w
+grid .myFrame.myChecks.myJDKCheck      -row $aCheckRowIter -column 12 -sticky e
+grid .myFrame.myChecks.myJDKLbl        -row $aCheckRowIter -column 13 -sticky w
 
 incr aCheckRowIter
-if { "$::tcl_platform(os)" == "Darwin" } {
-  grid .myFrame.myChecks.myMacGLXCheck -row $aCheckRowIter -column 0 -sticky e
-  grid .myFrame.myChecks.myMacGLXLbl   -row $aCheckRowIter -column 1 -sticky w
-  incr aCheckRowIter
-}
+grid .myFrame.myChecks.myRapidJsonCheck -row $aCheckRowIter -column 0 -sticky e
+grid .myFrame.myChecks.myRapidJsonLbl   -row $aCheckRowIter -column 1 -sticky w
+grid .myFrame.myChecks.myE57Check      -row $aCheckRowIter -column 6 -sticky e
+grid .myFrame.myChecks.myE57Lbl        -row $aCheckRowIter -column 7 -sticky w
+
+incr aCheckRowIter
 
 # Additional headers search paths
 grid .myFrame.myIncLbl    -row $aRowIter -column 0 -columnspan 10 -sticky w
@@ -603,6 +652,9 @@ grid .myFrame.mySave  -row $aRowIter -column 4 -columnspan 2
 grid .myFrame.myClose -row $aRowIter -column 6 -columnspan 2
 
 # Bind events
+bind .myFrame.myPrjFrame.myPrjCombo <<ComboboxSelected>> {
+  wokdep:gui:SwitchConfig
+}
 bind .myFrame.myVsFrame.myVsCombo <<ComboboxSelected>> {
   wokdep:gui:SwitchConfig
 }
@@ -611,6 +663,7 @@ bind .myFrame.myVsFrame.myArchCombo <<ComboboxSelected>> {
 }
 
 .myFrame.mySrchEntry configure -validate all -validatecommand {
+  set ::PRODUCTS_PATH [file normalize "$::PRODUCTS_PATH_INPUT"]
   #return [file exists "$::PRODUCTS_PATH"]
   wokdep:gui:UpdateList
   return 1

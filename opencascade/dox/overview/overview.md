@@ -32,7 +32,7 @@ Open CASCADE Technology is free software; you can redistribute it and / or modif
 @ref license_lgpl_21 "GNU Lesser General Public License (LGPL) version 2.1", with additional @ref occt_lgpl_exception "exception".
 
 Note that LGPL imposes some obligations on the application linked with Open CASCADE Technology.
-If you wish to use OCCT in a proprietary application, please, pay special attention to address the requirements of LGPL section 6.
+If you wish to use OCCT in a proprietary application, please pay a special attention to address the requirements of LGPL section 6.
 At minimum the following should be considered:
 1. Add the notice visible to the users of your application clearly stating that Open CASCADE Technology is used in this application, and that they have rights in this regard according to LGPL. 
    Such notice can be added in About dialog box (this is mandatory if this box contains copyright statements) or a similar place and/or in the documentation. 
@@ -55,7 +55,7 @@ disclaimer.
 
 You are hereby informed that all software is a property of its respective authors and is protected by 
 international and domestic laws on intellectual property and trademarks. 
-Should you need further information, please directly contact the authors.
+Should you need further information, directly contact the authors.
 
 **CAS.CADE** and **Open CASCADE** are registered trademarks of 
 OPEN CASCADE S.A.S.
@@ -80,7 +80,7 @@ and, in case you need any further information, directly contact their authors.
 **Qt** is a cross-platform application framework that is widely used for developing application software 
 with graphical user interface (GUI). Qt is free and open source software distributed under 
 the terms of the GNU Lesser General Public License. In OCCT Qt is used for programming samples. 
-If you need further information on Qt, please, refer to Qt Homepage (https://www.qt.io/)
+If you need further information on Qt, refer to Qt Homepage (https://www.qt.io/)
 
 **Tcl** is a high-level programming language. Tk is a graphical user interface (GUI) toolkit, 
 with buttons, menus, listboxes, scrollbars, and so on. Taken together Tcl and Tk provide a solution 
@@ -88,11 +88,7 @@ to develop cross-platform graphical user interfaces with a native look and feel.
 Scriptics Corp., Sun Microsystems, and other companies. However, Tcl/Tk is an open source, and 
 the copyright allows you to use, modify, and redistribute Tcl/Tk for any purpose, without an 
 explicit license agreement and without paying any license fees or royalties. 
-To use Tcl/Tk, please refer to the Licensing Terms (https://www.tcl.tk/software/tcltk/license.html).
-
-**GL2PS** is developed by Christophe Geuzaine and others. It is optionally used by OCCT to
-export content of OpenGL scene to vector graphics formats (PS, PDF, EMF, SVG). 
-The library is licensed under GL2PS license (http://www.geuz.org/gl2ps/COPYING.GL2PS).
+To use Tcl/Tk, refer to the Licensing Terms (https://www.tcl.tk/software/tcltk/license.html).
 
 **FreeType 2** is developed by Antoine Leca, David Turner, Werner Lemberg and others. 
 It is a software font engine that is designed to be small, efficient, highly customizable and 
@@ -113,18 +109,18 @@ implementation of 3D viewer. OpenGL specification is developed by the
 Khronos group, https://www.khronos.org/opengl/. OCCT code includes header 
 file *glext.h* obtained from Khronos web site.
 
-**VTK** -- The **Visualization Toolkit (VTK)** is an open-source, freely available software system for 3D computer graphics, image processing and visualization. OCCT VIS component provides adaptation functionality for visualization of OCCT topological shapes by means of VTK library. If you need further information on VTK, please, refer to VTK Homepage http://www.vtk.org/.
+**VTK** -- The **Visualization Toolkit (VTK)** is an open-source, freely available software system for 3D computer graphics, image processing and visualization. OCCT VIS component provides adaptation functionality for visualization of OCCT topological shapes by means of VTK library. If you need further information on VTK, refer to VTK Homepage https://www.vtk.org/.
 
 **Doxygen** developed by Dimitri van Heesch is open source documentation system for 
 C++, C, Java, Objective-C, Python, IDL, PHP and C#. This product is used in Open CASCADE Technology 
 for automatic creation of Technical Documentation from C++ header files. 
-If you need further information on Doxygen, please refer to https://www.stack.nl/~dimitri/doxygen/index.html.
+If you need further information on Doxygen, refer to https://www.stack.nl/~dimitri/doxygen/index.html.
 
 **Graphviz** is open source graph visualization software developed by John Ellson, Emden Gansner, Yifan Hu and Arif Bilgin. 
 Graph visualization is representiation of structured information as diagrams of abstract graphs and networks. 
 This product is used together with Doxygen in Open CASCADE Technology for automatic creation of Technical Documentation 
 (generation of dependency graphs). Current versions of Graphviz are licensed on an open source 
-basis under The Eclipse Public License (EPL) (http://www.graphviz.org/License.php).
+basis under The Eclipse Public License (EPL) (https://www.graphviz.org/license/).
 
 **Inno Setup** is a free script-driven installation system created in CodeGear Delphi by Jordan Russell. 
 In OCCT Inno Setup is used to create Installation Wizard on Windows. 
@@ -134,10 +130,10 @@ It is licensed under Inno Setup License (http://www.jrsoftware.org/files/is/lice
 and others used by multimedia applications. This library is developed by Hervé Drolon and Floris van den Berg. 
 FreeImage is easy to use, fast, multithreading safe, compatible with all 32-bit or 64-bit versions of Windows, 
 and cross-platform (works both with Linux and Mac OS X). FreeImage is optionally used by OCCT to work
-with images, on conditions of the FreeImage Public License (FIPL) (http://freeimage.sourceforge.net/freeimage-license.txt).
+with images, on conditions of the FreeImage Public License (FIPL) (https://freeimage.sourceforge.net/freeimage-license.txt).
 
 **David M. Gay's floating point routines** (dtoa.c) are used for fast reading of floating point values from text strings.
-These routines are available under MIT-like license (see http://www.netlib.org/fp/).
+These routines are available under MIT-like license (see https://www.netlib.org/fp/).
 
 **CMake** is an open-source, cross-platform family of tools designed to build, test and package software. CMake is used to control the software compilation process using simple platform and compiler independent configuration files, and generate native makefiles and workspaces that can be used in the compiler environment of your choice. 
 OCCT uses CMake as a build system. CMake is available under BSD 3-Clause license. See more at https://cmake.org/
@@ -153,6 +149,9 @@ FFmpeg is optionally used by OCCT for video recording, on LGPL conditions (https
 **MikTEX** is up-to-date implementation of TeX/LaTeX and related programs for Windows. It is used 
 for generation of User and Developer Guides in PDF format. See https://miktex.org for information
 on this tool.
+
+**RapidJSON** is an Open Source JSON parser and generator for C++.
+RapidJSON is optionally used by OCCT for reading glTF files (https://rapidjson.org/).
 
 Adobe Systems, Inc. provides **Adobe Reader**, which can be used to view files in Portable Document Format (PDF). 
 
@@ -208,13 +207,12 @@ for which OCCT is certified to work.
 
 | OS        | Compiler |
 | --------- | ----------- |
-| Windows   | Microsoft Visual Studio: 2008 SP1, 2010 SP1<sup>1</sup>, 2012 Update 4, 2013 Update 5, 2015, 2017 <br> GCC 4.3+ (Mingw-w64)|
+| Windows   | Microsoft Visual Studio: 2008 SP1, 2010 SP1, 2012 Update 4, 2013 Update 5, 2015 Update 3, 2017 <sup>1</sup>, 2019 <br> GCC 4.3+ (Mingw-w64)|
 | Linux     | GNU gcc 4.3+ <br> LLVM CLang 3.6+ |
 | OS X / macOS | XCode 6 or newer |
 | Android   | NDK r10, GNU gcc 4.8 or newer |
 
-1) VC++ 10 64-bit is used for regular testing and for building 
-  binary package of official release of OCCT on Windows.
+1) VC++ 141 64-bit is used for regular testing and for building binary package of official release of OCCT on Windows.
 
 @subsection overview_req_libs Third-party libraries
 
@@ -226,9 +224,9 @@ for which OCCT is certified to work.
 | Freetype (for text rendering) | FreeType 2.4.11-2.7.1 https://sourceforge.net/projects/freetype/files/ |
 | FreeImage (optional, for support of common 2D graphic formats) | FreeImage 3.17.0+ https://sourceforge.net/projects/freeimage/files |
 | FFmpeg (optional, for video recording) | FFmpeg 3.1+ https://www.ffmpeg.org/download.html |
-| gl2ps (optional, for export contents of OCCT viewer to vector formats) | gl2ps-1.3.8+  http://geuz.org/gl2ps/ |
+| RapidJSON (optional, for reading glTF) | RapidJSON 1.1+ https://rapidjson.org/ |
 | Intel TBB (optional, for multithreaded algorithms) | TBB 4.x or 5.x https://www.threadingbuildingblocks.org/ |
-| VTK (for VTK Integration Services | VTK 6.1+ http://www.vtk.org/download/ |
+| VTK (for VTK Integration Services | VTK 6.1+ https://www.vtk.org/download/ |
 | Doxygen (optional for building documentation) | Doxygen 1.8.5+ https://www.stack.nl/~dimitri/doxygen/download.html |
 
 @subsection overview_req_hw Hardware
@@ -286,13 +284,13 @@ When the installation is complete, you will find the directories for 3rd party p
 
 @figure{/overview/images/overview_3rdparty.png}
 
-The contents of the OCCT-7.3.0 directory (called further "OCCT root", or $CASROOT) are as follows:
+The contents of the OCCT-7.4.0 directory (called further "OCCT root", or $CASROOT) are as follows:
 
 @figure{/overview/images/overview_installation.png, "The directory tree"}
 
   * **adm**   This folder contains administration files, which allow rebuilding OCCT;
   * **adm/cmake**  This folder contains files of CMake building procedure;
-  * **adm/msvc**  This folder contains Visual Studio projects for Visual C++ 2010, 2012, 2013, 2015 and 2017 which allow rebuilding OCCT under Windows platform in 32 and 64-bit mode;
+  * **adm/msvc**  This folder contains Visual Studio projects for Visual C++ 2010, 2012, 2013, 2015, 2017 and 2019 which allow rebuilding OCCT under Windows platform in 32 and 64-bit mode;
   * **data**  This folder contains CAD files in different formats, which can be used to test the OCCT functionality;
   * **doc**  This folder contains OCCT documentation in HTML and PDF format;
   * **dox**  This folder contains sources of OCCT documentation in plain text (MarkDown) format;
@@ -311,7 +309,7 @@ To run any Open CASCADE Technology application you need to set the environment v
 
 You can define the environment variables with env.bat script located in the 
 $CASROOT folder. This script accepts two arguments to be used: 
-the version of Visual Studio (vc10 -- vc141) and the architecture (win32 or win64).
+the version of Visual Studio (vc10 -- vc142) and the architecture (win32 or win64).
 
 The additional environment settings necessary for compiling OCCT libraries and samples 
 by Microsoft Visual Studio can be set using script custom.bat located in the same folder. 
@@ -334,7 +332,7 @@ The scripts are located in the OCCT root folder.
 
   * **CASROOT** is used to define the root directory of Open CASCADE Technology;
   * **PATH** is required to define the path to OCCT binaries and 3rdparty folder;
-  * **LD_LIBRARY_PATH** is required to define the path to OCCT libraries (on UNIX platforms only);
+  * **LD_LIBRARY_PATH** is required to define the path to OCCT libraries (on UNIX platforms only; **DYLD_LIBRARY_PATH** variable in case of macOS);
   * **MMGT_OPT** (optional) if set to 1, the memory manager performs optimizations as described below; if set to 2, 
     Intel (R) TBB optimized memory manager is used; if 0 (default), every memory block is allocated 
     in C memory heap directly (via malloc() and free() functions). 
@@ -401,7 +399,7 @@ the specified resource file and activates the commands implemented in the plug-i
 The whole process of using the plug-in mechanism as well as the instructions for extending Test Harness is described in the @ref occt_user_guides__test_harness.
 
 Draw Test Harness provides an environment for OCCT automated testing system. 
-Please, consult its @ref occt_dev_guides__tests "Automated Testing System" for details.
+Check its @ref occt_dev_guides__tests "Automated Testing System" for details.
 
 Remarks:
 
@@ -415,8 +413,7 @@ Remarks:
 
 **On Linux:**
 
-1. If OCCT was built by Code::Blocks  use <i>$CASROOT/draw_cbp.sh</i> file to launch *DRAWEXE* executable;
-2. If OCCT was built by Automake    use <i>$CASROOT/draw_amk.sh</i> file to launch *DRAWEXE* executable;
+* If OCCT was built by Code::Blocks  use <i>$CASROOT/draw.sh</i> file to launch *DRAWEXE* executable.
 
 Draw[1]> prompt appears in the command window
 

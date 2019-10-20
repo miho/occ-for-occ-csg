@@ -92,7 +92,7 @@ Standard_Boolean BinMXCAFDoc_LocationDriver::Translate(const BinObjMgt_Persisten
     return Standard_True;
   }
   
-  Standard_Integer aFileVer = BinMDataStd::DocumentVersion();
+  Standard_Integer aFileVer = theMap.GetHeaderData()->StorageVersion().IntegerValue();
   if( aFileVer > 5 && myLocations == 0 )
   {
     return Standard_False;
@@ -178,7 +178,7 @@ void BinMXCAFDoc_LocationDriver::Translate(const TopLoc_Location& theLoc,
   if( myLocations == 0 )
   {
 #ifdef OCCT_DEBUG
-    cout<<"Pointer to LocationSet is NULL\n";
+    std::cout<<"Pointer to LocationSet is NULL\n";
 #endif
     return;
   }

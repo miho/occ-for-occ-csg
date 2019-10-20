@@ -7,7 +7,7 @@ Shape Healing  {#occt_user_guides__shape_healing}
 
 @subsection occt_shg_1_1 Introduction
 
-This manual explains how to use Shape Healing. It provides basic documentation on its operation. For advanced information on Shape Healing and its applications, see our <a href="http://www.opencascade.com/content/tutorial-learning">E-learning & Training</a> offerings. 
+This manual explains how to use Shape Healing. It provides basic documentation on its operation. For advanced information on Shape Healing and its applications, see our <a href="https://www.opencascade.com/content/tutorial-learning">E-learning & Training</a> offerings. 
 
 The **Shape Healing** toolkit provides a set of tools to work on the geometry and topology of Open CASCADE Technology (**OCCT**) shapes. Shape Healing adapts shapes so as to make them as appropriate for use by Open CASCADE Technology as possible. 
 
@@ -50,7 +50,7 @@ Each sub-domain has its own scope of functionality:
 * customization -- modifying shape representation to fit specific needs (shape is not modified, only the form of its representation is modified); 
 * processing  -- mechanism of managing shape modification via a user-editable resource file. 
 
-Message management is used for creating messages, filling them with various parameters and storing them in the trace file. This tool provides functionality for attaching messages to the shapes for deferred analysis of various run-time events. In this document only general principles of using Shape Healing will be described. For more detailed information please see the corresponding header files. 
+Message management is used for creating messages, filling them with various parameters and storing them in the trace file. This tool provides functionality for attaching messages to the shapes for deferred analysis of various run-time events. In this document only general principles of using Shape Healing will be described. For more detailed information, see the corresponding header files. 
 
 Tools responsible for analysis, fixing and upgrading of shapes can give the information about how these operations were performed. This information can be obtained by the user with the help of mechanism of status querying. 
 

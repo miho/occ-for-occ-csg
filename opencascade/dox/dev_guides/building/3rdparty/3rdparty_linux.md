@@ -10,7 +10,7 @@ products used by Open CASCADE Technology and samples on Linux platform.
 
 The links for downloading the third-party products are available on the web site 
 of OPEN CASCADE SAS at 
-http://www.opencascade.com/content/3rd-party-components. 
+https://www.opencascade.com/content/3rd-party-components.
 
 There are two types of third-party products, which are  necessary to build OCCT: 
   
@@ -19,7 +19,6 @@ There are two types of third-party products, which are  necessary to build OCCT:
 	* FreeType 2.4.10 - 2.5.3;
 * Optional  products: 
 	* TBB 3.x - 4.x;
-	* gl2ps 1.3.5 - 1.3.8;
 	* FreeImage 3.14.1 - 3.16.0;
 	* VTK 6.1.0.
 
@@ -31,7 +30,7 @@ Tcl/Tk is required for DRAW test harness.
 
 @subsubsection dev_guides__building_3rdparty_linux_2_1_2 Installation from sources: Tcl
   
-Download the necessary archive from http://www.tcl.tk/software/tcltk/download.html and unpack it. 
+Download the necessary archive from https://www.tcl.tk/software/tcltk/download.html and unpack it.
   
 1. Enter the unix sub-directory of the directory where the Tcl source  files are located <i>(TCL_SRC_DIR)</i>. 
 
@@ -54,7 +53,7 @@ Download the necessary archive from http://www.tcl.tk/software/tcltk/download.ht
 
 @subsubsection dev_guides__building_3rdparty_linux_2_1_3 Installation from sources: Tk
   
-Download the necessary archive from http://www.tcl.tk/software/tcltk/download.html and unpack it. 
+Download the necessary archive from https://www.tcl.tk/software/tcltk/download.html and unpack it.
   
 1. Enter the unix sub-directory of the directory where the Tk source files are located <i>(TK_SRC_DIR)</i> 
 
@@ -79,7 +78,7 @@ Download the necessary archive from http://www.tcl.tk/software/tcltk/download.ht
 @subsection dev_guides__building_3rdparty_linux_2_2 FreeType
 
 FreeType is required for text display in the 3D viewer. 
-Download the necessary archive from http://sourceforge.net/projects/freetype/files/ and unpack it. 
+Download the necessary archive from https://sourceforge.net/projects/freetype/files/ and unpack it.
   
 1. Enter the directory where the source files of FreeType  are located <i>(FREETYPE_SRC_DIR)</i>. 
 
@@ -104,39 +103,13 @@ Download the necessary archive from http://sourceforge.net/projects/freetype/fil
     
 @subsection dev_guides__building_3rdparty_linux_3_1 TBB
 
-This third-party product is  installed with binaries from the archive that can be downloaded from http://threadingbuildingblocks.org. 
+This third-party product is  installed with binaries from the archive that can be downloaded from https://github.com/intel/tbb.
 Go to the **Download** page, find the  release version you need and pick the archive for Linux platform.
 To install, unpack the downloaded archive of TBB product.
 
-@subsection dev_guides__building_3rdparty_linux_3_2 gl2ps
-
-Download the necessary archive from http://geuz.org/gl2ps/ and unpack it.
-  
-1. Install or build *cmake* product from the source file. 
-2. Start *cmake* in GUI mode with the directory where the source files of gl2ps are located:
-
-       ccmake GL2PS_SRC_DIR   
-
-   * Press <i>[c]</i> to make the  initial configuration; 
-   * Define the necessary options in *CMAKE_INSTALL_PREFIX* 
-   * Press <i>[c]</i> to make the final  configuration 
-   * Press <i>[g]</i> to generate  Makefile and exit 
-
-   or just run the following command: 
-
-       cmake  –DCMAKE_INSTALL_PREFIX=GL2PS_INSTALL_DIR –DCMAKE_BUILD_TYPE=Release   
-
-3. Start the building of gl2ps: 
-
-       make   
-
-4. Start the installation of gl2ps. Binaries will be  installed according to the *CMAKE_INSTALL_PREFIX* option. 
-
-       make install   
-
 @subsection dev_guides__building_3rdparty_linux_3_3 FreeImage
 
-Download the necessary archive from http://sourceforge.net/projects/freeimage/files/Source%20Distribution/
+Download the necessary archive from https://sourceforge.net/projects/freeimage/files/Source%20Distribution/
 and unpack it. The directory with unpacked sources is  further referred to as *FREEIMAGE_SRC_DIR*. 
   
 1. Modify *FREEIMAGE_SRC_DIR/Source/OpenEXR/Imath/ImathMatrix.h*: 
@@ -201,11 +174,11 @@ and unpack it. The directory with unpacked sources is  further referred to as *F
 
 @subsection dev_guides__building_3rdparty_linux_3_4 VTK
 
-You can download VTK sources from http://www.vtk.org/VTK/resources/software.html
+You can download VTK sources from https://www.vtk.org/VTK/resources/software.html
 
 ### The building procedure:
 
-Download the necessary archive from http://www.vtk.org/VTK/resources/software.html and unpack it.
+Download the necessary archive from https://www.vtk.org/VTK/resources/software.html and unpack it.
 
 1. Install or build *cmake* product from the source file.
 2. Start *cmake* in GUI mode with the directory where the source files of *VTK* are located:
@@ -221,7 +194,7 @@ Download the necessary archive from http://www.vtk.org/VTK/resources/software.ht
 
        make
 
-4. Start the installation of gl2ps. Binaries will be  installed according to the *VTK_INSTALL_PREFIX* option.
+4. Start the installation of VTK. Binaries will be installed according to the *VTK_INSTALL_PREFIX* option.
 
        make install
 
@@ -232,7 +205,7 @@ Download the necessary archive from http://www.vtk.org/VTK/resources/software.ht
 All 3rd-party products required for building of  OCCT could be installed
 from official repositories. You may install them from  console using apt-get utility:
 
-    sudo apt-get install tcllib tklib tcl-dev tk-dev libfreetype-dev libxt-dev libxmu-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libfreeimage-dev libtbb-dev libgl2ps-dev
+    sudo apt-get install tcllib tklib tcl-dev tk-dev libfreetype-dev libxt-dev libxmu-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libfreeimage-dev libtbb-dev
 
 To launch binaries built with WOK you need to install C shell and 32-bit libraries on x86_64 distributives:
 

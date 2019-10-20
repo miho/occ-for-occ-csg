@@ -251,8 +251,8 @@ Standard_Integer PCDM_ReadWriter_1::ReadReferenceCounter(const TCollection_Exten
     for ( i =1; i<=  refUserInfo.Length() ; i++) {
       if(refUserInfo(i).Search(REFERENCE_COUNTER) != -1) {
 	try { OCC_CATCH_SIGNALS theReferencesCounter=refUserInfo(i).Token(" ",2).IntegerValue();}
-	catch (Standard_Failure) { 
-//	  cout << "warning: could not read the reference counter in " << aFileName << endl;
+    catch (Standard_Failure const&) {
+//	  std::cout << "warning: could not read the reference counter in " << aFileName << std::endl;
 	  TCollection_ExtendedString aMsg("Warning: ");
 	  aMsg = aMsg.Cat("could not read the reference counter in ").Cat(aFileName).Cat("\0");
 	  if(!theMsgDriver.IsNull()) 
@@ -262,7 +262,7 @@ Standard_Integer PCDM_ReadWriter_1::ReadReferenceCounter(const TCollection_Exten
     }
     
   }
-  catch (Standard_Failure) {}
+  catch (Standard_Failure const&) {}
 
   if(theFileIsOpen)  theFileDriver->Close();
 
@@ -305,7 +305,7 @@ void PCDM_ReadWriter_1::ReadReferences(const TCollection_ExtendedString& aFileNa
 	if(!theAbsolutePath.IsEmpty()) thePath=theAbsolutePath;
       }
       if(!theMsgDriver.IsNull()) {
-//      cout << "reference found; ReferenceIdentifier: " << theReferenceIdentifier << "; File:" << thePath << ", version:" << theDocumentVersion;
+//      std::cout << "reference found; ReferenceIdentifier: " << theReferenceIdentifier << "; File:" << thePath << ", version:" << theDocumentVersion;
 	TCollection_ExtendedString aMsg("Warning: ");
 	aMsg = aMsg.Cat("reference found; ReferenceIdentifier:  ").Cat(theReferenceIdentifier).Cat("; File:").Cat(thePath).Cat(", version:").Cat(theDocumentVersion).Cat("\0");
 	theMsgDriver->Send(aMsg.ToExtString());
@@ -400,8 +400,8 @@ Standard_Integer PCDM_ReadWriter_1::ReadDocumentVersion(const TCollection_Extend
     for ( i =1; i<=  refUserInfo.Length() ; i++) {
       if(refUserInfo(i).Search(MODIFICATION_COUNTER) != -1) {
 	try { OCC_CATCH_SIGNALS theVersion=refUserInfo(i).Token(" ",2).IntegerValue();}
-	catch (Standard_Failure) { 
-//	  cout << "warning: could not read the version in " << aFileName << endl;
+    catch (Standard_Failure const&) {
+//	  std::cout << "warning: could not read the version in " << aFileName << std::endl;
 	  TCollection_ExtendedString aMsg("Warning: ");
 	  aMsg = aMsg.Cat("could not read the version in ").Cat(aFileName).Cat("\0");
 	  if(!theMsgDriver.IsNull()) 
@@ -412,7 +412,7 @@ Standard_Integer PCDM_ReadWriter_1::ReadDocumentVersion(const TCollection_Extend
     }
   }
 
-  catch (Standard_Failure) {}
+  catch (Standard_Failure const&) {}
 
   if(theFileIsOpen) theFileDriver->Close();
   delete theFileDriver;

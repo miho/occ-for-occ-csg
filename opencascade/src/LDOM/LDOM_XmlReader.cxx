@@ -13,7 +13,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-//AGV 060302: Input from istream
+//AGV 060302: Input from std::istream
 //            AGV 130302: bug corr: was error if strlen(root_elem_name) < 7
 
 #include <LDOM_XmlReader.hxx>
@@ -210,8 +210,7 @@ LDOM_XmlReader::RecordType LDOM_XmlReader::ReadRecord (Standard_IStream& theIStr
           }       // otherwise ERROR
         }     // end of switch
         myError = "Unknown XML object: ";
-        myError += TCollection_AsciiString ((const Standard_CString)myPtr,
-                                            XML_MIN_BUFFER);
+        myError += TCollection_AsciiString (myPtr, XML_MIN_BUFFER);
         return XML_UNKNOWN;
       case '\0':
         if (myEOF == Standard_True) continue;

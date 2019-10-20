@@ -1,0 +1,6 @@
+C:/Users/miho/Documents/GitHub/occ-for-occ-csg/dependencies/freetype/build/CMakeFiles/PACKAGE.dir
+C:/Users/miho/Documents/GitHub/occ-for-occ-csg/dependencies/freetype/build/CMakeFiles/freetype.dir
+C:/Users/miho/Documents/GitHub/occ-for-occ-csg/dependencies/freetype/build/CMakeFiles/dist.dir
+C:/Users/miho/Documents/GitHub/occ-for-occ-csg/dependencies/freetype/build/CMakeFiles/INSTALL.dir
+C:/Users/miho/Documents/GitHub/occ-for-occ-csg/dependencies/freetype/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/miho/Documents/GitHub/occ-for-occ-csg/dependencies/freetype/build/CMakeFiles/ZERO_CHECK.dir

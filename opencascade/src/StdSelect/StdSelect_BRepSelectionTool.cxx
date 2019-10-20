@@ -75,7 +75,7 @@ void StdSelect_BRepSelectionTool::PreBuildBVH (const Handle(SelectMgr_Selection)
 {
   for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (theSelection->Entities()); aSelEntIter.More(); aSelEntIter.Next())
   {
-    const Handle(SelectBasics_SensitiveEntity)& aSensitive = aSelEntIter.Value()->BaseSensitive();
+    const Handle(Select3D_SensitiveEntity)& aSensitive = aSelEntIter.Value()->BaseSensitive();
     if (aSensitive->NbSubElements() >= BVH_PRIMITIVE_LIMIT)
     {
       aSensitive->BVH();
@@ -190,8 +190,8 @@ void StdSelect_BRepSelectionTool::Load (const Handle(SelectMgr_Selection)& theSe
   // loading of selectables...
   for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (theSelection->Entities()); aSelEntIter.More(); aSelEntIter.Next())
   {
-    Handle(SelectMgr_EntityOwner) anOwner = Handle(SelectMgr_EntityOwner)::DownCast (aSelEntIter.Value()->BaseSensitive()->OwnerId());
-    anOwner->Set (theSelectableObj);
+    const Handle(SelectMgr_EntityOwner)& anOwner = aSelEntIter.Value()->BaseSensitive()->OwnerId();
+    anOwner->SetSelectable (theSelectableObj);
   }
 
   PreBuildBVH (theSelection);
@@ -443,19 +443,20 @@ void StdSelect_BRepSelectionTool::GetEdgeSensitive (const TopoDS_Shape& theShape
                                                     Handle(Select3D_SensitiveEntity)& theSensitive)
 {
   const TopoDS_Edge& anEdge = TopoDS::Edge (theShape);
+  // try to get points from existing polygons
+  Handle(TColgp_HArray1OfPnt) aPoints = GetPointsFromPolygon (anEdge);
+  if (!aPoints.IsNull()
+   && !aPoints->IsEmpty())
+  {
+    theSensitive = new Select3D_SensitiveCurve (theOwner, aPoints);
+    return;
+  }
+
   BRepAdaptor_Curve cu3d;
   try {
     OCC_CATCH_SIGNALS
     cu3d.Initialize (anEdge);
-  } catch (Standard_NullObject) {
-    return;
-  }
-
-  // try to get points from existing polygons
-  Handle(TColgp_HArray1OfPnt) aPoints = GetPointsFromPolygon (anEdge);
-  if (!aPoints.IsNull() && aPoints->Length() > 0)
-  {
-    theSensitive = new Select3D_SensitiveCurve (theOwner, aPoints);
+  } catch (Standard_NullObject const&) {
     return;
   }
 
@@ -621,13 +622,22 @@ Standard_Boolean StdSelect_BRepSelectionTool::GetSensitiveForFace (const TopoDS_
   BRepAdaptor_Curve cu3d;
   for (BRepTools_WireExplorer aWireExplorer (aWire); aWireExplorer.More(); aWireExplorer.Next())
   {
-    cu3d.Initialize (aWireExplorer.Current());
+    try
+    {
+      OCC_CATCH_SIGNALS
+      cu3d.Initialize (aWireExplorer.Current());
+    }
+    catch (Standard_NullObject const&)
+    {
+      continue;
+    }
+
     Standard_Real wf = 0.0, wl = 0.0;
     BRep_Tool::Range (aWireExplorer.Current(), wf, wl);
     if (Abs (wf - wl) <= Precision::Confusion())
     {
     #ifdef OCCT_DEBUG
-      cout<<" StdSelect_BRepSelectionTool : Curve where ufirst = ulast ...."<<endl;
+      std::cout<<" StdSelect_BRepSelectionTool : Curve where ufirst = ulast ...."<<std::endl;
     #endif
       continue;
     }

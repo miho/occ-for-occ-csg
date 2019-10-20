@@ -17,7 +17,6 @@ BOPAlgo_BuilderArea.cxx
 BOPAlgo_BuilderArea.hxx
 BOPAlgo_BuilderFace.cxx
 BOPAlgo_BuilderFace.hxx
-BOPAlgo_BuilderShape.cxx
 BOPAlgo_BuilderShape.hxx
 BOPAlgo_BuilderSolid.cxx
 BOPAlgo_BuilderSolid.hxx
@@ -28,6 +27,10 @@ BOPAlgo_CheckResult.cxx
 BOPAlgo_CheckResult.hxx
 BOPAlgo_CheckStatus.hxx
 BOPAlgo_ListOfCheckResult.hxx
+BOPAlgo_MakeConnected.cxx
+BOPAlgo_MakeConnected.hxx
+BOPAlgo_MakePeriodic.cxx
+BOPAlgo_MakePeriodic.hxx
 BOPAlgo_MakerVolume.cxx
 BOPAlgo_MakerVolume.hxx
 BOPAlgo_MakerVolume.lxx

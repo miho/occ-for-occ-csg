@@ -136,11 +136,69 @@ const char* GeomTools_Dump (void* theHandlePtr)
 Dump geometric object to cout.
 - *theHandlePtr* -- a pointer to the geometric variable (<i>Handle</i> to *Geom_Geometry* or *Geom2d_Curve* or descendant) to be set.
 
+
+@section occt_debug_dump_json Dump OCCT objects into Json
+
+Many OCCT classes may dump the current state into the stream. This stream contains the information about the class field into the field value/s.
+It is possible to prepare recursive dump using corresponded macro for class fields. The depth of this recursion is defined by parameter of the dump.
+The object defines What parameters should be presented in the Dump. The usual way is to dump all object fields.
+
+@subsection occt_debug_dump_json_object Implementation in object
+
+Steps to prepare dump of the object into json:
+
+1. Create method <b>DumpJson</b>. The method should accept the output stream and the depth for the fields dump.
+Depth, equal to zero means that only fields of this class should be dumped. Default value -1 means that whole tree of dump will be built recursively calling dump of all fields.
+
+2. Put into the first row of the method <b>OCCT_DUMP_CLASS_BEGIN</b>. This macro creates a local variable, that will open Json structure on start, and close on exit from this method.
+
+3. Add several macro to store field values.
+
+The following macro are defined to cover the object parameters into json format:
+
+| Name                        | Result in json |
+| :-------------------------- | :--------|
+| OCCT_DUMP_FIELD_VALUE_NUMERICAL  | "field": value |
+| OCCT_DUMP_FIELD_VALUE_STRING     | "field": "value" |
+| OCCT_DUMP_FIELD_VALUE_POINTER    | "field": "pointer address" |
+| OCCT_DUMP_FIELD_VALUES_DUMPED    | "field": { result of field->DumpJson(...) } |
+| OCCT_DUMP_FIELD_VALUES_NUMERICAL | "field": [value_1, ..., value_n]
+| OCCT_DUMP_FIELD_VALUES_STRING    | "field": ["value_1", ..., "value_n"]
+| OCCT_DUMP_BASE_CLASS   | "kind": { result of kind::DumpJson(...) } |
+
+@subsection occt_debug_dump_json_draw Using in DRAW
+
+In DRAW, key '-dumpJson' is used to dump an object.
+It is implemented in 'vaspect' and 'boundingbox' commands.
+
+Json output for Bnd_OBB (using command 'bounding v -obb -dumpJson'):
+
+~~~~~
+"Bnd_OBB": {
+   "Center": {
+      "gp_XYZ": [1, 2, 3]
+   },
+   "Axes[0]": {
+       "gp_XYZ:" [1, 0, 0]
+   },
+   "Axes[1]": {
+       "gp_XYZ:" [0, 1, 0]
+   },
+   "Axes[2]": {
+       "gp_XYZ:" [0, 0, 1]
+   },
+   "HDims[0]": 0,
+   "HDims[1]": 0,
+   "HDims[2]": 0,
+   "IsAABox": 1,
+}
+~~~~~
+
 @section occt_debug_vstudio Using Visual Studio debugger 
 
 @subsection occt_debug_vstudio_command Command window 
 
-Visual Studio debugger provides the Command Window (can be activated from menu <b>View / Other Windows / Command Window</b>), which can be used to evaluate variables and expressions interactively in a debug session (see http://msdn.microsoft.com/en-us/library/c785s0kz.aspx). Note that the Immediate Window can also be used but it has some limitations, e.g. does not support aliases.
+Visual Studio debugger provides the Command Window (can be activated from menu <b>View / Other Windows / Command Window</b>), which can be used to evaluate variables and expressions interactively in a debug session (see https://msdn.microsoft.com/en-us/library/c785s0kz.aspx). Note that the Immediate Window can also be used but it has some limitations, e.g. does not support aliases.
 
 When the execution is interrupted by a breakpoint, you can use this window to call the above described functions in context of the currently debugged function. Note that in most cases you will need to specify explicitly context of the function by indicating the name of the DLL where it is defined.
 

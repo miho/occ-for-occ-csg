@@ -17,6 +17,7 @@
 #include <Prs3d_TextAspect.hxx>
 
 #include <Font_NameOfFont.hxx>
+#include <Standard_Dump.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_TextAspect, Prs3d_BasicAspect)
 
@@ -26,7 +27,6 @@ IMPLEMENT_STANDARD_RTTIEXT(Prs3d_TextAspect, Prs3d_BasicAspect)
 // =======================================================================
 Prs3d_TextAspect::Prs3d_TextAspect()
 : myTextAspect (new Graphic3d_AspectText3d (Quantity_Color (Quantity_NOC_YELLOW), Font_NOF_ASCII_TRIPLEX, 1.0, 0.0)),
-  myAngle (0.0),
   myHeight(16.0),
   myHorizontalJustification (Graphic3d_HTA_LEFT),
   myVerticalJustification (Graphic3d_VTA_BOTTOM),
@@ -41,7 +41,6 @@ Prs3d_TextAspect::Prs3d_TextAspect()
 // =======================================================================
 Prs3d_TextAspect::Prs3d_TextAspect (const Handle(Graphic3d_AspectText3d)& theAspect)
 : myTextAspect (theAspect),
-  myAngle (0.0),
   myHeight(16.0),
   myHorizontalJustification (Graphic3d_HTA_LEFT),
   myVerticalJustification (Graphic3d_VTA_BOTTOM),
@@ -49,3 +48,20 @@ Prs3d_TextAspect::Prs3d_TextAspect (const Handle(Graphic3d_AspectText3d)& theAsp
 {
   //
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Prs3d_TextAspect::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Prs3d_TextAspect);
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTextAspect.get());
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHeight);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHorizontalJustification);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myVerticalJustification);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOrientation);
+}
+

@@ -356,7 +356,7 @@ bool VInspector_Window::OpenFile(const TCollection_AsciiString& theFileName)
 
   Handle(AIS_Shape) aPresentation = new AIS_Shape (aShape);
   aContext->Display (aPresentation, false);
-  aContext->Load (aPresentation, -1/*selection mode*/, true);
+  aContext->Load (aPresentation, -1/*selection mode*/);
   aContext->UpdateCurrentViewer();
 
   UpdateTreeModel();
@@ -408,7 +408,7 @@ void VInspector_Window::onToolBarActionClicked (const int theActionId)
     }
     case VInspector_ToolActionType_SelectOwnersId:
     {
-      NCollection_List<Handle(SelectBasics_EntityOwner)> anOwnersForViewer;
+      NCollection_List<Handle(SelectMgr_EntityOwner)> anOwnersForViewer;
       if (myToolBar->GetToolButton((VInspector_ToolActionType)theActionId)->isChecked())
         VInspector_ViewModel::GetSelectedOwners(myTreeView->selectionModel(), anOwnersForViewer);
       VInspector_Tools::AddOrRemoveSelectedShapes(aViewModel->GetContext(), anOwnersForViewer);
@@ -576,7 +576,7 @@ void VInspector_Window::displaySelectedPresentations(const bool theToDisplay)
     if (theToDisplay)
     {
       aContext->Display(aPresentation, false);
-      aContext->Load(aPresentation, -1, true);
+      aContext->Load(aPresentation, -1);
     }
     else
       aContext->Erase(aPresentation, false);

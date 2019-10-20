@@ -30,13 +30,15 @@ struct OpenGl_UnpackAlignmentSentry
 {
 
   //! Reset unpack alignment settings to safe values
-  void Reset()
+  static void Reset()
   {
     glPixelStorei (GL_UNPACK_ALIGNMENT,  1);
   #if !defined(GL_ES_VERSION_2_0)
     glPixelStorei (GL_UNPACK_ROW_LENGTH, 0);
   #endif
   }
+
+  OpenGl_UnpackAlignmentSentry() {}
 
   ~OpenGl_UnpackAlignmentSentry()
   {
@@ -180,7 +182,7 @@ bool OpenGl_Texture::InitSamplerObject (const Handle(OpenGl_Context)& theCtx)
 //purpose  :
 //=======================================================================
 bool OpenGl_Texture::GetDataFormat (const Handle(OpenGl_Context)& theCtx,
-                                    const Image_PixMap&           theData,
+                                    const Image_Format            theFormat,
                                     GLint&                        theTextFormat,
                                     GLenum&                       thePixelFormat,
                                     GLenum&                       theDataType)
@@ -188,7 +190,7 @@ bool OpenGl_Texture::GetDataFormat (const Handle(OpenGl_Context)& theCtx,
   theTextFormat  = GL_RGBA8;
   thePixelFormat = 0;
   theDataType    = 0;
-  switch (theData.Format())
+  switch (theFormat)
   {
     case Image_Format_GrayF:
     {
@@ -403,6 +405,15 @@ bool OpenGl_Texture::Init (const Handle(OpenGl_Context)& theCtx,
                            const Graphic3d_TypeOfTexture theType,
                            const Image_PixMap*           theImage)
 {
+  if (theSizeX < 1
+   || theSizeY < 1)
+  {
+    theCtx->PushMessage (GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+                         "Error: texture of 0 size cannot be created.");
+    Release (theCtx.operator->());
+    return false;
+  }
+
 #if !defined(GL_ES_VERSION_2_0)
   const GLenum aTarget = theType == Graphic3d_TOT_1D
                        ? GL_TEXTURE_1D
@@ -722,6 +733,12 @@ bool OpenGl_Texture::Init (const Handle(OpenGl_Context)& theCtx,
       Unbind (theCtx);
       return true;
     }
+    case Graphic3d_TOT_CUBEMAP:
+    {
+      Unbind (theCtx);
+      Release (theCtx.get());
+      return false;
+    }
   }
 
   Release (theCtx.operator->());
@@ -756,6 +773,36 @@ bool OpenGl_Texture::Init (const Handle(OpenGl_Context)& theCtx,
                (Standard_Integer)theImage.SizeX(),
                (Standard_Integer)theImage.SizeY(),
                theType, &theImage);
+}
+
+// =======================================================================
+// function : Init
+// purpose  :
+// =======================================================================
+bool OpenGl_Texture::Init (const Handle(OpenGl_Context)&       theCtx,
+                           const Handle(Graphic3d_TextureMap)& theTextureMap)
+{
+  if (theTextureMap.IsNull())
+  {
+    return false;
+  }
+
+  switch (theTextureMap->Type())
+  {
+    case Graphic3d_TOT_CUBEMAP:
+    {
+      return InitCubeMap (theCtx, Handle(Graphic3d_CubeMap)::DownCast(theTextureMap));
+    }
+    default:
+    {
+      Handle(Image_PixMap) anImage = theTextureMap->GetImage();
+      if (anImage.IsNull())
+      {
+        return false;
+      }
+      return Init (theCtx, *anImage, theTextureMap->Type());
+    }
+  }
 }
 
 // =======================================================================
@@ -839,6 +886,9 @@ bool OpenGl_Texture::InitRectangle (const Handle(OpenGl_Context)& theCtx,
 
   myTextFormat  = theFormat.Format();
   mySizedFormat = theFormat.Internal();
+
+  // setup the alignment
+  OpenGl_UnpackAlignmentSentry::Reset();
 
   glTexImage2D (GL_PROXY_TEXTURE_RECTANGLE, 0, mySizedFormat,
                 aSizeX, aSizeY, 0,
@@ -938,6 +988,9 @@ bool OpenGl_Texture::Init3D (const Handle(OpenGl_Context)& theCtx,
 
   mySizedFormat = theTextFormat;
 
+  // setup the alignment
+  OpenGl_UnpackAlignmentSentry::Reset();
+
 #if !defined (GL_ES_VERSION_2_0)
   theCtx->core15fwd->glTexImage3D (GL_PROXY_TEXTURE_3D, 0, mySizedFormat,
                                    aSizeX, aSizeY, aSizeZ, 0,
@@ -977,6 +1030,141 @@ bool OpenGl_Texture::Init3D (const Handle(OpenGl_Context)& theCtx,
   mySizeZ = aSizeZ;
 
   Unbind (theCtx);
+  return true;
+}
+
+// =======================================================================
+// function : InitCubeMap
+// purpose  :
+// =======================================================================
+bool OpenGl_Texture::InitCubeMap (const Handle(OpenGl_Context)&    theCtx,
+                                  const Handle(Graphic3d_CubeMap)& theCubeMap,
+                                  Standard_Size                    theSize,
+                                  Image_Format                     theFormat,
+                                  Standard_Boolean                 theToGenMipmap)
+{
+  if (!Create (theCtx))
+  {
+    Release (theCtx.get());
+    return false;
+  }
+
+  if (!theCubeMap.IsNull())
+  {
+    Handle(Image_PixMap) anImage = theCubeMap->Reset().Value();
+    if (!anImage.IsNull())
+    {
+      theSize   = anImage->SizeX();
+      theFormat = anImage->Format();
+    }
+    else
+    {
+      theCtx->PushMessage (GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+        "Unable to get the first side of cubemap");
+      Release(theCtx.get());
+      return false;
+    }
+  }
+
+  GLenum aPixelFormat = GL_RGB;
+  GLenum aDataType = 0;
+  GLint aTextFormat = 0;
+
+  if (!GetDataFormat (theCtx, theFormat, aTextFormat, aPixelFormat, aDataType))
+  {
+    Unbind(theCtx);
+    Release(theCtx.get());
+    return false;
+  }
+
+  myTarget = GL_TEXTURE_CUBE_MAP;
+  myHasMipmaps = theToGenMipmap;
+  myNbSamples = 1;
+  Bind (theCtx);
+  applyDefaultSamplerParams (theCtx);
+
+  for (Standard_Integer i = 0; i < 6; ++i)
+  {
+    const void* aData = NULL;
+    Handle(Image_PixMap) anImage;
+
+    if (!theCubeMap.IsNull())
+    {
+      anImage = theCubeMap->Value();
+      if (!anImage.IsNull())
+      {
+#if !defined(GL_ES_VERSION_2_0)
+        const GLint anAligment = Min ((GLint)anImage->MaxRowAligmentBytes(), 8); // OpenGL supports alignment upto 8 bytes
+        glPixelStorei (GL_UNPACK_ALIGNMENT, anAligment);
+
+        // notice that GL_UNPACK_ROW_LENGTH is not available on OpenGL ES 2.0 without GL_EXT_unpack_subimage extension
+        const GLint anExtraBytes = GLint(anImage->RowExtraBytes());
+        const GLint aPixelsWidth = GLint(anImage->SizeRowBytes() / anImage->SizePixelBytes());
+        const GLint aRowLength = (anExtraBytes >= anAligment) ? aPixelsWidth : 0;
+        glPixelStorei (GL_UNPACK_ROW_LENGTH, aRowLength);
+#else
+        Handle(Image_PixMap) aCopyImage = new Image_PixMap();
+        aCopyImage->InitTrash (theFormat, theSize, theSize);
+        for (unsigned int y = 0; y < theSize; ++y)
+        {
+          for (unsigned int x = 0; x < theSize; ++x)
+          {
+            for (unsigned int aByte = 0; aByte < anImage->SizePixelBytes(); ++aByte)
+            {
+              aCopyImage->ChangeRawValue (y, x)[aByte] = anImage->RawValue (y, x)[aByte];
+            }
+          }
+        }
+        anImage = aCopyImage;
+        const GLint anAligment = Min((GLint)anImage->MaxRowAligmentBytes(), 8); // OpenGL supports alignment upto 8 bytes
+        glPixelStorei (GL_UNPACK_ALIGNMENT, anAligment);
+#endif
+        aData = anImage->Data();
+      }
+      else
+      {
+        theCtx->PushMessage (GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, TCollection_AsciiString() +
+          "Unable to get [" + i + "] side of cubemap");
+        Unbind (theCtx);
+        Release (theCtx.get());
+        return false;
+      }
+      theCubeMap->Next();
+    }
+
+    glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
+                  aTextFormat,
+                  GLsizei(theSize), GLsizei(theSize),
+                  0, aPixelFormat, aDataType,
+                  aData);
+
+    OpenGl_UnpackAlignmentSentry::Reset();
+
+    if (glGetError() != GL_NO_ERROR)
+    {
+      theCtx->PushMessage (GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+        "Unable to initialize side of cubemap");
+      Unbind (theCtx);
+      Release (theCtx.get());
+      return false;
+    }
+  }
+
+  if (theToGenMipmap && theCtx->arbFBO != NULL)
+  {
+      theCtx->arbFBO->glGenerateMipmap (myTarget);
+
+      if (glGetError() != GL_NO_ERROR)
+      {
+        theCtx->PushMessage (GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH,
+          "Unable to generate mipmap of cubemap");
+        Unbind(theCtx);
+        Release(theCtx.get());
+        return false;
+      }
+  }
+
+  Unbind (theCtx.get());
   return true;
 }
 

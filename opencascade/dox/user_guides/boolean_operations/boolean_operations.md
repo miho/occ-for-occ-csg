@@ -797,7 +797,7 @@ The General Fuse algorithm has a set of options, which allow speeding-up the ope
 * Usage of Oriented Bounding Boxes in the operation;
 * History support.
 
-For more detailed information on these options please see the @ref occt_algorithms_11a "Advanced options" section.
+For more detailed information on these options, see the @ref occt_algorithms_11a "Advanced options" section.
 
 @subsection occt_algorithms_7_3b Usage
 
@@ -900,7 +900,7 @@ bbuild result
 
 @subsection occt_algorithms_7_3 Examples
 
-Please, have a look at the examples, which can help to better understand the definitions.
+Have a look at the examples to better understand the definitions.
 
 @subsubsection occt_algorithms_7_3_1	Case 1: Three edges intersecting at a point 
 
@@ -1891,6 +1891,21 @@ The input data for this step is as follows:
 | 2.3 |	Build solids <i>(SDi)</i> from *SFS*. |	*BOPAlgo_BuilderSolid* |
 | 2.4 |	Add the solids <i>(SDi)</i> to the result	| |
 
+@subsection occt_algorithms_bop_on_opensolids Boolean operations on open solids
+
+The Boolean operations on open solids are tricky enough that the standard approach of Boolean operations for building the result, based on the splits of solids does not work.
+It happens because the algorithm for splitting solids (*BOPAlgo_BuilderSolid*) always tries to create the closed loops (shells) and make solids from them. But if the input solid is not closed, what can be expected from its splits?
+For performing Boolean Operations on open solids another approach is used, which does not rely on the splits of the solids to be correct, but tries to select the splits of faces, which are necessary for the given type of operation.
+The point here is that the type of Boolean operation clearly defines the states for the faces to be taken into result:
+- For **COMMON** operation all the faces from the arguments located inside any solid of the opposite group must be taken;
+- For **FUSE** operation all the faces from the arguments located outside of all solids of the opposite group must be taken;
+- For **CUT** operation all the faces from the Objects located outside of all solids of the Tools and all faces from the Tools located inside any solid of the Objects must be taken;
+- For **CUT21** operation all the faces from the Objects located inside any solid of the Tools and all faces from the Tools located outside of all solids of the Objects must be taken.
+From the selected faces the result solids are built. Please note, that the result may contain as normal (closed) solids as the open ones.
+
+Even with this approach, the correct result of Boolean operation on open solids cannot be always guaranteed.
+This is explained by non-manifold nature of open solids: in some cases classification of a face depends on the point of the face chosen for classification.
+
 @section occt_algorithms_10a Section Algorithm 
 
 @subsection occt_algorithms_10a_1 Arguments
@@ -2428,7 +2443,7 @@ A lot of failures of GFA algorithm can be caused by bugs in low-level algorithms
 * The Projection Algorithm is used at the Intersection step. The purpose of Projection Algorithm is to compute 2D curves on surfaces. Wrong results here lead to incorrect or missing faces in the final GFA result. 
 * The Classification Algorithm is used at the Building step. The bugs in the Classification Algorithm lead to errors in selecting shape parts (edges, faces, solids) and ultimately to a wrong final GFA result.
 
-The description below illustrates some known GFA limitations. It does not enumerate exhaustively all problems that can arise in practice. Please, address cases of Algorithm failure to the OCCT Maintenance Service.
+The description below illustrates some known GFA limitations. It does not enumerate exhaustively all problems that can arise in practice. Please address cases of Algorithm failure to the OCCT Maintenance Service.
 
 
 @subsection occt_algorithms_10_1	Arguments
@@ -2524,7 +2539,7 @@ Let us also consider a cylinder-based *Face 2* with radii *R=3000* and *H=6000* 
 
 @figure{/user_guides/boolean_operations/images/operations_image047.png,"P-Curves for Face 2",230}
 
-Please, pay attention to the Zoom value of the Figures.
+Pay attention to the Zoom value of the Figures.
 
 It is obvious that starting with some value of *ScF*, e.g. *ScF>1000000*, all sloped p-Curves on *Face 2*  will be almost vertical. At least, there will be no difference between the values of angles computed by standard C Run-Time Library functions, such as *double acos(double x)*. The loss of accuracy in computation of angles can cause failure of some BP sub-algorithms, such as building faces from a set of edges or building solids from a set of faces.
 
@@ -3069,6 +3084,50 @@ generated gf2 com_hist f2
 # No shapes were generated from the shape
 
 ~~~~
+
+@section occt_algorithms_simplification BOP result simplification
+
+The API algorithms implementing Boolean Operations provide possibility to simplify the result shape by unification of the connected tangential edges and faces.
+This simplification is performed by the method *SimplifyResult* which is implemented in the class *BRepAlgoAPI_BuilderAlgo* (General Fuse operation).
+It makes it available for users of the classes *BRepAlgoAPI_BooleanOperation* (all Boolean Operations) and *BRepAlgoAPI_Splitter* (split operation).
+
+The simplification is performed by the means of *ShapeUpgrade_UnifySameDom* algorithm. The result of operation is overwritten with the simplified result.
+
+The simplification is performed without creation of the Internal shapes, i.e. shapes connections will never be broken. It is performed on the whole result shape.
+Thus, if the input shapes contained connected tangent edges or faces unmodified during the operation they will also be unified.
+
+History of the simplification is merged into the main history of operation, thus it will be accounted when asking for Modified, Generated and Deleted shapes.
+
+Some options of the main operation are passed into the Unifier:
+- Fuzzy tolerance of the operation is given to the Unifier as the linear tolerance.
+- Non destructive mode here controls the safe input mode in Unifier.
+
+For controlling this possibility in DRAW the command **bsimplify** has been implemented. See the @ref occt_draw_bop_options "Boolean Operations options" chapter in draw user guide.
+
+
+@subsection occt_algorithms_simplification_examples Examples
+
+Here is the simple example of simplification of the result of Fuse operation of two boxes:
+
+~~~~
+bsimplify -f 1
+
+box b1 10 10 15
+box b2 3 7 0 10 10 15
+bclearobjects
+bcleartools
+baddobjects b1
+baddtools b2
+bfillds
+bapibop r 1
+~~~~
+
+<table align="center">
+  <tr>
+    <td>@figure{/user_guides/boolean_operations/images/bop_simple_001.png, "Not simplified result", 420}</td>
+    <td>@figure{/user_guides/boolean_operations/images/bop_simple_002.png, "Simplified result", 420}</td>
+  </tr>
+</table>
 
 
 @section occt_algorithms_11b Usage 

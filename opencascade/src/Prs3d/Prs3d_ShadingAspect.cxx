@@ -18,6 +18,7 @@
 #include <Graphic3d_MaterialAspect.hxx>
 #include <Quantity_Color.hxx>
 #include <Standard_Type.hxx>
+#include <Standard_Dump.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Prs3d_ShadingAspect, Prs3d_BasicAspect)
 
@@ -76,9 +77,13 @@ const Quantity_Color& Prs3d_ShadingAspect::Color (const Aspect_TypeOfFacingModel
     default:
     case Aspect_TOFM_BOTH_SIDE:
     case Aspect_TOFM_FRONT_SIDE:
-      return myAspect->FrontMaterial().Color();
+      return myAspect->FrontMaterial().MaterialType() == Graphic3d_MATERIAL_ASPECT
+           ? myAspect->InteriorColor()
+           : myAspect->FrontMaterial().Color();
     case Aspect_TOFM_BACK_SIDE:
-      return myAspect->BackMaterial().Color();
+      return myAspect->BackMaterial().MaterialType() == Graphic3d_MATERIAL_ASPECT
+           ? myAspect->BackInteriorColor()
+           : myAspect->BackMaterial().Color();
   }
 }
 
@@ -164,3 +169,14 @@ Standard_Real Prs3d_ShadingAspect::Transparency (const Aspect_TypeOfFacingModel 
   }
   return 0.0;
 }
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Prs3d_ShadingAspect::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, Prs3d_ShadingAspect);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspect.get());
+}
+

@@ -31,7 +31,6 @@
 #include <Prs3d_Projector.hxx>
 #include <Quantity_Color.hxx>
 #include <Select3D_SensitivePoint.hxx>
-#include <SelectBasics_EntityOwner.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <Standard_Type.hxx>
 #include <StdPrs_Point.hxx>
@@ -124,7 +123,6 @@ void AIS_Point::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                  const Standard_Integer /*aMode*/)
 {
   Handle(SelectMgr_EntityOwner) eown = new SelectMgr_EntityOwner(this,10);
-//  eown -> SelectBasics_EntityOwner::Set(5);
   Handle(Select3D_SensitivePoint) sp = new Select3D_SensitivePoint(eown,
 								   myComponent->Pnt());
   aSelection->Add(sp);
@@ -206,18 +204,43 @@ void AIS_Point::UnsetMarker()
 }
 
 //=======================================================================
+//function : replaceWithNewPointAspect
+//purpose  :
+//=======================================================================
+void AIS_Point::replaceWithNewPointAspect (const Handle(Prs3d_PointAspect)& theAspect)
+{
+  if (!myDrawer->HasLink())
+  {
+    myDrawer->SetPointAspect (theAspect);
+    return;
+  }
+
+  const Handle(Graphic3d_AspectMarker3d) anAspectOld = myDrawer->PointAspect()->Aspect();
+  const Handle(Graphic3d_AspectMarker3d) anAspectNew = !theAspect.IsNull() ? theAspect->Aspect() : myDrawer->Link()->PointAspect()->Aspect();
+  if (anAspectNew != anAspectOld)
+  {
+    myDrawer->SetPointAspect (theAspect);
+    Graphic3d_MapOfAspectsToAspects aReplaceMap;
+    aReplaceMap.Bind (anAspectOld, anAspectNew);
+    replaceAspects (aReplaceMap);
+  }
+}
+
+//=======================================================================
 //function : UpdatePointValues
 //purpose  : 
 //=======================================================================
 
 void AIS_Point::UpdatePointValues()
 {
-
-  if(!hasOwnColor && myOwnWidth==0.0 && !myHasTOM)
+  if (!hasOwnColor
+   &&  myOwnWidth == 0.0f
+   && !myHasTOM)
   {
-    myDrawer->SetPointAspect (Handle(Prs3d_PointAspect)());
+    replaceWithNewPointAspect (Handle(Prs3d_PointAspect)());
     return;
   }
+
   Quantity_Color      aCol (Quantity_NOC_YELLOW);
   Aspect_TypeOfMarker aTOM = Aspect_TOM_PLUS;
   Standard_Real       aScale = 1.0;
@@ -229,20 +252,20 @@ void AIS_Point::UpdatePointValues()
   }
 
   if(hasOwnColor) aCol = myDrawer->Color();
-  if(myOwnWidth!=0.0) aScale = myOwnWidth;
+  if(myOwnWidth != 0.0f) aScale = myOwnWidth;
   if(myHasTOM) aTOM = myTOM;
-  
-  
-  if(myDrawer->HasOwnPointAspect()){
-    // CLE
-    // const Handle(Prs3d_PointAspect) PA =  myDrawer->PointAspect();
+
+  if(myDrawer->HasOwnPointAspect())
+  {
     Handle(Prs3d_PointAspect) PA =  myDrawer->PointAspect();
-    // ENDCLE
     PA->SetColor(aCol);
     PA->SetTypeOfMarker(aTOM);
     PA->SetScale(aScale);
+    SynchronizeAspects();
   }
   else
-    myDrawer->SetPointAspect(new Prs3d_PointAspect(aTOM,aCol,aScale));
+  {
+    replaceWithNewPointAspect (new Prs3d_PointAspect (aTOM, aCol, aScale));
+  }
 }
 

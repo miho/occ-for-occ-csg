@@ -23,7 +23,6 @@
 #include <Precision.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_Projector.hxx>
-#include <PrsMgr_ModedPresentation.hxx>
 #include <Select3D_SensitiveEntity.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_Selection.hxx>
@@ -92,12 +91,12 @@ void AIS_ConnectedInteractive::connect (const Handle(AIS_InteractiveObject)& the
 
 void AIS_ConnectedInteractive::Disconnect()
 {
-  for(Standard_Integer aPrsIter = 1; aPrsIter <= myPresentations.Length(); ++aPrsIter)
+  for (PrsMgr_Presentations::Iterator aPrsIter (myPresentations); aPrsIter.More(); aPrsIter.Next())
   {
-    const Handle(PrsMgr_Presentation)& aPrs = myPresentations (aPrsIter).Presentation();
+    const Handle(PrsMgr_Presentation)& aPrs = aPrsIter.Value();
     if (!aPrs.IsNull())
     {
-      aPrs->Presentation()->DisconnectAll (Graphic3d_TOC_DESCENDANT);
+      aPrs->DisconnectAll (Graphic3d_TOC_DESCENDANT);
     }
   }
 }
@@ -112,7 +111,7 @@ void AIS_ConnectedInteractive::Compute (const Handle(PrsMgr_PresentationManager3
   if (HasConnection())
   {
     thePrs->Clear (Standard_False);
-    thePrs->RemoveAll();
+    thePrs->DisconnectAll (Graphic3d_TOC_DESCENDANT);
 
     if (!myReference->HasInteractiveContext())
     {
@@ -234,7 +233,7 @@ void AIS_ConnectedInteractive::ComputeSelection (const Handle(SelectMgr_Selectio
 
   for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (TheRefSel->Entities()); aSelEntIter.More(); aSelEntIter.Next())
   {
-    if (Handle(Select3D_SensitiveEntity) aSensitive = Handle(Select3D_SensitiveEntity)::DownCast (aSelEntIter.Value()->BaseSensitive()))
+    if (const Handle(Select3D_SensitiveEntity)& aSensitive = aSelEntIter.Value()->BaseSensitive())
     {
       // Get the copy of SE3D
       if (Handle(Select3D_SensitiveEntity) aNewSensitive = aSensitive->GetConnected())
@@ -272,7 +271,7 @@ void AIS_ConnectedInteractive::computeSubShapeSelection (const Handle(SelectMgr_
   Shapes2EntitiesMap aShapes2EntitiesMap;
   for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (aRefSel->Entities()); aSelEntIter.More(); aSelEntIter.Next())
   {
-    if (Handle(Select3D_SensitiveEntity) aSE = Handle(Select3D_SensitiveEntity)::DownCast (aSelEntIter.Value()->BaseSensitive()))
+    if (const Handle(Select3D_SensitiveEntity)& aSE = aSelEntIter.Value()->BaseSensitive())
     {
       if (Handle(StdSelect_BRepOwner) anOwner = Handle(StdSelect_BRepOwner)::DownCast (aSE->OwnerId()))
       {

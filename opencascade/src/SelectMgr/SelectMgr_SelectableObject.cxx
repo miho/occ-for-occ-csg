@@ -16,9 +16,6 @@
 
 #include <SelectMgr_SelectableObject.hxx>
 
-#include <Aspect_TypeOfMarker.hxx>
-#include <Bnd_Box.hxx>
-#include <gp_Pnt.hxx>
 #include <Graphic3d_AspectLine3d.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Prs3d_Drawer.hxx>
@@ -26,25 +23,22 @@
 #include <Prs3d_PlaneAspect.hxx>
 #include <Prs3d_PointAspect.hxx>
 #include <Prs3d_Presentation.hxx>
-#include <PrsMgr_PresentableObjectPointer.hxx>
-#include <PrsMgr_PresentationManager3d.hxx>
+#include <PrsMgr_PresentationManager.hxx>
 #include <Select3D_SensitiveEntity.hxx>
-#include <SelectBasics_EntityOwner.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 #include <SelectMgr_Selection.hxx>
 #include <SelectMgr_SelectionManager.hxx>
 #include <Standard_NoSuchObject.hxx>
 #include <Standard_NotImplemented.hxx>
-#include <Standard_Type.hxx>
 #include <TopLoc_Location.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(SelectMgr_SelectableObject,PrsMgr_PresentableObject)
 
 namespace
 {
-  Handle(SelectMgr_Selection)   THE_NULL_SELECTION;
-  Handle(SelectMgr_EntityOwner) THE_NULL_ENTITYOWNER;
+  static const Handle(SelectMgr_Selection)   THE_NULL_SELECTION;
+  static const Handle(SelectMgr_EntityOwner) THE_NULL_ENTITYOWNER;
 }
 
 //==================================================
@@ -54,9 +48,9 @@ namespace
 
 SelectMgr_SelectableObject::SelectMgr_SelectableObject (const PrsMgr_TypeOfPresentation3d aTypeOfPresentation3d)
 : PrsMgr_PresentableObject (aTypeOfPresentation3d),
-  myAutoHilight            (Standard_True),
+  myGlobalSelMode          (0),
   mycurrent                (0),
-  myGlobalSelMode          (0)
+  myAutoHilight            (Standard_True)
 {
   //
 }
@@ -256,6 +250,14 @@ void SelectMgr_SelectableObject::UpdateTransformation()
   }
 
   PrsMgr_PresentableObject::UpdateTransformation();
+  if (!mySelectionPrs.IsNull())
+  {
+    mySelectionPrs->SetTransformation (TransformationGeom());
+  }
+  if (!myHilightPrs.IsNull())
+  {
+    myHilightPrs->SetTransformation (TransformationGeom());
+  }
 }
 
 //=======================================================================
@@ -267,12 +269,11 @@ void SelectMgr_SelectableObject::UpdateTransformations (const Handle(SelectMgr_S
   const TopLoc_Location aSelfLocation (Transformation());
   for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (theSel->Entities()); aSelEntIter.More(); aSelEntIter.Next())
   {
-    if (Handle(Select3D_SensitiveEntity) aSensEntity = Handle(Select3D_SensitiveEntity)::DownCast (aSelEntIter.Value()->BaseSensitive()))
+    if (const Handle(Select3D_SensitiveEntity)& aSensEntity = aSelEntIter.Value()->BaseSensitive())
     {
-      const Handle(SelectBasics_EntityOwner)& aEOwner = aSensEntity->OwnerId();
-      if (Handle(SelectMgr_EntityOwner) aMgrEO = Handle(SelectMgr_EntityOwner)::DownCast (aEOwner))
+      if (const Handle(SelectMgr_EntityOwner)& aEOwner = aSensEntity->OwnerId())
       {
-        aMgrEO->SetLocation (aSelfLocation);
+        aEOwner->SetLocation (aSelfLocation);
       }
     }
   }
@@ -282,7 +283,7 @@ void SelectMgr_SelectableObject::UpdateTransformations (const Handle(SelectMgr_S
 //function : HilightSelected
 //purpose  :
 //=======================================================================
-void SelectMgr_SelectableObject::HilightSelected (const Handle(PrsMgr_PresentationManager3d)&,
+void SelectMgr_SelectableObject::HilightSelected (const Handle(PrsMgr_PresentationManager)&,
                                                   const SelectMgr_SequenceOfOwner&)
 {
   throw Standard_NotImplemented("SelectMgr_SelectableObject::HilightSelected");
@@ -304,7 +305,7 @@ void SelectMgr_SelectableObject::ClearSelected()
 //function : ClearDynamicHighlight
 //purpose  :
 //=======================================================================
-void SelectMgr_SelectableObject::ClearDynamicHighlight (const Handle(PrsMgr_PresentationManager3d)& theMgr)
+void SelectMgr_SelectableObject::ClearDynamicHighlight (const Handle(PrsMgr_PresentationManager)& theMgr)
 {
   theMgr->ClearImmediateDraw();
 }
@@ -313,7 +314,7 @@ void SelectMgr_SelectableObject::ClearDynamicHighlight (const Handle(PrsMgr_Pres
 //function : HilightOwnerWithColor
 //purpose  :
 //=======================================================================
-void SelectMgr_SelectableObject::HilightOwnerWithColor (const Handle(PrsMgr_PresentationManager3d)&,
+void SelectMgr_SelectableObject::HilightOwnerWithColor (const Handle(PrsMgr_PresentationManager)&,
                                                         const Handle(Prs3d_Drawer)&,
                                                         const Handle(SelectMgr_EntityOwner)&)
 {
@@ -321,49 +322,34 @@ void SelectMgr_SelectableObject::HilightOwnerWithColor (const Handle(PrsMgr_Pres
 }
 
 //=======================================================================
-//function : IsAutoHilight
-//purpose  :
-//=======================================================================
-Standard_Boolean SelectMgr_SelectableObject::IsAutoHilight() const
-{
-  return myAutoHilight;
-}
-
-//=======================================================================
-//function : SetAutoHilight
-//purpose  :
-//=======================================================================
-void SelectMgr_SelectableObject::SetAutoHilight ( const Standard_Boolean newAutoHilight )
-{
-  myAutoHilight = newAutoHilight;
-}
-
-//=======================================================================
 //function : GetHilightPresentation
 //purpose  :
 //=======================================================================
-Handle(Prs3d_Presentation) SelectMgr_SelectableObject::GetHilightPresentation (const Handle(PrsMgr_PresentationManager3d)& theMgr)
+Handle(Prs3d_Presentation) SelectMgr_SelectableObject::GetHilightPresentation (const Handle(PrsMgr_PresentationManager)& theMgr)
 {
   if (myHilightPrs.IsNull() && !theMgr.IsNull())
   {
     myHilightPrs = new Prs3d_Presentation (theMgr->StructureManager());
     myHilightPrs->SetTransformPersistence (TransformPersistence());
+    myHilightPrs->SetClipPlanes (myClipPlanes);
+    myHilightPrs->SetTransformation (TransformationGeom());
   }
 
   return myHilightPrs;
 }
 
-
 //=======================================================================
 //function : GetSelectPresentation
 //purpose  :
 //=======================================================================
-Handle(Prs3d_Presentation) SelectMgr_SelectableObject::GetSelectPresentation (const Handle(PrsMgr_PresentationManager3d)& theMgr)
+Handle(Prs3d_Presentation) SelectMgr_SelectableObject::GetSelectPresentation (const Handle(PrsMgr_PresentationManager)& theMgr)
 {
   if (mySelectionPrs.IsNull() && !theMgr.IsNull())
   {
     mySelectionPrs = new Prs3d_Presentation (theMgr->StructureManager());
     mySelectionPrs->SetTransformPersistence (TransformPersistence());
+    mySelectionPrs->SetClipPlanes (myClipPlanes);
+    mySelectionPrs->SetTransformation (TransformationGeom());
   }
 
   return mySelectionPrs;
@@ -417,14 +403,31 @@ void SelectMgr_SelectableObject::SetZLayer (const Graphic3d_ZLayerId theLayerId)
     const Handle(SelectMgr_Selection)& aSel = aSelIter.Value();
     for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (aSel->Entities()); aSelEntIter.More(); aSelEntIter.Next())
     {
-      if (Handle(Select3D_SensitiveEntity) aEntity = Handle(Select3D_SensitiveEntity)::DownCast (aSelEntIter.Value()->BaseSensitive()))
+      if (const Handle(Select3D_SensitiveEntity)& aEntity = aSelEntIter.Value()->BaseSensitive())
       {
-        if (Handle(SelectMgr_EntityOwner) aOwner = Handle(SelectMgr_EntityOwner)::DownCast (aEntity->OwnerId()))
+        if (const Handle(SelectMgr_EntityOwner)& aOwner = aEntity->OwnerId())
         {
           aOwner->SetZLayer (theLayerId);
         }
       }
     }
+  }
+}
+
+//=======================================================================
+//function : UpdateClipping
+//purpose  :
+//=======================================================================
+void SelectMgr_SelectableObject::UpdateClipping()
+{
+  PrsMgr_PresentableObject::UpdateClipping();
+  if (!mySelectionPrs.IsNull())
+  {
+    mySelectionPrs->SetClipPlanes (myClipPlanes);
+  }
+  if (!myHilightPrs.IsNull())
+  {
+    myHilightPrs->SetClipPlanes (myClipPlanes);
   }
 }
 
@@ -509,7 +512,7 @@ Bnd_Box SelectMgr_SelectableObject::BndBoxOfSelected (const Handle(SelectMgr_Ind
 
     for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator aSelEntIter (aSel->Entities()); aSelEntIter.More(); aSelEntIter.Next())
     {
-      const Handle(SelectMgr_EntityOwner) anOwner = Handle(SelectMgr_EntityOwner)::DownCast (aSelEntIter.Value()->BaseSensitive()->OwnerId());
+      const Handle(SelectMgr_EntityOwner)& anOwner = aSelEntIter.Value()->BaseSensitive()->OwnerId();
       if (theOwners->Contains (anOwner))
       {
         Select3D_BndBox3d aBox = aSelEntIter.Value()->BaseSensitive()->BoundingBox();
@@ -532,7 +535,7 @@ Handle(SelectMgr_EntityOwner) SelectMgr_SelectableObject::GlobalSelOwner() const
   if (!aGlobalSel.IsNull()
    && !aGlobalSel->IsEmpty())
   {
-    return Handle(SelectMgr_EntityOwner)::DownCast (aGlobalSel->Entities().First()->BaseSensitive()->OwnerId());
+    return aGlobalSel->Entities().First()->BaseSensitive()->OwnerId();
   }
   return THE_NULL_ENTITYOWNER;
 }
@@ -544,4 +547,17 @@ Handle(SelectMgr_EntityOwner) SelectMgr_SelectableObject::GlobalSelOwner() const
 const Handle(SelectMgr_EntityOwner)& SelectMgr_SelectableObject::GetAssemblyOwner() const
 {
   return THE_NULL_ENTITYOWNER;
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void SelectMgr_SelectableObject::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, SelectMgr_SelectableObject);
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, PrsMgr_PresentableObject);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myGlobalSelMode);
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAutoHilight);
 }

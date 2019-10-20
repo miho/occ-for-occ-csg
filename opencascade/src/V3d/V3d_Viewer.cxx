@@ -22,6 +22,7 @@
 #include <Graphic3d_GraphicDriver.hxx>
 #include <Graphic3d_Group.hxx>
 #include <Graphic3d_Structure.hxx>
+#include <Graphic3d_Text.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_Type.hxx>
 #include <V3d.hxx>
@@ -152,7 +153,11 @@ void V3d_Viewer::SetViewOn (const Handle(V3d_View)& theView)
 
   theView->SetGrid (myPrivilegedPlane, Grid ());
   theView->SetGridActivity (Grid ()->IsActive ());
-  theView->Redraw();
+  if (theView->SetImmediateUpdate (Standard_False))
+  {
+    theView->Redraw();
+    theView->SetImmediateUpdate (Standard_True);
+  }
 }
 
 // ========================================================================
@@ -271,26 +276,37 @@ void V3d_Viewer::DelView (const Handle(V3d_View)& theView)
 }
 
 //=======================================================================
-//function : AddZLayer
+//function : InsertLayerBefore
 //purpose  :
 //=======================================================================
-Standard_Boolean V3d_Viewer::AddZLayer (Graphic3d_ZLayerId& theLayerId)
+Standard_Boolean V3d_Viewer::InsertLayerBefore (Graphic3d_ZLayerId& theNewLayerId,
+                                                const Graphic3d_ZLayerSettings& theSettings,
+                                                const Graphic3d_ZLayerId theLayerAfter)
 {
-  try
+  if (myZLayerGenId.Next (theNewLayerId))
   {
-    OCC_CATCH_SIGNALS
-    theLayerId = myZLayerGenId.Next();
+    myLayerIds.Add (theNewLayerId);
+    myDriver->InsertLayerBefore (theNewLayerId, theSettings, theLayerAfter);
+    return Standard_True;
   }
-  catch (Aspect_IdentDefinitionError)
+  return Standard_False;
+}
+
+//=======================================================================
+//function : InsertLayerAfter
+//purpose  :
+//=======================================================================
+Standard_Boolean V3d_Viewer::InsertLayerAfter (Graphic3d_ZLayerId& theNewLayerId,
+                                               const Graphic3d_ZLayerSettings& theSettings,
+                                               const Graphic3d_ZLayerId theLayerBefore)
+{
+  if (myZLayerGenId.Next (theNewLayerId))
   {
-    // new index can't be generated
-    return Standard_False;
+    myLayerIds.Add (theNewLayerId);
+    myDriver->InsertLayerAfter (theNewLayerId, theSettings, theLayerBefore);
+    return Standard_True;
   }
-
-  myLayerIds.Add (theLayerId);
-  myDriver->AddZLayer (theLayerId);
-
-  return Standard_True;
+  return Standard_False;
 }
 
 //=======================================================================
@@ -335,7 +351,7 @@ void V3d_Viewer::SetZLayerSettings (const Graphic3d_ZLayerId theLayerId, const G
 //function : ZLayerSettings
 //purpose  :
 //=======================================================================
-Graphic3d_ZLayerSettings V3d_Viewer::ZLayerSettings (const Graphic3d_ZLayerId theLayerId)
+const Graphic3d_ZLayerSettings& V3d_Viewer::ZLayerSettings (const Graphic3d_ZLayerId theLayerId) const
 {
   return myDriver->ZLayerSettings (theLayerId);
 }
@@ -532,17 +548,26 @@ void V3d_Viewer::DisplayPrivilegedPlane (const Standard_Boolean theOnOff, const 
   const gp_Pnt pX (p0.XYZ() + myDisplayPlaneLength * myPrivilegedPlane.XDirection().XYZ());
   aPrims->AddVertex (p0);
   aPrims->AddVertex (pX);
-  aGroup->Text ("X", Graphic3d_Vertex (pX.X(), pX.Y(), pX.Z()), 1.0 / 81.0);
+  Handle(Graphic3d_Text) aText = new Graphic3d_Text (1.0f / 81.0f);
+  aText->SetText ("X");
+  aText->SetPosition (pX);
+  aGroup->AddText (aText);
 
   const gp_Pnt pY (p0.XYZ() + myDisplayPlaneLength * myPrivilegedPlane.YDirection().XYZ());
   aPrims->AddVertex (p0);
   aPrims->AddVertex (pY);
-  aGroup->Text ("Y", Graphic3d_Vertex (pY.X(), pY.Y(), pY.Z()), 1.0 / 81.0);
+  aText = new Graphic3d_Text (1.0f / 81.0f);
+  aText->SetText ("Y");
+  aText->SetPosition (pY);
+  aGroup->AddText (aText);
 
   const gp_Pnt pZ (p0.XYZ() + myDisplayPlaneLength * myPrivilegedPlane.Direction().XYZ());
   aPrims->AddVertex (p0);
   aPrims->AddVertex (pZ);
-  aGroup->Text ("Z", Graphic3d_Vertex (pZ.X(), pZ.Y(), pZ.Z()), 1.0 / 81.0);
+  aText = new Graphic3d_Text (1.0f / 81.0f);
+  aText->SetText ("Z");
+  aText->SetPosition (pZ);
+  aGroup->AddText (aText);
 
   aGroup->AddPrimitiveArray (aPrims);
 

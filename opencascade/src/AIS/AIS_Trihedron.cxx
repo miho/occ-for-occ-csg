@@ -43,7 +43,6 @@
 #include <Select3D_SensitivePrimitiveArray.hxx>
 #include <Select3D_SensitiveSegment.hxx>
 #include <Select3D_SensitiveTriangle.hxx>
-#include <SelectBasics_EntityOwner.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <Standard_Type.hxx>
 
@@ -85,7 +84,7 @@ AIS_Trihedron::AIS_Trihedron (const Handle(Geom_Axis2Placement)& theComponent)
 void AIS_Trihedron::SetComponent (const Handle(Geom_Axis2Placement)& theComponent)
 {
   myComponent = theComponent;
-  LoadRecomputable (AIS_WireFrame);
+  SetToUpdate();
 }
 
 //=======================================================================
@@ -135,7 +134,8 @@ void AIS_Trihedron::SetSize(const Standard_Real aValue)
   setOwnDatumAspect();
   myDrawer->DatumAspect()->SetAxisLength(aValue, aValue, aValue);
 
-  Update();
+  SetToUpdate();
+  UpdatePresentations();
   UpdateSelection();
 }
 
@@ -162,7 +162,8 @@ void AIS_Trihedron::UnsetSize()
   }
   else
   {
-    Update();
+    SetToUpdate();
+    UpdatePresentations();
   }
   UpdateSelection();
 }
@@ -335,6 +336,10 @@ void AIS_Trihedron::HilightOwnerWithColor (const Handle(PrsMgr_PresentationManag
   }
   aGroup->AddPrimitiveArray (arrayOfPrimitives(aPart));
 
+  if (aPresentation->GetZLayer() != theStyle->ZLayer())
+  {
+    aPresentation->SetZLayer (theStyle->ZLayer());
+  }
   aPresentation->Highlight (theStyle);
   thePM->AddToImmediateList (aPresentation);
 }
@@ -557,19 +562,6 @@ void AIS_Trihedron::computePresentation (const Handle(PrsMgr_PresentationManager
 }
 
 //=======================================================================
-//function : LoadRecomputable
-//purpose  :
-//=======================================================================
-void AIS_Trihedron::LoadRecomputable (const Standard_Integer theMode)
-{
-  myRecomputeEveryPrs = Standard_False;
-  if (!myToRecomputeModes.Contains (theMode))
-  {
-    myToRecomputeModes.Append (theMode);
-  }
-}
-
-//=======================================================================
 //function : SetColor
 //purpose  :
 //=======================================================================
@@ -739,14 +731,14 @@ void AIS_Trihedron::SetDrawArrows (const Standard_Boolean theToDraw)
 //function : createSensitiveEntity
 //purpose  :
 //=======================================================================
-Handle(SelectBasics_SensitiveEntity) AIS_Trihedron::createSensitiveEntity (const Prs3d_DatumParts thePart,
-                                                   const Handle(SelectBasics_EntityOwner)& theOwner) const
+Handle(Select3D_SensitiveEntity) AIS_Trihedron::createSensitiveEntity (const Prs3d_DatumParts thePart,
+                                                   const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   Handle(Prs3d_DatumAspect) anAspect = myDrawer->DatumAspect();
   Handle(Graphic3d_ArrayOfPrimitives) aPrimitives = arrayOfPrimitives (thePart);
   if (aPrimitives.IsNull())
   {
-    return Handle(SelectBasics_SensitiveEntity)();
+    return Handle(Select3D_SensitiveEntity)();
   }
 
   if (thePart >= Prs3d_DP_XOYAxis
@@ -776,7 +768,7 @@ Handle(SelectBasics_SensitiveEntity) AIS_Trihedron::createSensitiveEntity (const
     const gp_Pnt anXYZ2 = aSegments->Vertice (2);
     return new Select3D_SensitiveSegment (theOwner, anXYZ1, anXYZ2);
   }
-  return Handle(SelectBasics_SensitiveEntity)();
+  return Handle(Select3D_SensitiveEntity)();
 }
 
 // =======================================================================

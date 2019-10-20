@@ -62,6 +62,12 @@
 #include <HLRBRep_PolyHLRToShape.hxx>
 #include <HLRBRep_PolyAlgo.hxx>
 
+#include <Standard_Failure.hxx>
+
+#include <Bnd_OBB.hxx>
+#include <BRepBndLib.hxx>
+#include <OSD_Timer.hxx>
+
 #include <limits>
 
 //=======================================================================
@@ -1315,7 +1321,7 @@ namespace AllocTest
         for (;;)
           aList.Append(Standard::Allocate(aBlockSizes[i]));
       }
-      catch (Standard_Failure)
+      catch (Standard_Failure const&)
       {
         aStatus |= OUMCatchOK;
       }
@@ -1409,7 +1415,7 @@ static Standard_Integer OCC27021(Draw_Interpretor& theDI,
 {
   if (theNArg != 2)
   {
-    cout << "Use: " << theArgVal[0] << " shape" << endl;
+    std::cout << "Use: " << theArgVal[0] << " shape" << std::endl;
     return 1;
   }
 
@@ -1429,20 +1435,20 @@ static Standard_Integer OCC27021(Draw_Interpretor& theDI,
   std::pair<gp_Pnt, gp_Pnt> vertices;
   clock_t t = clock();
 
-  theDI << "\nRetrieving " << iterations << " vertices using approach A)...";
+  theDI << "\nRetrieving " << iterations << " vertices using approach A)...\n";
   for (int i = 0; i < iterations; ++i)
   {
     vertices = getVerticesA(edge);
   }
-  theDI << "done in " << (clock() - t) / (double)CLOCKS_PER_SEC << " seconds\n";
+  theDI << "COUNTER RetrievingVertA" << ": " << (clock() - t) / (double)CLOCKS_PER_SEC << "\n";
   t = clock();
 
-  theDI << "\nRetrieving " << iterations << " vertices using approach B)...";
+  theDI << "\nRetrieving " << iterations << " vertices using approach B)...\n";
   for (int i = 0; i < iterations; ++i)
   {
     vertices = getVerticesB(edge);
   }
-  theDI << "done in " << (clock() - t) / (double)CLOCKS_PER_SEC << " seconds\n";
+  theDI << "COUNTER RetrievingVertB" << ": " << (clock() - t) / (double)CLOCKS_PER_SEC << "\n";
 
   return 0;
 }
@@ -1541,7 +1547,7 @@ static Standard_Integer OCC26930(Draw_Interpretor& theDI,
 {
   if (theNArg != 5)
   {
-    cout << "Use: " << theArgVal[0] <<" surface curve start end" << endl;
+    std::cout << "Use: " << theArgVal[0] <<" surface curve start end" << std::endl;
     return 1;
   }
 
@@ -1584,90 +1590,6 @@ static Standard_Integer OCC26930(Draw_Interpretor& theDI,
 }
 
 //=======================================================================
-//function : OCC27341
-//purpose : check exact HLR algorighm's work
-//=======================================================================
-static Standard_Integer OCC27341 (Draw_Interpretor& , Standard_Integer n, const char** a)
-{
-  if (n != 4)
-  {
-    cout << "Use: OCC27341 res shape axo/top/bottom/front/back/left/right" << endl;
-    return 1;
-  }
-
-  TopoDS_Shape aShape =  DBRep::Get(a[2]);
-  if (aShape.IsNull())
-    return 1;
-
-  gp_Pnt anOrigin(0.,0.,0.);
-  gp_Dir aNormal(0.57735026918962573, -0.57735026918962573, 0.57735026918962573);
-  gp_Ax2 anAxes(anOrigin, aNormal);
-  gp_Dir aDX = anAxes.XDirection();
-  
-  HLRAppli_ReflectLines Reflector(aShape);
-
-  if (strcmp(a[3],"axo") == 0)
-  {
-    aNormal.SetCoord(0.57735026918962573, -0.57735026918962573, 0.57735026918962573);
-    aDX.SetCoord(-0.40824829046386307, 0.40824829046386307, 0.81649658092772615);
-  }
-  else if (strcmp(a[3],"top") == 0)
-  {
-    aNormal.SetCoord(0,0,1);
-    aDX.SetCoord(0,1,0);
-  }
-  else if (strcmp(a[3],"bottom") == 0)
-  {
-    aNormal.SetCoord(0,0,-1);
-    aDX.SetCoord(0,-1,0);
-  }
-  else if (strcmp(a[3],"front") == 0)
-  {
-    aNormal.SetCoord(0,-1,0);
-    aDX.SetCoord(0,0,1);
-  }
-  else if (strcmp(a[3],"back") == 0)
-  {
-    aNormal.SetCoord(0,1,0);
-    aDX.SetCoord(0,0,1);
-  }
-  else if (strcmp(a[3],"left") == 0)
-  {
-    aNormal.SetCoord(-1,0,0);
-    aDX.SetCoord(0,0,1);
-  }
-  else if (strcmp(a[3],"right") == 0)
-  {
-    aNormal.SetCoord(1,0,0);
-    aDX.SetCoord(0,0,1);
-  }
-    
-  Reflector.SetAxes(aNormal.X(), aNormal.Y(), aNormal.Z(),
-                    anOrigin.X(), anOrigin.Y(), anOrigin.Z(),
-                    aDX.X(), aDX.Y(), aDX.Z());
-
-  Reflector.Perform();
-
-  TopoDS_Compound Result;
-  BRep_Builder BB;
-  BB.MakeCompound(Result);
-  
-  TopoDS_Shape SharpEdges = Reflector.GetCompoundOf3dEdges(HLRBRep_Sharp, Standard_True, Standard_False);
-  if (!SharpEdges.IsNull())
-    BB.Add(Result, SharpEdges);
-  TopoDS_Shape OutLines = Reflector.GetCompoundOf3dEdges(HLRBRep_OutLine, Standard_True, Standard_False);
-  if (!OutLines.IsNull())
-    BB.Add(Result, OutLines);
-  TopoDS_Shape SmoothEdges = Reflector.GetCompoundOf3dEdges(HLRBRep_Rg1Line, Standard_True, Standard_False);
-  if (!SmoothEdges.IsNull())
-    BB.Add(Result, SmoothEdges);
-  
-  DBRep::Set(a[1], Result);
-
-  return 0;
-}
-
-//=======================================================================
 //function : OCC27466
 //purpose :
 //=======================================================================
@@ -1677,7 +1599,7 @@ static Standard_Integer OCC27466(Draw_Interpretor& theDI,
 {
   if (theNArg != 4)
   {
-    cout << "Use: " << theArgVal[0] << " face point start_pnt2d" << endl;
+    std::cout << "Use: " << theArgVal[0] << " face point start_pnt2d" << std::endl;
     return 1;
   }
 
@@ -2025,7 +1947,7 @@ static Standard_Integer OCC27357(Draw_Interpretor& theDI,
         Geom2dAdaptor_Curve(normalLine),1e-9,g1,g1,g3);
       aDuumyList.Append(aCircleBuilder.NbSolutions());
     }
-    catch(Standard_Failure)
+    catch(Standard_Failure const&)
     {
       theDI << "Exception was caught\n";
     }
@@ -2078,7 +2000,7 @@ static Standard_Integer OCC26270(Draw_Interpretor& theDI,
         DBRep::Set(theArgVal[2], bsp_face1);
       }
     }
-    catch (Standard_Failure)
+    catch (Standard_Failure const&)
     {
       theDI << "ERROR: Exception in GeomFill_NSections\n";
     }
@@ -2595,11 +2517,11 @@ Standard_Boolean IsSameGuid (const Standard_GUID& aGuidNull, const Standard_GUID
 {
   Standard_Boolean isSame (Standard_False);
   if(Standard_GUID::IsEqual(aGuidNull, aGuid2)) {
-    aGuid2.ShallowDump(cout);
+    aGuid2.ShallowDump(std::cout);
     isSame = Standard_True;
   } else {
-    aGuid2.ShallowDump(cout);
-    cout <<endl;
+    aGuid2.ShallowDump(std::cout);
+    std::cout <<std::endl;
   }
   return isSame;
 }
@@ -2800,7 +2722,7 @@ static Standard_Integer OCC29064 (Draw_Interpretor& theDI, Standard_Integer theA
 {
   if (theArgc < 2)
   {
-    cout << "Error: give argument indicating type of map (map, doublemap, datamap, indexedmap, indexeddatamap)" << endl;
+    std::cout << "Error: give argument indicating type of map (map, doublemap, datamap, indexedmap, indexeddatamap)" << std::endl;
     return 1;
   }
 
@@ -2817,7 +2739,7 @@ static Standard_Integer OCC29064 (Draw_Interpretor& theDI, Standard_Integer theA
     AllocDummyArr<NCollection_IndexedDataMap<int, int> > (theDI, nbm1, nbm2);
   else
   {
-    cout << "Error: unrecognized argument " << theArgv[1] << endl;
+    std::cout << "Error: unrecognized argument " << theArgv[1] << std::endl;
     return 1;
   }
   return 0;
@@ -2889,6 +2811,642 @@ static Standard_Integer OCC29531(Draw_Interpretor&, Standard_Integer, const char
   return 0;
 }
 
+//=======================================================================
+//function : OCC29807
+//purpose  : 
+//=======================================================================
+#include <GeomAdaptor_HSurface.hxx>
+#include <IntPatch_PointLine.hxx>
+#include <IntSurf_PntOn2S.hxx>
+static Standard_Integer OCC29807(Draw_Interpretor& theDI, Standard_Integer theNArg, const char** theArgV)
+{
+  if (theNArg != 7)
+  {
+    theDI << "Use: " << theArgV[0] << "surface1 surface2 u1 v1 u2 v2\n";
+    return 1;
+  }
+
+  const Handle(Geom_Surface) aS1 = DrawTrSurf::GetSurface(theArgV[1]);
+  const Handle(Geom_Surface) aS2 = DrawTrSurf::GetSurface(theArgV[2]);
+
+  if (aS1.IsNull() || aS2.IsNull())
+  {
+    theDI << "Error. Null surface is not supported.\n";
+    return 1;
+  }
+
+  const Standard_Real aU1 = Draw::Atof(theArgV[3]);
+  const Standard_Real aV1 = Draw::Atof(theArgV[4]);
+  const Standard_Real aU2 = Draw::Atof(theArgV[5]);
+  const Standard_Real aV2 = Draw::Atof(theArgV[6]);
+
+  const Handle(GeomAdaptor_HSurface) anAS1 = new GeomAdaptor_HSurface(aS1);
+  const Handle(GeomAdaptor_HSurface) anAS2 = new GeomAdaptor_HSurface(aS2);
+
+  const gp_Pnt aP1 = anAS1->Value(aU1, aV1);
+  const gp_Pnt aP2 = anAS2->Value(aU2, aV2);
+
+  if (aP1.SquareDistance(aP2) > Precision::SquareConfusion())
+  {
+    theDI << "Error. True intersection point must be specified. "
+             "Please check parameters: u1 v1 u2 v2.\n";
+    return 1;
+  }
+
+  IntSurf_PntOn2S aPOn2S;
+  aPOn2S.SetValue(0.5*(aP1.XYZ() + aP2.XYZ()), aU1, aV1, aU2, aV2);
+
+  const Standard_Real aCurvatureRadius = IntPatch_PointLine::CurvatureRadiusOfIntersLine(anAS1, anAS2, aPOn2S);
+  theDI << "Radius of curvature is " << aCurvatureRadius << "\n";
+  return 0;
+}
+
+//=======================================================================
+//function : OCC29925
+//purpose  : check safety of functions like IsSpace(), LowerCase(), etc. for all chars
+//=======================================================================
+static Standard_Integer OCC29925 (Draw_Interpretor& theDI, Standard_Integer, const char**)
+{
+  // iterate by all valid ASCII chars (including extended)
+  for (int i = 0; i < 256; i++)
+  {
+    Standard_Character c = (char)(unsigned char)i;
+//    if (c != i) theDI << c << " != " << i << "\n";
+    const char* anOp = "";
+    try {
+      anOp = "IsAlphabetic";
+      IsAlphabetic (c);
+      anOp = "IsDigit";
+      IsDigit (c);
+      anOp = "IsXDigit";
+      IsXDigit (c);
+      anOp = "IsAlphanumeric";
+      IsAlphanumeric (c);
+      anOp = "IsControl";
+      IsControl (c);
+      anOp = "IsGraphic";
+      IsGraphic (c);
+      anOp = "IsLowerCase";
+      IsLowerCase (c);
+      anOp = "IsPrintable";
+      IsPrintable (c);
+      anOp = "IsPunctuation";
+      IsPunctuation (c);
+      anOp = "IsSpace";
+      IsSpace (c);
+      anOp = "IsUpperCase";
+      IsUpperCase (c);
+      anOp = "LowerCase";
+      LowerCase (c);
+      anOp = "UpperCase";
+      UpperCase (c);
+    }
+    catch (const Handle(Standard_Failure)& e)
+    {
+      theDI << anOp << "() fails for " << c << " (" << e->DynamicType()->Name() << ")\n";
+    }
+  }
+
+  return 0;
+}
+
+//=======================================================================
+//function : OCC29311
+//purpose  : check performance of OBB calculations
+//=======================================================================
+static Standard_Integer OCC29311 (Draw_Interpretor& theDI, Standard_Integer theArgc, const char** theArgv)
+{
+  if (theArgc < 4)
+  {
+    std::cerr << "Use: " << theArgv[0] << " shape counter_name nb_iterations" << std::endl;
+    return 1;
+  }
+
+  TopoDS_Shape aShape = DBRep::Get (theArgv[1]);
+  Standard_Integer aNbIter = Draw::Atoi (theArgv[3]);
+
+  Bnd_OBB anOBB;
+  OSD_Timer aTimer;
+  aTimer.Start ();
+  for (Standard_Integer aN = aNbIter; aN > 0; --aN)
+  {
+    anOBB.SetVoid ();
+    BRepBndLib::AddOBB (aShape, anOBB, Standard_False, Standard_False, Standard_False);
+  }
+  aTimer.Stop ();
+
+  theDI << "COUNTER " << theArgv[2] << ": " << aTimer.ElapsedTime() << "\n";
+
+  return 0;
+}
+
+//=======================================================================
+//function : OCC30391
+//purpose  : 
+//=======================================================================
+#include <BRepOffset_Tool.hxx>
+static Standard_Integer OCC30391(Draw_Interpretor& theDI,
+                                 Standard_Integer theNArg,
+                                 const char** theArgV)
+{
+  if (theNArg < 7)
+  {
+    theDI << "Use: " << theArgV[0] << "result face LenBeforeUfirst LenAfterUlast LenBeforeVfirst LenAfterVlast\n";
+    return 1;
+  }
+
+  TopoDS_Shape aShape = DBRep::Get(theArgV[2], TopAbs_FACE);
+  if (aShape.IsNull())
+    return 1;
+
+  const TopoDS_Face& aFace = TopoDS::Face(aShape);
+
+  Standard_Real aLenBeforeUfirst = atof(theArgV[3]);
+  Standard_Real aLenAfterUlast   = atof(theArgV[4]);
+  Standard_Real aLenBeforeVfirst = atof(theArgV[5]);
+  Standard_Real aLenAfterVlast   = atof(theArgV[6]);
+
+  TopoDS_Face Result;
+  BRepOffset_Tool::EnLargeFace(aFace, Result,
+                               Standard_True,Standard_True,Standard_True,Standard_True,Standard_True,1,
+                               aLenBeforeUfirst, aLenAfterUlast,
+                               aLenBeforeVfirst, aLenAfterVlast);
+
+  DBRep::Set(theArgV[1], Result);
+  return 0;
+}
+
+//=======================================================================
+//function : QAStartsWith string startstring
+//=======================================================================
+static Standard_Integer QAStartsWith(Draw_Interpretor& di, Standard_Integer n, const char** a)
+{
+  if (n == 3)
+  {
+    TCollection_ExtendedString str = a[1];
+    TCollection_ExtendedString startstr = a[2];
+    if (str.StartsWith(startstr))
+      di << "Yes";
+    else
+      di << "No";
+    return 0;
+  }
+  std::cerr << "Syntax error\n";
+  return 1;
+}
+
+//=======================================================================
+//function : QAEndsWith string endstring
+//=======================================================================
+static Standard_Integer QAEndsWith(Draw_Interpretor& di, Standard_Integer n, const char** a)
+{
+  if (n == 3)
+  {
+    TCollection_ExtendedString str = a[1];
+    TCollection_ExtendedString endstr = a[2];
+    if (str.EndsWith(endstr))
+      di << "Yes";
+    else
+      di << "No";
+    return 0;
+  }
+  std::cerr << "Syntax error\n";
+  return 1;
+}
+
+//Class is used in OCC30435
+#include <AppCont_Function.hxx>
+#include <Adaptor3d_HCurve.hxx>
+class CurveEvaluator : public AppCont_Function
+
+{
+
+public:
+  Handle(Adaptor3d_HCurve) myCurve;
+
+  CurveEvaluator(const Handle(Adaptor3d_HCurve)& C)
+    : myCurve(C)
+  {
+    myNbPnt = 1;
+    myNbPnt2d = 0;
+  }
+
+  Standard_Real FirstParameter() const
+  {
+    return myCurve->FirstParameter();
+  }
+
+  Standard_Real LastParameter() const
+  {
+    return myCurve->LastParameter();
+  }
+
+  Standard_Boolean Value(const Standard_Real   theT,
+    NCollection_Array1<gp_Pnt2d>& /*thePnt2d*/,
+    NCollection_Array1<gp_Pnt>&   thePnt) const
+  {
+    thePnt(1) = myCurve->Value(theT);
+    return Standard_True;
+  }
+
+  Standard_Boolean D1(const Standard_Real   theT,
+    NCollection_Array1<gp_Vec2d>& /*theVec2d*/,
+    NCollection_Array1<gp_Vec>&   theVec) const
+  {
+    gp_Pnt aDummyPnt;
+    myCurve->D1(theT, aDummyPnt, theVec(1));
+    return Standard_True;
+  }
+};
+
+#include <GeomAdaptor_HCurve.hxx>
+#include <Approx_FitAndDivide.hxx>
+#include <Convert_CompBezierCurvesToBSplineCurve.hxx>
+static Standard_Integer OCC30435(Draw_Interpretor& di, Standard_Integer, const char** a)
+{
+
+  Handle(Geom_Curve) GC;
+  GC = DrawTrSurf::GetCurve(a[2]);
+  if (GC.IsNull())
+    return 1;
+
+  Standard_Integer Dmin = 3;
+  Standard_Integer Dmax = 12;
+  Standard_Real Tol3d = 1.e-7;
+  Standard_Boolean inverse = Standard_True;
+
+
+  Standard_Integer inv = atoi(a[3]);
+  if (inv > 0)
+  {
+    inverse = Standard_True;
+  }
+  else
+  {
+    inverse = Standard_False;
+  }
+
+  Standard_Integer maxit = atoi(a[4]);
+
+  Handle(GeomAdaptor_HCurve) aGAC = new GeomAdaptor_HCurve(GC);
+
+  CurveEvaluator aCE(aGAC);
+
+  Approx_FitAndDivide anAppro(Dmin, Dmax, Tol3d, 0., Standard_True);
+  anAppro.SetInvOrder(inverse);
+  Standard_Integer i;
+  for (i = 1; i <= maxit; ++i)
+    anAppro.Perform(aCE);
+
+  if (!anAppro.IsAllApproximated())
+  {
+    di << "Approximation failed \n";
+    return 1;
+  }
+  Standard_Integer NbCurves = anAppro.NbMultiCurves();
+
+  Convert_CompBezierCurvesToBSplineCurve Conv;
+
+  Standard_Real tol3d, tol2d, tolreached = 0.;
+  for (i = 1; i <= NbCurves; i++) {
+    anAppro.Error(i, tol3d, tol2d);
+    tolreached = Max(tolreached, tol3d);
+    AppParCurves_MultiCurve MC = anAppro.Value(i);
+    TColgp_Array1OfPnt Poles(1, MC.Degree() + 1);
+    MC.Curve(1, Poles);
+    Conv.AddCurve(Poles);
+  }
+  Conv.Perform();
+  Standard_Integer NbPoles = Conv.NbPoles();
+  Standard_Integer NbKnots = Conv.NbKnots();
+
+  TColgp_Array1OfPnt      NewPoles(1, NbPoles);
+  TColStd_Array1OfReal    NewKnots(1, NbKnots);
+  TColStd_Array1OfInteger NewMults(1, NbKnots);
+
+  Conv.KnotsAndMults(NewKnots, NewMults);
+  Conv.Poles(NewPoles);
+
+  BSplCLib::Reparametrize(GC->FirstParameter(),
+    GC->LastParameter(),
+    NewKnots);
+  Handle(Geom_BSplineCurve) TheCurve = new Geom_BSplineCurve(NewPoles, NewKnots, NewMults, Conv.Degree());
+
+  DrawTrSurf::Set(a[1], TheCurve);
+  di << a[1] << ": tolreached = " << tolreached << "\n";
+
+  return 0;
+
+}
+
+//=======================================================================
+//function : OCC30708_1 
+//purpose  : Tests initialization of the TopoDS_Iterator with null shape
+//=======================================================================
+static Standard_Integer OCC30708_1 (Draw_Interpretor& di, Standard_Integer, const char**)
+{
+  TopoDS_Iterator it;
+  try
+  {
+    OCC_CATCH_SIGNALS
+
+    TopoDS_Shape empty;
+    it.Initialize (empty);
+
+  }
+  catch (Standard_Failure)
+  {
+    di << "Cannot initialize TopoDS_Iterator with null shape\n";
+    return 0;
+  }
+
+  if (it.More())
+    di << "Incorrect Iterator initialization: method More() returns true on null shape\n";
+
+  return 0;
+}
+
+//=======================================================================
+//function : OCC30708_2
+//purpose  : Tests initialization of the BRepLib_MakeWire with null wire
+//=======================================================================
+static Standard_Integer OCC30708_2 (Draw_Interpretor& di, Standard_Integer, const char**)
+{
+  try
+  {
+    OCC_CATCH_SIGNALS
+
+    TopoDS_Wire empty;
+    BRepLib_MakeWire aWBuilder (empty);
+  }
+  catch (Standard_Failure)
+  {
+    di << "Cannot initialize BRepLib_MakeWire with null wire\n";
+  }
+
+  return 0;
+}
+
+//=======================================================================
+//function : OCC30869
+//purpose  :
+//=======================================================================
+static Standard_Integer OCC30869 (Draw_Interpretor& theDI, Standard_Integer theArgc, const char** theArgv)
+{
+  if (theArgc != 2)
+  {
+    theDI.PrintHelp (theArgv[0]);
+    return 1;
+  }
+
+  TopoDS_Shape aWire = DBRep::Get (theArgv[1]);
+  if (aWire.IsNull() || aWire.ShapeType() != TopAbs_WIRE)
+  {
+    theDI << theArgv[1] << " is not a wire.\n";
+    return 1;
+  }
+
+  BRepAdaptor_CompCurve aBACC (TopoDS::Wire (aWire));
+
+  Standard_Real aFirst = aBACC.FirstParameter();
+  Standard_Real aLast  = aBACC.LastParameter();
+
+  gp_Pnt aPFirst, aPLast;
+  gp_Vec aVFirst, aVLast;
+
+  aBACC.D1 (aFirst, aPFirst, aVFirst);
+  aBACC.D1 (aLast,  aPLast,  aVLast);
+
+  if (aVFirst.SquareMagnitude() > gp::Resolution())
+    aVFirst.Normalize();
+  if (aVLast.SquareMagnitude() > gp::Resolution())
+    aVLast.Normalize();
+
+  theDI << aFirst << ": point " << aPFirst.X() << " "
+                                << aPFirst.Y() << " "
+                                << aPFirst.Z()
+                  << ", tangent " << aVFirst.X() << " "
+                                  << aVFirst.Y() << " "
+                                  << aVFirst.Z() << "\n";
+
+  theDI << aLast << ": point " << aPLast.X() << " "
+                              << aPLast.Y() << " "
+                              << aPLast.Z()
+                 << ", tangent " << aVLast.X() << " "
+                                 << aVLast.Y() << " "
+                                 << aVLast.Z() << "\n";
+
+  return 0;
+}
+
+#include <BRepExtrema_ExtCF.hxx>
+//=======================================================================
+//function : OCC30880
+//purpose  :
+//=======================================================================
+static Standard_Integer OCC30880 (Draw_Interpretor& theDI, Standard_Integer theArgc, const char** theArgv)
+{
+  if (theArgc != 3)
+  {
+    theDI.PrintHelp (theArgv[0]);
+    return 1;
+  }
+
+  TopoDS_Shape anEdge = DBRep::Get (theArgv[1]);
+  if (anEdge.IsNull() || anEdge.ShapeType() != TopAbs_EDGE)
+  {
+    theDI << theArgv[1] << " is not an edge.\n";
+    return 1;
+  }
+
+  TopoDS_Shape aFace = DBRep::Get (theArgv[2]);
+  if (aFace.IsNull() || aFace.ShapeType() != TopAbs_FACE)
+  {
+    theDI << theArgv[2] << " is not a face.\n";
+    return 1;
+  }
+
+  BRepExtrema_ExtCF anExtCF (TopoDS::Edge (anEdge),
+                             TopoDS::Face (aFace));
+  if (!anExtCF.IsDone())
+  {
+    theDI << "Not done\n";
+    return 0;
+  }
+
+  if (!anExtCF.NbExt())
+  {
+    theDI << "No solutions\n";
+    return 0;
+  }
+
+  if (anExtCF.IsParallel())
+  {
+    theDI << "Infinite number of solutions, distance - " << Sqrt (anExtCF.SquareDistance (1)) << "\n";
+    return 0;
+  }
+
+  Standard_Real aDistMin = RealLast();
+  Standard_Integer aSolMin = -1;
+  // Look for the minimal solution
+  for (int i = 1; i <= anExtCF.NbExt(); ++i)
+  {
+    Standard_Real aDist = anExtCF.SquareDistance (i);
+    if (aDist < aDistMin)
+    {
+      aDistMin = aDist;
+      aSolMin = i;
+    }
+  }
+
+  if (aSolMin < 0)
+  {
+    theDI << "Failed\n";
+    return 0;
+  }
+
+  theDI << "Minimal distance - " << Sqrt (aDistMin) << "\n";
+  return 0;
+}
+
+#include <BRepPrimAPI_MakeBox.hxx>
+static Standard_Integer OCC30704(Draw_Interpretor& di, Standard_Integer, const char**)
+{
+  // Make a shape somewhere far from (0, 0, 0).
+  BRepPrimAPI_MakeBox mkBox(gp_Pnt(100, 100, 100), 100, 100, 100);
+  const TopoDS_Shape& box = mkBox.Shape();
+
+  // Add a bounding box of a shape to a void bounding box.
+  Bnd_OBB aVoidBox, aBox;
+  BRepBndLib::AddOBB(box, aBox, Standard_False, Standard_False, Standard_False);
+  aVoidBox.Add(aBox);
+
+  // Print the center point of the bounding box.
+  const gp_XYZ& center = aVoidBox.Center();
+  di << center.X() << " " << center.Y() << " " << center.Z();
+  return 0;
+}
+static Standard_Integer OCC30704_1(Draw_Interpretor& di, Standard_Integer, const char**)
+{
+  // A point.
+  gp_Pnt aP(100, 200, 300);
+
+  // Add the point to a void bounding box.
+  Bnd_OBB aVoidBox;
+  aVoidBox.Add(aP);
+
+  // Print the center point of the bounding box.
+  const gp_XYZ& center = aVoidBox.Center();
+  di << center.X() << " " << center.Y() << " " << center.Z();
+  return 0;
+}
+
+//=======================================================================
+//function : OCC30990
+//purpose  : check consistency of implementation of cache in B-Spline surfaces
+//           with respect to update of the cache for points located exactly
+//           on boundary between bspline spans (i.e. at knots)
+//=======================================================================
+static Standard_Integer OCC30990 (Draw_Interpretor& theDI, Standard_Integer theNArg, const char** theArgV)
+{
+  if (theNArg != 2)
+  {
+    std::cerr << "Use: " << theArgV[0] << "surface\n";
+    return 1;
+  }
+
+  const Handle(Geom_BSplineSurface) aSurf = 
+    Handle(Geom_BSplineSurface)::DownCast (DrawTrSurf::GetSurface(theArgV[1]));
+  if (aSurf.IsNull())
+  {
+    theDI << "Error: " << theArgV[1] << " is not a B-Spline surface";
+    return 0;
+  }
+  GeomAdaptor_Surface aS (aSurf);
+
+  // Evaluate points for U and V located exactly at b-spline knots,
+  // after evaluation of points inside the spans before and after the knot,
+  // and ensure that result at the knot is exactly the same regardless
+  // of previous evaluation (i.e. the cache is updated as necessary).
+  // Note: the points (D0) computed on different spans are slighly different
+  // due to rounding, which allows us to detect this situation without
+  // analysis of higher derivatives (which would show non-negligible difference).
+  Standard_Integer aNbErr = 0;
+
+  theDI << "U knots: ";
+  for (int i = 1; i <= aSurf->NbUKnots(); i++)
+  {
+    theDI << aSurf->UKnot(i);
+    if (i < aSurf->NbUKnots()) theDI << ",";
+  }
+  theDI << "\n";
+  for (int i = 2; i < aSurf->NbUKnots(); i++)
+  {
+    Standard_Real aUknot = aSurf->UKnot(i);
+    Standard_Real aUprev = 0.5 * (aUknot + aSurf->UKnot(i-1));
+    Standard_Real aUnext = 0.5 * (aUknot + aSurf->UKnot(i+1));
+    for (int j = 1; j < aSurf->NbVKnots(); j++)
+    {
+      Standard_Real aV = 0.5 * (aSurf->VKnot(j) + aSurf->VKnot(j + 1));
+      aS.Value (aUprev, aV);
+      gp_Pnt aValue1 = aS.Value (aUknot, aV);
+      aS.Value (aUnext, aV);
+      gp_Pnt aValue2 = aS.Value (aUknot, aV);
+      for (int k = 1; k <= 3; k++)
+      {
+        if (aValue1.Coord(k) != aValue2.Coord(k))
+        {
+          Standard_SStream aStr;
+          aStr.precision(20);
+          aStr << "Error evaluating point at UV = (" << aUknot << ", " << aV << "):\n";
+          aStr << "probe 1: " << (char)('X' + k - 1) << " = " << aValue1.Coord(k) << "\n";
+          aStr << "probe 2: " << (char)('X' + k - 1) << " = " << aValue2.Coord(k) << "\n";
+          theDI << aStr.str().c_str();
+          aNbErr++;
+        }
+      }
+    }
+  }
+
+  theDI << "V knots: ";
+  for (int j = 1; j <= aSurf->NbVKnots(); j++)
+  {
+    theDI << aSurf->VKnot(j);
+    if (j < aSurf->NbVKnots()) theDI << ",";
+  }
+  theDI << "\n";
+  for (int j = 2; j < aSurf->NbVKnots(); j++)
+  {
+    Standard_Real aVknot = aSurf->VKnot(j);
+    Standard_Real aVprev = 0.5 * (aVknot + aSurf->VKnot(j-1));
+    Standard_Real aVnext = 0.5 * (aVknot + aSurf->VKnot(j+1));
+    for (int i = 1; i < aSurf->NbUKnots(); i++)
+    {
+      Standard_Real aU = 0.5 * (aSurf->UKnot(i) + aSurf->UKnot(i + 1));
+      aS.Value (aU, aVprev);
+      gp_Pnt aValue1 = aS.Value (aU, aVknot);
+      aS.Value (aU, aVnext);
+      gp_Pnt aValue2 = aS.Value (aU, aVknot);
+      for (int k = 1; k <= 3; k++)
+      {
+        if (aValue1.Coord(k) != aValue2.Coord(k))
+        {
+          Standard_SStream aStr;
+          aStr.precision(20);
+          aStr << "Error evaluating point at UV = (" << aU << ", " << aVknot << "):\n";
+          aStr << "probe 1: " << (char)('X' + k - 1) << " = " << aValue1.Coord(k) << "\n";
+          aStr << "probe 2: " << (char)('X' + k - 1) << " = " << aValue2.Coord(k) << "\n";
+          theDI << aStr.str().c_str();
+          aNbErr++;
+        }
+      }
+    }
+  }
+
+  theDI << "Total " << aNbErr << " deviations detected";
+  return 0;
+}
+
 void QABugs::Commands_20(Draw_Interpretor& theCommands) {
   const char *group = "QABugs";
 
@@ -2898,9 +3456,6 @@ void QABugs::Commands_20(Draw_Interpretor& theCommands) {
   theCommands.Add("OCC27235", "OCC27235", __FILE__, OCC27235, group);
   theCommands.Add("OCC26930", "OCC26930", __FILE__, OCC26930, group);
   theCommands.Add("OCC27466", "OCC27466", __FILE__, OCC27466, group);
-  theCommands.Add("OCC27341",
-                  "OCC27341 res shape axo/top/bottom/front/back/left/right",
-                  __FILE__, OCC27341, group);
   theCommands.Add ("OCC26747_1", "OCC26747_1 result", __FILE__, OCC26747_1, group);
   theCommands.Add ("OCC26747_2", "OCC26747_2 result", __FILE__, OCC26747_2, group);
   theCommands.Add ("OCC26747_3", "OCC26747_3 result", __FILE__, OCC26747_3, group);
@@ -2925,5 +3480,37 @@ void QABugs::Commands_20(Draw_Interpretor& theCommands) {
   theCommands.Add("OCC29531", "OCC29531 <step file name>", __FILE__, OCC29531, group);
 
   theCommands.Add ("OCC29064", "OCC29064: test memory usage by copying empty maps", __FILE__, OCC29064, group);
+  theCommands.Add ("OCC29925", "OCC29925: check safety of character classification functions", __FILE__, OCC29925, group);
+  theCommands.Add("OCC29807", "OCC29807 surface1 surface2 u1 v1 u2 v2", __FILE__, OCC29807, group);
+  theCommands.Add("OCC29311", "OCC29311 shape counter nbiter: check performance of OBB calculation", __FILE__, OCC29311, group);
+  theCommands.Add("OCC30391", "OCC30391 result face LenBeforeUfirst LenAfterUlast LenBeforeVfirst LenAfterVlast", __FILE__, OCC30391, group);
+  theCommands.Add("OCC30435", "OCC30435 result curve inverse nbit", __FILE__, OCC30435, group);
+  theCommands.Add("OCC30990", "OCC30990 surface", __FILE__, OCC30990, group);
+
+  theCommands.Add("QAStartsWith",
+                  "QAStartsWith string startstring",
+                  __FILE__, QAStartsWith, group);
+
+  theCommands.Add("QAEndsWith",
+                  "QAEndsWith string endstring",
+                  __FILE__, QAEndsWith, group);
+
+  theCommands.Add ("OCC30708_1", "Tests initialization of the TopoDS_Iterator with null shape",
+                   __FILE__, OCC30708_1, group);
+
+  theCommands.Add ("OCC30708_2", "Tests initialization of the BRepLib_MakeWire with null shape",
+                   __FILE__, OCC30708_2, group);
+
+  theCommands.Add ("OCC30869", "Prints bounding points of the given wire and tangent vectors at these points.\n"
+                               "Usage: OCC30869 wire",
+                   __FILE__, OCC30869, group);
+
+  theCommands.Add ("OCC30880", "Looks for extrema between edge and face.\n"
+                               "Usage: OCC30880 edge face",
+                   __FILE__, OCC30880, group);
+
+  theCommands.Add("OCC30704", "OCC30704", __FILE__, OCC30704, group);
+  theCommands.Add("OCC30704_1", "OCC30704_1", __FILE__, OCC30704_1, group);
+
   return;
 }

@@ -34,6 +34,8 @@
 #include <StepAP214_Protocol.hxx>
 #include <StepAP242_DraughtingModelItemAssociation.hxx>
 #include <StepAP242_GeometricItemSpecificUsage.hxx>
+#include <StepBasic_ConversionBasedUnitAndLengthUnit.hxx>
+#include <StepBasic_ConversionBasedUnitAndPlaneAngleUnit.hxx>
 #include <StepBasic_DerivedUnit.hxx>
 #include <StepBasic_DerivedUnitElement.hxx>
 #include <StepBasic_HArray1OfDerivedUnitElement.hxx>
@@ -347,7 +349,7 @@ IFSelect_ReturnStatus STEPCAFControl_Writer::Write (const Standard_CString filen
     TCollection_AsciiString fname = OSD_Path::AbsolutePath ( dpath, EF->GetName()->String() );
     if ( fname.Length() <= 0 ) fname = EF->GetName()->String();
 #ifdef OCCT_DEBUG
-    cout << "Writing external file: " << fname.ToCString() << endl;
+    std::cout << "Writing external file: " << fname.ToCString() << std::endl;
 #endif
     
     EF->SetWriteStatus ( EF->GetWS()->SendAll ( fname.ToCString() ) );
@@ -512,26 +514,26 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
   TDF_LabelSequence sublabels;
   for ( Standard_Integer i=1; i <= labels.Length(); i++ ) {
     TDF_Label L = labels.Value(i);
-    TopoDS_Shape dummy;
     if ( myLabels.IsBound ( L ) ) continue; // already processed
 
     TopoDS_Shape shape = XCAFDoc_ShapeTool::GetShape ( L );
     if ( shape.IsNull() ) continue;
-    
+
     // write shape either as a whole, or as multifile (with extern refs)
     if ( ! multi  ) {
       Actor->SetStdMode ( Standard_False );
 
       TDF_LabelSequence comp;
 
-      //for case when only part of assemby structure should be written in the document
+      //For case when only part of assemby structure should be written in the document
       //if specified label is component of the assembly then
       //in order to save location of this component in the high-level assembly
       //and save name of high-level assembly it is necessary to represent structure of high-level assembly 
       //as assembly with one component specified by current label. 
       //For that compound containing only specified component is binded to the label of the high-level assembly.
       //The such way full structure of high-level assembly was replaced on the assembly contaning one component.
-      if ( XCAFDoc_ShapeTool::IsComponent ( L ) )
+      //For case when free shape reference is (located root) also create an auxiliary assembly.
+      if ( XCAFDoc_ShapeTool::IsReference ( L ) )
       {
         TopoDS_Compound aComp;
         BRep_Builder aB;
@@ -545,7 +547,8 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
           if(XCAFDoc_ShapeTool::IsAssembly ( ref))
             XCAFDoc_ShapeTool::GetComponents ( ref, comp, Standard_True );
         }
-        L = L.Father();
+        if ( !XCAFDoc_ShapeTool::IsFree ( L ) )
+          L = L.Father();
       }
       else
       {
@@ -568,7 +571,8 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
       }
       myLabels.Bind ( L, shape );
       sublabels.Append ( L );
-      if ( XCAFDoc_ShapeTool::IsAssembly ( L ) )
+
+      if ( XCAFDoc_ShapeTool::IsAssembly ( L ) || XCAFDoc_ShapeTool::IsReference ( L ) )
         Actor->RegisterAssembly ( shape );
 
       writer.Transfer(shape,mode,Standard_False);
@@ -825,19 +829,19 @@ Standard_Boolean STEPCAFControl_Writer::WriteExternRefs (const Handle(XSControl_
     Handle(TransferBRep_ShapeMapper) mapper = TransferBRep::ShapeMapper ( FP, S );
     if ( ! FP->FindTypedTransient ( mapper, STANDARD_TYPE(StepShape_ShapeDefinitionRepresentation), SDR ) ) {
 #ifdef OCCT_DEBUG
-      cout << "Warning: Cannot find SDR for " << S.TShape()->DynamicType()->Name() << endl;
+      std::cout << "Warning: Cannot find SDR for " << S.TShape()->DynamicType()->Name() << std::endl;
 #endif
       continue;
     }
 
     // add extern ref
-    const Standard_CString format = (const Standard_CString) ( schema == 3 ? "STEP AP203" : "STEP AP214" );
+    const char* format = (schema == 3 ? "STEP AP203" : "STEP AP214");
     // try to get PD from SDR
     StepRepr_RepresentedDefinition RD = SDR->Definition();
     Handle(StepRepr_PropertyDefinition) aPropDef = RD.PropertyDefinition();
     if (aPropDef.IsNull()) {
 #ifdef OCCT_DEBUG
-      cout << "Warning: STEPCAFControl_Writer::WriteExternRefs StepRepr_PropertyDefinition is null for " << S.TShape()->DynamicType()->Name() << endl;
+      std::cout << "Warning: STEPCAFControl_Writer::WriteExternRefs StepRepr_PropertyDefinition is null for " << S.TShape()->DynamicType()->Name() << std::endl;
 #endif
       continue;
     }
@@ -845,7 +849,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteExternRefs (const Handle(XSControl_
     Handle(StepBasic_ProductDefinition) PD = CharDef.ProductDefinition();
     if (PD.IsNull()) {
 #ifdef OCCT_DEBUG
-      cout << "Warning: STEPCAFControl_Writer::WriteExternRefs StepBasic_ProductDefinition is null for " << S.TShape()->DynamicType()->Name() << endl;
+      std::cout << "Warning: STEPCAFControl_Writer::WriteExternRefs StepBasic_ProductDefinition is null for " << S.TShape()->DynamicType()->Name() << std::endl;
 #endif
       continue;
     }
@@ -937,7 +941,9 @@ static Standard_Boolean getStyledItem(const TopoDS_Shape& S,
     // search for PSA of Monifold solid
     if ( !anSelItmHArr.IsNull() )
     {
-      for (Standard_Integer si = 1; si <= anSelItmHArr->Length(); si++) {
+      TColStd_SequenceOfTransient aNewseqRI;
+      Standard_Boolean isFilled = Standard_False;
+      for (Standard_Integer si = 1; si <= anSelItmHArr->Length() && !found; si++) {
         Handle(StepVisual_StyledItem) aSelItm =
           Handle(StepVisual_StyledItem)::DownCast(anSelItmHArr->Value(si));
 
@@ -945,13 +951,16 @@ static Standard_Boolean getStyledItem(const TopoDS_Shape& S,
           continue;
 
         // check that it is a stiled item for monifold solid brep
-        TopLoc_Location Loc;
-        TColStd_SequenceOfTransient aNewseqRI;
-        FindEntities ( Styles.FinderProcess(), aTopLevSh, Loc, aNewseqRI );
+        if (!isFilled)
+        {
+          TopLoc_Location Loc;
+          FindEntities(Styles.FinderProcess(), aTopLevSh, Loc, aNewseqRI);
+          isFilled = Standard_True;
+        }
         if ( aNewseqRI.Length() > 0 )
         {
           
-          Handle(StepRepr_RepresentationItem) anItem = aSelItm->Item();
+          const Handle(StepRepr_RepresentationItem)& anItem = aSelItm->Item();
           Standard_Boolean isSameMonSolBR = Standard_False;
           for (Standard_Integer mi = 1; mi <= aNewseqRI.Length(); mi++) {
             if ( !anItem.IsNull() && anItem == aNewseqRI.Value( mi ) ) {
@@ -965,7 +974,7 @@ static Standard_Boolean getStyledItem(const TopoDS_Shape& S,
         
         
         for (Standard_Integer jsi = 1; jsi <= aSelItm->NbStyles() && !found; jsi++) {
-          Handle(StepVisual_PresentationStyleAssignment) aFatherPSA = aSelItm->StylesValue(jsi);
+          const Handle(StepVisual_PresentationStyleAssignment)& aFatherPSA = aSelItm->StylesValue(jsi);
           // check for PSA for top-level (not Presentation style by contex for NAUO)
           if (aFatherPSA.IsNull() || aFatherPSA->IsKind(STANDARD_TYPE(StepVisual_PresentationStyleByContext)))
             continue;
@@ -1073,7 +1082,7 @@ static void MakeSTEPStyles (STEPConstruct_Styles &Styles,
       TColStd_SequenceOfTransient seqRI;
       Standard_Integer nb = FindEntities ( Styles.FinderProcess(), S, L, seqRI );
 #ifdef OCCT_DEBUG
-      if ( nb <=0 ) cout << "Warning: Cannot find RI for " << S.TShape()->DynamicType()->Name() << endl;
+      if ( nb <=0 ) std::cout << "Warning: Cannot find RI for " << S.TShape()->DynamicType()->Name() << std::endl;
 #endif
       //Get overridden style gka 10.06.03
       if ( isComponent && nb) 
@@ -1167,8 +1176,8 @@ Standard_Boolean STEPCAFControl_Writer::WriteColors (const Handle(XSControl_Work
     // are not supported (it is not clear how to encode that in STEP)
     if ( XCAFDoc_ShapeTool::IsAssembly ( L ) ) {
 #ifdef OCCT_DEBUG
-      cout << "Warning: Cannot write color  for Assembly" << endl;
-      cout << "Info: Check for colors assigned to components in assembly" << endl;
+      std::cout << "Warning: Cannot write color  for Assembly" << std::endl;
+      std::cout << "Info: Check for colors assigned to components in assembly" << std::endl;
 #endif
       // PTV 22.01.2003 Write color for instances.
       TDF_LabelSequence compLabels;
@@ -1253,7 +1262,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteColors (const Handle(XSControl_Work
     if (!isComponent) {
       if ( myMapCompMDGPR.IsBound( aTopSh )) {
 #ifdef OCCT_DEBUG
-        cerr << "Error: Current Top-Level shape have MDGPR already " << endl;
+        std::cerr << "Error: Current Top-Level shape have MDGPR already " << std::endl;
 #endif
       }
       Styles.CreateMDGPR ( Context, aMDGPR );
@@ -1362,7 +1371,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteNames (const Handle(XSControl_WorkS
     Handle(TransferBRep_ShapeMapper) mapper = TransferBRep::ShapeMapper ( FP, S );
     if ( ! FP->FindTypedTransient ( mapper, STANDARD_TYPE(StepShape_ShapeDefinitionRepresentation), SDR ) ) {
 #ifdef OCCT_DEBUG
-      cout << "Warning: Cannot find SDR for " << S.TShape()->DynamicType()->Name() << endl;
+      std::cout << "Warning: Cannot find SDR for " << S.TShape()->DynamicType()->Name() << std::endl;
 #endif
       continue;
     }
@@ -1598,7 +1607,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteLayers (const Handle(XSControl_Work
       Standard_Integer nb = 
 	FindEntities ( FP, oneShape, Loc, seqRI );
       if ( nb <=0 ) 
-	FP->Messenger() << "Warning: Cannot find RI for " << oneShape.TShape()->DynamicType()->Name() << endl;
+	FP->Messenger() << "Warning: Cannot find RI for " << oneShape.TShape()->DynamicType()->Name() << Message_EndLine;
     }
     if ( seqRI.Length() <= 0 ) continue;
 
@@ -1610,7 +1619,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteLayers (const Handle(XSControl_Work
     if (L.FindAttribute(XCAFDoc::InvisibleGUID(), aUAttr)) {
       descr = new TCollection_HAsciiString ("invisible");
 #ifdef OCCT_DEBUG
-      FP->Messenger() << "\tLayer \"" << hName->String().ToCString() << "\" is invisible"<<endl;
+      FP->Messenger() << "\tLayer \"" << hName->String().ToCString() << "\" is invisible"<<Message_EndLine;
 #endif
       isLinv = Standard_True;
     }
@@ -1779,7 +1788,7 @@ static Standard_Boolean writeSHUO (const Handle(XCAFDoc_GraphNode)& theSHUO,
     // store SHUO recursive
 #ifdef OCCT_DEBUG
     if ( aNextUsageLabs.Length() > 1 )
-      cout << "Warning: store only one next_usage of current SHUO"  << endl;
+      std::cout << "Warning: store only one next_usage of current SHUO"  << std::endl;
 #endif    
     theSTool->GetSHUO( aNextUsageLabs.Value(1), NuSHUO );
     Handle(StepRepr_SpecifiedHigherUsageOccurrence) aNUEntSHUO =
@@ -1798,7 +1807,7 @@ static Standard_Boolean writeSHUO (const Handle(XCAFDoc_GraphNode)& theSHUO,
     if (!getProDefinitionOfNAUO( WS, aUUSh, nullPD, UUNAUO, Standard_True ) ||
         !getProDefinitionOfNAUO( WS, aNUSh, aRelatedPD, NUNAUO, Standard_False )) {
 #ifdef OCCT_DEBUG
-      cout << "Warning: cannot get related or relating PD" << endl;
+      std::cout << "Warning: cannot get related or relating PD" << std::endl;
 #endif
       return Standard_False;
     }
@@ -1883,7 +1892,7 @@ static Standard_Boolean createSHUOStyledItem (const XCAFPrs_Style& style,
   FindEntities ( FP, Sh, L, seqRI );
 #ifdef OCCT_DEBUG
   if ( seqRI.Length() <=0 ) 
-    FP->Messenger() << "Warning: Cannot find RI for " << Sh.TShape()->DynamicType()->Name() << endl;
+    FP->Messenger() << "Warning: Cannot find RI for " << Sh.TShape()->DynamicType()->Name() << Message_EndLine;
 #endif
   item = Handle(StepRepr_RepresentationItem)::DownCast(seqRI(1));
   //get overridden styled item
@@ -1899,7 +1908,7 @@ static Standard_Boolean createSHUOStyledItem (const XCAFPrs_Style& style,
   if ( !aTopSh.IsNull() &&  !myMapCompMDGPR.IsBound( aTopSh ) ) {
     // create MDGPR and record it in model
 #ifdef OCCT_DEBUG
-    cout << "Warning: " << __FILE__ << ": Create new MDGPR for SHUO instance"  << endl;
+    std::cout << "Warning: " << __FILE__ << ": Create new MDGPR for SHUO instance"  << std::endl;
 #endif
     Handle(StepVisual_MechanicalDesignGeometricPresentationRepresentation) aMDGPR;
     Styles.CreateMDGPR ( Context, aMDGPR );
@@ -1930,7 +1939,7 @@ static Standard_Boolean createSHUOStyledItem (const XCAFPrs_Style& style,
   else {
     WS->Model()->AddWithRefs ( STEPstyle ); // add as root to the model, but it is not good
 #ifdef OCCT_DEBUG
-    cout << "Warning: " << __FILE__ << ": adds styled item of SHUO as root, casue cannot find MDGPR" << endl;
+    std::cout << "Warning: " << __FILE__ << ": adds styled item of SHUO as root, casue cannot find MDGPR" << std::endl;
 #endif
   }
   // create invisibility item for the styled item
@@ -2002,7 +2011,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteSHUOs (const Handle(XSControl_WorkS
           XCAFPrs_Style SHUOstyle;
           if ( !getSHUOstyle ( aSHUOlab, CTool, SHUOstyle ) ) {
 #ifdef OCCT_DEBUG
-            cout << "Warning: " << __FILE__ << ": do not store SHUO without any style to the STEP model" << endl;
+            std::cout << "Warning: " << __FILE__ << ": do not store SHUO without any style to the STEP model" << std::endl;
 #endif
             continue;
           }
@@ -2015,13 +2024,13 @@ Standard_Boolean STEPCAFControl_Writer::WriteSHUOs (const Handle(XSControl_WorkS
           writeSHUO( aSHUO, CTool->ShapeTool(), WS, anEntOfSHUO, NAUOShape, aRelatingPD, isDeepest );
           if ( anEntOfSHUO.IsNull() || NAUOShape.IsNull() ) {
 #ifdef OCCT_DEBUG
-            cout << "Warning: " << __FILE__ << ": Cannot store SHUO" << endl;
+            std::cout << "Warning: " << __FILE__ << ": Cannot store SHUO" << std::endl;
 #endif
             continue;
           }
           // create new Product Definition Shape for TOP SHUO
 #ifdef OCCT_DEBUG
-            cout << "Info: " << __FILE__ << ": Create NEW PDS for current SHUO " << endl;
+            std::cout << "Info: " << __FILE__ << ": Create NEW PDS for current SHUO " << std::endl;
 #endif
           Handle(StepRepr_ProductDefinitionShape) PDS = new StepRepr_ProductDefinitionShape;
           Handle(TCollection_HAsciiString) aPDSname = new TCollection_HAsciiString("SHUO");
@@ -2172,62 +2181,65 @@ static StepBasic_Unit GetUnit(const Handle(StepRepr_RepresentationContext)& theR
                               const Standard_Boolean isAngle = Standard_False)
 {
   StepBasic_Unit aUnit;
+  Handle(StepBasic_NamedUnit) aCurrentUnit;
   if (isAngle) {
-    Handle(StepBasic_SiUnitAndPlaneAngleUnit) aSiPAU;
     Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext) aCtx =
       Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext)::DownCast(theRC);
     if(!aCtx.IsNull()) {
       for(Standard_Integer j = 1; j <= aCtx->NbUnits(); j++) {
-        if(aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndPlaneAngleUnit))) {
-          aSiPAU = Handle(StepBasic_SiUnitAndPlaneAngleUnit)::DownCast(aCtx->UnitsValue(j));
+        if (aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndPlaneAngleUnit)) ||
+            aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_ConversionBasedUnitAndPlaneAngleUnit))) {
+          aCurrentUnit = aCtx->UnitsValue(j);
           break;
         }
       }
     }
-    if(aSiPAU.IsNull()) {
+    if (aCurrentUnit.IsNull()) {
       Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx) aCtx1 =
         Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx)::DownCast(theRC);
       if(!aCtx1.IsNull()) {
         for(Standard_Integer j = 1; j <= aCtx1->NbUnits(); j++) {
-          if(aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndPlaneAngleUnit))) {
-            aSiPAU = Handle(StepBasic_SiUnitAndPlaneAngleUnit)::DownCast(aCtx1->UnitsValue(j));
+          if (aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndPlaneAngleUnit)) ||
+              aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_ConversionBasedUnitAndPlaneAngleUnit))) {
+            aCurrentUnit = aCtx1->UnitsValue(j);
             break;
           }
         }
       }
     }
-    if(aSiPAU.IsNull())
-      aSiPAU = new StepBasic_SiUnitAndPlaneAngleUnit;
-    aUnit.SetValue(aSiPAU);
+    if (aCurrentUnit.IsNull())
+      aCurrentUnit = new StepBasic_SiUnitAndPlaneAngleUnit;
   }
   else {
-    Handle(StepBasic_SiUnitAndLengthUnit) aSiLU;
     Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext) aCtx =
       Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext)::DownCast(theRC);
     if(!aCtx.IsNull()) {
       for(Standard_Integer j = 1; j <= aCtx->NbUnits(); j++) {
-        if(aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit))) {
-          aSiLU = Handle(StepBasic_SiUnitAndLengthUnit)::DownCast(aCtx->UnitsValue(j));
+        if (aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit)) ||
+            aCtx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_ConversionBasedUnitAndLengthUnit))) {
+          aCurrentUnit = aCtx->UnitsValue(j);
           break;
         }
       }
     }
-    if(aSiLU.IsNull()) {
+    if (aCurrentUnit.IsNull()) {
       Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx) aCtx1 =
         Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx)::DownCast(theRC);
       if(!aCtx1.IsNull()) {
         for(Standard_Integer j = 1; j <= aCtx1->NbUnits(); j++) {
-          if(aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit))) {
-            aSiLU = Handle(StepBasic_SiUnitAndLengthUnit)::DownCast(aCtx1->UnitsValue(j));
+          if (aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit)) ||
+              aCtx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_ConversionBasedUnitAndLengthUnit))) {
+            aCurrentUnit = aCtx1->UnitsValue(j);
             break;
           }
         }
       }
     }
-    if(aSiLU.IsNull())
-      aSiLU = new StepBasic_SiUnitAndLengthUnit;
-    aUnit.SetValue(aSiLU);
+    if (aCurrentUnit.IsNull())
+      aCurrentUnit = new StepBasic_SiUnitAndLengthUnit;
   }
+
+  aUnit.SetValue(aCurrentUnit);
   return aUnit;
 }
 
@@ -2308,7 +2320,7 @@ Handle(StepRepr_ShapeAspect) STEPCAFControl_Writer::WriteShapeAspect (const Hand
   TColStd_SequenceOfTransient aSeqRI;
   FindEntities( FP, theShape, aLoc, aSeqRI );
   if ( aSeqRI.Length() <= 0 ) {
-    FP->Messenger() << "Warning: Cannot find RI for "<<theShape.TShape()->DynamicType()->Name()<<endl;
+    FP->Messenger() << "Warning: Cannot find RI for "<<theShape.TShape()->DynamicType()->Name()<<Message_EndLine;
     return NULL;
   }
 
@@ -2480,7 +2492,7 @@ Handle(StepDimTol_Datum) STEPCAFControl_Writer::WriteDatumAP242(const Handle(XSC
     aShape = XCAFDoc_ShapeTool::GetShape(theShapeL.Value(i));
     FindEntities(FP, aShape, aLoc, aSeqRI);
     if (aSeqRI.Length() <= 0) {
-      FP->Messenger() << "Warning: Cannot find RI for " << aShape.TShape()->DynamicType()->Name() << endl;
+      FP->Messenger() << "Warning: Cannot find RI for " << aShape.TShape()->DynamicType()->Name() << Message_EndLine;
       continue;
     }
     anEnt = aSeqRI.Value(1);
@@ -3392,7 +3404,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSe
     TColStd_SequenceOfTransient seqRI;
     FindEntities( FP, aShape, Loc, seqRI );
     if ( seqRI.Length() <= 0 ) {
-      FP->Messenger() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<endl;
+      FP->Messenger() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<Message_EndLine;
       continue;
     }
     Handle(StepRepr_ProductDefinitionShape) PDS;
@@ -3402,7 +3414,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSe
     Handle(StepShape_EdgeCurve) EC;
     FindPDSforDGT(aGraph,ent,PDS,RC,AF,EC);
     if(PDS.IsNull()) continue;
-    //cout<<"Model->Number(PDS)="<<Model->Number(PDS)<<endl;
+    //std::cout<<"Model->Number(PDS)="<<Model->Number(PDS)<<std::endl;
     Handle(XCAFDoc_Datum) DatumAttr;
     if(!DatumL.FindAttribute(XCAFDoc_Datum::GetID(),DatumAttr)) continue;
     Handle(TCollection_HAsciiString) aName = DatumAttr->GetName();
@@ -3474,7 +3486,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSe
     TColStd_SequenceOfTransient seqRI;
     FindEntities( FP, aShape, Loc, seqRI );
     if ( seqRI.Length() <= 0 ) {
-      FP->Messenger() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<endl;
+      FP->Messenger() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<Message_EndLine;
       continue;
     }
     Handle(StepRepr_ProductDefinitionShape) PDS;
@@ -3484,7 +3496,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSe
     Handle(StepShape_EdgeCurve) EC;
     FindPDSforDGT(aGraph,ent,PDS,RC,AF,EC);
     if(PDS.IsNull()) continue;
-    //cout<<"Model->Number(PDS)="<<Model->Number(PDS)<<endl;
+    //std::cout<<"Model->Number(PDS)="<<Model->Number(PDS)<<std::endl;
 
     Handle(XCAFDoc_DimTol) DimTolAttr;
     if(!DimTolL.FindAttribute(XCAFDoc_DimTol::GetID(),DimTolAttr)) continue;
@@ -3517,33 +3529,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSe
     Model->AddWithRefs(SDR);
     // define aUnit for creation LengthMeasureWithUnit (common for all)
     StepBasic_Unit aUnit;
-    Handle(StepBasic_SiUnitAndLengthUnit) SLU;
-    Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext) Ctx =
-      Handle(StepGeom_GeometricRepresentationContextAndGlobalUnitAssignedContext)::DownCast(RC);
-    if(!Ctx.IsNull()) {
-      for(Standard_Integer j=1; j<=Ctx->NbUnits(); j++) {
-        if(Ctx->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit))) {
-          SLU = Handle(StepBasic_SiUnitAndLengthUnit)::DownCast(Ctx->UnitsValue(j));
-          break;
-        }
-      }
-    }
-    if(SLU.IsNull()) {
-      Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx) Ctx1 =
-        Handle(StepGeom_GeomRepContextAndGlobUnitAssCtxAndGlobUncertaintyAssCtx)::DownCast(RC);
-      if(!Ctx1.IsNull()) {
-        for(Standard_Integer j=1; j<=Ctx1->NbUnits(); j++) {
-          if(Ctx1->UnitsValue(j)->IsKind(STANDARD_TYPE(StepBasic_SiUnitAndLengthUnit))) {
-            SLU = Handle(StepBasic_SiUnitAndLengthUnit)::DownCast(Ctx1->UnitsValue(j));
-            break;
-          }
-        }
-      }
-    }
-    if(SLU.IsNull()) {
-      SLU = new StepBasic_SiUnitAndLengthUnit;
-    }
-    aUnit.SetValue(SLU);
+    aUnit = GetUnit(RC);
 
     // specific part of writing D&GT entities
     if(kind<20) { //dimension

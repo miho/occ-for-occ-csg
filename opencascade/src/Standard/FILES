@@ -11,6 +11,8 @@ Standard_Byte.hxx
 Standard_Character.hxx
 Standard_CLocaleSentry.cxx
 Standard_CLocaleSentry.hxx
+Standard_Condition.cxx
+Standard_Condition.hxx
 Standard_ConstructionError.hxx
 Standard_Copy.tcl
 Standard_CString.cxx
@@ -22,6 +24,8 @@ Standard_DimensionError.hxx
 Standard_DimensionMismatch.hxx
 Standard_DivideByZero.hxx
 Standard_DomainError.hxx
+Standard_Dump.cxx
+Standard_Dump.hxx
 Standard_ErrorHandler.cxx
 Standard_ErrorHandler.hxx
 Standard_ExtCharacter.hxx
@@ -74,12 +78,15 @@ Standard_PExtCharacter.hxx
 Standard_PrimitiveTypes.hxx
 Standard_ProgramError.hxx
 Standard_RangeError.hxx
+Standard_ReadBuffer.hxx
+Standard_ReadLineBuffer.hxx
 Standard_Real.cxx
 Standard_Real.hxx
 Standard_ShortReal.cxx
 Standard_ShortReal.hxx
 Standard_Size.hxx
 Standard_SStream.hxx
+Standard_Std.hxx
 Standard_Stream.hxx
 Standard_Strtod.cxx
 Standard_ThreadId.hxx

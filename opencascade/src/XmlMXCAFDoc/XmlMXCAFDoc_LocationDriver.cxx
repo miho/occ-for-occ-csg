@@ -104,7 +104,7 @@ void XmlMXCAFDoc_LocationDriver::Translate (const TopLoc_Location&      theLoc,
   if( myLocations == 0 )
   {
 #ifdef OCCT_DEBUG
-    cout<<"Pointer to LocationSet is NULL\n";
+    std::cout<<"Pointer to LocationSet is NULL\n";
 #endif
     return;
   }
@@ -148,7 +148,7 @@ Standard_Boolean XmlMXCAFDoc_LocationDriver::Translate
   if (aLocElem == NULL)
     return Standard_False;
   
-  Standard_Integer aFileVer = XmlMNaming::DocumentVersion();
+  Standard_Integer aFileVer = theMap.GetHeaderData()->StorageVersion().IntegerValue();
   if( aFileVer > 5 && myLocations == 0 )
   {
     return Standard_False;

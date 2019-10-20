@@ -51,7 +51,7 @@ for (Standard_Integer aGr = 1; aGr <= aLen; ++aGr)
 
 * All occurrences of *Select3D_Projector* in the application code (if any) should be replaced with *Handle(Select3D_Projector)*.
 * The code of inheritors of *Select3D_SensitiveEntity* should be updated if they override <i>Matches()</i> (this is probable, if clipping planes are used).
-* Constructor for *V3d_Plane* has been changed, so the extra argument should be removed if used in the application. It is necessary to add a new plane using method *V3d_Viewer::AddPlane()* if *V3d_Viewer* has been used to manage clipping planes list (this does not affect clipping planes representation). Please, have a look at the source code for new DRAWEXE *vclipplane* command in *ViewerTest_ObjectsCommands.cxx, VClipPlane* to see how clipping planes can be managed in the application.
+* Constructor for *V3d_Plane* has been changed, so the extra argument should be removed if used in the application. It is necessary to add a new plane using method *V3d_Viewer::AddPlane()* if *V3d_Viewer* has been used to manage clipping planes list (this does not affect clipping planes representation). Have a look at the source code for new DRAWEXE *vclipplane* command in *ViewerTest_ObjectsCommands.cxx, VClipPlane* to see how clipping planes can be managed in the application.
 
 @section upgrade_652 Upgrade to OCCT 6.5.2
 
@@ -112,14 +112,14 @@ Porting of user applications from an earlier OCCT version to version 6.6.0 requi
 It is necessary to introduce the corresponding changes in the applications for which the order of sub-shapes resulting from a Boolean operation is important. It is strongly recommended to use identification methods not relying on the order of sub-shapes (e.g. OCAF naming).
 * If you need to use OCCT on Mac OS X with X11 (without Cocoa), build OCCT with defined pre-processor macro *CSF_MAC_USE_GLX11*. XLib front-end (previously the only way for unofficial OCCT builds on Mac OS X) is now disabled by default on this platform. If your application has no support for Cocoa framework you may build OCCT with XLib front-end adding *MACOSX_USE_GLX* macro to compiler options (you may check the appropriate option in WOK configuration GUI and in CMake configuration). Notice that XQuartz (XLib implementation for Mac OS X) now is an optional component and does not provide a sufficient level of integrity with native (Cocoa-based) applications in the system. It is not possible to build OCCT with both XLib and Cocoa at the same time due to symbols conflict in OpenGL functions. 
 * Animation mode and degeneration presentation mode (simplified presentation for animation) and associated methods have been removed from 3D viewer functionality.
-Correspondingly, the code using methods *SetAnimationModeOn(), SetAnimationModeOff(), AnimationModeIsOn(), AnimationMode(), Tumble(), SetDegenerateModeOn(), SetDegenerateModeOff()* and *DegenerateModeIsOn()* of classes *V3d_View* and *Visual3d_View* will need to be removed or redesigned. Please, notice that Hidden Line Removal presentation was not affected; however, the old code that used methods *V3d_View::SetDegenerateModeOn* or *V3d_View::SetDegenerateModeOff* to control HLR presentation should be updated to use *V3d_View::SetComputedMode* method instead.
+Correspondingly, the code using methods *SetAnimationModeOn(), SetAnimationModeOff(), AnimationModeIsOn(), AnimationMode(), Tumble(), SetDegenerateModeOn(), SetDegenerateModeOff()* and *DegenerateModeIsOn()* of classes *V3d_View* and *Visual3d_View* will need to be removed or redesigned. Hidden Line Removal presentation was not affected; however, the old code that used methods *V3d_View::SetDegenerateModeOn* or *V3d_View::SetDegenerateModeOff* to control HLR presentation should be updated to use *V3d_View::SetComputedMode* method instead.
 * Calls of *Graphic3d_Group::BeginPrimitives()* and *Graphic3d_Group::EndPrimitives()* should be removed from the application code.
 * Application functionality for drawing 2D graphics that was formerly based on *TKV2d* API should be migrated to *TKV3d* API. The following changes are recommended for this migration:
    * A 2D view can be implemented as a *V3d_View* instance belonging to *V3d_Viewer* managed by *AIS_InteractiveContext* instance. To turn *V3d_View* into a 2D view, the necessary view orientation should be set up at the view initialization stage using *V3d_View::SetProj()* method, and view rotation methods simply should not be called.
    * Any 2D graphic entity (formerly represented with *AIS2D_InteractiveObject*) should become a class derived from *AIS_InteractiveObject* base. These entities should be manipulated in a view using *AIS_InteractiveContext* class API.
    * All drawing code should be put into *Compute()* virtual method of a custom interactive object class and use API of *Graphic3d* package. In particular, all geometry should be drawn using class hierarchy derived from *Graphic3d_ArrayOfPrimitives*. Normally, the Z coordinate for 2D geometry should be constant, unless the application implements some advanced 2D drawing techniques like e.g. multiple "Z layers" of drawings.
    * Interactive selection of 2D presentations should be set up inside *ComputeSelection()* virtual method of a custom interactive object class, using standard sensitive entities from *Select3D* package and standard or custom entity owners derived from *SelectMgr_EntityOwner* base.
-Please refer to the Visualization User's Guide for further details concerning OCCT 3D visualization and selection classes. See also *Viewer2D* OCCT sample application, which shows how 2D drawing can be implemented using TKV3d API.
+Refer to the Visualization User's Guide for further details concerning OCCT 3D visualization and selection classes. See also *Viewer2D* OCCT sample application, which shows how 2D drawing can be implemented using TKV3d API.
 * Run-time graphic driver library loading mechanism based on *CSF_GraphicShr* environment variable usage has been replaced by explicit linking against *TKOpenGl* library. The code sample below shows how the graphic driver should be created and initialized in the application code: 
 ~~~~
 // initialize a new viewer with OpenGl graphic driver
@@ -161,10 +161,10 @@ Porting of user applications from an earlier OCCT version to version 6.7.0 requi
 
 @subsection upgrade_670_clipping Object-level clipping and capping algorithm. 
 
-* It might be necessary to revise and port code related to management of view-level clipping to use *Graphic3d_ClipPlane* instead of *V3d_Plane* instances. Please note that *V3d_Plane* class has been preserved -- as previously, it can be used as plane representation. Another approach to represent *Graphic3d_ClipPlane* in a view is to use custom presentable object.
-* The list of arguments of *Select3D_SensitiveEntity::Matches()* method for picking detection has changed. Since now, for correct selection clipping, the implementations should perform a depth clipping check and return (as output argument) minimum depth value found at the detected part of sensitive. Please refer to CDL / Doxygen documentation to find descriptive hints and snippets.
+* It might be necessary to revise and port code related to management of view-level clipping to use *Graphic3d_ClipPlane* instead of *V3d_Plane* instances. Note that *V3d_Plane* class has been preserved -- as previously, it can be used as plane representation. Another approach to represent *Graphic3d_ClipPlane* in a view is to use custom presentable object.
+* The list of arguments of *Select3D_SensitiveEntity::Matches()* method for picking detection has changed. Since now, for correct selection clipping, the implementations should perform a depth clipping check and return (as output argument) minimum depth value found at the detected part of sensitive. Refer to CDL / Doxygen documentation to find descriptive hints and snippets.
 * *Select3D_SensitiveEntity::ComputeDepth()* abstract method has been removed. Custom implementations should provide depth checks by method *Matches()* instead -- all data required for it is available within a scope of single method.
-* It might be necessary to revise the code of custom sensitive entities and port *Matches()* and *ComputeDepth()* methods to ensure proper selection clipping. Please note that obsolete signature of *Matches* is not used anymore by the selector. If your class inheriting *Select3D_SensitiveEntity* redefines the method with old signature the code should not compile as the return type has been changed. This is done to prevent override of removed methods.
+* It might be necessary to revise the code of custom sensitive entities and port *Matches()* and *ComputeDepth()* methods to ensure proper selection clipping. Note that obsolete signature of *Matches* is not used anymore by the selector. If your class inheriting *Select3D_SensitiveEntity* redefines the method with old signature the code should not compile as the return type has been changed. This is done to prevent override of removed methods.
 
 @subsection upgrade_670_markers Redesign of markers presentation
 
@@ -210,7 +210,7 @@ If *ViewMapping* and *ViewOrientation* were used directly, this functionality ha
 
 The current perspective model is not fully backward compatible, so the old perspective-related functionality needs to be reviewed.
 
-Please revise application-specific custom presentations to provide proper bounding box. Otherwise object might become erroneously clipped by automatic *ZFit* or frustum culling algorithms enabled by default.
+Revise application-specific custom presentations to provide a proper bounding box, otherwise the object might become erroneously clipped by automatic *ZFit* or frustum culling algorithms enabled by default.
 
 @subsection upgrade_680_connected_objects Redesign of Connected Interactive Objects
 
@@ -439,7 +439,7 @@ class TColStd_Array1OfReal; -> #include <TColStd_Array1OfReal.hxx>
 ~~~~~
 Handle_Class -> Handle(Class)
 ~~~~~
-  This change is not applied if the source or header file is recognized as containing the definition of Qt class with signals or slots, to avoid possible compilation errors of MOC files caused by inability of MOC to recognize macros (see http://doc.qt.io/qt-4.8/signalsandslots.html).
+  This change is not applied if the source or header file is recognized as containing the definition of Qt class with signals or slots, to avoid possible compilation errors of MOC files caused by inability of MOC to recognize macros (see https://doc.qt.io/qt-4.8/signalsandslots.html).
   The file is considered as defining a Qt object if it contains strings *Q_OBJECT* and either *slots:* or *signals:*. 
 
 4. Removes forward declarations of classes with names <i>Handle(C)</i> or *Handle_C*, replacing them either by forward declaration of its argument class, or (for files defining Qt objects) <i>\#include</i> statement for a header with the name of the argument class and extension .hxx:
@@ -736,9 +736,9 @@ If you like to preserve the compatibility of your application code with OCCT ver
 If your application is essentially based on CDL, and you need to upgrade it to OCCT 7.0, you will very likely need to convert your application code to non-CDL form.
 This is a non-trivial effort; the required actions would depend strongly on the structure of the code and used CDL features.
 
-The upgrade script and sources of a specialized WOK version used for OCCT code upgrade can be found in WOK Git repository in branch [CR0_700_2](http://git.dev.opencascade.org/gitweb/?p=occt-wok.git;a=log;h=refs/heads/CR0_700_2).
+The upgrade script and sources of a specialized WOK version used for OCCT code upgrade can be found in WOK Git repository in branch [CR0_700_2](https://git.dev.opencascade.org/gitweb/?p=occt-wok.git;a=log;h=refs/heads/CR0_700_2).
 
-[Contact us](http://www.opencascade.com/contact/) if you need more help.
+[Contact us](https://www.opencascade.com/contact/) if you need more help.
 
 @subsection upgrade_occt700_bspline Separation of BSpline cache
 
@@ -987,11 +987,11 @@ The applications that use *gp_Quaternion* to convert Yaw-Pitch-Roll angles (or o
 
 @subsection upgrade_zoom_persistent_selection Zoom Persistent Selection
 
-Zoom persistent selection introduces a new structure *Graphic3d_TransformPers* to transform persistence methods and parameters and a new class *Graphic3d_WorldViewProjState* to refer to the camera transformation state. You might need to update your code to deal with the new classes if you were using the related features. Please, keep in mind the following: 
+Zoom persistent selection introduces a new structure *Graphic3d_TransformPers* to transform persistence methods and parameters and a new class *Graphic3d_WorldViewProjState* to refer to the camera transformation state. You might need to update your code to deal with the new classes if you were using the related features. Keep in mind the following: 
 * *Graphic3d_Camera::ModelViewState* has been renamed to *Graphic3d_Camera::WorldViewState*.
 * Transformation matrix utilities from *OpenGl_Utils* namespace have been moved to *Graphic3d_TransformUtils* and *Graphic3d_TransformUtils.hxx* header respectively.
 * Matrix stack utilities from *OpenGl_Utils* namespace have been moved to *OpenGl_MatrixStack* class and *OpenGl_MatrixStack.hxx* header respectively.
-* *OpenGl_View* methods *Begin/EndTransformPersistence* have been removed. Please, use *Graphic3d_TransformPers::Apply()* instead to apply persistence to perspective and world-view projection matrices.
+* *OpenGl_View* methods *Begin/EndTransformPersistence* have been removed. Use *Graphic3d_TransformPers::Apply()* instead to apply persistence to perspective and world-view projection matrices.
 
 @subsection upgrade_occt700_correction_of_texture Texture mapping of objects
 
@@ -1091,7 +1091,7 @@ The following environment variables have become redundant:
 
 * *CSF_UnitsLexicon* and *CSF_UnitsDefinition* are no more used.  Units definition (*UnitsAPI/Lexi_Expr.dat* and *UnitsAPI/Units.dat*) is now embedded into source code.
 * *CSF_XSMessage* and *CSF_XHMessage* are now optional.
-  English messages (XSMessage/*XSTEP.us* and SHMessage/*SHAPE.us*) are now embedded into source code
+  English messages (XSMessage/\*XSTEP.us* and SHMessage/\*SHAPE.us*) are now embedded into source code
   and automatically loaded when environment variables are not set.
 * *CSF_ShadersDirectory* is not required any more, though it still can be used to load custom shaders.
   Mandatory GLSL resources are now embedded into source code.
@@ -1124,7 +1124,7 @@ The following classes have been changed:
 * *BRepTools_Modifier* class now has two modes of work. They are defined by the boolean parameter *MutableInput*, which is turned off by default. This means that the algorithm always makes a copy of a sub-shape (e.g. vertex) if its tolerance is to be increased in the output shape. The old mode corresponds to *MutableInput* turned on. This change may impact an application if it implements a class derived from *BRepTools_Modifier*.
 * The second parameter *theIsOuterWire* of method *ShapeAnalysis_Wire::CheckSmallArea* has been removed.
 * In class *GeomPlate_CurveConstraint*, two constructors taking boundary curves of different types have been replaced with one constructor taking the curve of an abstract type.
-*  The last optional argument *RemoveInvalidFaces* has been removed from the constructor of class  *BRepOffset_MakeOffset* and method *Initialize*.
+* The last optional argument *RemoveInvalidFaces* has been removed from the constructor of class  *BRepOffset_MakeOffset* and method *Initialize*.
 * The public method *BOPDS_DS::VerticesOnIn* has been renamed into *SubShapesOnIn* and the new output parameter *theCommonPB* has been added.
 
 @section upgrade_occt720 Upgrade to OCCT 7.2.0
@@ -1546,6 +1546,8 @@ Since the new version, the method *BRepAdaptor_CompCurve::IsPeriodic()* will alw
 
 @subsection upgrade_730_removed Removed features
 * The methods *SetDeflection*, *SetEpsilonT*, *SetDiscretize* of the class *IntTools_EdgeFace* have been removed as redundant.
+* Deprecated functionality *V3d_View::Export()*, related enumerations Graphic3d_ExportFormat, Graphic3d_SortType
+  as well as optional dependency from gl2ps library have been removed.
 
 @subsection upgrade_730_BuilderSolid Boolean Operations - Solid Builder algorithm
 
@@ -1576,3 +1578,282 @@ Class *Message_PrinterOStream* can be used instead of *CDM_COutMessageDriver* to
 If custom driver class is used in the application, that class shall be reimplemented inheriting from *Message_Printer* instead of *CDM_MessageDriver*.
 Method *Send()* should be redefined instead of method *Write()* of *CDM_MessageDriver*.
 To use the custom printer in OCAF, it can be either added to default messenger or set into the custom *Message_Messenger* object created in the method *MessageDriver()* of a class inheriting *CDF_Application*.
+
+@section upgrade_occt740 Upgrade to OCCT 7.4.0
+
+@subsection upgrade_740_BRepPrimAPI_MakeRevol Changes in BRepPrimAPI_MakeRevol algorithm
+Previously the algorithm could create a shape with the same degenerated edge shared between some faces. Now it is prevented. The algorithm creates the different copy of this edge for each face. The method *Generated(...)* has been changed in order to apply restriction to the input shape: input shape can be only of type VERTEX, EDGE, FACE or SOLID. For input shape of another type the method always returns empty list.
+
+@subsection upgrade_740_removed Removed features
+* The following methods of the class *BRepAlgoAPI_BooleanOperation* have been removed as obsolete or replaced:
+  - *BuilderCanWork* can be replaced with *IsDone* or *HasErrors* method.
+  - *FuseEdges* removed as obsolete.
+  - *RefineEdges* replaced with new method *SimplifyResult*.
+* The method *ImagesResult* of the class *BOPAlgo_BuilderShape* has been removed as unused. The functionality of this method can be completely replaced by the history methods *Modified* and *IsDeleted*.
+* The method *TrackHistory* of the classes *BOPAlgo_RemoveFeatures* and *BRepAlgoAPI_Defeaturing* has been renamed to *SetToFillHistory*.
+* The method *GetHistory* of the class *BRepAlgoAPI_Defeaturing* has been renamed to *History*.
+* The classes *BRepAlgo_BooleanOperations* and *BRepAlgo_DSAccess* have been removed as obsolete. Please use the BRepAlgoAPI_* classes to perform Boolean operations.
+* *BRepAlgo_DataMapOfShapeBoolean* has been removed as unused.
+* *BRepAlgo_DataMapOfShapeInterference* has been removed as unused.
+* *BRepAlgo_EdgeConnector* has been removed as unused.
+* *BRepAlgo_SequenceOfSequenceOfInteger* has been removed as unused.
+
+@subsection upgrade_740_localcontext Local Context removal
+
+Previously deprecated Local Context functionality has been removed from AIS package,
+so that related methods have been removed from AIS_InteractiveContext interface:
+*HasOpenedContext()*, *HighestIndex()*, *LocalContext()*, *LocalSelector()*, *OpenLocalContext()*, *CloseLocalContext()*,
+*IndexOfCurrentLocal()*, *CloseAllContexts()*, *ResetOriginalState()*, *ClearLocalContext()*, *UseDisplayedObjects()*, *NotUseDisplayedObjects()*,
+*SetShapeDecomposition()*, *SetTemporaryAttributes()*, *ActivateStandardMode()*, *DeactivateStandardMode()*, *KeepTemporary()*,
+*SubIntensityOn()*, *SubIntensityOff()*, *ActivatedStandardModes()*, *IsInLocal()*, *AddOrRemoveSelected()* taking TopoDS_Shape.
+
+A set of deprecated methods previously related to Local Context and now redirecting to other methods has been preserved to simplify porting; they will be removed in next release.
+
+@subsection upgrade_740_geomconvert Changes in behavior of Convert algorithms
+
+Now methods *GeomConvert::ConcatG1*, *GeomConvert::ConcatC1*, *Geom2dConvert::ConcatG1*, *Geom2dConvert::ConcatC1* modify the input argument representing the flag of closedness.
+
+@subsection upgrade_740_selection Changes in selection API and picked point calculation algorithm.
+
+*SelectBasics_PickResult* structure has been extended, so that it now defines a 3D point on the detected entity in addition to Depth value along picking ray.
+*SelectMgr_SelectingVolumeManager::Overlap()* methods have been corrected to fill in *SelectBasics_PickResult* structure (depth and 3D point) instead of only depth value, so that custom *Select3D_SensitiveEntity* implementation should be updated accordingly (including *Select3D_SensitiveSet* subclasses).
+
+@subsection upgrade_740_ocafpersistence Document format version management improvement.
+
+Previously Document format version restored by *DocumentRetrievalDriver* was propagated using static methods of the corresponding units (like *MDataStd* or *MNaming*) to static variables of these units and after that became accessible to Drivers of these units.
+Now Document format version is available to drivers via *RelocationTable*. The Relocation table now keeps *HeaderData* of the document and a format version can be extracted in the following way: *theRelocTable.GetHeaderData()->StorageVersion()*.
+Obsolete methods: *static void SetDocumentVersion (const Standard_Integer DocVersion)* and *static Standard_Integer DocumentVersion()* have been removed from *BinMDataStd*, *BinMNaming*, *XmlMDataStd* and *XmlMNaming*.
+
+@subsection upgrade_740_changed_api_of_brepmesh BRepMesh - revision of the data model
+
+The entire structure of *BRepMesh* component has been revised and separated into several logically connected classes.
+
+In new version, deflection is controlled more accurately, this may be necessary to tune parameters of call of the BRepMesh algorithm on the application side to obtain the same quality of presentation and/or performance as before.
+
+*BRepMesh_FastDiscret* and *BRepMesh_FastDiscretFace* classes have been removed.
+
+The following changes have been introduced in the API of *BRepMesh_IncrementalMesh*, component entry point:
+* Due to revised logic, *adaptiveMin* parameter of the constructor has been removed as meaningless;
+* *BRepMesh_FastDiscret::Parameters* has been moved to a separate structure called *IMeshTools_Parameters*; the signatures of related methods have been changed correspondingly.
+
+* Interface of *BRepMesh_Delaun* class has been changed.
+
+Example of usage:
+Case 1 (explicit parameters):
+~~~~
+#include <IMeshData_Status.hxx>
+#include <IMeshTools_Parameters.hxx>
+#include <BRepMesh_IncrementalMesh.hxx>
+
+Standard_Boolean meshing_explicit_parameters()
+{
+  BRepMesh_IncrementalMesh aMesher (aShape, 0.1, Standard_False, 0.5, Standard_True);
+  const Standard_Integer aStatus = aMesher.GetStatusFlags();
+  return !aStatus;
+}
+
+Standard_Boolean meshing_new()
+{
+  IMeshTools_Parameters aMeshParams;
+  aMeshParams.Deflection               = 0.1;
+  aMeshParams.Angle                    = 0.5;
+  aMeshParams.Relative                 = Standard_False;
+  aMeshParams.InParallel               = Standard_True;
+  aMeshParams.MinSize                  = Precision::Confusion();
+  aMeshParams.InternalVerticesMode     = Standard_True;
+  aMeshParams.ControlSurfaceDeflection = Standard_True;
+
+  BRepMesh_IncrementalMesh aMesher (aShape, aMeshParams);
+  const Standard_Integer aStatus = aMesher.GetStatusFlags();
+  return !aStatus;
+}
+~~~~
+
+@subsection upgrade_740_chamfer Changes in API of Chamfer algorithms
+
+Some public methods of the class BRepFilletAPI_MakeChamfer are released from excess arguments:
+- method Add for symmetric chamfer now takes only 2 arguments: distance and edge;
+- method GetDistAngle now takes only 3 arguments: index of contour, distance and angle.
+
+@subsection upgrade_740_aspects Aspects unification
+
+Fill Area, Line and Marker aspects (classes *Graphic3d_AspectFillArea3d*, *Graphic3d_AspectLine3d*, *Graphic3d_AspectMarker3d* and *Graphic3d_AspectText3d*)
+have been merged into new class *Graphic3d_Aspects* providing a single state for rendering primitives of any type.
+The old per-primitive type aspect classes have been preserved as sub-classes of *Graphic3d_Aspects* with default values close to the previous behavior.
+All aspects except Graphic3d_AspectFillArea3d define Graphic3d_TOSM_UNLIT shading model.
+
+The previous approach with dedicated aspects per primitive type was handy in simplified case, but lead to confusion otherwise.
+In fact, drawing points or lines with lighting applied is a valid use case, but only *Graphic3d_AspectFillArea3d* previously defined necessary material properties.
+
+As aspects for different primitive types have been merged, Graphic3d_Group does no more provide per-type aspect properties.
+Existing code relying on old behavior and putting interleaved per-type aspects into single Graphic3d_Group should be updated.
+For example, the following pseudo-code will not work anymore, because all *SetGroupPrimitivesAspect* calls will setup the same property:
+~~~~
+Handle(Graphic3d_Group) aGroup = thePrs->NewGroup();
+aGroup->SetGroupPrimitivesAspect (myDrawer->ShadingAspect()->Aspect());
+aGroup->SetGroupPrimitivesAspect (myDrawer->LineAspect()->Aspect());    //!< overrides previous aspect
+
+Handle(Graphic3d_ArrayOfSegments) aLines = new Graphic3d_ArrayOfSegments (2);
+Handle(Graphic3d_ArrayOfTriangles) aTris = new Graphic3d_ArrayOfTriangles (3);
+aGroup->AddPrimitiveArray (aLines); //!< both arrays will use the same aspect
+aGroup->AddPrimitiveArray (aTris);
+~~~~
+
+To solve the problem, the code should be modified to either put primitives into dedicated groups (preferred approach), or using *SetPrimitivesAspect* in proper order:
+~~~~
+Handle(Graphic3d_Group) aGroup = thePrs->NewGroup();
+
+aGroup->SetGroupPrimitivesAspect (myDrawer->ShadingAspect()->Aspect());
+Handle(Graphic3d_ArrayOfTriangles) aTris = new Graphic3d_ArrayOfTriangles (3);
+aGroup->AddPrimitiveArray (aTris);
+
+Handle(Graphic3d_ArrayOfSegments) aLines = new Graphic3d_ArrayOfSegments (2);
+aGroup->SetPrimitivesAspect (myDrawer->LineAspect()->Aspect()); //!< next array will use the new aspect
+aGroup->AddPrimitiveArray (aLines);
+~~~~
+
+@subsection upgrade_740_materials Material definition
+
+Decomposition of Ambient, Diffuse, Specular and Emissive properties has been eliminated within *Graphic3d_MaterialAspect* definition.
+As result, the following methods of *Graphic3d_MaterialAspect* class have been removed: SetReflectionMode(), SetReflectionModeOn(), Ambient(), Diffuse(), Emissive(), Specular(), SetAmbient(), SetDiffuse(), SetSpecular(), SetEmissive().
+
+Previously, computation of final value required the following code:
+~~~~
+Graphic3d_MaterialAspect theMaterial; Quantity_Color theInteriorColor;
+Graphic3d_Vec3 anAmbient (0.0f);
+if (theMaterial.ReflectionMode (Graphic3d_TOR_AMBIENT))
+{
+  anAmbient = theMaterial.MaterialType (Graphic3d_MATERIAL_ASPECT)
+            ? (Graphic3d_Vec3 )theInteriorColor           * theMaterial.Ambient()
+            : (Graphic3d_Vec3 )theMaterial.AmbientColor() * theMaterial.Ambient();
+}
+~~~~
+
+New code looks like this:
+~~~~
+Graphic3d_MaterialAspect theMaterial; Quantity_Color theInteriorColor;
+Graphic3d_Vec3 anAmbient = theMaterial.AmbientColor();
+if (theMaterial.MaterialType (Graphic3d_MATERIAL_ASPECT)) { anAmbient *= (Graphic3d_Vec3 )theInteriorColor; }
+~~~~
+
+Existing code should be updated to:
+- Replace Graphic3d_MaterialAspect::SetReflectionModeOff() with setting black color; SetReflectionModeOn() calls can be simply removed.
+  R.g. theMaterial.SetAmbientColor(Quantity_NOC_BLACK).
+- Replace Graphic3d_MaterialAspect::Ambient(), SetAmbient(), Diffuse(), SetDiffuse(), Specular(), SetSpecular(), Emissive(), SetEmissive() with methods working with pre-multiplied color.
+  E.g. theMaterial.SetAmbientColor(Graphic3d_Vec3 (1.0f, 0.0f, 0.0f) * 0.2f).
+- Avoid using Graphic3d_MaterialAspect::Color() and SetColor() with non-physical materials (Graphic3d_MATERIAL_ASPECT).
+  These materials do not include color definition, because it is taken from Graphic3d_Aspects::InteriorColor() - this has not been changed.
+  However, previously it was possible storing the color with SetColor() call and then fetching it with Color() by application code (the rendering ignored this value);
+  now SetColor() explicitly ignores call for Graphic3d_MATERIAL_ASPECT materials and Color() returns DiffuseColor() multiplication coefficients.
+
+@subsection upgrade_740_text Changes in Graphic3d_Text and OpenGl_Text API
+
+Parameters of *Text* in *Graphic3d_Group* are moved into a new *Graphic3d_Text* class. *AddText* of *Graphic3d_Group* should be used instead of the previous *Text*.
+
+The previous code:
+~~~~
+Standard_Real x, y, z;
+theAttachmentPoint.Coord(x,y,z);
+theGroup->Text (theText,
+                Graphic3d_Vertex(x,y,z),
+                theAspect->Height(),
+                theAspect->Angle(),
+                theAspect->Orientation(),
+                theAspect->HorizontalJustification(),
+                theAspect->VerticalJustification());
+~~~~
+should be replaced by the new code:
+~~~~
+Handle(Graphic3d_Text) aText = new Graphic3d_Text (theAspect->Height());
+aText->SetText (theText.ToExtString());
+aText->SetPosition (theAttachmentPoint);
+aText->SetHorizontalAlignment (theAspect->HorizontalJustification());
+aText->SetVerticalAlignment (theAspect->VerticalJustification());
+theGroup->AddText (aText);
+~~~~
+
+*OpenGl_Text* contains *Graphic3d_Text* field.
+
+*OpenGl_TextParam* struct is removed. Constructor and *Init* of *OpenGl_Text* with *OpenGl_TextParam* are also removed.
+Instead of using them, change *OpenGl_Text*.
+
+Please, note, that after modifying *OpenGl_Text*, *Reset* of *OpenGl_Text* should be called.
+
+*FormatParams* of *OpenGl_Text* is replaced by *Text*.
+
+@subsection upgrade_740_prsupdate Presentation invalidation
+
+Historically AIS_InteractiveObject provided two independent mechanisms invalidating presentation (asking presentation manager to recompute specific display mode or all modes):
+
+1. *AIS_InteractiveObject::SetToUpdate()*, marking existing presentation for update.
+   This is main invalidation API, which is expected to be followed by *AIS_InteractiveContext::Update()* call.
+2. *AIS_InteractiveObject::myToRecomputeModes* + *myRecomputeEveryPrs*.
+   This is auxiliary invalidation API, used internally by AIS_InteractiveContext::SetColor()/UnsetColor() and similar modification methods.
+
+The latter one has been removed to avoid confusion and unexpected behavior.
+In addition, two methods *AIS_InteractiveObject::Update()* have been deprecated in favor of new *AIS_InteractiveObject::UpdatePresentations()* recomputing only invalidated presentations.
+
+Custom presentations implementing interface methods *AIS_InteractiveObject::SetColor()* and others should be revised to use *AIS_InteractiveObject::SetToUpdate()*
+or updating presentation without recomputation (see *AIS_InteractiveObject::SynchronizeAspects()* and *AIS_InteractiveObject::replaceAspects()*).
+
+@subsection upgrade_740_interiorstyles Interior styles
+
+* *Aspect_IS_HOLLOW* is now an alias to *Aspect_IS_EMPTY* and does not implicitly enables drawing mesh edges anymore.
+  Specify Graphic3d_AspectFillArea3d::SetDrawEdges(true) with Graphic3d_AspectFillArea3d::SetInteriorStyle(Aspect_IS_EMPTY) to get previous behavior of Aspect_IS_HOLLOW style.
+* *Aspect_IS_HIDDENLINE* does not implicitly enables drawing mesh edges anymore.
+  Specify Graphic3d_AspectFillArea3d::SetDrawEdges(true) with Graphic3d_AspectFillArea3d::SetInteriorStyle(Aspect_IS_HIDDENLINE) to get previous behavior of Aspect_IS_HIDDENLINE style.
+
+@subsection upgrade_740_modedprs PrsMgr and SelectMgr hierarchy clean up
+
+Proxy classes *Prs3d_Presentation*, *PrsMgr_ModedPresentation* and *PrsMgr_Prs* have been removed.
+Code iterating through the list of low-level structures AIS_InteractiveObject::Presentations() should be updated to access PrsMgr_Presentation directly.
+Forward declarations of *Prs3d_Presentation* should be corrected, since it is now a typedef to *Graphic3d_Structure*.
+
+Proxy classes *SelectBasics_SensitiveEntity* and *SelectBasics_EntityOwner* have been removed - *Select3D_SensitiveEntity* and *SelectMgr_EntityOwner* should be now used directly instead.
+
+@subsection upgrade_740_offset Polygon offset defaults
+
+*Graphic3d_PolygonOffset* default constructor has been corrected to define Units=1 instead of Units=0.
+Default polygon offset settings Mode=Aspect_POM_Fill + Factor=1 + Units=1 are intended to push triangulation
+(Shaded presentation) a little bit behind of lines (Wireframe and Face Edges)
+for reducing z-fighting effect of Shaded+Wireframe combination.
+The change in defaults (Units changed from 0 to 1) is intended to cover scenario when camera direction is perpendicular to model plane (like 2D view).
+
+Application observing unexpected visual difference on this change should consider customizing this property within AIS_InteractiveContext default attributes
+or on per-presentation basis via *Graphic3d_Aspects::SetPolygonOffset()* methods.
+
+@subsection upgrade_740_zlayer Adding ZLayers in given position
+
+Interface of insertion ZLayer in the viewer has been improved with ability to insert new layer before or after existing one.
+Previously undocumented behavior of *V3d_Viewer::AddZlayer()* method has been corrected to insert new layer before *Graphic3d_ZLayerId_Top*.
+Applications might need revising their custom layers creation code and specify precisely their order with new methods *V3d_Viewer::InsertLayerBefore()* and *V3d_Viewer::InsertLayerAfter()*.
+
+@subsection upgrade_740_enum_changed Modified enumerations
+
+Applications using integer values of the following enumerations in persistence
+should be corrected as these enumerations have been modified:
+
+| Name |
+| :----- |
+| AIS_TypeOfAttribute |
+| Aspect_InteriorStyle |
+| Font_FontAspect |
+
+@subsection upgrade_740_geproj Custom defines within env.bat
+
+*env.bat* produced by Visual Studio project generator *genproj.bat* has been modified so that *%CSF_DEFINES%* variable is reset to initial state.
+Custom building environment relying on old behavior and setting extra macros within *%CSF_DEFINES%* before env.bat should be updated
+to either modify custom.bat or setup new variable *%CSF_DEFINES_EXTRA%* instead.
+
+@subsection upgrade_740_BVH_in_BOP Switching Boolean Operations algorithm to use BVH tree instead of UB tree
+
+Since OCCT 7.4.0 Boolean Operations algorithm uses BVH tree instead of UBTree to find the pairs of entities with interfering bounding boxes.
+The following API changes have been made:
+* BOPTools_BoxBndTree and BOPTools_BoxBndTreeSelector have been removed. Use the BOPTools_BoxTree and BOPTools_BoxTreeSelector instead.
+* BOPTools_BoxSelector::SetBox() method now accepts the BVH_Box instead of Bnd_Box.
+* Methods BOPTools_BoxSelector::Reject and BOPTools_BoxSelector::Accept have been removed as unused.
+* The RunParallel flag has been removed from the list of parameters of BOPAlgo_Tools::IntersectVertices method. Earlier, it performed selection from the UB tree in parallel mode. Now all interfering pairs are found in one pass, using pair traverse of the same BVH tree.
+
+@subsection upgrade_740_stdnamespace Standard_Stream.hxx no more has "using std::" statements
+*Standard_Stream.hxx* header, commonly included by other OCCT header files, does no more add entities from *std namespace* related to streams (like *std::cout*, *std::istream* and others) into global namespace.
+The application code relying on this matter should be updated to either specify std namespace explicitly (like std::cout) or add "using std::" statements locally.

@@ -134,6 +134,9 @@ help testgrid {
   Run all tests, or specified group, or one grid
   Use: testgrid [groupmask [gridmask [casemask]]] [options...]
   Allowed options are:
+  -exclude N: exclude group, subgroup or single test case from executing, where
+              N is name of group, subgroup or case. Excluded items should be separated by comma.
+              Option should be used as the first argument after list of executed groups, grids, and test cases.
   -parallel N: run N parallel processes (default is number of CPUs, 0 to disable)
   -refresh N: save summary logs every N seconds (default 600, minimal 1, 0 to disable)
   -outdir dirname: set log directory (should be empty or non-existing)
@@ -165,6 +168,9 @@ proc testgrid {args} {
     set overwrite 0
     set xmlfile ""
     set signal 0
+    set exc_group 0
+    set exc_grid 0
+    set exc_case 0
     set regress 0
     set prev_logdir ""
     for {set narg 0} {$narg < [llength $args]} {incr narg} {
@@ -235,6 +241,45 @@ proc testgrid {args} {
                 set regress 1
             } else {
                 error "Option -regress requires argument"
+            }
+            continue
+        }
+
+        # exclude group, subgroup or single test case from executing
+        if { $arg == "-exclude" } {
+            incr narg
+            if { $narg < [llength $args] && ! [regexp {^-} [lindex $args $narg]] } {
+                set argts $args
+                set idx_begin [string first " -ex" $argts]
+                if { ${idx_begin} != "-1" } {
+                    set argts [string replace $argts 0 $idx_begin]
+                }
+                set idx_exclude [string first "exclude" $argts]
+                if { ${idx_exclude} != "-1" } {
+                    set argts [string replace $argts 0 $idx_exclude+7]
+                }
+                set idx [string first " -" $argts]
+                if { ${idx} != "-1" } {
+                    set argts [string replace $argts $idx end]
+                }
+                set argts [split $argts ,]
+                foreach argt $argts {
+                    if { [llength $argt] == 1 } {
+                        lappend exclude_group $argt
+                        set exc_group 1
+                    } elseif { [llength $argt] == 2 } {
+                        lappend exclude_grid $argt
+                        set exc_grid 1
+                        incr narg
+                    } elseif { [llength $argt] == 3 } {
+                        lappend exclude_case $argt
+                        set exc_case 1
+                        incr narg
+                        incr narg
+                    }
+                }
+            } else {
+                error "Option -exclude requires argument"
             }
             continue
         }
@@ -344,6 +389,18 @@ proc testgrid {args} {
             # search all directories in the current dir with specified mask
             if [catch {glob -directory $dir -tail -types d {*}$groupmask} groups] { continue }
 
+            # exclude selected groups from all groups
+            if { ${exc_group} > 0 } {
+                foreach exclude_group_element ${exclude_group} {
+                    set idx [lsearch $groups "${exclude_group_element}"]
+                    if { ${idx} != "-1" } {
+                        set groups [lreplace $groups $idx $idx]
+                    } else {
+                        continue
+                    }
+                }
+            }
+
             # iterate by groups
             if { $_tests_verbose > 0 } { _log_and_puts log "Groups to be executed: $groups" }
             foreach group [lsort -dictionary $groups] {
@@ -381,6 +438,19 @@ proc testgrid {args} {
                 }
                 close $fd
 
+                # exclude selected grids from all grids
+                if { ${exc_grid} > 0 } {
+                    foreach exclude_grid_element ${exclude_grid} {
+                        set exclude_elem [lindex $exclude_grid_element end]
+                        set idx [lsearch $gridlist "${exclude_elem}"]
+                        if { ${idx} != "-1" } {
+                            set gridlist [lreplace $gridlist $idx $idx]
+                        } else {
+                            continue
+                        }
+                    }
+                }
+
                 # iterate by all grids
                 foreach grid $gridlist {
 
@@ -405,6 +475,24 @@ proc testgrid {args} {
 
                     # iterate by all tests in the grid directory
                     if { [catch {glob -directory $griddir -type f {*}$casemask} testfiles] } { continue }
+
+                    # exclude selected test cases from all testfiles
+                    if { ${exc_case} > 0 } {
+                        foreach exclude_case_element ${exclude_case} {
+                            set exclude_casegroup_elem [lindex $exclude_case_element end-2]
+                            set exclude_casegrid_elem [lindex $exclude_case_element end-1]
+                            set exclude_elem [lindex $exclude_case_element end]
+                            if { ${exclude_casegrid_elem} == "${grid}" } {
+                                set idx [lsearch $testfiles "${dir}/${exclude_casegroup_elem}/${exclude_casegrid_elem}/${exclude_elem}"]
+                                if { ${idx} != "-1" } {
+                                    set testfiles [lreplace $testfiles $idx $idx]
+                                } else {
+                                    continue
+                                }
+                            }
+                        }
+                    }
+
                     foreach casefile [lsort -dictionary $testfiles] {
                         # filter out files with reserved names
                         set casename [file tail $casefile]
@@ -630,6 +718,7 @@ help testdiff {
   Compare results of two executions of tests (CPU times, ...)
   Use: testdiff dir1 dir2 [groupname [gridname]] [options...]
   Where dir1 and dir2 are directories containing logs of two test runs.
+  dir1 (A) should point to NEW tests results to be verified and dir2 (B) to REFERENCE results.
   Allowed options are:
   -image [filename]: compare only images and save its in specified file (default 
                    name is <dir1>/diffimage-<dir2>.log)
@@ -1028,32 +1117,35 @@ proc locate_data_file {filename} {
 
     # check if the file is located in the subdirectory data of the script dir
     set scriptfile [info script]
-    if { $scriptfile != "" } {
-        set path [file join [file dirname $scriptfile] data $filename]
-        if { [file exists $path] } {
-            return [file normalize $path]
+    if { "$scriptfile" != "" } {
+        set path [file join [file dirname "$scriptfile"] data "$filename"]
+        if { [file exists "$path"] } {
+            return [file normalize "$path"]
         }
     }
 
     # check sub-directories in paths indicated by CSF_TestDataPath
     if { [info exists env(CSF_TestDataPath)] } {
         foreach dir [_split_path $env(CSF_TestDataPath)] {
-            while {[llength $dir] != 0} { 
-                set name [lindex $dir 0]
-                set dir [lrange $dir 1 end]
+            set dir [list "$dir"]
+            while {[llength "$dir"] != 0} {
+                set name [lindex "$dir" 0]
+                set dir  [lrange "$dir" 1 end]
+
                 # skip directories starting with dot
-                if { [regexp {^[.]} $name] } { continue }
-                if { [file exists $name/$filename] } {
-                    return [file normalize $name/$filename]
+                set aTail [file tail "$name"]
+                if { [regexp {^[.]} "$aTail"] } { continue }
+                if { [file exists "$name/$filename"] } {
+                    return [file normalize "$name/$filename"]
                 }
-                eval lappend dir [glob -nocomplain -directory $name -type d *]
+                eval lappend dir [glob -nocomplain -directory "$name" -type d *]
             }
         }
     }
 
     # check current datadir
-    if { [file exists [uplevel datadir]/$filename] } {
-        return [file normalize [uplevel datadir]/$filename]
+    if { [file exists "[uplevel datadir]/$filename"] } {
+        return [file normalize "[uplevel datadir]/$filename"]
     }
 
     # raise error
@@ -1207,23 +1299,23 @@ proc _run_test {scriptsdir group gridname casefile echo} {
         # execute test scripts 
         if { [file exists $scriptsdir/$group/begin] } {
             puts "Executing $scriptsdir/$group/begin..."; flush stdout
-            uplevel source $scriptsdir/$group/begin
+            uplevel source -encoding utf-8 $scriptsdir/$group/begin
         }
         if { [file exists $scriptsdir/$group/$gridname/begin] } {
             puts "Executing $scriptsdir/$group/$gridname/begin..."; flush stdout
-            uplevel source $scriptsdir/$group/$gridname/begin
+            uplevel source -encoding utf-8 $scriptsdir/$group/$gridname/begin
         }
 
         puts "Executing $casefile..."; flush stdout
-        uplevel source $casefile
+        uplevel source -encoding utf-8 $casefile
 
         if { [file exists $scriptsdir/$group/$gridname/end] } {
             puts "Executing $scriptsdir/$group/$gridname/end..."; flush stdout
-            uplevel source $scriptsdir/$group/$gridname/end
+            uplevel source -encoding utf-8 $scriptsdir/$group/$gridname/end
         }
         if { [file exists $scriptsdir/$group/end] } {
             puts "Executing $scriptsdir/$group/end..."; flush stdout
-            uplevel source $scriptsdir/$group/end
+            uplevel source -encoding utf-8 $scriptsdir/$group/end
         }
     } res] {
         puts "Tcl Exception: $res"
@@ -1521,7 +1613,8 @@ proc _log_html {file log {title {}}} {
     }
     
     # print header
-    puts $fd "<html><head><title>$title</title></head><body><h1>$title</h1>"
+    puts $fd "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>"
+    puts $fd "<title>$title</title></head><body><h1>$title</h1>"
 
     # add images if present; these should have either PNG, GIF, or JPG extension,
     # and start with name of the test script, with optional suffix separated
@@ -1590,7 +1683,7 @@ proc _log_html_summary {logdir log totals regressions improvements skipped total
     }
 
     # write HRML header, including command to refresh log if still in progress
-    puts $fd "<html><head>"
+    puts $fd "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>"
     puts $fd "<title>Tests summary</title>"
     if { $total_time == "" } {
         puts $fd "<meta http-equiv=\"refresh\" content=\"10\">"
@@ -1632,7 +1725,7 @@ proc _log_html_summary {logdir log totals regressions improvements skipped total
         puts $fd "<table>"
         set groupgrid ""
         foreach test [lrange $featured 1 end] {
-            if { ! [regexp {^(.*)\s+([\w.]+)$} $test res gg name] } {
+            if { ! [regexp {^(.*)\s+([\w\-.]+)$} $test res gg name] } {
                 set gg UNKNOWN
                 set name "Error building short list; check details"
             }
@@ -2125,6 +2218,8 @@ proc _test_diff {dir1 dir2 basename image cpu memory status verbose _logvar _log
 
             # check images
             if {$image != false || ($image == false && $cpu == false && $memory == false)} {
+                set aCaseDiffColorTol 0
+                if { [regexp {IMAGE_COLOR_TOLERANCE:\s*([\d.]+)} $log1 res1 imgtol1] } { set aCaseDiffColorTol $imgtol1 }
                 set imglist1 [glob -directory $path1 -types f -tails -nocomplain ${casename}.{png,gif} ${casename}-*.{png,gif} ${casename}_*.{png,gif}]
                 set imglist2 [glob -directory $path2 -types f -tails -nocomplain ${casename}.{png,gif} ${casename}-*.{png,gif} ${casename}_*.{png,gif}]
                 _list_diff $imglist1 $imglist2 imgin1 imgin2 imgcommon
@@ -2149,7 +2244,7 @@ proc _test_diff {dir1 dir2 basename image cpu memory status verbose _logvar _log
                     set diffile [_diff_img_name $dir1 $dir2 $basename $imgfile]
                     if { [catch {diffimage [file join $dir1 $basename $imgfile] \
                                            [file join $dir2 $basename $imgfile] \
-                                           0 0 0 $diffile} diff] } {
+                                           -toleranceOfColor 0.0 -blackWhite off -borderFilter off $diffile} diff] } {
                         if {$image != false} {
                             _log_and_puts log_image "IMAGE [split $basename /] $casename: $imgfile cannot be compared"
                         } else {
@@ -2157,10 +2252,35 @@ proc _test_diff {dir1 dir2 basename image cpu memory status verbose _logvar _log
                         }
                         file delete -force $diffile ;# clean possible previous result of diffimage
                     } elseif { $diff != 0 } {
+                        set diff [string trimright $diff \n]
+                        if {$aCaseDiffColorTol != 0} {
+                            # retry with color tolerance
+                            if { [catch {diffimage [file join $dir1 $basename $imgfile] \
+                                                   [file join $dir2 $basename $imgfile] \
+                                                   -toleranceOfColor $aCaseDiffColorTol -blackWhite off -borderFilter off $diffile} diff2] } {
+                                if {$image != false} {
+                                    _log_and_puts log_image "IMAGE [split $basename /] $casename: $imgfile cannot be compared"
+                                } else {
+                                    _log_and_puts log "IMAGE [split $basename /] $casename: $imgfile cannot be compared"
+                                }
+                                continue
+                            } elseif { $diff2 == 0 } {
+                                # exclude image diff within tolerance but still keep info in the log
+                                set toLogImageCase false
+                                file delete -force $diffile
+                                if {$image != false} {
+                                    _log_and_puts log_image "IMAGE [split $basename /] $casename: $imgfile is similar \[$diff different pixels\]"
+                                } else {
+                                    _log_and_puts log "IMAGE [split $basename /] $casename: $imgfile is similar \[$diff different pixels\]"
+                                }
+                                continue
+                            }
+                        }
+
                         if {$image != false} {
-                            _log_and_puts log_image "IMAGE [split $basename /] $casename: $imgfile differs"
+                            _log_and_puts log_image "IMAGE [split $basename /] $casename: $imgfile differs \[$diff different pixels\]"
                         } else {
-                            _log_and_puts log "IMAGE [split $basename /] $casename: $imgfile differs"
+                            _log_and_puts log "IMAGE [split $basename /] $casename: $imgfile differs \[$diff different pixels\]"
                         }
                     } else {
                         file delete -force $diffile ;# clean useless artifact of diffimage
@@ -2219,10 +2339,11 @@ proc _log_html_diff {file log dir1 dir2 highlight_percent} {
     }
     
     # print header
-    puts $fd "<html><head><title>Diff $dir1 vs. $dir2</title></head><body>"
+    puts $fd "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>"
+    puts $fd "<title>Diff $dir1 vs. $dir2</title></head><body>"
     puts $fd "<h1>Comparison of test results:</h1>"
-    puts $fd "<h2>Version A - $dir1</h2>"
-    puts $fd "<h2>Version B - $dir2</h2>"
+    puts $fd "<h2>Version A \[NEW\] - $dir1</h2>"
+    puts $fd "<h2>Version B \[REF\] - $dir2</h2>"
 
     # add script for switching between images on click
     puts $fd ""
@@ -2244,12 +2365,16 @@ proc _log_html_diff {file log dir1 dir2 highlight_percent} {
         if { [regexp "\[\\\[](\[0-9.e+-]+)%\[\]]" $line res value] && 
              [expr abs($value)] > ${highlight_percent} } {
             puts $fd "<table><tr><td bgcolor=\"[expr $value > 0 ? \"ff8080\" : \"lightgreen\"]\">$line</td></tr></table>"
-        } else {
+        } elseif { [regexp {IMAGE[ \t]+([^:]+):[ \t]+([A-Za-z0-9_.-]+) is similar} $line res case img] } {
+            if { [catch {eval file join "" [lrange $case 0 end-1]} gridpath] } {
+                # note: special handler for the case if test grid directoried are compared directly
+                set gridpath ""
+            }
+            set aCaseName [lindex $case end]
+            puts $fd "<table><tr><td bgcolor=\"orange\"><a href=\"[_make_url $file [file join $dir1 $gridpath $aCaseName.html]]\">$line</a></td></tr></table>"
+        } elseif { [regexp {IMAGE[ \t]+([^:]+):[ \t]+([A-Za-z0-9_.-]+)} $line res case img] } {
+            # add images
             puts $fd $line
-        }
-
-        # add images
-        if { [regexp {IMAGE[ \t]+([^:]+):[ \t]+([A-Za-z0-9_.-]+)} $line res case img] } {
             if { [catch {eval file join "" [lrange $case 0 end-1]} gridpath] } {
                 # note: special handler for the case if test grid directoried are compared directly
                 set gridpath ""
@@ -2270,6 +2395,8 @@ proc _log_html_diff {file log dir1 dir2 highlight_percent} {
 
             puts $fd "<table><tr><th><abbr title=\"$dir1\">Version A</abbr></th><th><abbr title=\"$dir2\">Version B</abbr></th><th>Diff (click to toggle)</th></tr>"
             puts $fd "<tr><td>$img1</td><td>$img2</td><td>$imgd</td></tr></table>"
+        } else {
+            puts $fd $line
         }
     }
     puts $fd "</pre></body></html>"

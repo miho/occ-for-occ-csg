@@ -7,7 +7,7 @@ Modeling Data {#occt_user_guides__modeling_data}
 
 Modeling Data supplies data structures to represent 2D and 3D geometric models. 
 
-This manual explains how to use Modeling Data. For advanced information on modeling data, see our <a href="http://www.opencascade.com/content/tutorial-learning">E-learning & Training</a> offerings.
+This manual explains how to use Modeling Data. For advanced information on modeling data, see our <a href="https://www.opencascade.com/content/tutorial-learning">E-learning & Training</a> offerings.
 
 @section occt_modat_1 Geometry Utilities
 
@@ -1166,7 +1166,7 @@ Thus for a contour of four edges it should count 1 wire + 4 edges +4 vertices wi
   }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Note** For more details about Maps please, refer to the TCollection documentation. (Foundation Classes Reference Manual) 
+**Note** For more details about Maps, refer to the *TCollection* documentation (Foundation Classes Reference Manual). 
 
 The following example is more ambitious and writes a program which copies a data structure using an *IndexedMap*. The copy is an identical structure but it shares nothing with the original. The principal algorithm is as follows: 
 - All Shapes in the structure are put into an *IndexedMap*. 
@@ -1324,7 +1324,7 @@ BRepBndLib class contains methods for creation of bounding boxes (both AABB and 
 
 @subsubsection occt_modat_6_1_1 Creation of OBB from set of points
 
-The algorithm is described in <a href="http://www.idt.mdh.se/~tla/publ/FastOBBs.pdf">"Fast Computation of Tight Fitting Oriented Bounding Boxes" by Thomas Larsson and Linus Källberg</a>. It includes the following steps:
+The algorithm is described in "Fast Computation of Tight Fitting Oriented Bounding Boxes" by Thomas Larsson and Linus Källberg (FastOBBs.pdf). It includes the following steps:
 
 <span>1.</span> Choose \f$ N_{a} (N_{a} \geq 3) \f$ initial axes.<br>
 <span>2.</span> Project every given point to the every chosen (in item 1) axis. At that, "minimal" and "maximal" points of every axis (i.e. point having minimal and maximal parameter (correspondingly) of the projection to this axis) are chosen. I.e. \f$ 2*N_{a} \f$ points will be held and this set can contain equal points. Later (unless otherwise specified) in this algorithm we will work with these \f$ 2*N_{a} \f$ points only.<br>
@@ -1341,7 +1341,26 @@ Further, let us consider the triangle \f$ T_{0}\left \langle p_{0}, p_{1}, p_{2}
 <span>10.</span> Compute the center of OBB and its half dimensions.<br>
 <span>11.</span> Create OBB using the center, axes and half dimensions.<br>
 
-This algorithm is implemented in the *Bnd_OBB::ReBuild(...)* method.
+@subsubsection occt_modat_6_1_1_opt Creation of Optimal OBB from set of points
+
+For creation of the optimal OBB from set of points the same algorithm as described above is used but with some simplifications in logic and increased computation time.
+For the optimal OBB it is necessary to check all possible axes which can be created by the extremal points. And since the extremal points are only valid for the initial axes it is necessary to project the whole set of points on each axis.
+This approach usually provides much tighter OBB but the performance is lower. The complexity of the algorithm is still linear and with use of BVH for the set of points it is O(N + C*log(N)).
+
+Here is the example of optimal and not optimal OBB for the model using the set of 125K nodes:
+<table align="center">
+<tr>
+  <td>@figure{/user_guides/modeling_data/images/modeling_data_obb_125K.png,"Not optimal OBB by DiTo-14",160}</td>
+  <td>@figure{/user_guides/modeling_data/images/modeling_data_opt_obb_125K.png,"Optimal OBB by DiTo-14",160}</td>
+  <td>@figure{/user_guides/modeling_data/images/modeling_data_pca_obb_125K.png,"Not optimal OBB by PCA",160}</td>
+</tr>
+</table>
+
+Computation of the not optimal OBB in this case took 0.007 sec, optimal - 0.1 sec, which is about 14 times slower. Such performance is comparable to creation of the OBB for this shape by PCA approach (see below) which takes about 0.17 sec.
+
+The computation of optimal OBB is controlled by the same *theIsOptimal* flag in the BRepBndLib::AddOBB method as for PCA algorithm.
+
+These algorithms are implemented in the *Bnd_OBB::ReBuild(...)* method.
 
 @subsubsection occt_modat_6_1_2 Creation of OBB based on Axes of inertia
 
@@ -1360,7 +1379,7 @@ The algorithm contains the following steps:
 
 @subsubsection occt_modat_6_1_4 Method IsOut for another OBB
 
-According to the <a href="http://www.jkh.me/files/tutorials/Separating%20Axis%20Theorem%20for%20Oriented%20Bounding%20Boxes.pdf">"Separating Axis Theorem for Oriented Bounding Boxes"</a>, it is necessary to check the 15 separating axes: 6 axes of the boxes and 9 are their cross products.<br>
+According to the <a href="https://www.jkh.me/files/tutorials/Separating%20Axis%20Theorem%20for%20Oriented%20Bounding%20Boxes.pdf">"Separating Axis Theorem for Oriented Bounding Boxes"</a>, it is necessary to check the 15 separating axes: 6 axes of the boxes and 9 are their cross products.<br>
 The algorithm of analyzing axis \f$ \mathbf{l} \f$ is following:
 1. Compute the "length" according to the formula: \f$ L_{j}=\sum_{i=0}^{2}{H_{i}\cdot \left | \overrightarrow{\mathbf{a_{i}}} \cdot \overrightarrow{\mathbf{l}} \right |} \f$. Here, \f$ \mathbf{a_{i}} \f$ is an i-th axis (X-axis, Y-axis, Z-axis) of j-th BndBox (j=1...2). \f$ H_{i} \f$ is a half-dimension along i-th axis.
 2. If \f$ \left |\overrightarrow{C_{1}C_{2}} \cdot \overrightarrow{\mathbf{l}}  \right | > L_{1}+L_{2} \f$ (where \f$ C_{j} \f$ is the center of j-th OBB) then the considered OBBs are not interfered in terms of the axis \f$ \mathbf{l} \f$.

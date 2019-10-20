@@ -9,13 +9,13 @@ The IGES interface reads IGES files and translates them to Open CASCADE Technolo
 
 Other kinds of data such as colors and names can be read or written with the help of XDE tools <i> IGESCAFControl_Reader</i> and <i> IGESCAFControl_Writer</i>. 
 
-Please, note:
+**Note** :
 
   * an IGES model is an IGES file that has been loaded into memory.
   * an IGES entity is an entity in the IGES normal sense.
   * a root entity is the highest level entity of any given type, e.g. type 144 for surfaces and type 186 for solids. Roots are not referenced by other entities.
 
-This manual mainly explains how  to convert an IGES file to an Open CASCADE Technology (**OCCT**) shape and  vice versa. It provides basic documentation on conversion. For advanced  information on conversion, see our <a href="http://www.opencascade.com/content/tutorial-learning">E-learning & Training</a> offerings.
+This manual mainly explains how  to convert an IGES file to an Open CASCADE Technology (**OCCT**) shape and  vice versa. It provides basic documentation on conversion. For advanced  information on conversion, see our <a href="https://www.opencascade.com/content/tutorial-learning">E-learning & Training</a> offerings.
 
 IGES files produced in accordance with IGES standard versions up to and including version 5.3 can be read. IGES files that are produced by this  interface conform to IGES version 5.3 (Initial Graphics Exchange Specification,  IGES 5.3. ANS US PRO/IPO-100-1996). 
 
@@ -178,10 +178,10 @@ if  (!Interface_Static::SetRVal ("read.maxprecision.val",0.1))
 Default value is 1.  
 
 <h4>read.stdsameparameter.mode</h4>
-defines the using of  *BRepLib::SameParameter*. Its possible values are:  
-* 0 (Off) -- *BRepLib::SameParameter* is not called,  
-* 1 (On) -- *BRepLib::SameParameter* is called.  
-*BRepLib::SameParameter* is used through  *ShapeFix_Edge::SameParameter*. It ensures that the resulting edge will have the  lowest tolerance taking pcurves either unmodified from the IGES file or  modified by *BRepLib::SameParameter*.  
+defines the using of  *BRepLib\::SameParameter*. Its possible values are:  
+* 0 (Off) -- *BRepLib\::SameParameter* is not called,  
+* 1 (On) -- *BRepLib\::SameParameter* is called.  
+*BRepLib\::SameParameter* is used through  *ShapeFix_Edge\::SameParameter*. It ensures that the resulting edge will have the  lowest tolerance taking pcurves either unmodified from the IGES file or  modified by *BRepLib\::SameParameter*.  
 Read this parameter  with:  
 ~~~~~
 Standard_Integer mv =  Interface_Static::IVal("read.stdsameparameter.mode"); 
@@ -202,7 +202,7 @@ The processor also  decides to re-compute either the 3D or the 2D curve even if 
   * the number of sub-curves in  the 2D curve is different from the number of sub-curves in the 3D curve. This  can be either due to different numbers of sub-curves given in the IGES file or  because of splitting of curves during translation. 
   * 3D or 2D curve is a Circular  Arc (entity type 100) starting and ending in the same point (note that this  case is incorrect according to the IGES standard).
   
-The parameter  *read.surfacecurve.mode* defines which curve (3D or 2D) is used for re-computing  the other one:  
+The parameter  *read.surfacecurve.mode* defines which curve (3D or 2D) is used for re-computing  the other one:
 * *Default(0)* use  the preference flag value in the entity's Parameter Data section. The flag  values are:  
   * 0: no preference given, 
   * 1: use 2D for 142 entities  and 3D for 141 entities, 
@@ -251,7 +251,7 @@ Default value is 0.01.
 <h4>read.iges.bspline.approxd1.mode</h4>
 This parameter is obsolete (it is rarely used in real  practice). If set to True, it affects the translation of bspline curves of  degree 1 from IGES: these curves (which geometrically are polylines) are split  by duplicated points, and the translator attempts to convert each of the  obtained parts to a bspline of a higher continuity.  
 
-Read this parameter  with:  
+Read this parameter with:  
 ~~~~~
 Standard_Real bam =   Interface_Static::CVal("read.iges.bspline.approxd1.mode"); 
 ~~~~~
@@ -266,9 +266,9 @@ Default value is Off.
 <h4>read.iges.resource.name and read.iges.sequence</h4>
 These two parameters define the name of the resource file  and the name of the sequence of operators   (defined in that file) for Shape Processing, which is automatically performed  by the IGES   translator. The Shape Processing is a user-configurable step, which is  performed after   the translation and consists in application of a set of operators to a  resulting shape. This is   a very powerful tool allowing to customize the shape and to adapt it to the  needs of   a receiving application. By default, the sequence consists of a single operator  *ShapeFix* that calls Shape Healing from the IGES translator.  
 
-Please find an example of the resource file for IGES (which  defines parameters   corresponding to the sequence applied by default, i.e. if the resource file is  not found) in   the Open CASCADE Technology installation, by the path   <i>%CASROOT%/src/XSTEPResource/IGES</i> . 
+Find an example of the resource file for IGES (which  defines parameters corresponding to the sequence applied by default, i.e. if the resource file is  not found) in the Open CASCADE Technology sources by the path <i>%CASROOT%/src/XSTEPResource/IGES</i>. 
 
-In order for the IGES translator to use that file, you have  to define the environment variable   *CSF_IGESDefaults*, which should point to the directory where the resource file  resides.   Note that if you change parameter *read.iges.resource.name*, you should change  the name   of the resource file and the name of the environment variable correspondingly.  The variable should contain a path to the resource file. 
+IGES translator will use that file if you define the environment variable *CSF_IGESDefaults*, which should point to the directory where the resource file  resides.   Note that if you change parameter *read.iges.resource.name*, you should change  the name of the resource file and the name of the environment variable correspondingly.  The variable should contain a path to the resource file. 
 
 Default values:  
 * read.iges.resource.name -- IGES,  
@@ -286,7 +286,7 @@ A list of entities can  be formed by invoking the method *IGESControl_Reader::Gi
 Handle(TColStd_HSequenceOfTransient)  list = reader.GiveList(); 
 ~~~~~
 Several predefined  operators can be used to select a list of entities of a specific type. 
-To make a selection, you  use the method *IGESControl_Reader::GiveList* with the selection type in  quotation marks as an argument. You can also make cumulative selections. For  example, you would use the following syntax: 
+To make a selection, use the method *IGESControl_Reader::GiveList* with the selection type in  quotation marks as an argument. You can also make cumulative selections. For  example, you would use the following syntax: 
 1. Requesting the faces in the  file: 
 ~~~~~
 faces =  Reader.GiveList("iges-faces"); 
@@ -400,12 +400,12 @@ reader.PrintTransferInfo  (failsonly, mode);
 ~~~~~
 displays the messages  that appeared during the last invocation of *Transfer* or *TransferRoots*.  
 
-If *failsonly* is  *IFSelect_FailOnly*, only fail messages will be output, if it is  *IFSelect_FailAndWarn*, all messages will be output. Parameter “mode” can have  *IFSelect_xxx* values where *xxx* can be:  
-* *GeneralCount* -- gives general statistics  on the transfer (number of translated IGES entities, number of fails and  warnings, etc)  
-* *CountByItem* -- gives the number of IGES  entities with their types per message. 
-* *ListByItem* -- gives the number of IGES  entities with their type and DE numbers per message.  
-* *ResultCount*  -- gives the number of  resulting OCCT shapes per type.  
-* *Mapping* -- gives mapping between  roots of the IGES file and the resulting OCCT shape per IGES and OCCT type.
+If *failsonly* is  *IFSelect_FailOnly*, only fail messages will be output, if it is  *IFSelect_FailAndWarn*, all messages will be output. Parameter “mode” can have  *IFSelect_xxx* values where *xxx* can be:
+  * *GeneralCount* -- gives general statistics  on the transfer (number of translated IGES entities, number of fails and  warnings, etc)  
+  * *CountByItem* -- gives the number of IGES  entities with their types per message. 
+  * *ListByItem* -- gives the number of IGES  entities with their type and DE numbers per message.  
+  * *ResultCount*  -- gives the number of  resulting OCCT shapes per type.  
+  * *Mapping* -- gives mapping between  roots of the IGES file and the resulting OCCT shape per IGES and OCCT type.
  
 @subsection occt_iges_2_4 Mapping of IGES  entities to Open CASCADE Technology shapes
 
@@ -577,7 +577,7 @@ All  methods are in charge of transferring curves  from IGES curve entities <i>(
   * *IGESToBRep_TopoCurve::TransferPoint* -- vertex is constructed from a Point entity with tolerance *EpsGeom*UnitFactor*. 
   * *IGESToBRep_TopoCurve::Transfer2dPoint* -- vertex is constructed from a Point entity with tolerance *EpsCoeff*. 
   * *IGESToBRep_TopoCurve::TransferCompositeCurveGeneral* -- obtains shapes (edges or wires) from other methods and adds  them into the resulting wire. Two adjacent edges of the wire can be connected  with tolerance up to *MaxTol*. 
-  * *IGESToBRep_TopoCurve::TransferCurveOnFace* and  *IGESToBRep_TopoCurve::TransferBoundaryOnFace* build a wire from 3D and 2D representations of  a curve on surface. Edges and vertices of the wire cannot have tolerance larger than *MaxTol*. The value *EpsGeom*UnitFactor* is passed into *ShapeFix_Wire::SetPrecision* and *MaxTol* is passed into *ShapeFix_Wire::MaxTolerance*. To find out how these parameters affect the resulting tolerance changes, please,  refer to class *ShapeFix_Wire*. 
+  * *IGESToBRep_TopoCurve::TransferCurveOnFace* and  *IGESToBRep_TopoCurve::TransferBoundaryOnFace* build a wire from 3D and 2D representations of  a curve on surface. Edges and vertices of the wire cannot have tolerance larger than *MaxTol*. The value *EpsGeom*UnitFactor* is passed into *ShapeFix_Wire::SetPrecision* and *MaxTol* is passed into *ShapeFix_Wire::MaxTolerance*. To find out how these parameters affect the resulting tolerance changes, refer to class *ShapeFix_Wire*. 
   * *IGESToBRep_TopoCurve::TransferTopoBasicCurve* and  *IGESToBRep_TopoCurve::Transfer2dTopoBasicCurve* -- the boundary vertices of an edge (or a wire if a curve was  of C0 continuity) translated from a basis IGES curve (*BSplineCurve,  CopiousData, Line,* etc.) are built with tolerance *EpsGeom*UnitFactor*, the edge tolerance is *Precision::Confusion*. If a curve was divided into several edges, the common  vertices of such adjacent edges have tolerance *Precision::Confusion*.
   
   
@@ -710,7 +710,7 @@ if  (!Interface_Static::SetRVal(;write.precision.val;,0.01))
 ~~~~~
 Default value is 0.0001. 
 
-<h4>write.iges.resource.name</h4> and <h4>write.iges.sequence</h4> are the same as the corresponding read.iges.\* parameters, please, see above. Note that the  default sequence for writing   contains *DirectFaces* operator, which converts elementary surfaces based on left-hand axes (valid in CASCADE) to right-hand axes (which are valid only in IGES). 
+<h4>write.iges.resource.name</h4> and <h4>write.iges.sequence</h4> are the same as the corresponding read.iges.\* parameters. Note that the  default sequence for writing contains *DirectFaces* operator, which converts elementary surfaces based on left-hand axes (valid in CASCADE) to right-hand axes (which are valid only in IGES). 
 
 Default values : 
 ~~~~~

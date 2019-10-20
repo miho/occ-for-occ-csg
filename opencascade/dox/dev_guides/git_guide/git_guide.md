@@ -11,18 +11,17 @@ Guide to installing and using Git for OCCT development {#occt_dev_guides__git_gu
   to OCCT developers who are not familiar with this tool 
   and to facilitate the use of the official OCCT Git repository for code contribution to OCCT.
 
-  Reading this document does not exempt from the need to learn Git concepts and tools. 
-  Please consult a book or manual describing Git to get acquainted with this tool. 
-  Many good books on Git can be found at http://git-scm.com/documentation 
+  It can be useful to learn more about Git concepts and tools from a book a or manual. 
+  Many good books on Git can be found at https://git-scm.com/documentation
   
   For the experienced Git users it can be enough to read sections 1 and 3
    of this document to start working with the repository.
    
-  Please make sure to get familiar with the Contribution Workflow document 
+  Familiarize yourselves with the @ref occt_dev_guides__contribution_workflow "Contribution Workflow document"  
   that describes how Git is used for processing contributions to OCCT.
   
   This and related documents are available at the Resources page 
-  of the OCCT development portal at http://dev.opencascade.org/index.php?q=home/resources. 
+  of the OCCT development portal at https://dev.opencascade.org/index.php?q=home/resources.
 
 @subsection occt_gitguide_1_2 Git URL
 
@@ -83,7 +82,7 @@ The official repository contains:
 @subsection occt_gitguide_1_5 Version of Git
 
   The repository is tested to work with Git 1.7.6 and above. 
-  Please do not use versions below 1.7.1 as they are known to cause troubles.
+  Avoid using versions below 1.7.1 as they are known to cause troubles.
 
 @section occt_gitguide_2 Installing Tools for Work with Git
 
@@ -114,7 +113,7 @@ The official repository contains:
 
 @subsubsection occt_gitguide_2_1_2 Installation and configuration of TortoiseGit
 
-  Download TortoiseGit distributive from http://code.google.com/p/tortoisegit/downloads/list. 
+  Download TortoiseGit distributive from https://tortoisegit.org/download/.
   Launch the installation.
 
  * Select your SSH client. Choose option 
@@ -239,7 +238,7 @@ The official repository contains:
 
 @subsection occt_gitguide_3_3 Adding public key in your account
 
-Log in on the portal http://dev.opencascade.org and click on **My account** link to the right. If you have a Contributor status, you will see **SSH keys** tab to the right. 
+Log in on the portal https://dev.opencascade.org and click on **My account** link to the right. If you have a Contributor status, you will see **SSH keys** tab to the right.
 
 Click on that tab, then click **Add a public key**, and paste the text of the public key (see above sections on how to generate the key) into the text box. 
 
@@ -250,7 +249,7 @@ Click **Save** to input the key to the system.
   It is typical to use your e-mail address or workstation name for this field; no restrictions are set by the portal.
 
 
-  Please note that some time (5-10 min) is needed for the system 
+  **Note** that some time (5-10 min) is needed for the system 
   to update the configuration after the new key is added. 
   After that time, you can try accessing Git.
 
@@ -497,7 +496,7 @@ To rebase your branch into a single commit, you need to do the following:
 
   The changes made in the branch can be reviewed without direct access to Git, using GitWeb interface:
 
-  * Open GitWeb in your web browser: http://git.dev.opencascade.org/gitweb/?p=occt.git 
+  * Open GitWeb in your web browser: https://git.dev.opencascade.org/gitweb/?p=occt.git
   * Locate the branch you want to review among **heads** (click ‘…’ at the bottom of the page to see the full list).
   * Click **log** (or **shortlog**) to see the history of the branch. 
     

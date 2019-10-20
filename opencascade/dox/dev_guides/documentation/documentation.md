@@ -12,15 +12,15 @@ This document provides practical guidelines for generation and editing of OCCT u
 You need to have the following software installed to generate the documentation.
 
 **Tcl/Tk**
-Version 8.5 or 8.6: http://www.tcl.tk/software/tcltk/download.html
+Version 8.5 or 8.6: https://www.tcl.tk/software/tcltk/download.html
 
 **Doxygen**
-Version 1.8.4 or above: http://www.stack.nl/~dimitri/doxygen/download.html
+Version 1.8.4 or above: http://www.doxygen.nl/download.html
 
 **Dot**
-Part of Graphviz software, used by Doxygen for generation of class diagrams in Reference Manual: http://www.graphviz.org/Download..php
+Part of Graphviz software, used by Doxygen for generation of class diagrams in Reference Manual: https://www.graphviz.org/download/
 
-**MiKTeX** or other package providing **pdflatex** command (only needed for generation of PDF documents): http://miktex.org/download
+**MiKTeX** or other package providing **pdflatex** command (only needed for generation of PDF documents): https://miktex.org/download
 
 **Inkscape** (only needed for generation of PDF documents containing SVG images): http://www.inkscape.org/download
 
@@ -134,7 +134,7 @@ Add a relative path to *svn.md* in file <i>dox/FILES.txt</i>. For instance
 dev_guides/svn/svn.md
 @endverbatim
 
-**Note** that the order of paths to documents in *FILES.txt* is reproduced in the Table of Contents in the HTML output. Please, place them logically.
+**Note** that the order of paths to documents in *FILES.txt* is reproduced in the Table of Contents in the HTML output, thus they need to be placed logically.
 
 **Note** that you should specify a file tag, not the document name. See @ref OCCT_DM_SECTION_A_1 "Header and hierarchic document structure" section for details.
 
@@ -180,7 +180,7 @@ For example:
   @subsubsection occt_ocaf_1_1_1 The document and the data framework
 @endverbatim
 
-Please, note that section names can be used for references within the document and in other documents, so it is necessary to use the common prefix indicative of the document name for all section names in the given document. 
+**Note** that section names can be used for references within the document and in other documents, so it is necessary to use the common prefix indicative of the document name for all section names in the given document. 
 For example,  *occt_ocaf* for sections in Open CASCADE Application Framework manual.
 
 The remaining part of section names in most documents consists only of numbers, for example *1_1*. Actually, the hierarchical structure of the output table of contents is not based on these numbers and is generated automatically. 

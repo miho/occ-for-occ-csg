@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\miho\Documents\GitHub\occ-for-occ-csg\dependencies\freetype\build\CMakeFiles\9ec839f33ab8cfb0698bfa19cdf0d272\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{14FAD13B-E380-376F-9698-776DB125DA0B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

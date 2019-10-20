@@ -180,7 +180,8 @@ void XCAFPrs_AISObject::DispatchStyles (const Standard_Boolean theToSyncStyles)
       aShapeCur = aComp;
     }
 
-    Handle(AIS_ColoredDrawer) aDrawer = CustomAspects (aShapeCur);
+    Handle(AIS_ColoredDrawer) aDrawer = new AIS_ColoredDrawer (myDrawer);
+    myShapeColors.Bind (aShapeCur, aDrawer);
     const XCAFPrs_Style& aStyle = aStyleGroupIter.Key();
     aDrawer->SetHidden (!aStyle.IsVisible());
 
@@ -206,8 +207,8 @@ void XCAFPrs_AISObject::Compute (const Handle(PrsMgr_PresentationManager3d)& the
     Standard_Boolean toMapStyles = myToSyncStyles;
     for (PrsMgr_Presentations::Iterator aPrsIter (myPresentations); aPrsIter.More(); aPrsIter.Next())
     {
-      if (aPrsIter.Value().Presentation()->Presentation() != thePrs
-      && !aPrsIter.Value().Presentation()->MustBeUpdated())
+      if (aPrsIter.Value() != thePrs
+      && !aPrsIter.Value()->MustBeUpdated())
       {
         toMapStyles = Standard_False;
         break;
@@ -225,8 +226,7 @@ void XCAFPrs_AISObject::Compute (const Handle(PrsMgr_PresentationManager3d)& the
 
   if (myshape.ShapeType() == TopAbs_COMPOUND)
   {
-    TopoDS_Iterator anExplor (myshape);
-    if (!anExplor.More())
+    if (myshape.NbChildren() == 0)
     {
       return;
     }

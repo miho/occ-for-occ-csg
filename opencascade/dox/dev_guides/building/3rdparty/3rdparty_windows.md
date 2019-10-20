@@ -8,7 +8,7 @@ This document presents guidelines for building third-party products used by Open
 
 You need to use the same version of MS Visual Studio for building all third-party products and OCCT itself, in order to receive a consistent set of run-time binaries. 
 
-The links for downloading the third-party products are available on the web site of OPEN CASCADE SAS at http://www.opencascade.com/content/3rd-party-components.
+The links for downloading the third-party products are available on the web site of OPEN CASCADE SAS at https://www.opencascade.com/content/3rd-party-components.
 
 There are two types of third-party products used  by OCCT: 
 
@@ -17,7 +17,6 @@ There are two types of third-party products used  by OCCT:
 	* FreeType 2.4.10 -- 2.5.3.
 * Optional  products:
 	* TBB 3.x -- 4.x;
-	* gl2ps 1.3.5 -- 1.3.8;
 	* FreeImage 3.14.1 -- 3.16.0;
 	* VTK 6.1.0.
 
@@ -33,7 +32,7 @@ Tcl/Tk is required for DRAW test harness.
 
 @subsubsection dev_guides__building_3rdparty_win_2_1_1 Installation from sources: Tcl
   
-Download the necessary archive from http://www.tcl.tk/software/tcltk/download.html and unpack it. 
+Download the necessary archive from https://www.tcl.tk/software/tcltk/download.html and unpack it.
   
 1. In the *win* sub-directory, edit file *buildall.vc.bat*:
 
@@ -86,7 +85,7 @@ Download the necessary archive from http://www.tcl.tk/software/tcltk/download.ht
 
 @subsubsection dev_guides__building_3rdparty_win_2_1_2 Installation from sources: Tk
   
-Download the necessary archive from http://www.tcl.tk/software/tcltk/download.html and unpack it. 
+Download the necessary archive from https://www.tcl.tk/software/tcltk/download.html and unpack it.
 
 Apply the same steps as described for building Tcl above, with the same INSTALLDIR.
 Note that Tk produces its own executable, called *wish*. 
@@ -95,7 +94,7 @@ You might need to edit default value of *TCLDIR* variable defined in *buildall.v
 
 @subsection dev_guides__building_3rdparty_win_2_2 FreeType
 
-FreeType is required for text display in a 3D viewer. You can download its sources from http://sourceforge.net/projects/freetype/files/   
+FreeType is required for text display in a 3D viewer. You can download its sources from https://sourceforge.net/projects/freetype/files/
 
 ### The building procedure
 
@@ -149,97 +148,18 @@ FreeType is required for text display in a 3D viewer. You can download its sourc
 @subsection dev_guides__building_3rdparty_win_3_1 TBB
 
 This third-party product is installed with binaries 
-from the archive that can be downloaded from http://threadingbuildingblocks.org/. 
+from the archive that can be downloaded from https://github.com/intel/tbb.
 Go to the **Download** page, find the  release version you need  (e.g. *tbb30_018oss*) and pick the archive for Windows  platform. 
 
 Unpack the downloaded  archive of TBB product into the *3rdparty* folder. 
 
 Further in this document,  this folder is referred to as *tbb*. 
 
-@subsection dev_guides__building_3rdparty_win_3_2  gl2ps
-
-This third-party product should be built as a dynamically loadable library (dll file). 
-You can download its sources from  http://geuz.org/gl2ps/src/. 
-
-### The building procedure
-
-1. Unpack the downloaded  archive of gl2ps product (e.g. *gl2ps-1.3.5.tgz*) into the *3rdparty*  folder. 
-
-   As a result, you will get a folder named, for example, *3rdparty\\gl2ps-1.3.5-source*. 
-
-   Rename it into <i>gl2ps-platform-compiler-building mode</i>, where 
-   * **platform** -- *win32*  or *win64*; 
-   * **compiler** -- *vc8*, *vc9* or *vc10*; 
-   * **building mode** -- *opt*  (for release) or *deb* (for debug). 
-   
-   For example, <i>gl2ps-win64-vc10-deb</i>
-
-   Further in this document,  this folder is referred to as *gl2ps*. 
-
-2. Download (from http://www.cmake.org/cmake/resources/software.html) 
-   and install the *CMake* build system.  
-
-3. Edit the file *gl2ps\\CMakeLists.txt*. 
-
-   After line 113 in *CMakeLists.txt*: 
-
-       set_target_properties(shared PROPERTIES  COMPILE_FLAGS \"-DGL2PSDLL -DGL2PSDLL_EXPORTS\")
-    
-   add the following line:   
-    
-       add_definitions(-D_USE_MATH_DEFINES)  
-
-   Attention: If Cygwin was installed on  your computer, make sure that there is no path to it in the *PATH* variable to avoid possible conflicts during the configuration. 
-
-4. Launch CMake <i>(cmake-gui.exe)</i> using  the Program menu. 
-
-   In CMake: 
-  
-   * Define where the source code is. 
-     This path must point to *gl2ps*  folder. 
-
-   * Define where to build the  binaries. 
-     This path must point to the folder where generated gl2ps project binaries will be placed 
-     (for example, *gl2ps\\bin*). 
-     Further in this document, this folder is referred to as *gl2ps_bin*.
-
-   * Press  **Configure** button. 
-   
-     @figure{/dev_guides/building/3rdparty/images/3rdparty_image004.png}
-
-   * Select the generator (the compiler  and the target platform -- 32 or 64 bit) in the pop-up window. 
-   
-     @figure{/dev_guides/building/3rdparty/images/3rdparty_image005.png}
-
-   * Press **Finish** button to  return to the main CMake window. 
-     Expand the ENABLE group and uncheck  ENABLE_PNG and ENABLE_ZLIB check boxes. 
-	 
-     @figure{/dev_guides/building/3rdparty/images/3rdparty_image006.png}
-
-   * Expand the CMAKE group and define *CMAKE_INSTALL_PREFIX* which is the path where you want to install the build results, for example, *c:\\occ3rdparty\\gl2ps-1.3.5*. 
-   
-     @figure{/dev_guides/building/3rdparty/images/3rdparty_image007.png}
-
-   * Press **Configure** button again, then press **Generate** button to generate Visual Studio projects. After completion, close CMake application. 
-
-5. Open the solution file *gl2ps_bin\\gl2ps.sln* in Visual Studio. 
-
-   * Select a configuration to build 
-     * Choose **Release** to build Release binaries. 
-     * Choose **Debug** to build Debug binaries. 
-   * Select a platform to build. 
-     * Choose **Win32** to build for a 32 bit platform. 
-     * Choose **x64** to build for a 64 bit platform. 
-   * Build the solution. 
-   * Build the *INSTALL* project. 
-    
-As a  result, you should have the installed gl2ps product in the *CMAKE_INSTALL_PREFIX* path. 
-
 @subsection dev_guides__building_3rdparty_win_3_3 FreeImage
 
 This third-party product should be built as a dynamically loadable library (.dll file). 
 You can download its sources from 
-http://sourceforge.net/projects/freeimage/files/Source%20Distribution/
+https://sourceforge.net/projects/freeimage/files/Source%20Distribution/
 
 ### The building procedure: 
 
@@ -312,7 +232,7 @@ VTK is an open-source, freely available software system for 3D computer graphics
 
 ### The building procedure:
 
-1. Download the necessary archive from http://www.vtk.org/VTK/resources/software.html and unpack it into *3rdparty* folder.
+1. Download the necessary archive from https://www.vtk.org/VTK/resources/software.html and unpack it into *3rdparty* folder.
 
    As a result, you will get a folder named, for example, <i>3rdparty\VTK-6.1.0.</i>
 

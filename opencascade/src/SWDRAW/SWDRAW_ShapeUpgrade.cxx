@@ -1029,7 +1029,7 @@ static Standard_Integer splitface
   if ( uval.Length() >0 ) {
     di << "Splitting by U: ";
     for ( Standard_Integer j=1; j <= uval.Length(); j++ ) {
-      //cout << ( i >j ? ", " : "" ) << uval(j);
+      //std::cout << ( i >j ? ", " : "" ) << uval(j);
       if (i >j) {
 	di << ", ";
       } else {
@@ -1042,7 +1042,7 @@ static Standard_Integer splitface
   if ( vval.Length() >0 ) {
     di << "Splitting by V: ";
     for ( Standard_Integer j=1; j <= vval.Length(); j++ ) {
-      //cout << ( j >1 ? ", " : "" ) << vval(j);
+      //std::cout << ( j >1 ? ", " : "" ) << vval(j);
       if (j >1) {
 	di << ", ";
       } else {
@@ -1299,7 +1299,7 @@ static Standard_Integer unifysamedom(Draw_Interpretor& di, Standard_Integer n, c
     di << "+b to switch on 'concat bspline' mode\n";
     di << "+i to switch on 'allow internal edges' mode\n";
     di << "-t val to set linear tolerance\n";
-    di << "-a val to set angular tolerance\n";
+    di << "-a val to set angular tolerance (in degrees)\n";
     di << "'unify-faces' and 'unify-edges' modes are switched on by default";
     return 1;
   }
@@ -1341,7 +1341,10 @@ static Standard_Integer unifysamedom(Draw_Interpretor& di, Standard_Integer n, c
         {
           if (++i < n)
           {
-            (a[i-1][1] == 't' ? aLinTol : aAngTol) = Draw::Atof(a[i]);
+            if (a[i-1][1] == 't')
+              aLinTol = Draw::Atof(a[i]);
+            else
+              aAngTol = Draw::Atof(a[i]) * (M_PI / 180.0);
           }
           else
           {
@@ -1361,7 +1364,8 @@ static Standard_Integer unifysamedom(Draw_Interpretor& di, Standard_Integer n, c
   Unifier().Build();
   TopoDS_Shape Result = Unifier().Shape();
 
-  BRepTest_Objects::SetHistory(Unifier().History());
+  if (BRepTest_Objects::IsHistoryNeeded())
+    BRepTest_Objects::SetHistory(Unifier().History());
 
   DBRep::Set(a[1], Result);
   return 0;
@@ -1397,18 +1401,20 @@ static Standard_Integer reshape(Draw_Interpretor& /*theDI*/,
 {
   if ( theArgc < 4 )
   {
-    cout << "Error: wrong number of arguments. Type 'help " << theArgv[0] << "'\n";
+    std::cout << "Error: wrong number of arguments. Type 'help " << theArgv[0] << "'\n";
     return 1;
   }
 
   TopoDS_Shape aSource = DBRep::Get(theArgv[2]);
   if ( aSource.IsNull() )
   {
-    cout << "Error: source shape ('" << theArgv[2] << "') is null\n";
+    std::cout << "Error: source shape ('" << theArgv[2] << "') is null\n";
     return 1;
   }
 
   Handle(BRepTools_ReShape) aReShaper = new BRepTools_ReShape;
+
+  TopAbs_ShapeEnum aShapeLevel = TopAbs_SHAPE;
 
   // Record the requested modifications
   for ( Standard_Integer i = 3; i < theArgc; ++i )
@@ -1421,21 +1427,21 @@ static Standard_Integer reshape(Draw_Interpretor& /*theDI*/,
     {
       if ( theArgc - i < 3 )
       {
-        cout << "Error: not enough arguments for replacement\n";
+        std::cout << "Error: not enough arguments for replacement\n";
         return 1;
       }
 
       TopoDS_Shape aWhat = DBRep::Get(theArgv[++i]);
       if ( aWhat.IsNull() )
       {
-        cout << "Error: argument shape ('" << theArgv[i] << "') is null\n";
+        std::cout << "Error: argument shape ('" << theArgv[i] << "') is null\n";
         return 1;
       }
 
       TopoDS_Shape aWith = DBRep::Get(theArgv[++i]);
       if ( aWith.IsNull() )
       {
-        cout << "Error: replacement shape ('" << theArgv[i] << "') is null\n";
+        std::cout << "Error: replacement shape ('" << theArgv[i] << "') is null\n";
         return 1;
       }
 
@@ -1445,31 +1451,75 @@ static Standard_Integer reshape(Draw_Interpretor& /*theDI*/,
     {
       if ( theArgc - i < 2 )
       {
-        cout << "Error: not enough arguments for removal\n";
+        std::cout << "Error: not enough arguments for removal\n";
         return 1;
       }
 
       TopoDS_Shape aWhat = DBRep::Get(theArgv[++i]);
       if ( aWhat.IsNull() )
       {
-        cout << "Error: shape to remove ('" << theArgv[i] << "') is null\n";
+        std::cout << "Error: shape to remove ('" << theArgv[i] << "') is null\n";
         return 1;
       }
 
       aReShaper->Remove(aWhat);
     }
+    else if (anOpt == "-until")
+    {
+      if (theArgc - i < 2)
+      {
+        std::cout << "Error: not enough arguments for level specification\n";
+        return 1;
+      }
+
+      Standard_CString aLevelCStr = theArgv[++i];
+      TCollection_AsciiString aLevelStr(aLevelCStr);
+      aLevelStr.LowerCase();
+      if (aLevelStr == "compound" ||
+          aLevelStr == "cd")
+        aShapeLevel = TopAbs_COMPOUND;
+      else if (aLevelStr == "compsolid" ||
+               aLevelStr == "c")
+        aShapeLevel = TopAbs_COMPSOLID;
+      else if (aLevelStr == "solid" ||
+               aLevelStr == "so")
+        aShapeLevel = TopAbs_SOLID;
+      else if (aLevelStr == "shell" ||
+               aLevelStr == "sh")
+        aShapeLevel = TopAbs_SHELL;
+      else if (aLevelStr == "face" ||
+               aLevelStr == "f")
+        aShapeLevel = TopAbs_FACE;
+      else if (aLevelStr == "wire" ||
+               aLevelStr == "w")
+        aShapeLevel = TopAbs_WIRE;
+      else if (aLevelStr == "edge" ||
+               aLevelStr == "e")
+        aShapeLevel = TopAbs_EDGE;
+      else if (aLevelStr == "vertex" ||
+               aLevelStr == "v")
+        aShapeLevel = TopAbs_VERTEX;
+      else if (aLevelStr == "shape" ||
+               aLevelStr == "s")
+        aShapeLevel = TopAbs_SHAPE;
+      else
+      {
+        std::cout << "Error: unknown shape type '" << theArgv[i] << "'\n";
+        return 1;
+      }
+    }
     else
     {
-      cout << "Error: invalid syntax at " << anOpt << "\n" ;
+      std::cout << "Error: invalid syntax at " << anOpt << "\n" ;
       return 1;
     }
   }
 
   // Apply all the recorded modifications
-  TopoDS_Shape aResult = aReShaper->Apply(aSource);
+  TopoDS_Shape aResult = aReShaper->Apply(aSource, aShapeLevel);
   if ( aResult.IsNull() )
   {
-    cout << "Error: result shape is null\n";
+    std::cout << "Error: result shape is null\n";
     return 1;
   }
 
@@ -1585,10 +1635,12 @@ static Standard_Integer reshape(Draw_Interpretor& /*theDI*/,
   theCommands.Add ("copytranslate","result shape dx dy dz",__FILE__,copytranslate,g);
 
   theCommands.Add ("reshape",
-    "\n    reshape : result shape [-replace what with] [-remove what]"
+    "\n    reshape : result shape [-replace what with] [-remove what] [-until level]"
     "\n    Basic utility for topological modification: "
     "\n      '-replace what with'   Replaces 'what' sub-shape with 'with' sub-shape"
     "\n      '-remove what'         Removes 'what' sub-shape"
-    "\n    Requests '-replace' and '-remove' can be repeated many times.",
+    "\n    Requests '-replace' and '-remove' can be repeated many times."
+    "\n    '-until level' specifies level until which shape for replcement/removal"
+    "\n    will be searched.",
     __FILE__, reshape, g);
 }

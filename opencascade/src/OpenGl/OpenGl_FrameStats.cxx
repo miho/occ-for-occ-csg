@@ -17,86 +17,10 @@
 #include <OpenGl_View.hxx>
 #include <OpenGl_Workspace.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(OpenGl_FrameStats, Standard_Transient)
+IMPLEMENT_STANDARD_RTTIEXT(OpenGl_FrameStats, Graphic3d_FrameStats)
 
 namespace
 {
-  //! Format counter.
-  static std::ostream& formatCounter (std::ostream& theStream,
-                                      Standard_Integer theWidth,
-                                      const char* thePrefix,
-                                      Standard_Size theValue,
-                                      const char* thePostfix = NULL)
-  {
-    if (thePrefix != NULL)
-    {
-      theStream << thePrefix;
-    }
-    theStream << std::setfill(' ') << std::setw (theWidth);
-    if (theValue >= 1000000000)
-    {
-      Standard_Real aValM = Standard_Real(theValue) / 1000000000.0;
-      theStream << std::fixed << std::setprecision (1) << aValM << "G";
-    }
-    else if (theValue >= 1000000)
-    {
-      Standard_Real aValM = Standard_Real(theValue) / 1000000.0;
-      theStream << std::fixed << std::setprecision (1) << aValM << "M";
-    }
-    else if (theValue >= 1000)
-    {
-      Standard_Real aValK = Standard_Real(theValue) / 1000.0;
-      theStream << std::fixed << std::setprecision (1) << aValK << "k";
-    }
-    else
-    {
-      theStream << theValue;
-    }
-    if (thePostfix != NULL)
-    {
-      theStream << thePostfix;
-    }
-    return theStream;
-  }
-
-  //! Format memory counter.
-  static std::ostream& formatBytes (std::ostream& theStream,
-                                    Standard_Integer theWidth,
-                                    const char* thePrefix,
-                                    Standard_Size theValue,
-                                    const char* thePostfix = NULL)
-  {
-    if (thePrefix != NULL)
-    {
-      theStream << thePrefix;
-    }
-    theStream << std::setfill(' ') << std::setw (theWidth);
-    if (theValue >= 1024 * 1024 * 1024)
-    {
-      Standard_Real aValM = Standard_Real(theValue) / (1024.0 * 1024.0 * 1024.0);
-      theStream << std::fixed << std::setprecision (1) << aValM << " GiB";
-    }
-    else if (theValue >= 1024 * 1024)
-    {
-      Standard_Real aValM = Standard_Real(theValue) / (1024.0 * 1024.0);
-      theStream << std::fixed << std::setprecision (1) << aValM << " MiB";
-    }
-    else if (theValue >= 1024)
-    {
-      Standard_Real aValK = Standard_Real(theValue) / 1024.0;
-      theStream << std::fixed << std::setprecision (1) << aValK << " KiB";
-    }
-    else
-    {
-      theStream << theValue;
-    }
-    if (thePostfix != NULL)
-    {
-      theStream << thePostfix;
-    }
-    return theStream;
-  }
-
   //! Return estimated data size.
   static Standard_Size estimatedDataSize (const Handle(OpenGl_Resource)& theRes)
   {
@@ -109,17 +33,8 @@ namespace
 // purpose  :
 // =======================================================================
 OpenGl_FrameStats::OpenGl_FrameStats()
-: myFpsTimer (Standard_True),
-  myFrameStartTime (0.0),
-  myFrameDuration  (0.0),
-  myFps    (-1.0),
-  myFpsCpu (-1.0),
-  myUpdateInterval (1.0),
-  myFpsFrameCount (0),
-  myIsLongLineFormat (Standard_False)
 {
-  memset (myCounters,    0, sizeof(myCounters));
-  memset (myCountersTmp, 0, sizeof(myCountersTmp));
+  //
 }
 
 // =======================================================================
@@ -132,173 +47,49 @@ OpenGl_FrameStats::~OpenGl_FrameStats()
 }
 
 // =======================================================================
-// function : FormatStats
+// function : IsFrameUpdated
 // purpose  :
 // =======================================================================
-TCollection_AsciiString OpenGl_FrameStats::FormatStats (Graphic3d_RenderingParams::PerfCounters theFlags) const
+bool OpenGl_FrameStats::IsFrameUpdated (Handle(OpenGl_FrameStats)& thePrev) const
 {
-  const Standard_Integer aValWidth = 5;
-  std::stringstream aBuf;
-  const Standard_Boolean isCompact = theFlags == Graphic3d_RenderingParams::PerfCounters_FrameRate; // only FPS is displayed
-  if (myIsLongLineFormat
-   && (theFlags & Graphic3d_RenderingParams::PerfCounters_FrameRate) != 0
-   && (theFlags & Graphic3d_RenderingParams::PerfCounters_CPU) != 0)
+  const Graphic3d_FrameStatsData& aFrame = LastDataFrame();
+  if (thePrev.IsNull())
   {
-    aBuf << "FPS: "     << std::setfill(' ') << std::setw (isCompact ? aValWidth : 9)  << std::fixed << std::setprecision (1) << myFps
-         << " [CPU: "   << std::setfill(' ') << std::setw (isCompact ? aValWidth : 10) << std::fixed << std::setprecision (1) << myFpsCpu << "]\n";
+    thePrev = new OpenGl_FrameStats();
   }
-  else
+  // check just a couple of major counters
+  else if (myLastFrameIndex == thePrev->myLastFrameIndex
+        && Abs (aFrame.FrameRate()    - thePrev->myCountersTmp.FrameRate())    <= 0.001
+        && Abs (aFrame.FrameRateCpu() - thePrev->myCountersTmp.FrameRateCpu()) <= 0.001
+        && aFrame[Graphic3d_FrameStatsCounter_NbLayers]           == thePrev->myCountersTmp[Graphic3d_FrameStatsCounter_NbLayers]
+        && aFrame[Graphic3d_FrameStatsCounter_NbLayersNotCulled]  == thePrev->myCountersTmp[Graphic3d_FrameStatsCounter_NbLayersNotCulled]
+        && aFrame[Graphic3d_FrameStatsCounter_NbStructs]          == thePrev->myCountersTmp[Graphic3d_FrameStatsCounter_NbStructs]
+        && aFrame[Graphic3d_FrameStatsCounter_NbStructsNotCulled] == thePrev->myCountersTmp[Graphic3d_FrameStatsCounter_NbStructsNotCulled])
   {
-    if ((theFlags & Graphic3d_RenderingParams::PerfCounters_FrameRate) != 0)
-    {
-      aBuf << "FPS:     " << std::setfill(' ') << std::setw (isCompact ? aValWidth : aValWidth + 3) << std::fixed << std::setprecision (1) << myFps  << "\n";
-    }
-    if ((theFlags & Graphic3d_RenderingParams::PerfCounters_CPU) != 0)
-    {
-      aBuf << "CPU FPS: " << std::setfill(' ') << std::setw (isCompact ? aValWidth : aValWidth + 3) << std::fixed << std::setprecision (1) << myFpsCpu << "\n";
-    }
+    return false;
   }
-  if ((theFlags & Graphic3d_RenderingParams::PerfCounters_Layers) != 0)
-  {
-    if (myIsLongLineFormat)
-    {
-      formatCounter (aBuf, aValWidth, "Layers:  ", myCounters[Counter_NbLayers]);
-      if (HasCulledLayers())
-      {
-        formatCounter (aBuf, aValWidth, " [rendered: ", myCounters[Counter_NbLayersNotCulled], "]");
-      }
-      aBuf << "\n";
-    }
-    else
-    {
-      formatCounter (aBuf, aValWidth + 3, "Layers:  ", myCounters[Counter_NbLayers], "\n");
-    }
-  }
-  if ((theFlags & Graphic3d_RenderingParams::PerfCounters_Structures) != 0)
-  {
-    if (myIsLongLineFormat)
-    {
-      formatCounter (aBuf, aValWidth, "Structs: ", myCounters[Counter_NbStructs]);
-      if (HasCulledStructs())
-      {
-        formatCounter (aBuf, aValWidth, " [rendered: ", myCounters[Counter_NbStructsNotCulled], "]");
-      }
-      aBuf << "\n";
-    }
-    else
-    {
-      formatCounter (aBuf, aValWidth + 3, "Structs: ", myCounters[Counter_NbStructs], "\n");
-    }
-  }
-  if ((theFlags & Graphic3d_RenderingParams::PerfCounters_Groups) != 0
-   || (theFlags & Graphic3d_RenderingParams::PerfCounters_GroupArrays) != 0
-   || (theFlags & Graphic3d_RenderingParams::PerfCounters_Triangles) != 0
-   || (theFlags & Graphic3d_RenderingParams::PerfCounters_Points) != 0
-   || (!myIsLongLineFormat
-    && ((theFlags & Graphic3d_RenderingParams::PerfCounters_Structures) != 0
-     || (theFlags & Graphic3d_RenderingParams::PerfCounters_Layers) != 0)))
-  {
-    aBuf << "Rendered\n";
-  }
-  if (!myIsLongLineFormat
-   && (theFlags & Graphic3d_RenderingParams::PerfCounters_Layers) != 0)
-  {
-    formatCounter (aBuf, aValWidth, "    Layers: ", myCounters[Counter_NbLayersNotCulled], "\n");
-  }
-  if (!myIsLongLineFormat
-   && (theFlags & Graphic3d_RenderingParams::PerfCounters_Structures) != 0)
-  {
-    formatCounter (aBuf, aValWidth, "   Structs: ", myCounters[Counter_NbStructsNotCulled], "\n");
-  }
-  if ((theFlags & Graphic3d_RenderingParams::PerfCounters_Groups) != 0)
-  {
-    formatCounter (aBuf, aValWidth, "    Groups: ", myCounters[Counter_NbGroupsNotCulled], "\n");
-  }
-  if ((theFlags & Graphic3d_RenderingParams::PerfCounters_GroupArrays) != 0)
-  {
-    formatCounter (aBuf, aValWidth, "    Arrays: ", myCounters[Counter_NbElemsNotCulled], "\n");
-    formatCounter (aBuf, aValWidth, "    [fill]: ", myCounters[Counter_NbElemsFillNotCulled], "\n");
-    formatCounter (aBuf, aValWidth, "    [line]: ", myCounters[Counter_NbElemsLineNotCulled], "\n");
-    formatCounter (aBuf, aValWidth, "   [point]: ", myCounters[Counter_NbElemsPointNotCulled], "\n");
-    formatCounter (aBuf, aValWidth, "    [text]: ", myCounters[Counter_NbElemsTextNotCulled], "\n");
-  }
-  if ((theFlags & Graphic3d_RenderingParams::PerfCounters_Triangles) != 0)
-  {
-    formatCounter (aBuf, aValWidth, " Triangles: ", myCounters[Counter_NbTrianglesNotCulled], "\n");
-  }
-  if ((theFlags & Graphic3d_RenderingParams::PerfCounters_Points) != 0)
-  {
-    formatCounter (aBuf, aValWidth, "    Points: ", myCounters[Counter_NbPointsNotCulled], "\n");
-  }
-  if ((theFlags & Graphic3d_RenderingParams::PerfCounters_EstimMem) != 0)
-  {
-    aBuf << "GPU Memory\n";
-    formatBytes (aBuf, aValWidth, "  Geometry: ", myCounters[Counter_EstimatedBytesGeom], "\n");
-    formatBytes (aBuf, aValWidth, "  Textures: ", myCounters[Counter_EstimatedBytesTextures], "\n");
-    formatBytes (aBuf, aValWidth, "    Frames: ", myCounters[Counter_EstimatedBytesFbos], "\n");
-  }
-  return TCollection_AsciiString (aBuf.str().c_str());
+
+  thePrev->myLastFrameIndex = myLastFrameIndex;
+  thePrev->myCountersTmp = aFrame;
+  return true;
 }
 
 // =======================================================================
-// function : FrameStart
+// function : updateStatistics
 // purpose  :
 // =======================================================================
-void OpenGl_FrameStats::FrameStart (const Handle(OpenGl_Workspace)& )
+void OpenGl_FrameStats::updateStatistics (const Handle(Graphic3d_CView)& theView,
+                                          bool theIsImmediateOnly)
 {
-  memset (myCountersTmp, 0, sizeof(myCountersTmp));
-  myFrameStartTime = myFpsTimer.ElapsedTime();
-  if (!myFpsTimer.IsStarted())
+  const OpenGl_View* aView = dynamic_cast<const OpenGl_View*> (theView.get());
+  if (aView == NULL)
   {
-    myFpsTimer.Reset();
-    myFpsTimer.Start();
-    myFpsFrameCount = 0;
-  }
-}
-
-// =======================================================================
-// function : FrameEnd
-// purpose  :
-// =======================================================================
-void OpenGl_FrameStats::FrameEnd (const Handle(OpenGl_Workspace)& theWorkspace)
-{
-  const Graphic3d_RenderingParams::PerfCounters aBits = !theWorkspace.IsNull()
-                                                      ? theWorkspace->View()->RenderingParams().CollectedStats
-                                                      : Graphic3d_RenderingParams::PerfCounters_NONE;
-  const double aTime = myFpsTimer.ElapsedTime();
-  myFrameDuration = aTime - myFrameStartTime;
-  ++myFpsFrameCount;
-  if (!theWorkspace.IsNull())
-  {
-    myUpdateInterval = theWorkspace->View()->RenderingParams().StatsUpdateInterval;
-  }
-
-  if (aTime < myUpdateInterval)
-  {
+    myCounters.SetValue (myLastFrameIndex, myCountersTmp);
+    myCountersTmp.Reset();
     return;
   }
 
-  if (aTime > gp::Resolution())
-  {
-    // update FPS
-    myFpsTimer.Stop();
-    const double aCpuSec = myFpsTimer.UserTimeCPU();
-    myFps    = double(myFpsFrameCount) / aTime;
-    myFpsCpu = aCpuSec > gp::Resolution()
-             ? double(myFpsFrameCount) / aCpuSec
-             : -1.0;
-    myFpsTimer.Reset();
-    myFpsTimer.Start();
-    myFpsFrameCount = 0;
-  }
-
-  // update structure counters
-  if (theWorkspace.IsNull())
-  {
-    memcpy (myCounters, myCountersTmp, sizeof(myCounters));
-    return;
-  }
-
+  const Graphic3d_RenderingParams::PerfCounters aBits = theView->RenderingParams().CollectedStats;
   const Standard_Boolean toCountMem     = (aBits & Graphic3d_RenderingParams::PerfCounters_EstimMem)  != 0;
   const Standard_Boolean toCountTris    = (aBits & Graphic3d_RenderingParams::PerfCounters_Triangles) != 0
                                        || (aBits & Graphic3d_RenderingParams::PerfCounters_Points)    != 0;
@@ -307,20 +98,25 @@ void OpenGl_FrameStats::FrameEnd (const Handle(OpenGl_Workspace)& theWorkspace)
   const Standard_Boolean toCountStructs = (aBits & Graphic3d_RenderingParams::PerfCounters_Structures)  != 0
                                        || (aBits & Graphic3d_RenderingParams::PerfCounters_Layers)      != 0 || toCountGroups;
 
-  myCountersTmp[Counter_NbLayers] = theWorkspace->View()->LayerList().Layers().Size();
+  myCountersTmp[Graphic3d_FrameStatsCounter_NbLayers] = aView->LayerList().Layers().Size();
   if (toCountStructs
    || (aBits & Graphic3d_RenderingParams::PerfCounters_Layers)    != 0)
   {
-    const Standard_Integer aViewId = theWorkspace->View()->Identification();
-    for (OpenGl_SequenceOfLayers::Iterator aLayerIter (theWorkspace->View()->LayerList().Layers()); aLayerIter.More(); aLayerIter.Next())
+    const Standard_Integer aViewId = aView->Identification();
+    for (NCollection_List<Handle(Graphic3d_Layer)>::Iterator aLayerIter (aView->LayerList().Layers()); aLayerIter.More(); aLayerIter.Next())
     {
       const Handle(OpenGl_Layer)& aLayer = aLayerIter.Value();
+      myCountersTmp[Graphic3d_FrameStatsCounter_NbStructs] += aLayer->NbStructures();
+      if (theIsImmediateOnly && !aLayer->LayerSettings().IsImmediate())
+      {
+        continue;
+      }
+
       if (!aLayer->IsCulled())
       {
-        ++myCountersTmp[Counter_NbLayersNotCulled];
+        ++myCountersTmp[Graphic3d_FrameStatsCounter_NbLayersNotCulled];
       }
-      myCountersTmp[Counter_NbStructs]          += aLayer->NbStructures();
-      myCountersTmp[Counter_NbStructsNotCulled] += aLayer->NbStructuresNotCulled();
+      myCountersTmp[Graphic3d_FrameStatsCounter_NbStructsNotCulled] += aLayer->NbStructuresNotCulled();
       if (toCountGroups)
       {
         updateStructures (aViewId, aLayer->CullableStructuresBVH().Structures(), toCountElems, toCountTris, toCountMem);
@@ -329,18 +125,16 @@ void OpenGl_FrameStats::FrameEnd (const Handle(OpenGl_Workspace)& theWorkspace)
       }
     }
   }
-  if (toCountMem
-  && !theWorkspace.IsNull())
+  if (toCountMem)
   {
-    for (OpenGl_Context::OpenGl_ResourcesMap::Iterator aResIter (theWorkspace->GetGlContext()->SharedResources());
+    for (OpenGl_Context::OpenGl_ResourcesMap::Iterator aResIter (aView->GlWindow()->GetGlContext()->SharedResources());
          aResIter.More(); aResIter.Next())
     {
-      myCountersTmp[Counter_EstimatedBytesTextures] += aResIter.Value()->EstimatedDataSize();
+      myCountersTmp[Graphic3d_FrameStatsCounter_EstimatedBytesTextures] += aResIter.Value()->EstimatedDataSize();
     }
 
-    const OpenGl_View* aView = theWorkspace->View();
     {
-      Standard_Size& aMemFbos = myCountersTmp[Counter_EstimatedBytesFbos];
+      Standard_Size& aMemFbos = myCountersTmp[Graphic3d_FrameStatsCounter_EstimatedBytesFbos];
       // main FBOs
       aMemFbos += estimatedDataSize (aView->myMainSceneFbos[0]);
       aMemFbos += estimatedDataSize (aView->myMainSceneFbos[1]);
@@ -367,10 +161,12 @@ void OpenGl_FrameStats::FrameEnd (const Handle(OpenGl_Workspace)& theWorkspace)
       aMemFbos += estimatedDataSize (aView->myRaytraceVisualErrorTexture[1]);
       aMemFbos += estimatedDataSize (aView->myRaytraceTileOffsetsTexture[0]);
       aMemFbos += estimatedDataSize (aView->myRaytraceTileOffsetsTexture[1]);
+      aMemFbos += estimatedDataSize (aView->myRaytraceTileSamplesTexture[0]);
+      aMemFbos += estimatedDataSize (aView->myRaytraceTileSamplesTexture[1]);
     }
     {
       // Ray Tracing geometry
-      Standard_Size& aMemGeom = myCountersTmp[Counter_EstimatedBytesGeom];
+      Standard_Size& aMemGeom = myCountersTmp[Graphic3d_FrameStatsCounter_EstimatedBytesGeom];
       aMemGeom += estimatedDataSize (aView->mySceneNodeInfoTexture);
       aMemGeom += estimatedDataSize (aView->mySceneMinPointTexture);
       aMemGeom += estimatedDataSize (aView->mySceneMaxPointTexture);
@@ -383,7 +179,6 @@ void OpenGl_FrameStats::FrameEnd (const Handle(OpenGl_Workspace)& theWorkspace)
       aMemGeom += estimatedDataSize (aView->myRaytraceLightSrcTexture);
     }
   }
-  memcpy (myCounters, myCountersTmp, sizeof(myCounters));
 }
 
 // =======================================================================
@@ -391,135 +186,139 @@ void OpenGl_FrameStats::FrameEnd (const Handle(OpenGl_Workspace)& theWorkspace)
 // purpose  :
 // =======================================================================
 void OpenGl_FrameStats::updateStructures (Standard_Integer theViewId,
-                                          const OpenGl_IndexedMapOfStructure& theStructures,
+                                          const NCollection_IndexedMap<const Graphic3d_CStructure*>& theStructures,
                                           Standard_Boolean theToCountElems,
                                           Standard_Boolean theToCountTris,
                                           Standard_Boolean theToCountMem)
 {
-  for (OpenGl_IndexedMapOfStructure::Iterator aStructIter (theStructures); aStructIter.More(); aStructIter.Next())
+  for (OpenGl_Structure::StructIterator aStructIter (theStructures); aStructIter.More(); aStructIter.Next())
   {
     const OpenGl_Structure* aStruct = aStructIter.Value();
-    if (aStruct->IsCulled()
-    || !aStruct->IsVisible (theViewId))
+    const bool isStructHidden = aStruct->IsCulled()
+                            || !aStruct->IsVisible (theViewId);
+    for (; aStruct != NULL; aStruct = aStruct->InstancedStructure())
     {
-      if (theToCountMem)
+      if (isStructHidden)
       {
-        for (OpenGl_Structure::GroupIterator aGroupIter (aStruct->Groups()); aGroupIter.More(); aGroupIter.Next())
+        if (theToCountMem)
         {
-          const OpenGl_Group* aGroup = aGroupIter.Value();
-          for (const OpenGl_ElementNode* aNodeIter = aGroup->FirstNode(); aNodeIter != NULL; aNodeIter = aNodeIter->next)
+          for (OpenGl_Structure::GroupIterator aGroupIter (aStruct->Groups()); aGroupIter.More(); aGroupIter.Next())
           {
-            if (const OpenGl_PrimitiveArray* aPrim = dynamic_cast<const OpenGl_PrimitiveArray*> (aNodeIter->elem))
+            const OpenGl_Group* aGroup = aGroupIter.Value();
+            for (const OpenGl_ElementNode* aNodeIter = aGroup->FirstNode(); aNodeIter != NULL; aNodeIter = aNodeIter->next)
             {
-              myCountersTmp[Counter_EstimatedBytesGeom] += estimatedDataSize (aPrim->AttributesVbo());
-              myCountersTmp[Counter_EstimatedBytesGeom] += estimatedDataSize (aPrim->IndexVbo());
+              if (const OpenGl_PrimitiveArray* aPrim = dynamic_cast<const OpenGl_PrimitiveArray*> (aNodeIter->elem))
+              {
+                myCountersTmp[Graphic3d_FrameStatsCounter_EstimatedBytesGeom] += estimatedDataSize (aPrim->AttributesVbo());
+                myCountersTmp[Graphic3d_FrameStatsCounter_EstimatedBytesGeom] += estimatedDataSize (aPrim->IndexVbo());
+              }
             }
           }
         }
+        continue;
       }
-      continue;
-    }
 
-    myCountersTmp[Counter_NbGroupsNotCulled] += aStruct->Groups().Size();
-    if (!theToCountElems)
-    {
-      continue;
-    }
-
-    for (OpenGl_Structure::GroupIterator aGroupIter (aStruct->Groups()); aGroupIter.More(); aGroupIter.Next())
-    {
-      const OpenGl_Group* aGroup = aGroupIter.Value();
-      for (const OpenGl_ElementNode* aNodeIter = aGroup->FirstNode(); aNodeIter != NULL; aNodeIter = aNodeIter->next)
+      myCountersTmp[Graphic3d_FrameStatsCounter_NbGroupsNotCulled] += aStruct->Groups().Size();
+      if (!theToCountElems)
       {
-        if (const OpenGl_PrimitiveArray* aPrim = dynamic_cast<const OpenGl_PrimitiveArray*> (aNodeIter->elem))
+        continue;
+      }
+
+      for (OpenGl_Structure::GroupIterator aGroupIter (aStruct->Groups()); aGroupIter.More(); aGroupIter.Next())
+      {
+        const OpenGl_Group* aGroup = aGroupIter.Value();
+        for (const OpenGl_ElementNode* aNodeIter = aGroup->FirstNode(); aNodeIter != NULL; aNodeIter = aNodeIter->next)
         {
-          ++myCountersTmp[Counter_NbElemsNotCulled];
-          if (theToCountMem)
+          if (const OpenGl_PrimitiveArray* aPrim = dynamic_cast<const OpenGl_PrimitiveArray*> (aNodeIter->elem))
           {
-            myCountersTmp[Counter_EstimatedBytesGeom] += estimatedDataSize (aPrim->AttributesVbo());
-            myCountersTmp[Counter_EstimatedBytesGeom] += estimatedDataSize (aPrim->IndexVbo());
-          }
-
-          if (aPrim->IsFillDrawMode())
-          {
-            ++myCountersTmp[Counter_NbElemsFillNotCulled];
-            if (!theToCountTris)
+            ++myCountersTmp[Graphic3d_FrameStatsCounter_NbElemsNotCulled];
+            if (theToCountMem)
             {
-              continue;
+              myCountersTmp[Graphic3d_FrameStatsCounter_EstimatedBytesGeom] += estimatedDataSize (aPrim->AttributesVbo());
+              myCountersTmp[Graphic3d_FrameStatsCounter_EstimatedBytesGeom] += estimatedDataSize (aPrim->IndexVbo());
             }
 
-            const Handle(OpenGl_VertexBuffer)& anAttribs = aPrim->AttributesVbo();
-            if (anAttribs.IsNull()
-            || !anAttribs->IsValid())
+            if (aPrim->IsFillDrawMode())
             {
-              continue;
-            }
+              ++myCountersTmp[Graphic3d_FrameStatsCounter_NbElemsFillNotCulled];
+              if (!theToCountTris)
+              {
+                continue;
+              }
 
-            const Handle(OpenGl_VertexBuffer)& anIndices = aPrim->IndexVbo();
-            const Standard_Integer aNbIndices = !anIndices.IsNull() ? anIndices->GetElemsNb() : anAttribs->GetElemsNb();
-            const Standard_Integer aNbBounds  = !aPrim->Bounds().IsNull() ? aPrim->Bounds()->NbBounds : 1;
-            switch (aPrim->DrawMode())
-            {
-              case GL_TRIANGLES:
-              {
-                myCountersTmp[Counter_NbTrianglesNotCulled] += aNbIndices / 3;
-                break;
-              }
-              case GL_TRIANGLE_STRIP:
-              case GL_TRIANGLE_FAN:
-              {
-                myCountersTmp[Counter_NbTrianglesNotCulled] += aNbIndices - 2 * aNbBounds;
-                break;
-              }
-              case GL_TRIANGLES_ADJACENCY:
-              {
-                myCountersTmp[Counter_NbTrianglesNotCulled] += aNbIndices / 6;
-                break;
-              }
-              case GL_TRIANGLE_STRIP_ADJACENCY:
-              {
-                myCountersTmp[Counter_NbTrianglesNotCulled] += aNbIndices - 4 * aNbBounds;
-                break;
-              }
-            #if !defined(GL_ES_VERSION_2_0)
-              case GL_QUADS:
-              {
-                myCountersTmp[Counter_NbTrianglesNotCulled] += aNbIndices / 2;
-                break;
-              }
-              case GL_QUAD_STRIP:
-              {
-                myCountersTmp[Counter_NbTrianglesNotCulled] += (aNbIndices / 2 - aNbBounds) * 2;
-                break;
-              }
-            #endif
-            }
-          }
-          else if (aPrim->DrawMode() == GL_POINTS)
-          {
-            ++myCountersTmp[Counter_NbElemsPointNotCulled];
-            if (theToCountTris)
-            {
               const Handle(OpenGl_VertexBuffer)& anAttribs = aPrim->AttributesVbo();
-              if (!anAttribs.IsNull()
-                && anAttribs->IsValid())
+              if (anAttribs.IsNull()
+              || !anAttribs->IsValid())
               {
-                const Handle(OpenGl_VertexBuffer)& anIndices = aPrim->IndexVbo();
-                const Standard_Integer aNbIndices = !anIndices.IsNull() ? anIndices->GetElemsNb() : anAttribs->GetElemsNb();
-                myCountersTmp[Counter_NbPointsNotCulled] += aNbIndices;
+                continue;
+              }
+
+              const Handle(OpenGl_VertexBuffer)& anIndices = aPrim->IndexVbo();
+              const Standard_Integer aNbIndices = !anIndices.IsNull() ? anIndices->GetElemsNb() : anAttribs->GetElemsNb();
+              const Standard_Integer aNbBounds  = !aPrim->Bounds().IsNull() ? aPrim->Bounds()->NbBounds : 1;
+              switch (aPrim->DrawMode())
+              {
+                case GL_TRIANGLES:
+                {
+                  myCountersTmp[Graphic3d_FrameStatsCounter_NbTrianglesNotCulled] += aNbIndices / 3;
+                  break;
+                }
+                case GL_TRIANGLE_STRIP:
+                case GL_TRIANGLE_FAN:
+                {
+                  myCountersTmp[Graphic3d_FrameStatsCounter_NbTrianglesNotCulled] += aNbIndices - 2 * aNbBounds;
+                  break;
+                }
+                case GL_TRIANGLES_ADJACENCY:
+                {
+                  myCountersTmp[Graphic3d_FrameStatsCounter_NbTrianglesNotCulled] += aNbIndices / 6;
+                  break;
+                }
+                case GL_TRIANGLE_STRIP_ADJACENCY:
+                {
+                  myCountersTmp[Graphic3d_FrameStatsCounter_NbTrianglesNotCulled] += aNbIndices - 4 * aNbBounds;
+                  break;
+                }
+              #if !defined(GL_ES_VERSION_2_0)
+                case GL_QUADS:
+                {
+                  myCountersTmp[Graphic3d_FrameStatsCounter_NbTrianglesNotCulled] += aNbIndices / 2;
+                  break;
+                }
+                case GL_QUAD_STRIP:
+                {
+                  myCountersTmp[Graphic3d_FrameStatsCounter_NbTrianglesNotCulled] += (aNbIndices / 2 - aNbBounds) * 2;
+                  break;
+                }
+              #endif
               }
             }
+            else if (aPrim->DrawMode() == GL_POINTS)
+            {
+              ++myCountersTmp[Graphic3d_FrameStatsCounter_NbElemsPointNotCulled];
+              if (theToCountTris)
+              {
+                const Handle(OpenGl_VertexBuffer)& anAttribs = aPrim->AttributesVbo();
+                if (!anAttribs.IsNull()
+                  && anAttribs->IsValid())
+                {
+                  const Handle(OpenGl_VertexBuffer)& anIndices = aPrim->IndexVbo();
+                  const Standard_Integer aNbIndices = !anIndices.IsNull() ? anIndices->GetElemsNb() : anAttribs->GetElemsNb();
+                  myCountersTmp[Graphic3d_FrameStatsCounter_NbPointsNotCulled] += aNbIndices;
+                }
+              }
+            }
+            else
+            {
+              ++myCountersTmp[Graphic3d_FrameStatsCounter_NbElemsLineNotCulled];
+            }
           }
-          else
+          else if (const OpenGl_Text* aText = dynamic_cast<const OpenGl_Text*> (aNodeIter->elem))
           {
-            ++myCountersTmp[Counter_NbElemsLineNotCulled];
+            (void )aText;
+            ++myCountersTmp[Graphic3d_FrameStatsCounter_NbElemsNotCulled];
+            ++myCountersTmp[Graphic3d_FrameStatsCounter_NbElemsTextNotCulled];
           }
-        }
-        else if (const OpenGl_Text* aText = dynamic_cast<const OpenGl_Text*> (aNodeIter->elem))
-        {
-          (void )aText;
-          ++myCountersTmp[Counter_NbElemsNotCulled];
-          ++myCountersTmp[Counter_NbElemsTextNotCulled];
         }
       }
     }

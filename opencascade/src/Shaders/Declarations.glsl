@@ -1,21 +1,5 @@
-// Created on: 2013-10-10
-// Created by: Denis BOGOLEPOV
-// Copyright (c) 2013-2014 OPEN CASCADE SAS
-//
-// This file is part of Open CASCADE Technology software library.
-//
-// This library is free software; you can redistribute it and/or modify it under
-// the terms of the GNU Lesser General Public License version 2.1 as published
-// by the Free Software Foundation, with special exception defined in the file
-// OCCT_LGPL_EXCEPTION.txt. Consult the file LICENSE_LGPL_21.txt included in OCCT
-// distribution for complete text of the license and disclaimer of any warranty.
-//
-// Alternatively, this file may be used under the terms of Open CASCADE
-// commercial license or contractual agreement.
 
-//! @file Declarations.glsl
-//! This files includes definition of common uniform variables in OCCT GLSL programs
-
+//! @file Declarations.glsl includes definition of common uniform variables in OCCT GLSL programs
 //! @def THE_MAX_LIGHTS
 //! Specifies the length of array of lights, which is 8 by default. Defined by Shader Manager.
 // #define THE_MAX_LIGHTS 8
@@ -155,9 +139,11 @@ vec4  occBackMaterial_Specular(void);      //!< Specular reflection
 float occBackMaterial_Shininess(void);     //!< Specular exponent
 float occBackMaterial_Transparency(void);  //!< Transparency coefficient
 
+#ifdef THE_HAS_DEFAULT_SAMPLER
 #define occActiveSampler    occSampler0                //!< alias for backward compatibility
 #define occSamplerBaseColor occSampler0                //!< alias to a base color texture
 uniform               sampler2D occSampler0;           //!< current active sampler;
+#endif
                                                        //!  occSampler1, occSampler2,... should be defined in GLSL program body for multitexturing
 uniform               vec4      occColor;              //!< color value (in case of disabled lighting)
 uniform THE_PREC_ENUM int       occDistinguishingMode; //!< Are front and back faces distinguished?
@@ -173,5 +159,7 @@ uniform               float     occAlphaCutoff;    //!< alpha test cutoff value
 //! Parameters of clipping planes
 #if defined(THE_MAX_CLIP_PLANES) && (THE_MAX_CLIP_PLANES > 0)
 uniform               vec4 occClipPlaneEquations[THE_MAX_CLIP_PLANES];
+uniform THE_PREC_ENUM int  occClipPlaneChains[THE_MAX_CLIP_PLANES]; //! Indicating the number of planes in the Chain
 uniform THE_PREC_ENUM int  occClipPlaneCount;   //!< Total number of clip planes
 #endif
+//! @endfile Declarations.glsl

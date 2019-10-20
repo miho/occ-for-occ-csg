@@ -19,17 +19,19 @@ set "HAVE_TBB=false"
 set "HAVE_OPENCL=false"
 set "HAVE_FREEIMAGE=false"
 set "HAVE_FFMPEG=false"
-set "HAVE_GL2PS=false"
 set "HAVE_VTK=false"
 set "HAVE_GLES2=false"
 set "HAVE_D3D=false"
 set "HAVE_ZLIB=false"
 set "HAVE_LIBLZMA=false"
+set "HAVE_RAPIDJSON=false"
+set "HAVE_E57=false"
 set "CSF_OPT_INC="
 set "CSF_OPT_LIB32="
 set "CSF_OPT_LIB64="
 set "CSF_OPT_BIN32="
 set "CSF_OPT_BIN64="
+set "CSF_DEFINES=%CSF_DEFINES_EXTRA%"
 
 if not ["%CASROOT%"] == [""] if exist "%SCRIPTROOT%\%CASROOT%" set "CASROOT=%SCRIPTROOT%\%CASROOT%"
 if     ["%CASROOT%"] == [""] set "CASROOT=%SCRIPTROOT%"
@@ -100,6 +102,10 @@ if not "%DevEnvDir%" == "" (
   for /f "usebackq delims=" %%i in (`vswhere.exe -version "[15.0,15.99]" -requires Microsoft.VisualStudio.Workload.%VCPROP% -property installationPath`) do (
     set "DevEnvDir=%%i\Common7\IDE\"
   )
+) else if /I "%VCFMT%" == "vc142" (
+  for /f "usebackq delims=" %%i in (`vswhere.exe -version "[16.0,16.99]" -latest -requires Microsoft.VisualStudio.Workload.%VCPROP% -property installationPath`) do (
+    set "DevEnvDir=%%i\Common7\IDE\"
+  )
 ) else if /I "%VCFMT%" == "gcc" (
   rem MinGW
 ) else (
@@ -111,6 +117,7 @@ if not "%DevEnvDir%" == "" (
   echo vc12  = VS 2013 ^(SP3^)
   echo vc14  = VS 2015
   echo vc141 = VS 2017
+  echo vc142 = VS 2019
   exit /B
 )
 
@@ -135,6 +142,11 @@ if /I "%VCFMT%" == "vc9" (
     set "VCVARS=%%i\VC\Auxiliary\Build\vcvarsall.bat"
   )
   set "VCPlatformToolSet=v141"
+) else if /I "%VCFMT%" == "vc142" (
+  for /f "usebackq delims=" %%i in (`vswhere.exe -version "[16.0,16.99]" -latest -requires Microsoft.VisualStudio.Workload.%VCPROP% -property installationPath`) do (
+    set "VCVARS=%%i\VC\Auxiliary\Build\vcvarsall.bat"
+  ) 
+  set "VCPlatformToolSet=v142"
 ) else if /I "%VCFMT%" == "gcc" (
   rem MinGW
 ) else (
@@ -156,7 +168,6 @@ set "CSF_OPT_CMPL="
 set "PRODUCTS_DEFINES="
 if ["%HAVE_TBB%"]       == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_TBB"       & set "CSF_DEFINES=HAVE_TBB;%CSF_DEFINES%"
 if ["%HAVE_OPENCL%"]    == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_OPENCL"    & set "CSF_DEFINES=HAVE_OPENCL;%CSF_DEFINES%"
-if ["%HAVE_GL2PS%"]     == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_GL2PS"     & set "CSF_DEFINES=HAVE_GL2PS;%CSF_DEFINES%"
 if ["%HAVE_FREEIMAGE%"] == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_FREEIMAGE" & set "CSF_DEFINES=HAVE_FREEIMAGE;%CSF_DEFINES%"
 if ["%HAVE_FFMPEG%"]    == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_FFMPEG"    & set "CSF_DEFINES=HAVE_FFMPEG;%CSF_DEFINES%"
 if ["%HAVE_VTK%"]       == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_VTK"       & set "CSF_DEFINES=HAVE_VTK;%CSF_DEFINES%"
@@ -164,6 +175,8 @@ if ["%HAVE_GLES2%"]     == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DH
 if ["%HAVE_D3D%"]       == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_D3D"       & set "CSF_DEFINES=HAVE_D3D;%CSF_DEFINES%"
 if ["%HAVE_ZLIB%"]      == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_ZLIB"      & set "CSF_DEFINES=HAVE_ZLIB;%CSF_DEFINES%"
 if ["%HAVE_LIBLZMA%"]   == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_LIBLZMA"   & set "CSF_DEFINES=HAVE_LIBLZMA;%CSF_DEFINES%"
+if ["%HAVE_RAPIDJSON%"] == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_RAPIDJSON" & set "CSF_DEFINES=HAVE_RAPIDJSON;%CSF_DEFINES%"
+if ["%HAVE_E57%"]       == ["true"] set "PRODUCTS_DEFINES=%PRODUCTS_DEFINES% -DHAVE_E57"       & set "CSF_DEFINES=HAVE_E57;%CSF_DEFINES%"
 
 rem Eliminate VS warning
 if ["%CSF_DEFINES%"]  == [""] set "CSF_DEFINES=;"

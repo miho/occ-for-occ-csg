@@ -188,8 +188,8 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
         TCollection_AsciiString  newName;	
         if(Storage_Schema::CheckTypeMigration(aStr, newName)) {
 #ifdef OCCT_DEBUG
-          cout << "CheckTypeMigration:OldType = " <<aStr << " Len = "<<aStr.Length()<<endl;
-          cout << "CheckTypeMigration:NewType = " <<newName  << " Len = "<< newName.Length()<<endl;
+          std::cout << "CheckTypeMigration:OldType = " <<aStr << " Len = "<<aStr.Length()<<std::endl;
+          std::cout << "CheckTypeMigration:NewType = " <<newName  << " Len = "<< newName.Length()<<std::endl;
 #endif
           aStr = newName;
         }
@@ -215,24 +215,20 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
         myMsgDriver->Send (aTypeNames(i), Message_Warning);
   }
 
-  // propagate the opened document version to data drivers
-  PropagateDocumentVersion(aFileVer);
-
   // 2. Read document contents
-
   // 2a. Retrieve data from the stream:
   myRelocTable.Clear();
   myRelocTable.SetHeaderData(aHeaderData);
   mySections.Clear();
   myPAtt.Init();
   Handle(TDF_Data) aData = new TDF_Data();
-  streampos aDocumentPos = -1;
+  std::streampos aDocumentPos = -1;
 
   // 2b. Read the TOC of Sections
   if (aFileVer >= 3) {
     BinLDrivers_DocumentSection aSection;
     do {
-      BinLDrivers_DocumentSection::ReadTOC (aSection, theIStream);
+      BinLDrivers_DocumentSection::ReadTOC (aSection, theIStream, aFileVer);
       mySections.Append(aSection);
     } while(!aSection.Name().IsEqual((Standard_CString)SHAPESECTION_POS) && !theIStream.eof());
 
@@ -249,7 +245,7 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
     for (; anIterS.More(); anIterS.Next()) {
       BinLDrivers_DocumentSection& aCurSection = anIterS.ChangeValue();
       if (aCurSection.IsPostRead() == Standard_False) {
-        theIStream.seekg ((streampos) aCurSection.Offset());
+        theIStream.seekg ((std::streampos) aCurSection.Offset());
         if (aCurSection.Name().IsEqual ((Standard_CString)SHAPESECTION_POS)) 
           ReadShapeSection (aCurSection, theIStream);
         else
@@ -282,11 +278,11 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
       aShapeSectionPos = InverseInt (aShapeSectionPos);
 #endif
 #ifdef OCCT_DEBUG
-      cout <<"aShapeSectionPos = " <<aShapeSectionPos <<endl;
+      std::cout <<"aShapeSectionPos = " <<aShapeSectionPos <<std::endl;
 #endif
       if(aShapeSectionPos) { 
         aDocumentPos = theIStream.tellg();
-        theIStream.seekg((streampos) aShapeSectionPos);
+        theIStream.seekg((std::streampos) aShapeSectionPos);
 
         CheckShapeSection(aShapeSectionPos, theIStream);
         // Read Shapes
@@ -321,7 +317,7 @@ void BinLDrivers_DocumentRetrievalDriver::Read (Standard_IStream&               
     for (; aSectIter.More(); aSectIter.Next()) {
       BinLDrivers_DocumentSection& aCurSection = aSectIter.ChangeValue();
       if (aCurSection.IsPostRead()) {
-        theIStream.seekg ((streampos) aCurSection.Offset());
+        theIStream.seekg ((std::streampos) aCurSection.Offset());
         ReadSection (aCurSection, theDoc, theIStream); 
       }
     }
@@ -338,7 +334,7 @@ Standard_Integer BinLDrivers_DocumentRetrievalDriver::ReadSubTree
                           const TDF_Label&  theLabel)
 {
   Standard_Integer nbRead = 0;
-  static TCollection_ExtendedString aMethStr
+  TCollection_ExtendedString aMethStr
     ("BinLDrivers_DocumentRetrievalDriver: ");
 
   // Read attributes:
@@ -491,7 +487,7 @@ void BinLDrivers_DocumentRetrievalDriver::CheckShapeSection(
   {
     const std::streamoff endPos = IS.rdbuf()->pubseekoff(0L, std::ios_base::end, std::ios_base::in);
 #ifdef OCCT_DEBUG
-    cout << "endPos = " << endPos <<endl;
+    std::cout << "endPos = " << endPos <<std::endl;
 #endif
     if(ShapeSectionPos != endPos) {
       const TCollection_ExtendedString aMethStr ("BinLDrivers_DocumentRetrievalDriver: ");
@@ -509,15 +505,6 @@ void BinLDrivers_DocumentRetrievalDriver::Clear()
   myPAtt.Destroy();    // free buffer
   myRelocTable.Clear();
   myMapUnsupported.Clear();
-}
-
-//=======================================================================
-//function : PropagateDocumentVersion
-//purpose  : 
-//=======================================================================
-void BinLDrivers_DocumentRetrievalDriver::PropagateDocumentVersion(const Standard_Integer theDocVersion )
-{
-  BinMDataStd::SetDocumentVersion(theDocVersion);
 }
 
 //=======================================================================

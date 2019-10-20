@@ -299,13 +299,13 @@ Standard_Boolean AIS_RubberBand::fillTriangles()
   Handle(BRepMesh_DataStructureOfDelaun) aMeshStructure = new BRepMesh_DataStructureOfDelaun(anAllocator);
   Standard_Integer aPtsLower = myPoints.Lower();
   Standard_Integer aPtsUpper = myPoints.Upper();
-  BRepMesh::Array1OfInteger anIndexes (0, myPoints.Length() - 1);
+  IMeshData::VectorOfInteger anIndexes (myPoints.Length(), anAllocator);
   for (Standard_Integer aPtIdx = aPtsLower; aPtIdx <= aPtsUpper; ++aPtIdx)
   {
     gp_XY aP ((Standard_Real)myPoints.Value (aPtIdx).x(),
               (Standard_Real)myPoints.Value (aPtIdx).y());
     BRepMesh_Vertex aVertex (aP, aPtIdx, BRepMesh_Frontier);
-    anIndexes.ChangeValue (aPtIdx - aPtsLower) = aMeshStructure->AddNode (aVertex);
+    anIndexes.Append (aMeshStructure->AddNode (aVertex));
   }
 
   Standard_Real aPtSum = 0;
@@ -328,7 +328,7 @@ Standard_Boolean AIS_RubberBand::fillTriangles()
   }
 
   BRepMesh_Delaun aTriangulation (aMeshStructure, anIndexes);
-  const BRepMesh::MapOfInteger& aTriangles = aMeshStructure->ElementsOfDomain();
+  const IMeshData::MapOfInteger& aTriangles = aMeshStructure->ElementsOfDomain();
   if (aTriangles.Extent() < 1)
     return Standard_False;
 
@@ -341,7 +341,7 @@ Standard_Boolean AIS_RubberBand::fillTriangles()
   }
 
   Standard_Integer aVertexIndex = 1;
-  BRepMesh::MapOfInteger::Iterator aTriangleIt (aTriangles);
+  IMeshData::IteratorOfMapOfInteger aTriangleIt (aTriangles);
   for (; aTriangleIt.More(); aTriangleIt.Next())
   {
     const Standard_Integer aTriangleId = aTriangleIt.Key();
@@ -392,13 +392,12 @@ void AIS_RubberBand::Compute (const Handle(PrsMgr_PresentationManager3d)& /*theP
                               const Handle(Prs3d_Presentation)& thePresentation,
                               const Standard_Integer /*theMode*/)
 {
-  Handle (Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (thePresentation);
-
   // Draw filling
   if (IsFilling() && fillTriangles())
   {
-    aGroup->SetGroupPrimitivesAspect (myDrawer->ShadingAspect()->Aspect());
-    aGroup->AddPrimitiveArray (myTriangles);
+    Handle(Graphic3d_Group) aGroup1 = thePresentation->NewGroup();
+    aGroup1->SetGroupPrimitivesAspect (myDrawer->ShadingAspect()->Aspect());
+    aGroup1->AddPrimitiveArray (myTriangles);
   }
 
   // Draw frame
@@ -433,6 +432,7 @@ void AIS_RubberBand::Compute (const Handle(PrsMgr_PresentationManager3d)& /*theP
     }
   }
 
+  Handle(Graphic3d_Group) aGroup = thePresentation->NewGroup();
   aGroup->SetGroupPrimitivesAspect (myDrawer->LineAspect()->Aspect());
   aGroup->AddPrimitiveArray (myBorders);
 }

@@ -25,7 +25,7 @@ matrix:
       install: true
 
 cache:
-  ccache: true
+  ccache: false
   directories:
    #- $HOME/Library/Caches/Homebrew
    - $HOME/.ccache

@@ -25,7 +25,7 @@ matrix:
       install: true
 
 cache:
-  ccache: false
+  ccache: true
   directories:
    #- $HOME/Library/Caches/Homebrew
    - $HOME/.ccache
@@ -58,7 +58,7 @@ script:
     
     - mkdir -p $OUR_DIR/dependencies-installation/freetype
     - cd $OUR_DIR/dependencies/freetype  
-    - mkdir -p build; cd build;
+    - rm -rf build; mkdir -p build; cd build;
     - if [ "$TRAVIS_OS_NAME" == "linux" ]; then cmake .. -DWITH_ZLIB=OFF -DWITH_HarfBuzz=OFF -DWITH_PNG=OFF -DWITH_BZip2=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$OUR_DIR/dependencies-installation/freetype -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCMAKE_C_COMPILER=/usr/bin/clang ; fi
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cmake .. -DWITH_ZLIB=OFF -DWITH_HarfBuzz=OFF -DWITH_PNG=OFF -DWITH_BZip2=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$OUR_DIR/dependencies-installation/freetype -DCMAKE_CXX_COMPILER=/usr/local/opt/ccache/libexec/clang++ -DCMAKE_C_COMPILER=/usr/local/opt/ccache/libexec/clang ; fi
     - make -j2 && make install

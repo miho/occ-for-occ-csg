@@ -17,12 +17,8 @@
 
 #include <CDF_Directory.hxx>
 #include <CDF_DirectoryIterator.hxx>
-#include <CDF_Session.hxx>
 #include <CDM_Document.hxx>
 #include <Standard_NoSuchObject.hxx>
-
-CDF_DirectoryIterator::CDF_DirectoryIterator():myIterator(CDF_Session::CurrentSession()->Directory()->List()) {}
-
 
 
 CDF_DirectoryIterator::CDF_DirectoryIterator(const Handle(CDF_Directory)& aDirectory):myIterator(aDirectory->List()) {}

@@ -12,7 +12,7 @@
 #include "Fonc.hxx"
 
 #define DEFAULT_COLOR Quantity_NOC_CYAN1
-#define DEFAULT_MATERIAL Graphic3d_NOM_PLASTER
+#define DEFAULT_MATERIAL Graphic3d_NameOfMaterial_Plastered
 #define DEFAULT_DEVIATIONCOEFFICIENT 0.001
 #define DEFAULT_HILIGHTCOLOR Quantity_NOC_YELLOW
 
@@ -45,10 +45,6 @@ CAnimationDoc::CAnimationDoc()
 {
 	// TODO: add one-time construction code here
 
-	static Standard_Integer StaticCount=1;
-	StaticCount++;
-	myCount = StaticCount;
-
 	Handle(Graphic3d_GraphicDriver) aGraphicDriver = 
 		((CAnimationApp*)AfxGetApp())->GetGraphicDriver();
 
@@ -60,7 +56,6 @@ CAnimationDoc::CAnimationDoc()
 
 	myDeviation = 0.0008;
 	thread = 4;
-	myAngle = 0;
 
 	BRep_Builder B;
 	TopoDS_Shape CrankArm;
@@ -128,23 +123,23 @@ CAnimationDoc::CAnimationDoc()
 
 	myAisCylinderHead = new AIS_Shape (CylinderHead);
 	myAISContext->SetColor    (myAisCylinderHead, Quantity_NOC_WHITE, Standard_False);
-	myAISContext->SetMaterial (myAisCylinderHead, Graphic3d_NOM_PLASTIC, Standard_False);
+	myAISContext->SetMaterial (myAisCylinderHead, Graphic3d_NameOfMaterial_Plastified, Standard_False);
 	myAisEngineBlock  = new AIS_Shape (EngineBlock);
 	myAISContext->SetColor(myAisEngineBlock,   Quantity_NOC_WHITE, Standard_False);
-	myAISContext->SetMaterial(myAisEngineBlock,Graphic3d_NOM_PLASTIC, Standard_False);
+	myAISContext->SetMaterial(myAisEngineBlock,Graphic3d_NameOfMaterial_Plastified, Standard_False);
 
 	myAISContext->Display(myAisCylinderHead ,1,-1,Standard_False);
 	myAISContext->Display(myAisEngineBlock  ,1,-1,Standard_False);
 
 	myAisCrankArm     = new AIS_Shape (CrankArm);
 	myAISContext->SetColor   (myAisCrankArm, Quantity_NOC_HOTPINK, Standard_False);
-	myAISContext->SetMaterial(myAisCrankArm, Graphic3d_NOM_PLASTIC, Standard_False);
+	myAISContext->SetMaterial(myAisCrankArm, Graphic3d_NameOfMaterial_Plastified, Standard_False);
 	myAisPiston       = new AIS_Shape (Piston);
 	myAISContext->SetColor   (myAisPiston  , Quantity_NOC_WHITE, Standard_False);
-	myAISContext->SetMaterial(myAisPiston  , Graphic3d_NOM_PLASTIC, Standard_False);
+	myAISContext->SetMaterial(myAisPiston  , Graphic3d_NameOfMaterial_Plastified, Standard_False);
 	myAisPropeller    = new AIS_Shape (Propeller);
 	myAISContext->SetColor   (myAisPropeller, Quantity_NOC_RED, Standard_False);
-	myAISContext->SetMaterial(myAisPropeller, Graphic3d_NOM_PLASTIC, Standard_False);
+	myAISContext->SetMaterial(myAisPropeller, Graphic3d_NameOfMaterial_Plastified, Standard_False);
 
 	myAISContext->Display(myAisCrankArm,  1,-1,Standard_False);
 	myAISContext->Display(myAisPropeller, 1,-1,Standard_False);
@@ -184,90 +179,6 @@ void CAnimationDoc::Dump(CDumpContext& dc) const
 //-----------------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------------
-void CAnimationDoc::DragEvent(const Standard_Integer  x        ,
-				                  const Standard_Integer  y        ,
-				                  const Standard_Integer  TheState ,
-                                  const Handle(V3d_View)& aView    )
-{
-
-    // TheState == -1  button down
-	// TheState ==  0  move
-	// TheState ==  1  button up
-
-    static Standard_Integer theButtonDownX=0;
-    static Standard_Integer theButtonDownY=0;
-
-	if (TheState == -1)
-    {
-      theButtonDownX=x;
-      theButtonDownY=y;
-    }
-
-	if (TheState == 1)
-	  myAISContext->Select (theButtonDownX, theButtonDownY, x, y, aView, Standard_True);
-}
-
-//-----------------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------------
-void CAnimationDoc::InputEvent(const Standard_Integer  /*x*/,
-                               const Standard_Integer  /*y*/,
-                               const Handle(V3d_View)& /*aView*/ )
-{
-    myAISContext->Select (Standard_True);
-}
-
-//-----------------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------------
-void CAnimationDoc::MoveEvent(const Standard_Integer  x       ,
-                                  const Standard_Integer  y       ,
-                                  const Handle(V3d_View)& aView   ) 
-{
-      myAISContext->MoveTo (x, y, aView, Standard_True);
-}
-
-//-----------------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------------
-void CAnimationDoc::ShiftMoveEvent(const Standard_Integer  x       ,
-                                  const Standard_Integer  y       ,
-                                  const Handle(V3d_View)& aView   ) 
-{
-      myAISContext->MoveTo (x, y, aView, Standard_True);
-}
-
-//-----------------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------------
-void CAnimationDoc::ShiftDragEvent(const Standard_Integer  x        ,
-									   const Standard_Integer  y        ,
-									   const Standard_Integer  TheState ,
-                                       const Handle(V3d_View)& aView    ) 
-{
-    static Standard_Integer theButtonDownX=0;
-    static Standard_Integer theButtonDownY=0;
-
-	if (TheState == -1)
-    {
-      theButtonDownX=x;
-      theButtonDownY=y;
-    }
-
-	if (TheState == 0)
-	  myAISContext->ShiftSelect (theButtonDownX, theButtonDownY, x, y, aView, Standard_True);
-}
-
-
-//-----------------------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------------------
-void CAnimationDoc::ShiftInputEvent(const Standard_Integer  /*x*/,
-                                    const Standard_Integer  /*y*/,
-                                    const Handle(V3d_View)& /*aView*/)
-{
-  myAISContext->ShiftSelect (Standard_True);
-}
 
 //-----------------------------------------------------------------------------------------
 //
@@ -278,7 +189,7 @@ void  CAnimationDoc::Popup(const Standard_Integer  /*x*/,
 {
 }
 
-void CAnimationDoc::OnMyTimer() 
+void CAnimationDoc::OnMyTimer (double theTimeSec) 
 {
 	// TODO: Add your message handler code here and/or call default
 	
@@ -287,9 +198,7 @@ void CAnimationDoc::OnMyTimer()
 	Standard_Real X;
 	gp_Ax1 Ax1(gp_Pnt(0,0,0),gp_Vec(0,0,1));
 
-	myAngle++;
-
-	angleA = thread*myAngle*M_PI/180;
+	angleA = thread * theTimeSec;
 	X = Sin(angleA)*3/8;
 	angleB = atan(X / Sqrt(-X * X + 1));
 	Standard_Real decal(25*0.6);
@@ -308,8 +217,6 @@ void CAnimationDoc::OnMyTimer()
     gp_Trsf aPistonTrsf;
     aPistonTrsf.SetTranslation(gp_Vec(-3*decal*(1-Cos(angleA))-8*decal*(1-Cos(angleB)),0,0));
 	myAISContext->SetLocation(myAisPiston,aPistonTrsf);
-
-    myAISContext->UpdateCurrentViewer();
 }
 
 void CAnimationDoc::OnShading() 
@@ -409,7 +316,7 @@ void CAnimationDoc::OnFileLoadgrid()
 	  myAISContext->Display(myAISSurface, Standard_False);
 	  myAISContext->Deactivate(myAISSurface,Standard_False);
 	  myAISContext->SetColor (myAISSurface,Quantity_NOC_WHITE,Standard_False);
-	  myAISContext->SetMaterial (myAISSurface,Graphic3d_NOM_STONE,Standard_False);
+	  myAISContext->SetMaterial (myAISSurface,Graphic3d_NameOfMaterial_Stone,Standard_False);
 	  myAISContext->SetDisplayMode (myAISSurface,1,Standard_False);
 	  myAISContext->SetDeviationCoefficient (0.001);
   	CMDIFrameWnd *pFrame =  (CMDIFrameWnd*)AfxGetApp()->m_pMainWnd;

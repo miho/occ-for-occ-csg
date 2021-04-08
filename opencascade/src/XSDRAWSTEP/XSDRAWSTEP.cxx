@@ -23,7 +23,7 @@
 #include <Interface_Static.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
-#include <Message_ProgressSentry.hxx>
+#include <Message_ProgressScope.hxx>
 #include <STEPControl_ActorWrite.hxx>
 #include <STEPControl_Controller.hxx>
 #include <STEPControl_Reader.hxx>
@@ -83,7 +83,7 @@ void XSDRAWSTEP::Init ()
 //purpose  : 
 //=======================================================================
 
-static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_Integer argc, const char** argv) 
+static Standard_Integer stepread (Draw_Interpretor& di, Standard_Integer argc, const char** argv) 
 {
   if (argc < 3) {
     di << "Use: stepread  [file] [f or r (type of model full or reduced)]\n";
@@ -96,8 +96,7 @@ static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_
 
   // Progress indicator
   Handle(Draw_ProgressIndicator) progress = new Draw_ProgressIndicator ( di, 1 );
-  progress->SetScale ( 0, 100, 1 );
-  progress->Show();
+  Message_ProgressScope aPSRoot (progress->Start(), "Reading", 100);
 
   STEPControl_Reader sr (XSDRAW::Session(),Standard_False);
   TCollection_AsciiString fnom,rnom;
@@ -108,8 +107,8 @@ static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_
   di<<" -- Names of variables BREP-DRAW prefixed by : "<<rnom.ToCString()<<"\n";
   IFSelect_ReturnStatus readstat = IFSelect_RetVoid;
 
-  progress->NewScope ( 20, "Loading" ); // On average loading takes 20% 
-  progress->Show();
+  aPSRoot.SetName("Loading");
+  progress->Show(aPSRoot);
 
   Standard_Boolean fromtcl = Standard_False;
   Standard_Boolean aFullMode = Standard_False;
@@ -143,8 +142,9 @@ static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_
   if (modfic) readstat = sr.ReadFile (fnom.ToCString());
   else  if (XSDRAW::Session()->NbStartingEntities() > 0) readstat = IFSelect_RetDone;
 
-  progress->EndScope();
-  progress->Show();
+  aPSRoot.Next(20); // On average loading takes 20% 
+  if (aPSRoot.UserBreak())
+    return 1;
 
   if (readstat != IFSelect_RetDone) {
     if (modfic) di<<"Could not read file "<<fnom.ToCString()<<" , abandon\n";
@@ -152,7 +152,6 @@ static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_
     return 1;
   }
   
-
   //   nom = "." -> fichier deja lu
   Standard_Integer i, num, nbs, modepri = 1;
   if (fromtcl) modepri = 4;
@@ -162,7 +161,9 @@ static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_
       di<<"NbRootsForTransfer="<<num<<" :\n";
       for (i = 1; i <= num; i ++) {
         di<<"Root."<<i<<", Ent. ";
-        sr.Model()->Print (sr.RootForTransfer(i), Message::DefaultMessenger());
+        Standard_SStream aTmpStream;
+        sr.Model()->Print (sr.RootForTransfer(i), aTmpStream);
+        di << aTmpStream.str().c_str();
         di<<" Type:"<<sr.RootForTransfer(i)->DynamicType()->Name()<<"\n";
       }
 
@@ -176,12 +177,11 @@ static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_
       if (modepri == 2) {
         std::cout<<"Root N0 : "<<std::flush;  std::cin>>num;
       }
+      aPSRoot.SetName("Translation");
+      progress->Show(aPSRoot);
 
-      progress->NewScope ( 80, "Translation" );
-      progress->Show();
-      sr.WS()->TransferReader()->TransientProcess()->SetProgress ( progress );
-
-      if (!sr.TransferRoot (num)) di<<"Transfer root n0 "<<num<<" : no result\n";
+      if (!sr.TransferRoot (num, aPSRoot.Next(80)))
+        di<<"Transfer root n0 "<<num<<" : no result\n";
       else {
         nbs = sr.NbShapes();
         char shname[30];  Sprintf (shname,"%s_%d",rnom.ToCString(),nbs);
@@ -190,14 +190,13 @@ static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_
         TopoDS_Shape sh = sr.Shape(nbs);
         DBRep::Set (shname,sh);
       }
-
-      sr.WS()->TransferReader()->TransientProcess()->SetProgress ( 0 );
-      progress->EndScope();
-      progress->Show();
+      if (aPSRoot.UserBreak())
+        return 1;
     }
     else if (modepri == 3) {
       std::cout<<"Entity : "<<std::flush;  num = XSDRAW::GetEntityNumber();
-      if (!sr.TransferOne (num)) di<<"Transfer entity n0 "<<num<<" : no result\n";
+      if (!sr.TransferOne (num))
+        di<<"Transfer entity n0 "<<num<<" : no result\n";
       else {
         nbs = sr.NbShapes();
         char shname[30];  Sprintf (shname,"%s_%d",rnom.ToCString(),num);
@@ -239,15 +238,15 @@ static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_
       di<<"Nb entities selected : "<<nbl<<"\n";
       if (nbl == 0) continue;
 
-      progress->NewScope ( 80, "Translation" );
-      progress->Show();
-      sr.WS()->TransferReader()->TransientProcess()->SetProgress ( progress );
+      aPSRoot.SetName("Translation");
+      progress->Show(aPSRoot);
 
-      Message_ProgressSentry PSentry ( progress, "Root", 0, nbl, 1 );
-      for (ill = 1; ill <= nbl && PSentry.More(); ill ++, PSentry.Next()) {
+      Message_ProgressScope aPS(aPSRoot.Next(80), "Root", nbl);
+      for (ill = 1; ill <= nbl && aPS.More(); ill++) {
         num = sr.Model()->Number(list->Value(ill));
         if (num == 0) continue;
-        if (!sr.TransferOne(num)) di<<"Transfer entity n0 "<<num<<" : no result\n";
+        if (!sr.TransferOne(num, aPS.Next()))
+          di<<"Transfer entity n0 "<<num<<" : no result\n";
         else {
           nbs = sr.NbShapes();
           char shname[30];  Sprintf (shname,"%s_%d",rnom.ToCString(),nbs);
@@ -257,9 +256,8 @@ static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_
           DBRep::Set (shname,sh);
         }
       }
-      sr.WS()->TransferReader()->TransientProcess()->SetProgress ( 0 );
-      progress->EndScope();
-      progress->Show();
+      if (aPSRoot.UserBreak())
+        return 1;
     }
     else di<<"Unknown mode n0 "<<modepri<<"\n";
   }
@@ -270,17 +268,30 @@ static Standard_Integer stepread (Draw_Interpretor& di/*theCommands*/, Standard_
 //function : testreadstep
 //purpose  : 
 //=======================================================================
-static Standard_Integer testread (Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+static Standard_Integer testreadstep (Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
-  if (argc != 3)                                                                                      
-    {                                                                                             
-      di << "ERROR in " << argv[0] << "Wrong Number of Arguments.\n";                     
-      di << " Usage : " << argv[0] <<" file_name shape_name\n";                          
-      return 1;                                                                                 
-    }
+  if (argc < 3 || argc > 4)                                                                                      
+  {
+    di << "ERROR in " << argv[0] << "Wrong Number of Arguments.\n";
+    di << " Usage : " << argv[0] << " file_name shape_name [-stream]\n";
+    di << " Option -stream forces usage of API accepting stream\n";
+    return 1;
+  }
+
+  Standard_Boolean useStream = (argc > 3 && ! strcasecmp (argv[3], "-stream"));
+
   STEPControl_Reader Reader;
   Standard_CString filename = argv[1];
-  IFSelect_ReturnStatus readstat = Reader.ReadFile(filename);
+  IFSelect_ReturnStatus readstat;
+  if (useStream)
+  {
+    std::ifstream aStream (filename);
+    readstat = Reader.ReadStream(filename, aStream);
+  }
+  else
+  {
+    readstat = Reader.ReadFile(filename);
+  }
   di<<"Status from reading STEP file "<<filename<<" : ";  
   switch(readstat) {                                                              
     case IFSelect_RetVoid  : { di<<"empty file\n"; return 1; }            
@@ -378,11 +389,10 @@ static Standard_Integer stepwrite (Draw_Interpretor& di, Standard_Integer argc, 
   Standard_Integer nbavant = (stepmodel.IsNull() ? 0 : stepmodel->NbEntities());
 
   Handle(Draw_ProgressIndicator) progress = new Draw_ProgressIndicator ( di, 1 );
-  progress->NewScope(90,"Translating");
-  progress->Show();
-  sw.WS()->TransferWriter()->FinderProcess()->SetProgress(progress);
+  Message_ProgressScope aPSRoot (progress->Start(), "Translating", 100);
+  progress->Show(aPSRoot);
 
-  Standard_Integer stat = sw.Transfer (shape,mode);
+  Standard_Integer stat = sw.Transfer (shape, mode, Standard_True, aPSRoot.Next(90));
   if (stat == IFSelect_RetDone)
   {
     di << "Translation: OK\n";
@@ -392,11 +402,10 @@ static Standard_Integer stepwrite (Draw_Interpretor& di, Standard_Integer argc, 
     di << "Error: translation failed, status = " << stat << "\n";
   }
 
-  sw.WS()->TransferWriter()->FinderProcess()->SetProgress(0);
-  progress->EndScope();
-  progress->Show();
-  progress->NewScope(10,"Writing");
-  progress->Show();
+  if (aPSRoot.UserBreak())
+    return 1;
+  aPSRoot.SetName("Writing");
+  progress->Show(aPSRoot);
 
 //   Que s est-il passe
   stepmodel = sw.Model();
@@ -418,9 +427,6 @@ static Standard_Integer stepwrite (Draw_Interpretor& di, Standard_Integer argc, 
     case IFSelect_RetStop : di<<"Error on writing file: no space on disk or destination is write protected\n"; break;
     default : di<<"Error: File "<<nomfic<<" written with fail messages\n"; break;
   }
-
-  progress->EndScope();
-  progress->Show();
 
   return 0;
 }
@@ -500,7 +506,7 @@ static Standard_Integer stepfileunits (Draw_Interpretor& di, Standard_Integer ar
 
   if(  argc < 2)
   {
-    std::cout<<"Error: Invalid number of parameters. Should be: getfileunits name_file"<<std::endl;
+    di << "Error: Invalid number of parameters. Should be: getfileunits name_file\n";
     return 1;
   }
   STEPControl_Reader aStepReader;
@@ -547,7 +553,7 @@ void XSDRAWSTEP::InitCommands (Draw_Interpretor& theCommands)
   theCommands.Add("stepwrite" ,    "stepwrite mode[0-4 afsmw] shape",  __FILE__, stepwrite,     g);
   theCommands.Add("testwritestep", "testwritestep filename.stp shape", __FILE__, testwrite,     g);
   theCommands.Add("stepread",      "stepread  [file] [f or r (type of model full or reduced)]",__FILE__, stepread,      g);
-  theCommands.Add("testreadstep",  "testreadstep [file] [name DRAW]",  __FILE__, testread,      g);
+  theCommands.Add("testreadstep",  "testreadstep file shape [-stream]",__FILE__, testreadstep,  g);
   theCommands.Add("steptrans",     "steptrans shape stepax1 stepax2",  __FILE__, steptrans,     g);
   theCommands.Add("countexpected","TEST",                              __FILE__, countexpected, g);
   theCommands.Add("dumpassembly", "TEST",                              __FILE__, dumpassembly,  g);

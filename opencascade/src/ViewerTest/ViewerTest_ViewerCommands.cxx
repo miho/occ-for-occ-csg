@@ -52,17 +52,19 @@
 #include <Image_AlienPixMap.hxx>
 #include <Image_Diff.hxx>
 #include <Image_VideoRecorder.hxx>
-#include <Message_ProgressSentry.hxx>
+#include <Message_ProgressScope.hxx>
+#include <Message_ProgressRange.hxx>
 #include <NCollection_DataMap.hxx>
 #include <NCollection_List.hxx>
+#include <NCollection_LocalArray.hxx>
 #include <NCollection_Vector.hxx>
 #include <OSD.hxx>
+#include <OSD_Parallel.hxx>
 #include <OSD_Timer.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <Prs3d_ShadingAspect.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_LineAspect.hxx>
-#include <Prs3d_Root.hxx>
 #include <Prs3d_Text.hxx>
 #include <Select3D_SensitivePrimitiveArray.hxx>
 #include <TColStd_HSequenceOfAsciiString.hxx>
@@ -71,6 +73,7 @@
 #include <TColgp_Array1OfPnt2d.hxx>
 #include <TColStd_MapOfAsciiString.hxx>
 #include <ViewerTest_AutoUpdater.hxx>
+#include <ViewerTest_ContinuousRedrawer.hxx>
 #include <ViewerTest_EventManager.hxx>
 #include <ViewerTest_DoubleMapOfInteractiveAndName.hxx>
 #include <ViewerTest_DoubleMapIteratorOfDoubleMapOfInteractiveAndName.hxx>
@@ -88,6 +91,7 @@
 #if defined(_WIN32)
   #include <WNT_WClass.hxx>
   #include <WNT_Window.hxx>
+  #include <WNT_HIDSpaceMouse.hxx>
 #elif defined(__APPLE__) && !defined(MACOSX_USE_GLX)
   #include <Cocoa_Window.hxx>
 #else
@@ -416,6 +420,9 @@ namespace
     //! the option key for the command that sets inversion of Z axis for background cubemap
     ViewerTest_CommandOptionKey myCubeMapInvertedZOptionKey;
 
+    //! the option key for the command that allows skip IBL map generation
+    ViewerTest_CommandOptionKey myCubeMapDoNotGenPBREnvOptionKey;
+
     //! the variable set of options that are allowed for the old scenario (without any option passed)
     CommandOptionKeyVariableSet myUnnamedOptionVariableSet;
 
@@ -466,6 +473,7 @@ namespace
       myCubeMapOrderOptionKey      = myCommandParser.AddOption ("order|o", "order of sides in one image packed cubemap");
       myCubeMapInvertedZOptionKey = myCommandParser.AddOption (
         "invertedz|invz|iz", "whether Z axis is inverted or not during background cubemap rendering");
+      myCubeMapDoNotGenPBREnvOptionKey = myCommandParser.AddOption ("nopbrenv", "whether IBL map generation should be skipped");
     }
 
     //! Creates option sets used to determine if a passed option set is valid or not
@@ -479,6 +487,7 @@ namespace
       aCubeMapOptionSet.insert (myCubeMapOptionKey);
       ViewerTest_CommandOptionKeySet aCubeMapAdditionalOptionKeySet;
       aCubeMapAdditionalOptionKeySet.insert (myCubeMapInvertedZOptionKey);
+      aCubeMapAdditionalOptionKeySet.insert (myCubeMapDoNotGenPBREnvOptionKey);
       aCubeMapAdditionalOptionKeySet.insert (myCubeMapOrderOptionKey);
       myCubeMapOptionVariableSet     = CommandOptionKeyVariableSet (aCubeMapOptionSet, aCubeMapAdditionalOptionKeySet);
 
@@ -852,7 +861,17 @@ namespace
         aZIsInverted = true;
       }
 
-      setCubeMap (aFilePaths, anOrder.Validated(), aZIsInverted);
+      bool aToGenPBREnv = true;
+      if (myCommandParser.HasOption (myCubeMapDoNotGenPBREnvOptionKey))
+      {
+        if (!processCubeMapDoNotGenPBREnvOptionSet())
+        {
+          return false;
+        }
+        aToGenPBREnv = false;
+      }
+
+      setCubeMap (aFilePaths, anOrder.Validated(), aZIsInverted, aToGenPBREnv);
       return true;
     }
 
@@ -1017,8 +1036,7 @@ namespace
       return true;
     }
 
-    //! Processes the cubemap option
-    //! @param theIsNeededToRedraw defines need of redraw after option's processing 
+    //! Processes the inverted z cubemap option
     //! @return true if processing was successful, or false otherwise
     bool processCubeMapInvertedZOptionSet () const
     {
@@ -1026,6 +1044,21 @@ namespace
         myCommandParser.GetNumberOfOptionArguments (myCubeMapInvertedZOptionKey);
 
       if (aNumberOfCubeMapZInversionOptionArguments != 0)
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    //! Processes the option allowing to skip IBM maps generation
+    //! @return true if processing was successful, or false otherwise
+    bool processCubeMapDoNotGenPBREnvOptionSet() const
+    {
+      const Standard_Integer aNumberOfCubeMapDoNotGenPBREnvOptionArguments =
+        myCommandParser.GetNumberOfOptionArguments(myCubeMapDoNotGenPBREnvOptionKey);
+
+      if (aNumberOfCubeMapDoNotGenPBREnvOptionArguments != 0)
       {
         return false;
       }
@@ -1221,7 +1254,8 @@ namespace
     //! @param theOrder array of cubemap sides indexes mapping them from tiles in packed cubemap
     static void setCubeMap (const NCollection_Array1<TCollection_AsciiString>& theFileNames,
                             const Graphic3d_ValidatedCubeMapOrder              theOrder = Graphic3d_CubeMapOrder::Default(),
-                            bool                                               theZIsInverted = false)
+                            bool                                               theZIsInverted = false,
+                            bool                                               theToGenPBREnv = true)
     {
       const Handle(V3d_View)& aCurrentView = ViewerTest::CurrentView();
       Handle(Graphic3d_CubeMap) aCubeMap;
@@ -1237,7 +1271,7 @@ namespace
       aCubeMap->GetParams()->SetRepeat(Standard_False);
       aCubeMap->GetParams()->SetTextureUnit(Graphic3d_TextureUnit_EnvMap);
 
-      aCurrentView->SetBackgroundCubeMap (aCubeMap, Standard_True);
+      aCurrentView->SetBackgroundCubeMap (aCubeMap, theToGenPBREnv, Standard_True);
     }
 
     //! Sets the image as a background
@@ -1367,9 +1401,9 @@ static LRESULT WINAPI AdvViewerWindowProc(
 //purpose  :
 //==============================================================================
 
-const Handle(Standard_Transient)& ViewerTest::WClass()
+const Handle(WNT_WClass)& ViewerTest::WClass()
 {
-  static Handle(Standard_Transient) theWClass;
+  static Handle(WNT_WClass) theWClass;
 #if defined(_WIN32)
   if (theWClass.IsNull())
   {
@@ -1610,120 +1644,6 @@ TCollection_AsciiString ViewerTest::GetCurrentViewName ()
   return ViewerTest_myViews.Find2( ViewerTest::CurrentView());
 }
 
-//! Auxiliary tool performing continuous redraws of specified window.
-class ViewerTest_ContinuousRedrawer
-{
-public:
-  //! Return global instance.
-  static ViewerTest_ContinuousRedrawer& Instance()
-  {
-    static ViewerTest_ContinuousRedrawer aRedrawer;
-    return aRedrawer;
-  }
-public:
-
-  //! Destructor.
-  ~ViewerTest_ContinuousRedrawer()
-  {
-    Stop();
-  }
-
-  //! Start thread.
-  void Start (const Handle(Aspect_Window)& theWindow,
-              Standard_Real theTargetFps)
-  {
-    if (myWindow != theWindow
-     || myTargetFps != theTargetFps)
-    {
-      Stop();
-      myWindow = theWindow;
-      myTargetFps = theTargetFps;
-    }
-    if (myThread.GetId() == 0)
-    {
-      myToStop = false;
-      myThread.Run (this);
-    }
-  }
-
-  //! Stop thread.
-  void Stop (const Handle(Aspect_Window)& theWindow = NULL)
-  {
-    if (!theWindow.IsNull()
-      && myWindow != theWindow)
-    {
-      return;
-    }
-
-    {
-      Standard_Mutex::Sentry aLock (myMutex);
-      myToStop = true;
-    }
-    myThread.Wait();
-    myToStop = false;
-    myWindow.Nullify();
-  }
-
-private:
-
-  //! Thread loop.
-  void doThreadLoop()
-  {
-    Handle(Aspect_DisplayConnection) aDisp = new Aspect_DisplayConnection();
-    OSD_Timer aTimer;
-    aTimer.Start();
-    Standard_Real aTimeOld = 0.0;
-    const Standard_Real aTargetDur = myTargetFps > 0.0 ? 1.0 / myTargetFps : -1.0;
-    for (;;)
-    {
-      {
-        Standard_Mutex::Sentry aLock (myMutex);
-        if (myToStop)
-        {
-          return;
-        }
-      }
-      if (myTargetFps > 0.0)
-      {
-        const Standard_Real aTimeNew  = aTimer.ElapsedTime();
-        const Standard_Real aDuration = aTimeNew - aTimeOld;
-        if (aDuration >= aTargetDur)
-        {
-          myWindow->InvalidateContent (aDisp);
-          aTimeOld = aTimeNew;
-        }
-      }
-      else
-      {
-        myWindow->InvalidateContent (aDisp);
-      }
-
-      OSD::MilliSecSleep (1);
-    }
-  }
-
-  //! Thread creation callback.
-  static Standard_Address doThreadWrapper (Standard_Address theData)
-  {
-    ViewerTest_ContinuousRedrawer* aThis = (ViewerTest_ContinuousRedrawer* )theData;
-    aThis->doThreadLoop();
-    return 0;
-  }
-
-  //! Empty constructor.
-  ViewerTest_ContinuousRedrawer()
-  : myThread (doThreadWrapper),
-    myTargetFps (0.0),
-    myToStop (false) {}
-
-private:
-  Handle(Aspect_Window) myWindow;
-  OSD_Thread      myThread;
-  Standard_Mutex  myMutex;
-  Standard_Real   myTargetFps;
-  volatile bool   myToStop;
-};
-
 //==============================================================================
 //function : ViewerInit
 //purpose  : Create the window viewer and initialize all the global variable
@@ -1909,12 +1829,12 @@ TCollection_AsciiString ViewerTest::ViewerInit (const Standard_Integer thePxLeft
 
   // Create window
 #if defined(_WIN32)
-  VT_GetWindow() = new WNT_Window (aTitle.ToCString(),
-                                    Handle(WNT_WClass)::DownCast (WClass()),
+  VT_GetWindow() = new WNT_Window (aTitle.ToCString(), WClass(),
                                     Draw_VirtualWindows ? WS_POPUP : WS_OVERLAPPEDWINDOW,
                                     aPxLeft, aPxTop,
                                     aPxWidth, aPxHeight,
                                     Quantity_NOC_BLACK);
+  VT_GetWindow()->RegisterRawInputDevices (WNT_Window::RawInputMask_SpaceMouse);
 #elif defined(__APPLE__) && !defined(MACOSX_USE_GLX)
   VT_GetWindow() = new Cocoa_Window (aTitle.ToCString(),
                                      aPxLeft, aPxTop,
@@ -2045,7 +1965,7 @@ static int VInit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const cha
     {
       ViewerTest_EventManager::ToExitOnCloseView() = true;
       if (anArgIt + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIt + 1], ViewerTest_EventManager::ToExitOnCloseView()))
+       && Draw::ParseOnOff (theArgVec[anArgIt + 1], ViewerTest_EventManager::ToExitOnCloseView()))
       {
         ++anArgIt;
       }
@@ -2055,7 +1975,7 @@ static int VInit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const cha
     {
       ViewerTest_EventManager::ToCloseViewOnEscape() = true;
       if (anArgIt + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIt + 1], ViewerTest_EventManager::ToCloseViewOnEscape()))
+       && Draw::ParseOnOff (theArgVec[anArgIt + 1], ViewerTest_EventManager::ToCloseViewOnEscape()))
       {
         ++anArgIt;
       }
@@ -2066,7 +1986,7 @@ static int VInit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const cha
     {
       bool toEnable = true;
       if (anArgIt + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIt + 1], toEnable))
+       && Draw::ParseOnOff (theArgVec[anArgIt + 1], toEnable))
       {
         ++anArgIt;
       }
@@ -2122,7 +2042,7 @@ static int VInit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const cha
       }
       else
       {
-        std::cout << "Syntax error: unknown argument " << anArg << ".\n";
+        Message::SendFail() << "Syntax error: unknown argument " << anArg;
         return 1;
       }
     }
@@ -2132,7 +2052,7 @@ static int VInit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const cha
     }
     else
     {
-      std::cout << "Syntax error: unknown argument " << anArg << ".\n";
+      Message::SendFail() << "Syntax error: unknown argument " << anArg;
       return 1;
     }
   }
@@ -2141,7 +2061,7 @@ static int VInit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const cha
   if (!aDisplayName.IsEmpty())
   {
     aDisplayName.Clear();
-    std::cout << "Warning: display parameter will be ignored.\n";
+    Message::SendWarning() << "Warning: display parameter will be ignored.\n";
   }
 #endif
 
@@ -2199,7 +2119,7 @@ static int VHLR (Draw_Interpretor& di, Standard_Integer argc, const char** argv)
   const Handle(AIS_InteractiveContext) aCtx = ViewerTest::GetAISContext();
   if (aView.IsNull())
   {
-    std::cerr << "Error: No opened viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -2219,7 +2139,7 @@ static int VHLR (Draw_Interpretor& di, Standard_Integer argc, const char** argv)
     }
     else if (anArg == "-showhidden"
           && anArgIter + 1 < argc
-          && ViewerTest::ParseOnOff (argv[anArgIter + 1], toShowHidden))
+          && Draw::ParseOnOff (argv[anArgIter + 1], toShowHidden))
     {
       ++anArgIter;
       hasShowHiddenArg = Standard_True;
@@ -2235,21 +2155,21 @@ static int VHLR (Draw_Interpretor& di, Standard_Integer argc, const char** argv)
       continue;
     }
     else if (!hasHlrOnArg
-          && ViewerTest::ParseOnOff (argv[anArgIter], isHLROn))
+          && Draw::ParseOnOff (argv[anArgIter], isHLROn))
     {
       hasHlrOnArg = Standard_True;
       continue;
     }
     // old syntax
     else if (!hasShowHiddenArg
-          && ViewerTest::ParseOnOff(argv[anArgIter], toShowHidden))
+          && Draw::ParseOnOff(argv[anArgIter], toShowHidden))
     {
       hasShowHiddenArg = Standard_True;
       continue;
     }
     else
     {
-      std::cout << "Syntax error at '" << argv[anArgIter] << "'\n";
+      Message::SendFail() << "Syntax error at '" << argv[anArgIter] << "'";
       return 1;
     }
   }
@@ -2317,7 +2237,7 @@ static int VHLRType (Draw_Interpretor& , Standard_Integer argc, const char** arg
   const Handle(AIS_InteractiveContext) aCtx = ViewerTest::GetAISContext();
   if (aView.IsNull())
   {
-    std::cerr << "Error: No opened viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -2353,14 +2273,14 @@ static int VHLRType (Draw_Interpretor& , Standard_Integer argc, const char** arg
       TCollection_AsciiString aName (argv[anArgIter]);
       if (!aMap.IsBound2 (aName))
       {
-        std::cout << "Syntax error: Wrong shape name '" << aName << "'.\n";
+        Message::SendFail() << "Syntax error: Wrong shape name '" << aName << "'";
         return 1;
       }
 
       Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast (aMap.Find2 (aName));
       if (aShape.IsNull())
       {
-        std::cout << "Syntax error: '" << aName << "' is not a shape presentation.\n";
+        Message::SendFail() << "Syntax error: '" << aName << "' is not a shape presentation";
         return 1;
       }
       aListOfShapes.Append (aShape);
@@ -2369,7 +2289,7 @@ static int VHLRType (Draw_Interpretor& , Standard_Integer argc, const char** arg
   }
   if (aTypeOfHLR == Prs3d_TOH_NotSet)
   {
-    std::cout << "Syntax error: wrong number of arguments!\n";
+    Message::SendFail ("Syntax error: wrong number of arguments");
     return 1;
   }
 
@@ -2481,7 +2401,7 @@ void ViewerTest::RemoveView (const TCollection_AsciiString& theViewName, const S
 {
   if (!ViewerTest_myViews.IsBound1(theViewName))
   {
-    std::cout << "Wrong view name\n";
+    Message::SendFail() << "Wrong view name";
     return;
   }
 
@@ -2534,8 +2454,8 @@ void ViewerTest::RemoveView (const TCollection_AsciiString& theViewName, const S
   if (!aCurrentContext.IsNull())
   {
     // Check if there are more difined views in the viewer
-    aCurrentContext->CurrentViewer()->InitDefinedViews();
-    if ((isContextRemoved || ViewerTest_myContexts.Size() != 1) && !aCurrentContext->CurrentViewer()->MoreDefinedViews())
+    if ((isContextRemoved || ViewerTest_myContexts.Size() != 1)
+     && aCurrentContext->CurrentViewer()->DefinedViews().IsEmpty())
     {
       // Remove driver if there is no viewers that use it
       Standard_Boolean isRemoveDriver = Standard_True;
@@ -2562,7 +2482,7 @@ void ViewerTest::RemoveView (const TCollection_AsciiString& theViewName, const S
       ViewerTest_myContexts.UnBind2(aCurrentContext);
     }
   }
-  std::cout << "3D View - " << theViewName << " was deleted.\n";
+  Message::SendInfo() << "3D View - " << theViewName << " was deleted.\n";
   if (ViewerTest_EventManager::ToExitOnCloseView())
   {
     Draw_Interprete ("exit");
@@ -2602,7 +2522,7 @@ static int VClose (Draw_Interpretor& /*theDi*/,
       ViewerTest_Names aViewName (theArgVec[1]);
       if (!ViewerTest_myViews.IsBound1 (aViewName.GetViewName()))
       {
-        std::cerr << "The view with name '" << theArgVec[1] << "' does not exist\n";
+        Message::SendFail() << "Error: the view with name '" << theArgVec[1] << "' does not exist";
         return 1;
       }
       aViewList.Append (aViewName.GetViewName());
@@ -2613,7 +2533,7 @@ static int VClose (Draw_Interpretor& /*theDi*/,
     // close active view
     if (ViewerTest::CurrentView().IsNull())
     {
-      std::cerr << "No active view!\n";
+      Message::SendFail ("Error: no active view");
       return 1;
     }
     aViewList.Append (ViewerTest_myViews.Find2 (ViewerTest::CurrentView()));
@@ -2672,7 +2592,7 @@ static int VActivate (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const
     }
     else
     {
-      std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+      Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
       return 1;
     }
   }
@@ -2683,7 +2603,7 @@ static int VActivate (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const
   }
   else if (aNameString.IsEmpty())
   {
-    std::cout << "Syntax error: wrong number of arguments\n";
+    Message::SendFail ("Syntax error: wrong number of arguments");
     return 1;
   }
 
@@ -2799,7 +2719,7 @@ static int VViewProj (Draw_Interpretor& ,
   const Handle(V3d_View)& aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cout << "Error: no active view\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -3023,7 +2943,7 @@ static int VViewProj (Draw_Interpretor& ,
         gp_Dir aRight, anUp;
         if (aFrameDef.Value (2) == aFrameDef.Value (4))
         {
-          std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+          Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
           return 1;
         }
 
@@ -3041,7 +2961,7 @@ static int VViewProj (Draw_Interpretor& ,
         }
         else
         {
-          std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+          Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
           return 1;
         }
 
@@ -3059,7 +2979,7 @@ static int VViewProj (Draw_Interpretor& ,
         }
         else
         {
-          std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+          Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
           return 1;
         }
 
@@ -3076,7 +2996,7 @@ static int VViewProj (Draw_Interpretor& ,
       }
       else
       {
-        std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+        Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
         return 1;
       }
     }
@@ -3085,7 +3005,7 @@ static int VViewProj (Draw_Interpretor& ,
   if (!isGeneralCmd
     && theNbArgs != 1)
   {
-    std::cout << "Syntax error: wrong number of arguments\n";
+    Message::SendFail ("Syntax error: wrong number of arguments");
     return 1;
   }
   return 0;
@@ -3105,12 +3025,19 @@ static int VHelp(Draw_Interpretor& di, Standard_Integer , const char** )
   di << "B : BottomView\n";
   di << "R : RightView\n";
   di << "L : LeftView\n";
-  di << "A : AxonometricView\n";
-  di << "D : ResetView\n";
+  di << "Backspace : AxonometricView\n";
 
   di << "=========================\n";
-  di << "S : Shading\n";
-  di << "W : Wireframe\n";
+  di << "W, S : Fly   forward/backward\n";
+  di << "A, D : Slide left/right\n";
+  di << "Q, E : Bank  left/right\n";
+  di << "-, + : Change flying speed\n";
+  di << "Arrows : look left/right/up/down\n";
+  di << "Arrows+Shift : slide left/right/up/down\n";
+
+  di << "=========================\n";
+  di << "S + Ctrl : Shading\n";
+  di << "W + Ctrl : Wireframe\n";
   di << "H : HiddenLineRemoval\n";
   di << "U : Unset display mode\n";
   di << "Delete : Remove selection from viewer\n";
@@ -3333,6 +3260,40 @@ static LRESULT WINAPI ViewerWindowProc (HWND theWinHandle,
 
       ViewerTest::CurrentEventManager()->UpdateMousePosition (aPos, aButtons, aFlags, false);
       ViewerTest::CurrentEventManager()->FlushViewEvents (ViewerTest::GetAISContext(), aView, true);
+      break;
+    }
+    case WM_INPUT:
+    {
+      UINT aSize = 0;
+      ::GetRawInputData ((HRAWINPUT )lParam, RID_INPUT, NULL, &aSize, sizeof(RAWINPUTHEADER));
+      NCollection_LocalArray<BYTE> aRawData (aSize);
+      if (aSize == 0 || ::GetRawInputData ((HRAWINPUT )lParam, RID_INPUT, aRawData, &aSize, sizeof(RAWINPUTHEADER)) != aSize)
+      {
+        break;
+      }
+
+      const RAWINPUT* aRawInput = (RAWINPUT* )(BYTE* )aRawData;
+      if (aRawInput->header.dwType != RIM_TYPEHID)
+      {
+        break;
+      }
+
+      RID_DEVICE_INFO aDevInfo;
+      aDevInfo.cbSize = sizeof(RID_DEVICE_INFO);
+      UINT aDevInfoSize = sizeof(RID_DEVICE_INFO);
+      if (::GetRawInputDeviceInfoW (aRawInput->header.hDevice, RIDI_DEVICEINFO, &aDevInfo, &aDevInfoSize) != sizeof(RID_DEVICE_INFO)
+        || (aDevInfo.hid.dwVendorId != WNT_HIDSpaceMouse::VENDOR_ID_LOGITECH
+         && aDevInfo.hid.dwVendorId != WNT_HIDSpaceMouse::VENDOR_ID_3DCONNEXION))
+      {
+        break;
+      }
+
+      WNT_HIDSpaceMouse aSpaceData (aDevInfo.hid.dwProductId, aRawInput->data.hid.bRawData, aRawInput->data.hid.dwSizeHid);
+      if (ViewerTest::CurrentEventManager()->Update3dMouse (aSpaceData)
+      && !VT_GetWindow().IsNull())
+      {
+        VT_GetWindow()->InvalidateContent();
+      }
       break;
     }
     default:
@@ -3624,7 +3585,7 @@ static void VProcessEvents (ClientData theDispX, int)
   }
   if (aDispConn.IsNull())
   {
-    std::cerr << "Error: ViewerTest is unable processing messages for unknown X Display\n";
+    Message::SendFail ("Error: ViewerTest is unable processing messages for unknown X Display");
     return;
   }
 
@@ -3720,7 +3681,7 @@ static int VFit (Draw_Interpretor& /*theDi*/, Standard_Integer theArgNb, const c
   const Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cout << "Error: no active viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -3741,7 +3702,7 @@ static int VFit (Draw_Interpretor& /*theDi*/, Standard_Integer theArgNb, const c
     }
     else
     {
-      std::cout << "Syntax error at '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error at '" << anArg << "'";
     }
   }
 
@@ -3762,7 +3723,7 @@ static int VFitArea (Draw_Interpretor& theDI, Standard_Integer  theArgNb, const 
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cerr << theArgVec[0] << "Error: No active view.\n";
+    Message::SendFail ("Error: No active viewer");
     return 1;
   }
 
@@ -3788,7 +3749,7 @@ static int VFitArea (Draw_Interpretor& theDI, Standard_Integer  theArgNb, const 
   }
   else
   {
-    std::cerr << theArgVec[0] << "Error: Invalid number of arguments.\n";
+    Message::SendFail ("Syntax error: Invalid number of arguments");
     theDI.PrintHelp(theArgVec[0]);
     return 1;
   }
@@ -3806,7 +3767,7 @@ static int VFitArea (Draw_Interpretor& theDI, Standard_Integer  theArgNb, const 
 
   if (aDiagonal < Precision::Confusion())
   {
-    std::cerr << theArgVec[0] << "Error: view area is too small.\n";
+    Message::SendFail ("Error: view area is too small");
     return 1;
   }
 
@@ -3825,7 +3786,7 @@ static int VZFit (Draw_Interpretor& /*theDi*/, Standard_Integer theArgsNb, const
 
   if (aCurrentView.IsNull())
   {
-    std::cout << theArgVec[0] << ": Call vinit before this command, please.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -3858,7 +3819,7 @@ static int VRepaint (Draw_Interpretor& , Standard_Integer theArgNb, const char**
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cout << "Error: no active viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -3872,7 +3833,7 @@ static int VRepaint (Draw_Interpretor& , Standard_Integer theArgNb, const char**
     {
       isImmediateUpdate = Standard_True;
       if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], isImmediateUpdate))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], isImmediateUpdate))
       {
         ++anArgIter;
       }
@@ -3901,7 +3862,7 @@ static int VRepaint (Draw_Interpretor& , Standard_Integer theArgNb, const char**
     }
     else
     {
-      std::cout << "Syntax error at '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error at '" << anArg << "'";
       return 1;
     }
   }
@@ -3947,7 +3908,7 @@ static int VPick (Draw_Interpretor& ,
 
   if (theNbArgs < 4)
   {
-    std::cout << "Syntax error: Invalid number of arguments\n";
+    Message::SendFail ("Syntax error: wrong number of arguments");
     return 1;
   }
 
@@ -4019,7 +3980,7 @@ static int VZBuffTrihedron (Draw_Interpretor& /*theDI*/,
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cout << "Error: no active viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -4059,7 +4020,7 @@ static int VZBuffTrihedron (Draw_Interpretor& /*theDI*/,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
 
@@ -4099,7 +4060,7 @@ static int VZBuffTrihedron (Draw_Interpretor& /*theDI*/,
       }
       else
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "' - unknown position '" << aPosName << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "' - unknown position '" << aPosName << "'";
         return 1;
       }
     }
@@ -4107,7 +4068,7 @@ static int VZBuffTrihedron (Draw_Interpretor& /*theDI*/,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
 
@@ -4125,14 +4086,14 @@ static int VZBuffTrihedron (Draw_Interpretor& /*theDI*/,
       }
       else
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "' - unknown type '" << aTypeName << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "' - unknown type '" << aTypeName << "'";
       }
     }
     else if (aFlag == "-scale")
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
 
@@ -4143,7 +4104,7 @@ static int VZBuffTrihedron (Draw_Interpretor& /*theDI*/,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
 
@@ -4154,7 +4115,7 @@ static int VZBuffTrihedron (Draw_Interpretor& /*theDI*/,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
 
@@ -4164,7 +4125,7 @@ static int VZBuffTrihedron (Draw_Interpretor& /*theDI*/,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
 
@@ -4173,55 +4134,55 @@ static int VZBuffTrihedron (Draw_Interpretor& /*theDI*/,
     else if (aFlag == "-colorlabel"
           || aFlag == "-colorlabels")
     {
-      Standard_Integer aNbParsed = ViewerTest::ParseColor (theArgNb  - anArgIter - 1,
-                                                           theArgVec + anArgIter + 1,
-                                                           aLabelsColor);
+      Standard_Integer aNbParsed = Draw::ParseColor (theArgNb  - anArgIter - 1,
+                                                     theArgVec + anArgIter + 1,
+                                                     aLabelsColor);
       if (aNbParsed == 0)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
       anArgIter += aNbParsed;
     }
     else if (aFlag == "-colorarrowx")
     {
-      Standard_Integer aNbParsed = ViewerTest::ParseColor (theArgNb  - anArgIter - 1,
-                                                           theArgVec + anArgIter + 1,
-                                                           anArrowColorX);
+      Standard_Integer aNbParsed = Draw::ParseColor (theArgNb  - anArgIter - 1,
+                                                     theArgVec + anArgIter + 1,
+                                                     anArrowColorX);
       if (aNbParsed == 0)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
       anArgIter += aNbParsed;
     }
     else if (aFlag == "-colorarrowy")
     {
-      Standard_Integer aNbParsed = ViewerTest::ParseColor (theArgNb  - anArgIter - 1,
-                                                           theArgVec + anArgIter + 1,
-                                                           anArrowColorY);
+      Standard_Integer aNbParsed = Draw::ParseColor (theArgNb  - anArgIter - 1,
+                                                     theArgVec + anArgIter + 1,
+                                                     anArrowColorY);
       if (aNbParsed == 0)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
       anArgIter += aNbParsed;
     }
     else if (aFlag == "-colorarrowz")
     {
-      Standard_Integer aNbParsed = ViewerTest::ParseColor (theArgNb  - anArgIter - 1,
-                                                           theArgVec + anArgIter + 1,
-                                                           anArrowColorZ);
+      Standard_Integer aNbParsed = Draw::ParseColor (theArgNb  - anArgIter - 1,
+                                                     theArgVec + anArgIter + 1,
+                                                     anArrowColorZ);
       if (aNbParsed == 0)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
       anArgIter += aNbParsed;
     }
     else
     {
-      std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+      Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
       return 1;
     }
   }
@@ -4243,7 +4204,7 @@ static int VRotate (Draw_Interpretor& /*theDi*/, Standard_Integer theArgNb, cons
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cout << "No active view!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -4259,7 +4220,7 @@ static int VRotate (Draw_Interpretor& /*theDi*/, Standard_Integer theArgNb, cons
       hasFlags = Standard_True;
       if (anArgIter + 2 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
 
@@ -4272,7 +4233,7 @@ static int VRotate (Draw_Interpretor& /*theDi*/, Standard_Integer theArgNb, cons
       hasFlags = Standard_True;
       if (anArgIter + 2 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
 
@@ -4283,7 +4244,7 @@ static int VRotate (Draw_Interpretor& /*theDi*/, Standard_Integer theArgNb, cons
     else if (theArgNb != 4
           && theArgNb != 7)
     {
-      std::cout << "Error: wrong syntax at '" << anArg << "'\n";
+      Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
       return 1;
     }
   }
@@ -4314,7 +4275,7 @@ static int VRotate (Draw_Interpretor& /*theDi*/, Standard_Integer theArgNb, cons
     return 0;
   }
 
-  std::cout << "Error: Invalid number of arguments\n";
+  Message::SendFail ("Error: Invalid number of arguments");
   return 1;
 }
 
@@ -4370,13 +4331,13 @@ static int VPlace (Draw_Interpretor& /*theDi*/, Standard_Integer theArgNb, const
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cerr << theArgs[0] << "Error: no active view." << std::endl;
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
   if (theArgNb != 3)
   {
-    std::cerr << theArgs[0] << "Error: invalid number of arguments." << std::endl;
+    Message::SendFail ("Syntax error: wrong number of arguments");
     return 1;
   }
 
@@ -4393,12 +4354,12 @@ static int VColorScale (Draw_Interpretor& theDI,
   Handle(V3d_View)               aView    = ViewerTest::CurrentView();
   if (aContext.IsNull())
   {
-    std::cout << "Error: no active view!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
   if (theArgNb <= 1)
   {
-    std::cout << "Error: wrong syntax at command '" << theArgVec[0] << "'!\n";
+    Message::SendFail() << "Error: wrong syntax at command '" << theArgVec[0] << "'";
     return 1;
   }
 
@@ -4409,7 +4370,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     aColorScale = Handle(AIS_ColorScale)::DownCast (GetMapOfAIS().Find2 (theArgVec[1]));
     if (aColorScale.IsNull())
     {
-      std::cout << "Error: object '" << theArgVec[1] << "'is already defined and is not a color scale!\n";
+      Message::SendFail() << "Error: object '" << theArgVec[1] << "'is already defined and is not a color scale";
       return 1;
     }
   }
@@ -4418,7 +4379,7 @@ static int VColorScale (Draw_Interpretor& theDI,
   {
     if (aColorScale.IsNull())
     {
-      std::cout << "Syntax error: colorscale with a given name does not exist.\n";
+      Message::SendFail() << "Syntax error: colorscale with a given name does not exist";
       return 1;
     }
 
@@ -4469,7 +4430,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 3 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Error: wrong syntax at argument '" << anArg << "'";
         return 1;
       }
 
@@ -4479,12 +4440,12 @@ static int VColorScale (Draw_Interpretor& theDI,
       if (!aRangeMin.IsRealValue()
        || !aRangeMax.IsRealValue())
       {
-        std::cout << "Error: the range values should be real!\n";
+        Message::SendFail ("Syntax error: the range values should be real");
         return 1;
       }
       else if (!aNbIntervals.IsIntegerValue())
       {
-        std::cout << "Error: the number of intervals should be integer!\n";
+        Message::SendFail ("Syntax error: the number of intervals should be integer");
         return 1;
       }
 
@@ -4495,13 +4456,13 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 1 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
       TCollection_AsciiString aFontArg(theArgVec[anArgIter + 1]);
       if (!aFontArg.IsIntegerValue())
       {
-        std::cout << "Error: HeightFont value should be integer!\n";
+        Message::SendFail ("Syntax error: HeightFont value should be integer");
         return 1;
       }
 
@@ -4512,7 +4473,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 1 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -4537,7 +4498,7 @@ static int VColorScale (Draw_Interpretor& theDI,
       }
       else
       {
-        std::cout << "Error: unknown position '" << aTextPosArg << "'!\n";
+        Message::SendFail() << "Syntax error: unknown position '" << aTextPosArg << "'";
         return 1;
       }
       aColorScale->SetLabelPosition (aLabPosition);
@@ -4547,14 +4508,14 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 1 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Synta error at argument '" << anArg << "'";
         return 1;
       }
 
       Standard_Boolean IsLog;
-      if (!ViewerTest::ParseOnOff(theArgVec[++anArgIter], IsLog))
+      if (!Draw::ParseOnOff(theArgVec[++anArgIter], IsLog))
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
       aColorScale->SetLogarithmic (IsLog);
@@ -4564,7 +4525,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 2 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -4575,18 +4536,18 @@ static int VColorScale (Draw_Interpretor& theDI,
     else if (aFlag == "-colorrange")
     {
       Quantity_Color aColorMin, aColorMax;
-      Standard_Integer aNbParsed1 = ViewerTest::ParseColor (theArgNb  - (anArgIter + 1),
-                                                            theArgVec + (anArgIter + 1),
-                                                            aColorMin);
+      Standard_Integer aNbParsed1 = Draw::ParseColor (theArgNb  - (anArgIter + 1),
+                                                      theArgVec + (anArgIter + 1),
+                                                      aColorMin);
       anArgIter += aNbParsed1;
-      Standard_Integer aNbParsed2 = ViewerTest::ParseColor (theArgNb  - (anArgIter + 1),
-                                                            theArgVec + (anArgIter + 1),
-                                                            aColorMax);
+      Standard_Integer aNbParsed2 = Draw::ParseColor (theArgNb  - (anArgIter + 1),
+                                                      theArgVec + (anArgIter + 1),
+                                                      aColorMax);
       anArgIter += aNbParsed2;
       if (aNbParsed1 == 0
        || aNbParsed2 == 0)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
 
@@ -4599,7 +4560,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff(theArgVec[anArgIter + 1], toEnable))
+       && Draw::ParseOnOff(theArgVec[anArgIter + 1], toEnable))
       {
         ++anArgIter;
       }
@@ -4610,7 +4571,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
       {
         ++anArgIter;
       }
@@ -4620,7 +4581,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 2 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -4629,7 +4590,7 @@ static int VColorScale (Draw_Interpretor& theDI,
       if (!anX.IsIntegerValue()
        || !anY.IsIntegerValue())
       {
-        std::cout << "Error: coordinates should be integer values!\n";
+        Message::SendFail ("Syntax error: coordinates should be integer values");
         return 1;
       }
 
@@ -4641,14 +4602,14 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 1 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       const TCollection_AsciiString aBreadth (theArgVec[++anArgIter]);
       if (!aBreadth.IsIntegerValue())
       {
-        std::cout << "Error: a width should be an integer value!\n";
+        Message::SendFail ("Syntax error: a width should be an integer value");
         return 1;
       }
       aColorScale->SetBreadth (aBreadth.IntegerValue());
@@ -4658,14 +4619,14 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 1 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       const TCollection_AsciiString aHeight (theArgVec[++anArgIter]);
       if (!aHeight.IsIntegerValue())
       {
-        std::cout << "Error: a width should be an integer value!\n";
+        Message::SendFail ("Syntax error: a width should be an integer value");
         return 1;
       }
       aColorScale->SetHeight (aHeight.IntegerValue());
@@ -4674,35 +4635,35 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (aColorScale->GetColorType() != Aspect_TOCSD_USER)
       {
-        std::cout << "Error: wrong color type! Call -colors before to set user-specified colors!\n";
+        Message::SendFail ("Syntax error: wrong color type. Call -colors before to set user-specified colors");
         return 1;
       }
       else if (anArgIter + 2 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       const TCollection_AsciiString anInd (theArgVec[++anArgIter]);
       if (!anInd.IsIntegerValue())
       {
-        std::cout << "Error: Index value should be integer!\n";
+        Message::SendFail ("Syntax error: Index value should be integer");
         return 1;
       }
       const Standard_Integer anIndex = anInd.IntegerValue();
       if (anIndex <= 0 || anIndex > aColorScale->GetNumberOfIntervals())
       {
-        std::cout << "Error: Index value should be within range 1.." << aColorScale->GetNumberOfIntervals() <<"!\n";
+        Message::SendFail() << "Syntax error: Index value should be within range 1.." << aColorScale->GetNumberOfIntervals();
         return 1;
       }
 
       Quantity_Color aColor;
-      Standard_Integer aNbParsed = ViewerTest::ParseColor (theArgNb  - (anArgIter + 1),
-                                                           theArgVec + (anArgIter + 1),
-                                                           aColor);
+      Standard_Integer aNbParsed = Draw::ParseColor (theArgNb  - (anArgIter + 1),
+                                                     theArgVec + (anArgIter + 1),
+                                                     aColor);
       if (aNbParsed == 0)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Error: wrong syntax at '" << anArg << "'";
         return 1;
       }
       aColorScale->SetIntervalColor (aColor, anIndex);
@@ -4713,23 +4674,23 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (aColorScale->GetColorType() != Aspect_TOCSD_USER)
       {
-        std::cout << "Error: wrong label type! Call -labels before to set user-specified labels!\n";
+        Message::SendFail ("Syntax error: wrong label type. Call -labels before to set user-specified labels");
         return 1;
       }
       else if (anArgIter + 2 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       Standard_Integer anIndex = Draw::Atoi (theArgVec[anArgIter + 1]);
       if (anIndex <= 0 || anIndex > aColorScale->GetNumberOfIntervals() + 1)
       {
-        std::cout << "Error: Index value should be within range 1.." << aColorScale->GetNumberOfIntervals() + 1 <<"!\n";
+        Message::SendFail() << "Syntax error: Index value should be within range 1.." << (aColorScale->GetNumberOfIntervals() + 1);
         return 1;
       }
 
-      TCollection_ExtendedString aText (theArgVec[anArgIter + 2]);
+      TCollection_ExtendedString aText (theArgVec[anArgIter + 2], Standard_True);
       aColorScale->SetLabel     (aText, anIndex);
       aColorScale->SetLabelType (Aspect_TOCSD_USER);
       anArgIter += 2;
@@ -4761,13 +4722,13 @@ static int VColorScale (Draw_Interpretor& theDI,
         }
         if (aLabAtBorder == -1)
         {
-          std::cout << "Syntax error at argument '" << anArg << "'!\n";
+          Message::SendFail() << "Syntax error at argument '" << anArg << "'";
           return 1;
         }
         toEnable = (aLabAtBorder == 1);
       }
       else if (anArgIter + 1 < theArgNb
-            && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
+            && Draw::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
       {
         ++anArgIter;
       }
@@ -4782,9 +4743,9 @@ static int VColorScale (Draw_Interpretor& theDI,
       for (;;)
       {
         Quantity_Color aColor;
-        Standard_Integer aNbParsed = ViewerTest::ParseColor (theArgNb  - (anArgIter + 1),
-                                                             theArgVec + (anArgIter + 1),
-                                                             aColor);
+        Standard_Integer aNbParsed = Draw::ParseColor (theArgNb  - (anArgIter + 1),
+                                                       theArgVec + (anArgIter + 1),
+                                                       aColor);
         if (aNbParsed == 0)
         {
           break;
@@ -4794,12 +4755,20 @@ static int VColorScale (Draw_Interpretor& theDI,
       }
       if (aSeq.Length() != aColorScale->GetNumberOfIntervals())
       {
-        std::cout << "Error: not enough arguments! You should provide color names or RGB color values for every interval of the "
-                  << aColorScale->GetNumberOfIntervals() << " intervals\n";
+        Message::SendFail() << "Error: not enough arguments! You should provide color names or RGB color values for every interval of the "
+                            << aColorScale->GetNumberOfIntervals() << " intervals";
         return 1;
       }
 
       aColorScale->SetColors    (aSeq);
+      aColorScale->SetColorType (Aspect_TOCSD_USER);
+    }
+    else if (aFlag == "-uniform")
+    {
+      const Standard_Real aLightness = Draw::Atof (theArgVec[++anArgIter]);
+      const Standard_Real aHueStart = Draw::Atof (theArgVec[++anArgIter]);
+      const Standard_Real aHueEnd = Draw::Atof (theArgVec[++anArgIter]);
+      aColorScale->SetUniformColors (aLightness, aHueStart, aHueEnd);
       aColorScale->SetColorType (Aspect_TOCSD_USER);
     }
     else if (aFlag == "-labels"
@@ -4807,7 +4776,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 1 >= theArgNb)
       {
-        std::cout << "Syntax error at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -4821,14 +4790,14 @@ static int VColorScale (Draw_Interpretor& theDI,
       }
       if (anArgIter + aNbLabels >= theArgNb)
       {
-        std::cout << "Error: not enough arguments! " << aNbLabels << " text labels are expected.\n";
+        Message::SendFail() << "Syntax error: not enough arguments. " << aNbLabels << " text labels are expected";
         return 1;
       }
 
       TColStd_SequenceOfExtendedString aSeq;
       for (Standard_Integer aLabelIter = 0; aLabelIter < aNbLabels; ++aLabelIter)
       {
-        aSeq.Append (TCollection_ExtendedString (theArgVec[++anArgIter]));
+        aSeq.Append (TCollection_ExtendedString (theArgVec[++anArgIter], Standard_True));
       }
       aColorScale->SetLabels (aSeq);
       aColorScale->SetLabelType (Aspect_TOCSD_USER);
@@ -4837,7 +4806,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 1 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -4870,7 +4839,8 @@ static int VColorScale (Draw_Interpretor& theDI,
       Standard_ENABLE_DEPRECATION_WARNINGS
       }
 
-      aColorScale->SetTitle (theArgVec[anArgIter + 1]);
+      TCollection_ExtendedString aTitle(theArgVec[anArgIter + 1], Standard_True);
+      aColorScale->SetTitle (aTitle);
       if (isTwoArgs)
       {
         anArgIter += 1;
@@ -4894,7 +4864,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     {
       if (anArgIter + 1 >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -4902,7 +4872,7 @@ static int VColorScale (Draw_Interpretor& theDI,
 
       if (!anArg1.IsRealValue())
       {
-        std::cout << "Error: the value should be real!\n";
+        Message::SendFail ("Syntax error: the value should be real");
         return 1;
       }
 
@@ -4913,7 +4883,7 @@ static int VColorScale (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Error: wrong syntax at " << anArg << " - unknown argument!\n";
+      Message::SendFail() << "Syntax error at " << anArg << " - unknown argument";
       return 1;
     }
   }
@@ -4955,9 +4925,9 @@ static int VGraduatedTrihedron (Draw_Interpretor& /*theDi*/, Standard_Integer th
 {
   if (theArgNum < 2)
   {
-    std::cout << theArgs[0] << " error: wrong number of parameters. Type 'help"
-              << theArgs[0] <<"' for more information.\n";
-    return 1;  //TCL_ERROR
+    Message::SendFail() << "Syntax error: wrong number of parameters. Type 'help"
+                        << theArgs[0] <<"' for more information";
+    return 1;
   }
 
   NCollection_DataMap<TCollection_AsciiString, Handle(TColStd_HSequenceOfAsciiString)> aMapOfArgs;
@@ -5050,15 +5020,15 @@ static int VGraduatedTrihedron (Draw_Interpretor& /*theDi*/, Standard_Integer th
     aLowerKey  = "-";
     aLowerKey += aKey;
     aLowerKey.LowerCase();
-    std::cout << theArgs[0] << ": " << aLowerKey << " is unknown option, or the arguments are unacceptable.\n";
-    std::cout << "Type help for more information.\n";
+    Message::SendFail() << "Syntax error: " << aLowerKey << " is unknown option, or the arguments are unacceptable.\n"
+                        << "Type help for more information";
     return 1;
   }
 
   Handle(AIS_InteractiveContext) anAISContext = ViewerTest::GetAISContext();
   if (anAISContext.IsNull())
   {
-    std::cout << theArgs[0] << ":  please use 'vinit' command to initialize view.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -5115,7 +5085,7 @@ static int VGraduatedTrihedron (Draw_Interpretor& /*theDi*/, Standard_Integer th
   {
     if (!GetColor (aValues->Value(1), aColor))
     {
-      std::cout << theArgs[0] << "error: -xnamecolor wrong color name.\n";
+      Message::SendFail ("Syntax error: -xnamecolor wrong color name");
       return 1;
     }
     aTrihedronData.ChangeXAxisAspect().SetNameColor (aColor);
@@ -5124,7 +5094,7 @@ static int VGraduatedTrihedron (Draw_Interpretor& /*theDi*/, Standard_Integer th
   {
     if (!GetColor (aValues->Value(1), aColor))
     {
-      std::cout << theArgs[0] << "error: -ynamecolor wrong color name.\n";
+      Message::SendFail ("Syntax error: -ynamecolor wrong color name");
       return 1;
     }
     aTrihedronData.ChangeYAxisAspect().SetNameColor (aColor);
@@ -5133,7 +5103,7 @@ static int VGraduatedTrihedron (Draw_Interpretor& /*theDi*/, Standard_Integer th
   {
     if (!GetColor (aValues->Value(1), aColor))
     {
-      std::cout << theArgs[0] << "error: -znamecolor wrong color name.\n";
+      Message::SendFail ("Syntax error: -znamecolor wrong color name");
       return 1;
     }
     aTrihedronData.ChangeZAxisAspect().SetNameColor (aColor);
@@ -5142,7 +5112,7 @@ static int VGraduatedTrihedron (Draw_Interpretor& /*theDi*/, Standard_Integer th
   {
     if (!GetColor (aValues->Value(1), aColor))
     {
-      std::cout << theArgs[0] << "error: -xcolor wrong color name.\n";
+      Message::SendFail ("Syntax error: -xcolor wrong color name");
       return 1;
     }
     aTrihedronData.ChangeXAxisAspect().SetColor (aColor);
@@ -5151,7 +5121,7 @@ static int VGraduatedTrihedron (Draw_Interpretor& /*theDi*/, Standard_Integer th
   {
     if (!GetColor (aValues->Value(1), aColor))
     {
-      std::cout << theArgs[0] << "error: -ycolor wrong color name.\n";
+      Message::SendFail ("Syntax error: -ycolor wrong color name");
       return 1;
     }
     aTrihedronData.ChangeYAxisAspect().SetColor (aColor);
@@ -5160,7 +5130,7 @@ static int VGraduatedTrihedron (Draw_Interpretor& /*theDi*/, Standard_Integer th
   {
     if (!GetColor (aValues->Value(1), aColor))
     {
-      std::cout << theArgs[0] << "error: -zcolor wrong color name.\n";
+      Message::SendFail ("Syntax error: -zcolor wrong color name");
       return 1;
     }
     aTrihedronData.ChangeZAxisAspect().SetColor (aColor);
@@ -5282,7 +5252,7 @@ static int VTile (Draw_Interpretor& theDI,
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cerr << "Error: no active viewer.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -5305,7 +5275,7 @@ static int VTile (Draw_Interpretor& theDI,
     {
       if (anArgIter + 3 < theArgNb)
       {
-        std::cerr << "Syntax error at '" << theArgVec[anArgIter] << "'.\n";
+        Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
         return 1;
       }
       aTile.IsTopDown = (anArg == "-upperleft") == Standard_True;
@@ -5318,7 +5288,7 @@ static int VTile (Draw_Interpretor& theDI,
     {
       if (anArgIter + 3 < theArgNb)
       {
-        std::cerr << "Syntax error at '" << theArgVec[anArgIter] << "'.\n";
+        Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
         return 1;
       }
       aTile.TotalSize.x() = Draw::Atoi (theArgVec[anArgIter + 1]);
@@ -5326,7 +5296,7 @@ static int VTile (Draw_Interpretor& theDI,
       if (aTile.TotalSize.x() < 1
        || aTile.TotalSize.y() < 1)
       {
-        std::cerr << "Error: total size is incorrect.\n";
+        Message::SendFail ("Error: total size is incorrect");
         return 1;
       }
     }
@@ -5334,7 +5304,7 @@ static int VTile (Draw_Interpretor& theDI,
     {
       if (anArgIter + 3 < theArgNb)
       {
-        std::cerr << "Syntax error at '" << theArgVec[anArgIter] << "'.\n";
+        Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
         return 1;
       }
 
@@ -5343,7 +5313,7 @@ static int VTile (Draw_Interpretor& theDI,
       if (aTile.TileSize.x() < 1
        || aTile.TileSize.y() < 1)
       {
-        std::cerr << "Error: tile size is incorrect.\n";
+        Message::SendFail ("Error: tile size is incorrect");
         return 1;
       }
     }
@@ -5358,13 +5328,13 @@ static int VTile (Draw_Interpretor& theDI,
   if (aTile.TileSize.x() < 1
    || aTile.TileSize.y() < 1)
   {
-    std::cerr << "Error: tile size is undefined.\n";
+    Message::SendFail ("Error: tile size is undefined");
     return 1;
   }
   else if (aTile.TotalSize.x() < 1
         || aTile.TotalSize.y() < 1)
   {
-    std::cerr << "Error: total size is undefined.\n";
+    Message::SendFail ("Error: total size is undefined");
     return 1;
   }
 
@@ -5423,7 +5393,7 @@ static int VZLayer (Draw_Interpretor& theDI,
   Handle(AIS_InteractiveContext) aContextAIS = ViewerTest::GetAISContext();
   if (aContextAIS.IsNull())
   {
-    std::cout << "No active viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -5481,7 +5451,7 @@ static int VZLayer (Draw_Interpretor& theDI,
       aLayerId = Graphic3d_ZLayerId_UNKNOWN;
       if (!aViewer->AddZLayer (aLayerId))
       {
-        std::cout << "Error: can not add a new z layer!\n";
+        Message::SendFail ("Error: can not add a new z layer");
         return 0;
       }
 
@@ -5495,7 +5465,7 @@ static int VZLayer (Draw_Interpretor& theDI,
       aLayerId = Graphic3d_ZLayerId_UNKNOWN;
       if (!aViewer->InsertLayerBefore (aLayerId, Graphic3d_ZLayerSettings(), anOtherLayerId))
       {
-        std::cout << "Error: can not add a new z layer!\n";
+        Message::SendFail ("Error: can not add a new z layer");
         return 0;
       }
 
@@ -5509,7 +5479,7 @@ static int VZLayer (Draw_Interpretor& theDI,
       aLayerId = Graphic3d_ZLayerId_UNKNOWN;
       if (!aViewer->InsertLayerAfter (aLayerId, Graphic3d_ZLayerSettings(), anOtherLayerId))
       {
-        std::cout << "Error: can not add a new z layer!\n";
+        Message::SendFail ("Error: can not add a new z layer");
         return 0;
       }
 
@@ -5523,7 +5493,7 @@ static int VZLayer (Draw_Interpretor& theDI,
       {
         if (++anArgIter >= theArgNb)
         {
-          std::cout << "Syntax error: id of z layer to remove is missing\n";
+          Message::SendFail ("Syntax error: id of z layer to remove is missing");
           return 1;
         }
 
@@ -5537,7 +5507,7 @@ static int VZLayer (Draw_Interpretor& theDI,
        || aLayerId == Graphic3d_ZLayerId_TopOSD
        || aLayerId == Graphic3d_ZLayerId_BotOSD)
       {
-        std::cout << "Syntax error: standard Z layer can not be removed\n";
+        Message::SendFail ("Syntax error: standard Z layer can not be removed");
         return 1;
       }
 
@@ -5556,7 +5526,7 @@ static int VZLayer (Draw_Interpretor& theDI,
 
       if (!aViewer->RemoveZLayer (aLayerId))
       {
-        std::cout << "Z layer can not be removed!\n";
+        Message::SendFail ("Z layer can not be removed");
       }
       else
       {
@@ -5579,13 +5549,13 @@ static int VZLayer (Draw_Interpretor& theDI,
     {
       if (aLayerId == Graphic3d_ZLayerId_UNKNOWN)
       {
-        std::cout << "Syntax error: id of Z layer is missing\n";
+        Message::SendFail ("Syntax error: id of Z layer is missing");
         return 1;
       }
 
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error: name is missing\n";
+        Message::SendFail ("Syntax error: name is missing");
         return 1;
       }
 
@@ -5597,13 +5567,13 @@ static int VZLayer (Draw_Interpretor& theDI,
     {
       if (aLayerId == Graphic3d_ZLayerId_UNKNOWN)
       {
-        std::cout << "Syntax error: id of Z layer is missing\n";
+        Message::SendFail ("Syntax error: id of Z layer is missing");
         return 1;
       }
 
       if (anArgIter + 2 >= theArgNb)
       {
-        std::cout << "Syntax error: origin coordinates are missing\n";
+        Message::SendFail ("Syntax error: origin coordinates are missing");
         return 1;
       }
 
@@ -5658,7 +5628,7 @@ static int VZLayer (Draw_Interpretor& theDI,
       {
         if (++anArgIter >= theArgNb)
         {
-          std::cout << "Syntax error: id of Z layer is missing\n";
+          Message::SendFail ("Syntax error: id of Z layer is missing");
           return 1;
         }
 
@@ -5677,7 +5647,7 @@ static int VZLayer (Draw_Interpretor& theDI,
                                      || anArg == "enable";
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error: option name is missing\n";
+        Message::SendFail ("Syntax error: option name is missing");
         return 1;
       }
 
@@ -5687,7 +5657,7 @@ static int VZLayer (Draw_Interpretor& theDI,
       {
         if (++anArgIter >= theArgNb)
         {
-          std::cout << "Syntax error: id of Z layer is missing\n";
+          Message::SendFail ("Syntax error: id of Z layer is missing");
           return 1;
         }
 
@@ -5719,7 +5689,7 @@ static int VZLayer (Draw_Interpretor& theDI,
         {
           if (anArgIter + 2 >= theArgNb)
           {
-            std::cout << "Syntax error: factor and units values for depth offset are missing\n";
+            Message::SendFail ("Syntax error: factor and units values for depth offset are missing");
             return 1;
           }
 
@@ -5765,7 +5735,7 @@ static int VZLayer (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Syntax error: unknown option " << theArgVec[anArgIter] << "\n";
+      Message::SendFail() << "Syntax error: unknown option " << theArgVec[anArgIter];
       return 1;
     }
   }
@@ -5824,10 +5794,10 @@ void V3d_LineItem::Compute (const Handle(PrsMgr_PresentationManager3d)& /*thePre
                             const Standard_Integer /*theMode*/)
 {
   thePresentation->Clear();
-  Quantity_Color aColor (1.0, 0, 0, Quantity_TOC_RGB);
+  Quantity_Color aColor (Quantity_NOC_RED);
   Standard_Integer aWidth, aHeight;
   ViewerTest::CurrentView()->Window()->Size (aWidth, aHeight);
-  Handle (Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (thePresentation);
+  Handle(Graphic3d_Group) aGroup = thePresentation->CurrentGroup();
   Handle(Graphic3d_ArrayOfPolylines) aPrim = new Graphic3d_ArrayOfPolylines(5);
   aPrim->AddVertex(myX1, aHeight-myY1, 0.);
   aPrim->AddVertex(myX2, aHeight-myY2, 0.);
@@ -5884,7 +5854,7 @@ static int VLayerLine(Draw_Interpretor& di, Standard_Integer argc, const char** 
   if (argc > 6
   && !ViewerTest::ParseLineType (argv[6], aLineType))
   {
-    std::cout << "Syntax error: unknown line type '" << argv[6] << "'\n";
+    Message::SendFail() << "Syntax error: unknown line type '" << argv[6] << "'";
     return 1;
   }
 
@@ -5927,7 +5897,7 @@ static int VGrid (Draw_Interpretor& /*theDI*/,
   Handle(V3d_Viewer) aViewer = ViewerTest::GetViewerFromContext();
   if (aView.IsNull() || aViewer.IsNull())
   {
-    std::cerr << "Error: no active view\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -5964,7 +5934,7 @@ static int VGrid (Draw_Interpretor& /*theDI*/,
       }
       else
       {
-        std::cout << "Syntax error at '" << anArgNext << "'\n";
+        Message::SendFail() << "Syntax error at '" << anArgNext << "'";
         return 1;
       }
     }
@@ -5987,7 +5957,7 @@ static int VGrid (Draw_Interpretor& /*theDI*/,
       }
       else
       {
-        std::cout << "Syntax error at '" << anArgNext << "'\n";
+        Message::SendFail() << "Syntax error at '" << anArgNext << "'";
         return 1;
       }
     }
@@ -6009,7 +5979,7 @@ static int VGrid (Draw_Interpretor& /*theDI*/,
       if (aNewStepXY.x() <= 0.0
        || aNewStepXY.y() <= 0.0)
       {
-        std::cout << "Syntax error: wrong step '" << theArgVec[anArgIter + 1] << " " << theArgVec[anArgIter + 2] << "'\n";
+        Message::SendFail() << "Syntax error: wrong step '" << theArgVec[anArgIter + 1] << " " << theArgVec[anArgIter + 2] << "'";
         return 1;
       }
       anArgIter += 2;
@@ -6037,7 +6007,7 @@ static int VGrid (Draw_Interpretor& /*theDI*/,
       aNewSizeXY.SetValues (Draw::Atof (theArgVec[anArgIter]), 0.0);
       if (aNewStepXY.x() <= 0.0)
       {
-        std::cout << "Syntax error: wrong size '" << theArgVec[anArgIter] << "'\n";
+        Message::SendFail() << "Syntax error: wrong size '" << theArgVec[anArgIter] << "'";
         return 1;
       }
     }
@@ -6050,7 +6020,7 @@ static int VGrid (Draw_Interpretor& /*theDI*/,
       if (aNewStepXY.x() <= 0.0
        || aNewStepXY.y() <= 0.0)
       {
-        std::cout << "Syntax error: wrong size '" << theArgVec[anArgIter + 1] << " " << theArgVec[anArgIter + 2] << "'\n";
+        Message::SendFail() << "Syntax error: wrong size '" << theArgVec[anArgIter + 1] << " " << theArgVec[anArgIter + 2] << "'";
         return 1;
       }
       anArgIter += 2;
@@ -6087,7 +6057,7 @@ static int VGrid (Draw_Interpretor& /*theDI*/,
     }
     else
     {
-      std::cout << "Syntax error at '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error at '" << anArg << "'";
       return 1;
     }
   }
@@ -6143,7 +6113,7 @@ static int VGrid (Draw_Interpretor& /*theDI*/,
       aDivisionNumber = (int )aNewStepXY[1];
       if (aDivisionNumber < 1)
       {
-        std::cout << "Syntax error: invalid division number '" << aNewStepXY[1] << "'\n";
+        Message::SendFail() << "Syntax error: invalid division number '" << aNewStepXY[1] << "'";
         return 1;
       }
     }
@@ -6162,7 +6132,7 @@ static int VGrid (Draw_Interpretor& /*theDI*/,
         aRadius = aNewSizeXY.x();
         if (aNewSizeXY.y() != 0.0)
         {
-          std::cout << "Syntax error: circular size should be specified as radius\n";
+          Message::SendFail ("Syntax error: circular size should be specified as radius");
           return 1;
         }
       }
@@ -6188,7 +6158,7 @@ static int VPriviledgedPlane (Draw_Interpretor& theDI,
 {
   if (theArgNb != 1 && theArgNb != 7 && theArgNb != 10)
   {
-    std::cerr << "Error: wrong number of arguments! See usage:\n";
+    Message::SendFail ("Error: wrong number of arguments! See usage:");
     theDI.PrintHelp (theArgVec[0]);
     return 1;
   }
@@ -6197,7 +6167,7 @@ static int VPriviledgedPlane (Draw_Interpretor& theDI,
   Handle(V3d_Viewer) aViewer = ViewerTest::GetViewerFromContext();
   if (aViewer.IsNull())
   {
-    std::cerr << "Error: no active viewer. Please call vinit.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -6255,7 +6225,7 @@ static int VConvert (Draw_Interpretor& theDI,
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cerr << "Error: no active view. Please call vinit.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -6277,7 +6247,7 @@ static int VConvert (Draw_Interpretor& theDI,
   // non-numeric argument too early
   if (aCoord.IsEmpty())
   {
-    std::cerr << "Error: wrong number of arguments! See usage:\n";
+    Message::SendFail ("Error: wrong number of arguments! See usage:");
     theDI.PrintHelp (theArgVec[0]);
     return 1;
   }
@@ -6293,7 +6263,7 @@ static int VConvert (Draw_Interpretor& theDI,
     else if (anArg == "ray")    aMode = Ray;
     else
     {
-      std::cerr << "Error: wrong argument " << anArg << "! See usage:\n";
+      Message::SendFail() << "Error: wrong argument " << anArg << "! See usage:";
       theDI.PrintHelp (theArgVec[0]);
       return 1;
     }
@@ -6304,7 +6274,7 @@ static int VConvert (Draw_Interpretor& theDI,
       (aCoord.Length() == 2 && theArgNb > 4) ||
       (aCoord.Length() == 3 && theArgNb > 5))
   {
-    std::cerr << "Error: wrong number of arguments! See usage:\n";
+    Message::SendFail ("Error: wrong number of arguments! See usage:");
     theDI.PrintHelp (theArgVec[0]);
     return 1;
   }
@@ -6320,7 +6290,7 @@ static int VConvert (Draw_Interpretor& theDI,
       case View   : theDI << "View Vv: "   << aView->Convert ((Standard_Integer)aCoord (1)); return 0;
       case Window : theDI << "Window Vp: " << aView->Convert (aCoord (1)); return 0;
       default:
-        std::cerr << "Error: wrong arguments! See usage:\n";
+        Message::SendFail ("Error: wrong arguments! See usage:");
         theDI.PrintHelp (theArgVec[0]);
         return 1;
     }
@@ -6361,7 +6331,7 @@ static int VConvert (Draw_Interpretor& theDI,
         return 0;
 
       default:
-        std::cerr << "Error: wrong arguments! See usage:\n";
+        Message::SendFail ("Error: wrong arguments! See usage:");
         theDI.PrintHelp (theArgVec[0]);
         return 1;
     }
@@ -6383,7 +6353,7 @@ static int VConvert (Draw_Interpretor& theDI,
         return 0;
 
       default:
-        std::cerr << "Error: wrong arguments! See usage:\n";
+        Message::SendFail ("Error: wrong arguments! See usage:");
         theDI.PrintHelp (theArgVec[0]);
         return 1;
     }
@@ -6405,7 +6375,7 @@ static int VFps (Draw_Interpretor& theDI,
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cerr << "No active view. Please call vinit.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -6429,13 +6399,13 @@ static int VFps (Draw_Interpretor& theDI,
       aFramesNb = anArg.IntegerValue();
       if (aFramesNb <= 0)
       {
-        std::cerr << "Syntax error at '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at '" << anArg << "'";
         return 1;
       }
     }
     else
     {
-      std::cerr << "Syntax error at '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error at '" << anArg << "'";
       return 1;
     }
   }
@@ -6583,7 +6553,7 @@ static int VGlDebug (Draw_Interpretor& theDI,
     {
       Standard_Boolean toShowWarns = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toShowWarns))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toShowWarns))
       {
         --anArgIter;
       }
@@ -6599,7 +6569,7 @@ static int VGlDebug (Draw_Interpretor& theDI,
     {
       Standard_Boolean toShow = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toShow))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toShow))
       {
         --anArgIter;
       }
@@ -6615,7 +6585,7 @@ static int VGlDebug (Draw_Interpretor& theDI,
     {
       Standard_Boolean toSuppress = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toSuppress))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toSuppress))
       {
         --anArgIter;
       }
@@ -6629,7 +6599,7 @@ static int VGlDebug (Draw_Interpretor& theDI,
     {
       Standard_Boolean toSync = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toSync))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toSync))
       {
         --anArgIter;
       }
@@ -6657,13 +6627,13 @@ static int VGlDebug (Draw_Interpretor& theDI,
     else if (anArgCase == "-debug")
     {
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnableDebug))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnableDebug))
       {
         --anArgIter;
       }
       aDefCaps->contextDebug = toEnableDebug;
     }
-    else if (ViewerTest::ParseOnOff (anArg, toEnableDebug)
+    else if (Draw::ParseOnOff (anArg, toEnableDebug)
           && (anArgIter + 1 == theArgNb))
     {
       // simple alias to turn on almost everything
@@ -6689,7 +6659,7 @@ static int VGlDebug (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Error: wrong syntax at '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error at '" << anArg << "'";
       return 1;
     }
   }
@@ -6719,7 +6689,7 @@ static int VVbo (Draw_Interpretor& theDI,
   {
     if (!toSet)
     {
-      std::cerr << "No active view!\n";
+      Message::SendFail ("Error: no active viewer");
     }
     return 1;
   }
@@ -6759,6 +6729,7 @@ static int VCaps (Draw_Interpretor& theDI,
 
   if (theArgNb < 2)
   {
+    theDI << "sRGB:    " << (aCaps->sRGBDisable       ? "0" : "1") << "\n";
     theDI << "VBO:     " << (aCaps->vboDisable        ? "0" : "1") << "\n";
     theDI << "Sprites: " << (aCaps->pntSpritesDisable ? "0" : "1") << "\n";
     theDI << "SoftMode:" << (aCaps->contextNoAccel    ? "1" : "0") << "\n";
@@ -6770,6 +6741,7 @@ static int VCaps (Draw_Interpretor& theDI,
     theDI << "WinBuffer: " << (aCaps->useSystemBuffer ? "1" : "0") << "\n";
     theDI << "NoExt:"    << (aCaps->contextNoExtensions ? "1" : "0") << "\n";
     theDI << "MaxVersion:" << aCaps->contextMajorVersionUpper << "." << aCaps->contextMinorVersionUpper << "\n";
+    theDI << "CompressTextures: " << (aCaps->compressedTexturesDisable ? "0" : "1") << "\n";
     return 0;
   }
 
@@ -6788,7 +6760,7 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -6798,7 +6770,7 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -6808,17 +6780,37 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
       aCaps->usePolygonMode = toEnable;
     }
+    else if (anArgCase == "-srgb")
+    {
+      Standard_Boolean toEnable = Standard_True;
+      if (++anArgIter < theArgNb
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
+      {
+        --anArgIter;
+      }
+      aCaps->sRGBDisable = !toEnable;
+    }
+    else if (anArgCase == "-compressedtextures")
+    {
+      Standard_Boolean toEnable = Standard_True;
+      if (++anArgIter < theArgNb
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
+      {
+        --anArgIter;
+      }
+      aCaps->compressedTexturesDisable = !toEnable;
+    }
     else if (anArgCase == "-vbo")
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -6829,7 +6821,7 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -6839,7 +6831,7 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -6853,7 +6845,7 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -6864,7 +6856,7 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -6877,7 +6869,7 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -6892,7 +6884,7 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -6907,7 +6899,7 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -6919,7 +6911,7 @@ static int VCaps (Draw_Interpretor& theDI,
     {
       Standard_Boolean toDisable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toDisable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toDisable))
       {
         --anArgIter;
       }
@@ -6945,7 +6937,7 @@ static int VCaps (Draw_Interpretor& theDI,
       if (aVer[0] < -1
        || aVer[1] < -1)
       {
-        std::cout << "Syntax error at '" << anArgCase << "'\n";
+        Message::SendFail() << "Syntax error at '" << anArgCase << "'";
         return 1;
       }
       aCaps->contextMajorVersionUpper = aVer[0];
@@ -6953,7 +6945,7 @@ static int VCaps (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Error: unknown argument '" << anArg << "'\n";
+      Message::SendFail() << "Error: unknown argument '" << anArg << "'";
       return 1;
     }
   }
@@ -6977,14 +6969,14 @@ static int VMemGpu (Draw_Interpretor& theDI,
   Handle(AIS_InteractiveContext) aContextAIS = ViewerTest::GetAISContext();
   if (aContextAIS.IsNull())
   {
-    std::cerr << "No active view. Please call vinit.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
   Handle(Graphic3d_GraphicDriver) aDriver = aContextAIS->CurrentViewer()->Driver();
   if (aDriver.IsNull())
   {
-    std::cerr << "Graphic driver not available.\n";
+    Message::SendFail ("Error: graphic driver not available");
     return 1;
   }
 
@@ -6992,7 +6984,7 @@ static int VMemGpu (Draw_Interpretor& theDI,
   TCollection_AsciiString anInfo;
   if (!aDriver->MemoryInfo (aFreeBytes, anInfo))
   {
-    std::cerr << "Information not available.\n";
+    Message::SendFail ("Error: information not available");
     return 1;
   }
 
@@ -7020,12 +7012,13 @@ static int VReadPixel (Draw_Interpretor& theDI,
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cerr << "No active view. Please call vinit.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
   else if (theArgNb < 3)
   {
-    std::cerr << "Usage : " << theArgVec[0] << " xPixel yPixel [{rgb|rgba|depth|hls|rgbf|rgbaf}=rgba] [name]\n";
+    Message::SendFail() << "Syntax error: wrong number of arguments.\n"
+                        << "Usage: " << theArgVec[0] << " xPixel yPixel [{rgb|rgba|depth|hls|rgbf|rgbaf}=rgba] [name]";
     return 1;
   }
 
@@ -7038,20 +7031,23 @@ static int VReadPixel (Draw_Interpretor& theDI,
   const Standard_Integer anY = Draw::Atoi (theArgVec[2]);
   if (anX < 0 || anX >= aWidth || anY < 0 || anY > aHeight)
   {
-    std::cerr << "Pixel coordinates (" << anX << "; " << anY << ") are out of view (" << aWidth << " x " << aHeight << ")\n";
+    Message::SendFail() << "Error: pixel coordinates (" << anX << "; " << anY << ") are out of view (" << aWidth << " x " << aHeight << ")";
     return 1;
   }
 
-  bool toShowName = false, toShowHls = false, toShowHex = false;
+  bool toShowName = false, toShowHls = false, toShowHex = false, toShow_sRGB = false;
   for (Standard_Integer anIter = 3; anIter < theArgNb; ++anIter)
   {
     TCollection_AsciiString aParam (theArgVec[anIter]);
     aParam.LowerCase();
     if (aParam == "-rgb"
-     || aParam == "rgb")
+     || aParam == "rgb"
+     || aParam == "-srgb"
+     || aParam == "srgb")
     {
       aFormat     = Image_Format_RGB;
       aBufferType = Graphic3d_BT_RGB;
+      toShow_sRGB = aParam == "-srgb" || aParam == "srgb";
     }
     else if (aParam == "-hls"
           || aParam == "hls")
@@ -7067,10 +7063,13 @@ static int VReadPixel (Draw_Interpretor& theDI,
       aBufferType = Graphic3d_BT_RGB;
     }
     else if (aParam == "-rgba"
-          || aParam == "rgba")
+          || aParam == "rgba"
+          || aParam == "-srgba"
+          || aParam == "srgba")
     {
       aFormat     = Image_Format_RGBA;
       aBufferType = Graphic3d_BT_RGBA;
+      toShow_sRGB = aParam == "-srgba" || aParam == "srgba";
     }
     else if (aParam == "-rgbaf"
           || aParam == "rgbaf")
@@ -7096,7 +7095,7 @@ static int VReadPixel (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Syntax error at '" << aParam << "'\n";
+      Message::SendFail() << "Syntax error at '" << aParam << "'";
       return 1;
     }
   }
@@ -7104,12 +7103,12 @@ static int VReadPixel (Draw_Interpretor& theDI,
   Image_PixMap anImage;
   if (!anImage.InitTrash (aFormat, aWidth, aHeight))
   {
-    std::cerr << "Image allocation failed\n";
+    Message::SendFail ("Error: image allocation failed");
     return 1;
   }
   else if (!aView->ToPixMap (anImage, aWidth, aHeight, aBufferType))
   {
-    std::cerr << "Image dump failed\n";
+    Message::SendFail ("Error: image dump failed");
     return 1;
   }
 
@@ -7123,7 +7122,7 @@ static int VReadPixel (Draw_Interpretor& theDI,
   }
   theDI.Reset();
 
-  Quantity_ColorRGBA aColor = anImage.PixelColor (anX, anY);
+  Quantity_ColorRGBA aColor = anImage.PixelColor (anX, anY, true);
   if (toShowName)
   {
     if (aBufferType == Graphic3d_BT_RGBA)
@@ -7157,6 +7156,11 @@ static int VReadPixel (Draw_Interpretor& theDI,
         {
           theDI << aColor.GetRGB().Hue() << " " << aColor.GetRGB().Light() << " " << aColor.GetRGB().Saturation();
         }
+        else if (toShow_sRGB)
+        {
+          const Graphic3d_Vec4 aColor_sRGB = Quantity_ColorRGBA::Convert_LinearRGB_To_sRGB ((Graphic3d_Vec4 )aColor);
+          theDI << aColor_sRGB.r() << " " << aColor_sRGB.g() << " " << aColor_sRGB.b();
+        }
         else
         {
           theDI << aColor.GetRGB().Red() << " " << aColor.GetRGB().Green() << " " << aColor.GetRGB().Blue();
@@ -7165,7 +7169,8 @@ static int VReadPixel (Draw_Interpretor& theDI,
       }
       case Graphic3d_BT_RGBA:
       {
-        theDI << aColor.GetRGB().Red() << " " << aColor.GetRGB().Green() << " " << aColor.GetRGB().Blue() << " " << aColor.Alpha();
+        const Graphic3d_Vec4 aVec4 = toShow_sRGB ? Quantity_ColorRGBA::Convert_LinearRGB_To_sRGB ((Graphic3d_Vec4 )aColor) : (Graphic3d_Vec4 )aColor;
+        theDI << aVec4.r() << " " << aVec4.g() << " " << aVec4.b() << " " << aVec4.a();
         break;
       }
       case Graphic3d_BT_Depth:
@@ -7291,7 +7296,7 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
 {
   if (theArgNb < 3)
   {
-    std::cout << "Syntax error: not enough arguments.\n";
+    Message::SendFail ("Syntax error: not enough arguments");
     return 1;
   }
 
@@ -7317,7 +7322,7 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
       aTolColor = Atof (theArgVec[++anArgIter]);
       if (aTolColor < 0.0 || aTolColor > 1.0)
       {
-        std::cout << "Syntax error at '" << anArg << " " << theArgVec[anArgIter] << "'\n";
+        Message::SendFail() << "Syntax error at '" << anArg << " " << theArgVec[anArgIter] << "'";
         return 1;
       }
     }
@@ -7325,7 +7330,7 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
     {
       Standard_Boolean toEnable = Standard_True;
       if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
       {
         ++anArgIter;
       }
@@ -7335,7 +7340,7 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
     {
       Standard_Boolean toEnable = Standard_True;
       if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
       {
         ++anArgIter;
       }
@@ -7345,7 +7350,7 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
     {
       ViewerTest_EventManager::ToExitOnCloseView() = true;
       if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], ViewerTest_EventManager::ToExitOnCloseView()))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], ViewerTest_EventManager::ToExitOnCloseView()))
       {
         ++anArgIter;
       }
@@ -7355,7 +7360,7 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
     {
       ViewerTest_EventManager::ToCloseViewOnEscape() = true;
       if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], ViewerTest_EventManager::ToCloseViewOnEscape()))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], ViewerTest_EventManager::ToCloseViewOnEscape()))
       {
         ++anArgIter;
       }
@@ -7379,7 +7384,7 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
       aTolColor = anArg.RealValue();
       if (aTolColor < 0.0 || aTolColor > 1.0)
       {
-        std::cout << "Syntax error at '" << anArg << " " << theArgVec[anArgIter] << "'\n";
+        Message::SendFail() << "Syntax error at '" << anArg << " " << theArgVec[anArgIter] << "'";
         return 1;
       }
     }
@@ -7401,7 +7406,7 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
     }
     else
     {
-      std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+      Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
       return 1;
     }
   }
@@ -7410,12 +7415,12 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
   Handle(Image_AlienPixMap) anImgNew = new Image_AlienPixMap();
   if (!anImgRef->Load (anImgPathRef))
   {
-    std::cout << "Error: image file '" << anImgPathRef << "' cannot be read\n";
+    Message::SendFail() << "Error: image file '" << anImgPathRef << "' cannot be read";
     return 1;
   }
   if (!anImgNew->Load (anImgPathNew))
   {
-    std::cout << "Error: image file '" << anImgPathNew << "' cannot be read\n";
+    Message::SendFail() << "Error: image file '" << anImgPathNew << "' cannot be read";
     return 1;
   }
 
@@ -7438,14 +7443,14 @@ static int VDiffImage (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
     aDiff = new Image_AlienPixMap();
     if (!aDiff->InitTrash (Image_Format_Gray, anImgRef->SizeX(), anImgRef->SizeY()))
     {
-      std::cout << "Error: cannot allocate memory for diff image " << anImgRef->SizeX() << "x" << anImgRef->SizeY() << "\n";
+      Message::SendFail() << "Error: cannot allocate memory for diff image " << anImgRef->SizeX() << "x" << anImgRef->SizeY();
       return 1;
     }
     aComparer.SaveDiffImage (*aDiff);
     if (!aDiffImagePath.IsEmpty()
      && !aDiff->Save (aDiffImagePath))
     {
-      std::cout << "Error: diff image file '" << aDiffImagePath << "' cannot be written\n";
+      Message::SendFail() << "Error: diff image file '" << aDiffImagePath << "' cannot be written";
       return 1;
     }
   }
@@ -7538,7 +7543,7 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
   const Handle(AIS_InteractiveContext)& aCtx = ViewerTest::GetAISContext();
   if (aCtx.IsNull())
   {
-    std::cout << "Error: no active View\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -7552,7 +7557,7 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
     {
       toAllowOverlap = true;
       if (anArgIter + 1 < theNbArgs
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toAllowOverlap))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toAllowOverlap))
       {
         ++anArgIter;
       }
@@ -7571,16 +7576,11 @@ static Standard_Integer VSelect (Draw_Interpretor& ,
     }
     else
     {
-      std::cout << "Syntax error at '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error at '" << anArg << "'";
       return 1;
     }
   }
-  if (toAllowOverlap
-   && aPnts.Length() != 2)
-  {
-    std::cout << "Syntax error: -allowoverlap key is applied only for rectangle selection\n";
-    return 1;
-  }
+
   if (toAllowOverlap)
   {
     aCtx->MainSelector()->AllowOverlapDetection (toAllowOverlap);
@@ -7633,7 +7633,7 @@ static Standard_Integer VMoveTo (Draw_Interpretor& theDI,
   const Handle(V3d_View)&               aView    = ViewerTest::CurrentView();
   if (aContext.IsNull())
   {
-    std::cout << "Error: no active View\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -7647,7 +7647,7 @@ static Standard_Integer VMoveTo (Draw_Interpretor& theDI,
     {
       if (anArgIter + 1 < theNbArgs)
       {
-        std::cout << "Syntax error at '" << theArgVec[anArgIter + 1] << "'\n";
+        Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter + 1] << "'";
         return 1;
       }
 
@@ -7675,7 +7675,7 @@ static Standard_Integer VMoveTo (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+      Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
       return 1;
     }
   }
@@ -7683,7 +7683,7 @@ static Standard_Integer VMoveTo (Draw_Interpretor& theDI,
   if (aMousePos.x() == IntegerLast()
    || aMousePos.y() == IntegerLast())
   {
-    std::cout << "Syntax error: wrong number of arguments\n";
+    Message::SendFail ("Syntax error: wrong number of arguments");
     return 1;
   }
 
@@ -7881,7 +7881,7 @@ static int VViewParams (Draw_Interpretor& theDi, Standard_Integer theArgsNb, con
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cout << theArgVec[0] << ": please initialize or activate view.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -8046,7 +8046,7 @@ static int VViewParams (Draw_Interpretor& theDi, Standard_Integer theArgsNb, con
     }
     else
     {
-      std::cout << "Syntax error at '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error at '" << anArg << "'";
       return 1;
     }
   }
@@ -8094,7 +8094,7 @@ static Standard_Integer V2DMode (Draw_Interpretor&, Standard_Integer theArgsNb, 
   Handle(ViewerTest_V3dView) aV3dView = Handle(ViewerTest_V3dView)::DownCast (ViewerTest::CurrentView());
   if (aV3dView.IsNull())
   {
-    std::cout << "Error: no active view.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
   for (Standard_Integer anArgIt = 1; anArgIt < theArgsNb; ++anArgIt)
@@ -8109,7 +8109,7 @@ static Standard_Integer V2DMode (Draw_Interpretor&, Standard_Integer theArgsNb, 
       TCollection_AsciiString aViewName = aViewNames.GetViewName();
       if (!ViewerTest_myViews.IsBound1 (aViewName))
       {
-        std::cout << "Syntax error: unknown view '" << theArgVec[anArgIt - 1] << "'.\n";
+        Message::SendFail() << "Syntax error: unknown view '" << theArgVec[anArgIt - 1] << "'";
         return 1;
       }
       aV3dView = Handle(ViewerTest_V3dView)::DownCast (ViewerTest_myViews.Find1 (aViewName));
@@ -8117,18 +8117,18 @@ static Standard_Integer V2DMode (Draw_Interpretor&, Standard_Integer theArgsNb, 
     else if (anArgCase == "-mode")
     {
       if (anArgIt + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIt + 1], is2dMode))
+       && Draw::ParseOnOff (theArgVec[anArgIt + 1], is2dMode))
       {
         ++anArgIt;
       }
     }
-    else if (ViewerTest::ParseOnOff (theArgVec[anArgIt], is2dMode))
+    else if (Draw::ParseOnOff (theArgVec[anArgIt], is2dMode))
     {
       //
     }
     else
     {
-      std::cout << "Syntax error: unknown argument " << anArg << ".\n";
+      Message::SendFail() << "Syntax error: unknown argument " << anArg;
       return 1;
     }
   }
@@ -8157,7 +8157,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
   }
   if (aCtx.IsNull())
   {
-    std::cout << "Error: no active view\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -8165,7 +8165,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
   TCollection_AsciiString aNameArg (theArgVec[anArgIter++]);
   if (aNameArg.IsEmpty())
   {
-    std::cout << "Syntax error: animation name is not defined.\n";
+    Message::SendFail ("Syntax error: animation name is not defined");
     return 1;
   }
 
@@ -8179,7 +8179,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
   }
   else if (aNameArg.Value (1) == '-')
   {
-    std::cout << "Syntax error: invalid animation name '" << aNameArg  << "'.\n";
+    Message::SendFail() << "Syntax error: invalid animation name '" << aNameArg  << "'";
     return 1;
   }
 
@@ -8200,7 +8200,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (aSplitPos == aNameArg.Length())
       {
-        std::cout << "Syntax error: animation name is not defined.\n";
+        Message::SendFail ("Syntax error: animation name is not defined");
         return 1;
       }
 
@@ -8326,7 +8326,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg << "";
         return 1;
       }
       aPlaySpeed = Draw::Atof (theArgVec[anArgIter]);
@@ -8349,7 +8349,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
 
@@ -8378,7 +8378,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
 
@@ -8397,7 +8397,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
         aRecParams.FpsDen = aDenStr.IntegerValue();
         if (aRecParams.FpsDen < 1)
         {
-          std::cout << "Syntax error at " << anArg << ".\n";
+          Message::SendFail() << "Syntax error at " << anArg;
           return 1;
         }
       }
@@ -8406,7 +8406,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
       aRecParams.Format = theArgVec[anArgIter];
@@ -8417,7 +8417,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
       aRecParams.PixelFormat = theArgVec[anArgIter];
@@ -8428,7 +8428,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
       aRecParams.VideoCodec = theArgVec[anArgIter];
@@ -8440,7 +8440,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
       const TCollection_AsciiString aParamName = anArg.SubString (2, anArg.Length());
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
 
@@ -8453,7 +8453,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
 
@@ -8466,7 +8466,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
 
@@ -8478,7 +8478,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
 
@@ -8493,7 +8493,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
 
@@ -8509,7 +8509,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
 
@@ -8518,7 +8518,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
       Handle(AIS_InteractiveObject) anObject;
       if (!aMapOfAIS.Find2 (anObjName, anObject))
       {
-        std::cout << "Syntax error: wrong object name at " << anArg << "\n";
+        Message::SendFail() << "Syntax error: wrong object name at " << anArg;
         return 1;
       }
 
@@ -8540,7 +8540,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
           if (aTrsfArgIter + 4 >= theArgNb
           || !parseQuaternion (theArgVec + aTrsfArgIter + 1, aRotQuats[anIndex]))
           {
-            std::cout << "Syntax error at " << aTrsfArg << ".\n";
+            Message::SendFail() << "Syntax error at " << aTrsfArg;
             return 1;
           }
           aTrsfArgIter += 4;
@@ -8552,7 +8552,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
           if (aTrsfArgIter + 3 >= theArgNb
           || !parseXYZ (theArgVec + aTrsfArgIter + 1, aLocPnts[anIndex]))
           {
-            std::cout << "Syntax error at " << aTrsfArg << ".\n";
+            Message::SendFail() << "Syntax error at " << aTrsfArg;
             return 1;
           }
           aTrsfArgIter += 3;
@@ -8562,14 +8562,14 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
           isTrsfSet = Standard_True;
           if (++aTrsfArgIter >= theArgNb)
           {
-            std::cout << "Syntax error at " << aTrsfArg << ".\n";
+            Message::SendFail() << "Syntax error at " << aTrsfArg;
             return 1;
           }
 
           const TCollection_AsciiString aScaleStr (theArgVec[aTrsfArgIter]);
           if (!aScaleStr.IsRealValue())
           {
-            std::cout << "Syntax error at " << aTrsfArg << ".\n";
+            Message::SendFail() << "Syntax error at " << aTrsfArg;
             return 1;
           }
           aScales[anIndex] = aScaleStr.RealValue();
@@ -8582,7 +8582,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
       }
       if (!isTrsfSet)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
       else if (aTrsfArgIter >= theArgNb)
@@ -8628,14 +8628,14 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
           isTrsfSet = Standard_True;
           if (++aViewArgIter >= theArgNb)
           {
-            std::cout << "Syntax error at " << anArg << ".\n";
+            Message::SendFail() << "Syntax error at " << anArg;
             return 1;
           }
 
           const TCollection_AsciiString aScaleStr (theArgVec[aViewArgIter]);
           if (!aScaleStr.IsRealValue())
           {
-            std::cout << "Syntax error at " << aViewArg << ".\n";
+            Message::SendFail() << "Syntax error at " << aViewArg;
             return 1;
           }
           Standard_Real aScale = aScaleStr.RealValue();
@@ -8652,7 +8652,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
           if (aViewArgIter + 3 >= theArgNb
           || !parseXYZ (theArgVec + aViewArgIter + 1, anXYZ))
           {
-            std::cout << "Syntax error at " << aViewArg << ".\n";
+            Message::SendFail() << "Syntax error at " << aViewArg;
             return 1;
           }
           aViewArgIter += 3;
@@ -8679,7 +8679,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
       }
       if (!isTrsfSet)
       {
-        std::cout << "Syntax error at " << anArg << ".\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
       else if (aViewArgIter >= theArgNb)
@@ -8692,7 +8692,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Syntax error at " << anArg << ".\n";
+      Message::SendFail() << "Syntax error at " << anArg;
       return 1;
     }
   }
@@ -8781,7 +8781,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
       aRecorder = new Image_VideoRecorder();
       if (!aRecorder->Open (aRecFile.ToCString(), aRecParams))
       {
-        std::cout << "Error: failed to open video file for recording\n";
+        Message::SendFail ("Error: failed to open video file for recording");
         return 0;
       }
 
@@ -8791,9 +8791,10 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
     // Manage frame-rated animation here
     Standard_Real aPts = aPlayStartTime;
     int64_t aNbFrames = 0;
-    Message_ProgressSentry aPSentry (aProgress, "Video recording, sec", 0, Max (1, Standard_Integer(aPlayDuration / aPlaySpeed)), 1);
+    Message_ProgressScope aPS(Message_ProgressIndicator::Start(aProgress),
+                              "Video recording, sec", Max(1, Standard_Integer(aPlayDuration / aPlaySpeed)));
     Standard_Integer aSecondsProgress = 0;
-    for (; aPts <= anUpperPts && aPSentry.More();)
+    for (; aPts <= anUpperPts && aPS.More();)
     {
       const Standard_Real aRecPts = aPlaySpeed * ((Standard_Real(aRecParams.FpsDen) / Standard_Real(aRecParams.FpsNum)) * Standard_Real(aNbFrames));
       aPts = aPlayStartTime + aRecPts;
@@ -8813,7 +8814,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
         aDumpParams.ToAdjustAspect = Standard_True;
         if (!aView->ToPixMap (aRecorder->ChangeFrame(), aDumpParams))
         {
-          std::cout << "Error: view dump is failed!\n";
+          Message::SendFail ("Error: view dump is failed");
           return 0;
         }
         aFlipper.FlipY (aRecorder->ChangeFrame());
@@ -8829,7 +8830,7 @@ static Standard_Integer VAnimation (Draw_Interpretor& theDI,
 
       while (aSecondsProgress < Standard_Integer(aRecPts / aPlaySpeed))
       {
-        aPSentry.Next();
+        aPS.Next();
         ++aSecondsProgress;
       }
     }
@@ -9105,7 +9106,7 @@ static int VTextureEnv (Draw_Interpretor& /*theDI*/, Standard_Integer theArgNb, 
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cerr << "No active view. Please call vinit.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -9149,9 +9150,9 @@ static int VTextureEnv (Draw_Interpretor& /*theDI*/, Standard_Integer theArgNb, 
 
   if (!isOk)
   {
-    std::cerr << "Usage :" << std::endl;
-    std::cerr << theArgVec[0] << " off" << std::endl;
-    std::cerr << theArgVec[0] << " on {index_of_std_texture(0..7)|texture_file_name} [{clamp|repeat} {decal|modulate} {nearest|bilinear|trilinear} scale_s scale_t translation_s translation_t rotation_degrees]" << std::endl;
+    Message::SendFail() << "Usage:\n"
+                        << theArgVec[0] << " off\n"
+                        << theArgVec[0] << " on {index_of_std_texture(0..7)|texture_file_name} [{clamp|repeat} {decal|modulate} {nearest|bilinear|trilinear} scale_s scale_t translation_s translation_t rotation_degrees]";
     return 1;
   }
 
@@ -9201,7 +9202,7 @@ namespace
     Handle(Graphic3d_ClipPlane) aClipPlane;
     if (!theRegPlanes.Find (theName, aClipPlane))
     {
-      std::cout << "Warning: no such plane.\n";
+      Message::SendWarning ("Warning: no such plane");
       return;
     }
 
@@ -9247,7 +9248,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
   const Handle(V3d_View)& anActiveView = ViewerTest::CurrentView();
   if (anActiveView.IsNull())
   {
-    std::cout << "Error: no active view.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -9270,7 +9271,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
   {
     if (theArgsNb < 3)
     {
-      std::cout << "Syntax error: plane name is required.\n";
+      Message::SendFail ("Syntax error: plane name is required");
       return 1;
     }
 
@@ -9299,19 +9300,19 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (!aRegPlanes.IsBound (aPlane))
       {
-        std::cout << "Error: no such plane.\n";
+        Message::SendFail ("Error: no such plane");
         return 1;
       }
       else if (theArgsNb < 4)
       {
-        std::cout << "Syntax error: enter name for new plane.\n";
+        Message::SendFail ("Syntax error: enter name for new plane");
         return 1;
       }
 
       TCollection_AsciiString aClone (theArgVec[3]);
       if (aRegPlanes.IsBound (aClone))
       {
-        std::cout << "Error: plane name is in use.\n";
+        Message::SendFail ("Error: plane name is in use");
         return 1;
       }
 
@@ -9353,7 +9354,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
   {
     if (theArgsNb < 5)
     {
-      std::cout << "Syntax error: need more arguments.\n";
+      Message::SendFail ("Syntax error: need more arguments");
       return 1;
     }
 
@@ -9380,7 +9381,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     // old syntax support
     if (theArgsNb < 3)
     {
-      std::cout << "Syntax error: need more arguments.\n";
+      Message::SendFail ("Syntax error: need more arguments");
       return 1;
     }
 
@@ -9388,7 +9389,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     aPlaneName = theArgVec[2];
     if (!aRegPlanes.Find (aPlaneName, aClipPlane))
     {
-      std::cout << "Error: no such plane '" << aPlaneName << "'.\n";
+      Message::SendFail() << "Error: no such plane '" << aPlaneName << "'";
       return 1;
     }
   }
@@ -9408,7 +9409,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
 
   if (theArgsNb - anArgIter < 1)
   {
-    std::cout << "Syntax error: need more arguments.\n";
+    Message::SendFail ("Syntax error: need more arguments");
     return 1;
   }
 
@@ -9420,7 +9421,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     aChangeArg.LowerCase();
 
     Standard_Boolean toEnable = Standard_True;
-    if (ViewerTest::ParseOnOff (aChangeArgs[0], toEnable))
+    if (Draw::ParseOnOff (aChangeArgs[0], toEnable))
     {
       aClipPlane->SetOn (toEnable);
     }
@@ -9429,7 +9430,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (aNbChangeArgs < 5)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
 
@@ -9441,7 +9442,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
         if (!aSubStr.IsIntegerValue()
           || aSubStr.IntegerValue() <= 0)
         {
-          std::cout << "Syntax error: unknown argument '" << aChangeArg << "'.\n";
+          Message::SendFail() << "Syntax error: unknown argument '" << aChangeArg << "'";
           return 1;
         }
         aSubIndex = aSubStr.IntegerValue();
@@ -9506,11 +9507,11 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (aNbChangeArgs < 2)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
 
-      if (ViewerTest::ParseOnOff (aChangeArgs[1], toEnable))
+      if (Draw::ParseOnOff (aChangeArgs[1], toEnable))
       {
         aClipPlane->SetCapping (toEnable);
         anArgIter += 1;
@@ -9527,11 +9528,11 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (aNbChangeArgs < 2)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
 
-      if (ViewerTest::ParseOnOff (aChangeArgs[1], toEnable))
+      if (Draw::ParseOnOff (aChangeArgs[1], toEnable))
       {
         aClipPlane->SetUseObjectMaterial (toEnable == Standard_True);
         anArgIter += 1;
@@ -9544,11 +9545,11 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (aNbChangeArgs < 2)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
 
-      if (ViewerTest::ParseOnOff (aChangeArgs[1], toEnable))
+      if (Draw::ParseOnOff (aChangeArgs[1], toEnable))
       {
         aClipPlane->SetUseObjectTexture (toEnable == Standard_True);
         anArgIter += 1;
@@ -9559,11 +9560,11 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (aNbChangeArgs < 2)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
 
-      if (ViewerTest::ParseOnOff (aChangeArgs[1], toEnable))
+      if (Draw::ParseOnOff (aChangeArgs[1], toEnable))
       {
         aClipPlane->SetUseObjectShader (toEnable == Standard_True);
         anArgIter += 1;
@@ -9573,12 +9574,12 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
           || aChangeArg == "color")
     {
       Quantity_Color aColor;
-      Standard_Integer aNbParsed = ViewerTest::ParseColor (aNbChangeArgs - 1,
-                                                           aChangeArgs + 1,
-                                                           aColor);
+      Standard_Integer aNbParsed = Draw::ParseColor (aNbChangeArgs - 1,
+                                                     aChangeArgs + 1,
+                                                     aColor);
       if (aNbParsed == 0)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
       aClipPlane->SetCappingColor (aColor);
@@ -9592,7 +9593,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
       Graphic3d_NameOfMaterial aMatName;
       if (!Graphic3d_MaterialAspect::MaterialFromName (aChangeArgs[1], aMatName))
       {
-        std::cout << "Syntax error: unknown material '" << aChangeArgs[1] << "'.\n";
+        Message::SendFail() << "Syntax error: unknown material '" << aChangeArgs[1] << "'";
         return 1;
       }
       aClipPlane->SetCappingMaterial (aMatName);
@@ -9632,7 +9633,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
         }
         else
         {
-          std::cout << "Syntax error at '" << aValStr << "'\n";
+          Message::SendFail() << "Syntax error at '" << aValStr << "'";
           return 1;
         }
         anAspect->SetAlphaMode (aMode);
@@ -9645,7 +9646,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (aNbChangeArgs < 2)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
 
@@ -9668,13 +9669,13 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (aClipPlane->CappingTexture().IsNull())
       {
-        std::cout << "Error: no texture is set.\n";
+        Message::SendFail ("Error: no texture is set");
         return 1;
       }
 
       if (aNbChangeArgs < 3)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
 
@@ -9688,13 +9689,13 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (aClipPlane->CappingTexture().IsNull())
       {
-        std::cout << "Error: no texture is set.\n";
+        Message::SendFail ("Error: no texture is set");
         return 1;
       }
 
       if (aNbChangeArgs < 3)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
 
@@ -9709,13 +9710,13 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (aClipPlane->CappingTexture().IsNull())
       {
-        std::cout << "Error: no texture is set.\n";
+        Message::SendFail ("Error: no texture is set");
         return 1;
       }
 
       if (aNbChangeArgs < 2)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
 
@@ -9728,7 +9729,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     {
       if (aNbChangeArgs < 2)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
 
@@ -9802,7 +9803,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
         }
         else
         {
-          std::cout << "Error: object/view '" << anEntityName << "' is not found!\n";
+          Message::SendFail() << "Error: object/view '" << anEntityName << "' is not found";
           return 1;
         }
       }
@@ -9826,7 +9827,7 @@ static int VClipPlane (Draw_Interpretor& theDi, Standard_Integer theArgsNb, cons
     }
     else
     {
-      std::cout << "Syntax error: unknown argument '" << aChangeArg << "'.\n";
+      Message::SendFail() << "Syntax error: unknown argument '" << aChangeArg << "'";
       return 1;
     }
   }
@@ -9845,7 +9846,7 @@ static int VZRange (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const c
 
   if (aCurrentView.IsNull())
   {
-    std::cout << theArgVec[0] << ": Call vinit before this command, please.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -9865,14 +9866,13 @@ static int VZRange (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const c
 
     if (aNewZNear >= aNewZFar)
     {
-      std::cout << theArgVec[0] << ": invalid arguments: znear should be less than zfar.\n";
+      Message::SendFail ("Syntax error: invalid arguments: znear should be less than zfar");
       return 1;
     }
 
     if (!aCamera->IsOrthographic() && (aNewZNear <= 0.0 || aNewZFar <= 0.0))
     {
-      std::cout << theArgVec[0] << ": invalid arguments: ";
-      std::cout << "znear, zfar should be positive for perspective camera.\n";
+      Message::SendFail ("Syntax error: invalid arguments: znear, zfar should be positive for perspective camera");
       return 1;
     }
 
@@ -9880,7 +9880,7 @@ static int VZRange (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const c
   }
   else
   {
-    std::cout << theArgVec[0] << ": wrong command arguments. Type help for more information.\n";
+    Message::SendFail ("Syntax error: wrong command arguments");
     return 1;
   }
 
@@ -9899,7 +9899,7 @@ static int VAutoZFit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const
 
   if (aCurrentView.IsNull())
   {
-    std::cout << theArgVec[0] << ": Call vinit before this command, please.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -9907,7 +9907,7 @@ static int VAutoZFit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const
 
   if (theArgsNb > 3)
   {
-    std::cout << theArgVec[0] << ": wrong command arguments. Type help for more information.\n";
+    Message::SendFail ("Syntax error: wrong command arguments");
     return 1;
   }
 
@@ -9927,9 +9927,7 @@ static int VAutoZFit (Draw_Interpretor& theDi, Standard_Integer theArgsNb, const
   }
 
   aCurrentView->SetAutoZFitMode (isOn, aScale);
-  aCurrentView->AutoZFit();
   aCurrentView->Redraw();
-
   return 0;
 }
 
@@ -9958,7 +9956,7 @@ static int VCamera (Draw_Interpretor& theDI,
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cout << "Error: no active view.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -9967,6 +9965,8 @@ static int VCamera (Draw_Interpretor& theDI,
   {
     theDI << "ProjType:   " << projTypeName (aCamera->ProjectionType()) << "\n";
     theDI << "FOVy:       " << aCamera->FOVy() << "\n";
+    theDI << "FOVx:       " << aCamera->FOVx() << "\n";
+    theDI << "FOV2d:      " << aCamera->FOV2d() << "\n";
     theDI << "Distance:   " << aCamera->Distance() << "\n";
     theDI << "IOD:        " << aCamera->IOD() << "\n";
     theDI << "IODType:    " << (aCamera->GetIODType() == Graphic3d_Camera::IODType_Absolute   ? "absolute" : "relative") << "\n";
@@ -10071,7 +10071,7 @@ static int VCamera (Draw_Interpretor& theDI,
       }
       else if (*anArgValue != '-')
       {
-        std::cout << "Error: unknown IOD type '" << anArgValue << "'\n";
+        Message::SendFail() << "Error: unknown IOD type '" << anArgValue << "'";
         return 1;
       }
       switch (aCamera->GetIODType())
@@ -10113,7 +10113,7 @@ static int VCamera (Draw_Interpretor& theDI,
       }
       else if (*anArgValue != '-')
       {
-        std::cout << "Error: unknown ZFocus type '" << anArgValue << "'\n";
+        Message::SendFail() << "Error: unknown ZFocus type '" << anArgValue << "'";
         return 1;
       }
       switch (aCamera->ZFocusType())
@@ -10122,18 +10122,83 @@ static int VCamera (Draw_Interpretor& theDI,
         case Graphic3d_Camera::FocusType_Relative: theDI << "relative "; break;
       }
     }
+    else if (anArgCase == "-lockzup"
+          || anArgCase == "-turntable")
+    {
+      bool toLockUp = true;
+      if (++anArgIter < theArgsNb
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toLockUp))
+      {
+        --anArgIter;
+      }
+      ViewerTest::CurrentEventManager()->SetLockOrbitZUp (toLockUp);
+    }
     else if (anArgCase == "-fov"
-          || anArgCase == "-fovy")
+          || anArgCase == "-fovy"
+          || anArgCase == "-fovx"
+          || anArgCase == "-fov2d")
     {
       Standard_CString anArgValue = (anArgIter + 1 < theArgsNb) ? theArgVec[anArgIter + 1] : NULL;
       if (anArgValue != NULL
       && *anArgValue != '-')
       {
         ++anArgIter;
-        aCamera->SetFOVy (Draw::Atof (anArgValue));
+        if (anArgCase == "-fov2d")
+        {
+          aCamera->SetFOV2d (Draw::Atof (anArgValue));
+        }
+        else if (anArgCase == "-fovx")
+        {
+          aCamera->SetFOVy (Draw::Atof (anArgValue) / aCamera->Aspect());///
+        }
+        else
+        {
+          aCamera->SetFOVy (Draw::Atof (anArgValue));
+        }
         continue;
       }
-      theDI << aCamera->FOVy() << " ";
+      if (anArgCase == "-fov2d")
+      {
+        theDI << aCamera->FOV2d() << " ";
+      }
+      else if (anArgCase == "-fovx")
+      {
+        theDI << aCamera->FOVx() << " ";
+      }
+      else
+      {
+        theDI << aCamera->FOVy() << " ";
+      }
+    }
+    else if (anArgIter + 1 < theArgsNb
+          && anArgCase == "-xrpose")
+    {
+      TCollection_AsciiString anXRArg (theArgVec[++anArgIter]);
+      anXRArg.LowerCase();
+      if (anXRArg == "base")
+      {
+        aCamera = aView->View()->BaseXRCamera();
+      }
+      else if (anXRArg == "head")
+      {
+        aCamera = aView->View()->PosedXRCamera();
+      }
+      else
+      {
+        Message::SendFail() << "Syntax error: unknown XR pose '" << anXRArg << "'";
+        return 1;
+      }
+      if (aCamera.IsNull())
+      {
+        Message::SendFail() << "Error: undefined XR pose";
+        return 0;
+      }
+      if (aView->AutoZFitMode())
+      {
+        const Bnd_Box aMinMaxBox  = aView->View()->MinMaxValues (false);
+        const Bnd_Box aGraphicBox = aView->View()->MinMaxValues (true);
+        aCamera->ZFitAll (aView->AutoZFitScaleFactor(), aMinMaxBox, aGraphicBox);
+      }
     }
     else if (aPrsName.IsEmpty()
          && !anArgCase.StartsWith ("-"))
@@ -10142,7 +10207,7 @@ static int VCamera (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Error: unknown argument '" << anArg << "'\n";
+      Message::SendFail() << "Error: unknown argument '" << anArg << "'";
       return 1;
     }
   }
@@ -10150,7 +10215,6 @@ static int VCamera (Draw_Interpretor& theDI,
   if (aPrsName.IsEmpty()
    || theArgsNb > 2)
   {
-    aView->AutoZFit();
     aView->Redraw();
   }
 
@@ -10163,7 +10227,7 @@ static int VCamera (Draw_Interpretor& theDI,
       aCameraFrustum = Handle(AIS_CameraFrustum)::DownCast (GetMapOfAIS().Find2 (theArgVec[1]));
       if (aCameraFrustum.IsNull())
       {
-        std::cout << "Error: object '" << aPrsName << "'is already defined and is not a camera frustum!\n";
+        Message::SendFail() << "Error: object '" << aPrsName << "'is already defined and is not a camera frustum";
         return 1;
       }
     }
@@ -10178,7 +10242,7 @@ static int VCamera (Draw_Interpretor& theDI,
       ViewerTest::GetAISContext()->Erase (aCameraFrustum, false);
       aView->ZFitAll();
     }
-    aCameraFrustum->SetCameraFrustum (aView->Camera());
+    aCameraFrustum->SetCameraFrustum (aCamera);
 
     ViewerTest::Display (aPrsName, aCameraFrustum);
   }
@@ -10230,6 +10294,11 @@ inline Standard_Boolean parseStereoMode (Standard_CString      theArg,
         || aFlag == "softpageflip")
   {
     theMode = Graphic3d_StereoMode_SoftPageFlip;
+  }
+  else if (aFlag == "openvr"
+        || aFlag == "vr")
+  {
+    theMode = Graphic3d_StereoMode_OpenVR;
   }
   else
   {
@@ -10288,7 +10357,7 @@ static int VStereo (Draw_Interpretor& theDI,
   {
     if (aView.IsNull())
     {
-      std::cout << "Error: no active viewer!\n";
+      Message::SendFail ("Error: no active viewer");
       return 0;
     }
 
@@ -10306,6 +10375,7 @@ static int VStereo (Draw_Interpretor& theDI,
         case Graphic3d_StereoMode_SideBySide       : aMode = "sideBySide";       break;
         case Graphic3d_StereoMode_OverUnder        : aMode = "overUnder";        break;
         case Graphic3d_StereoMode_SoftPageFlip     : aMode = "softpageflip";     break;
+        case Graphic3d_StereoMode_OpenVR           : aMode = "openVR";           break;
         case Graphic3d_StereoMode_Anaglyph  :
           aMode = "anaglyph";
           switch (aView->RenderingParams().AnaglyphFilter)
@@ -10349,7 +10419,7 @@ static int VStereo (Draw_Interpretor& theDI,
     {
       if (++anArgIter < theArgNb)
       {
-        std::cout << "Error: wrong number of arguments!\n";
+        Message::SendFail ("Error: wrong number of arguments");
         return 1;
       }
 
@@ -10366,7 +10436,7 @@ static int VStereo (Draw_Interpretor& theDI,
     {
       if (++anArgIter < theArgNb)
       {
-        std::cout << "Error: wrong number of arguments!\n";
+        Message::SendFail ("Error: wrong number of arguments");
         return 1;
       }
 
@@ -10375,7 +10445,10 @@ static int VStereo (Draw_Interpretor& theDI,
         aCamera->SetProjectionType (Graphic3d_Camera::Projection_Stereo);
       }
       ViewerTest_myDefaultCaps.contextStereo = Standard_True;
-      return 0;
+      if (aParams->StereoMode != Graphic3d_StereoMode_OpenVR)
+      {
+        return 0;
+      }
     }
     else if (aFlag == "-reverse"
           || aFlag == "-reversed"
@@ -10383,7 +10456,7 @@ static int VStereo (Draw_Interpretor& theDI,
     {
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -10394,7 +10467,7 @@ static int VStereo (Draw_Interpretor& theDI,
     {
       Standard_Boolean toDisable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toDisable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toDisable))
       {
         --anArgIter;
       }
@@ -10406,7 +10479,7 @@ static int VStereo (Draw_Interpretor& theDI,
       if (++anArgIter >= theArgNb
       || !parseStereoMode (theArgVec[anArgIter], aMode))
       {
-        std::cout << "Error: syntax error at '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at '" << anArg << "'";
         return 1;
       }
 
@@ -10422,7 +10495,7 @@ static int VStereo (Draw_Interpretor& theDI,
       if (++anArgIter >= theArgNb
       || !parseAnaglyphFilter (theArgVec[anArgIter], aFilter))
       {
-        std::cout << "Error: syntax error at '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at '" << anArg << "'";
         return 1;
       }
 
@@ -10436,9 +10509,37 @@ static int VStereo (Draw_Interpretor& theDI,
         ViewerTest_myDefaultCaps.contextStereo = Standard_True;
       }
     }
+    else if (anArgIter + 1 < theArgNb
+          && aFlag == "-hmdfov2d")
+    {
+      aParams->HmdFov2d = (float )Draw::Atof (theArgVec[++anArgIter]);
+      if (aParams->HmdFov2d < 10.0f
+       || aParams->HmdFov2d > 180.0f)
+      {
+        Message::SendFail() << "Error: FOV is out of range";
+        return 1;
+      }
+    }
+    else if (aFlag == "-mirror"
+          || aFlag == "-mirrorcomposer")
+    {
+      Standard_Boolean toEnable = Standard_True;
+      if (++anArgIter < theArgNb
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
+      {
+        --anArgIter;
+      }
+      aParams->ToMirrorComposer = toEnable;
+    }
+    else if (anArgIter + 1 < theArgNb
+          && (aFlag == "-unitfactor"
+           || aFlag == "-unitscale"))
+    {
+      aView->View()->SetUnitFactor (Draw::Atof (theArgVec[++anArgIter]));
+    }
     else
     {
-      std::cout << "Error: syntax error at '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error at '" << anArg << "'";
       return 1;
     }
   }
@@ -10447,6 +10548,11 @@ static int VStereo (Draw_Interpretor& theDI,
   {
     aParams->StereoMode = aMode;
     aCamera->SetProjectionType (Graphic3d_Camera::Projection_Stereo);
+    if (aParams->StereoMode == Graphic3d_StereoMode_OpenVR)
+    {
+      // initiate implicit continuous rendering
+      ViewerTest::CurrentEventManager()->FlushViewEvents (ViewerTest::GetAISContext(), aView, true);
+    }
   }
   return 0;
 }
@@ -10462,7 +10568,7 @@ static int VDefaults (Draw_Interpretor& theDi,
   const Handle(AIS_InteractiveContext)& aCtx = ViewerTest::GetAISContext();
   if (aCtx.IsNull())
   {
-    std::cout << "Error: no active viewer\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -10479,7 +10585,7 @@ static int VDefaults (Draw_Interpretor& theDi,
       theDi << "DeflType:           absolute\n"
             << "AbsoluteDeflection: " << aDefParams->MaximalChordialDeviation() << "\n";
     }
-    theDi << "AngularDeflection:  " << (180.0 * aDefParams->HLRAngle() / M_PI) << "\n";
+    theDi << "AngularDeflection:  " << (180.0 * aDefParams->DeviationAngle() / M_PI) << "\n";
     theDi << "AutoTriangulation:  " << (aDefParams->IsAutoTriangulation() ? "on" : "off") << "\n";
     return 0;
   }
@@ -10495,7 +10601,7 @@ static int VDefaults (Draw_Interpretor& theDi,
     {
       if (++anArgIter >= theArgsNb)
       {
-        std::cout << "Error: wrong syntax at " << anArg << "\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
       aDefParams->SetTypeOfDeflection         (Aspect_TOD_ABSOLUTE);
@@ -10509,7 +10615,7 @@ static int VDefaults (Draw_Interpretor& theDi,
     {
       if (++anArgIter >= theArgsNb)
       {
-        std::cout << "Error: wrong syntax at " << anArg << "\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
       aDefParams->SetTypeOfDeflection     (Aspect_TOD_RELATIVE);
@@ -10521,11 +10627,10 @@ static int VDefaults (Draw_Interpretor& theDi,
     {
       if (++anArgIter >= theArgsNb)
       {
-        std::cout << "Error: wrong syntax at " << anArg << "\n";
+        Message::SendFail() << "Syntax error at " << anArg;
         return 1;
       }
-      // currently HLRDeviationAngle is used instead of DeviationAngle in most places
-      aDefParams->SetHLRAngle (M_PI * Draw::Atof (theArgVec[anArgIter]) / 180.0);
+      aDefParams->SetDeviationAngle (M_PI * Draw::Atof (theArgVec[anArgIter]) / 180.0);
     }
     else if (anArg == "-AUTOTR"
           || anArg == "-AUTOTRIANG"
@@ -10534,16 +10639,16 @@ static int VDefaults (Draw_Interpretor& theDi,
       ++anArgIter;
       bool toTurnOn = true;
       if (anArgIter >= theArgsNb
-      || !ViewerTest::ParseOnOff (theArgVec[anArgIter], toTurnOn))
+      || !Draw::ParseOnOff (theArgVec[anArgIter], toTurnOn))
       {
-        std::cout << "Syntax error at '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at '" << anArg << "'";
         return 1;
       }
       aDefParams->SetAutoTriangulation (toTurnOn);
     }
     else
     {
-      std::cout << "Syntax error: unknown argument '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error: unknown argument '" << anArg << "'";
       return 1;
     }
   }
@@ -10615,7 +10720,7 @@ static int VLight (Draw_Interpretor& theDi,
   if (aView.IsNull()
    || aViewer.IsNull())
   {
-    std::cerr << "No active viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -10660,6 +10765,7 @@ static int VLight (Draw_Interpretor& theDi,
           theDi << "  Position:   " << anXYZ[0] << ", " << anXYZ[1] << ", " << anXYZ[2] << "\n";
           aLight->Attenuation (anAtten[0], anAtten[1]);
           theDi << "  Atten.:     " << anAtten[0] << " " << anAtten[1] << "\n";
+          theDi << "  Range:      " << aLight->Range() << "\n";
           break;
         }
         case V3d_SPOT:
@@ -10675,6 +10781,7 @@ static int VLight (Draw_Interpretor& theDi,
           theDi << "  Atten.:     " << anAtten[0] << " " << anAtten[1] << "\n";
           theDi << "  Angle:      " << (aLight->Angle() * 180.0 / M_PI) << "\n";
           theDi << "  Exponent:   " << aLight->Concentration() << "\n";
+          theDi << "  Range:      " << aLight->Range() << "\n";
           break;
         }
         default:
@@ -10720,7 +10827,7 @@ static int VLight (Draw_Interpretor& theDi,
     {
       if (++anArgIt >= theArgsNb)
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -10755,7 +10862,7 @@ static int VLight (Draw_Interpretor& theDi,
       }
       else
       {
-        std::cout << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
     }
@@ -10821,7 +10928,7 @@ static int VLight (Draw_Interpretor& theDi,
     {
       if (!toCreate)
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -10834,7 +10941,7 @@ static int VLight (Draw_Interpretor& theDi,
     {
       if (!toCreate)
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -10847,7 +10954,7 @@ static int VLight (Draw_Interpretor& theDi,
     {
       if (!toCreate)
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -10860,7 +10967,7 @@ static int VLight (Draw_Interpretor& theDi,
     {
       if (!toCreate)
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -10873,7 +10980,7 @@ static int VLight (Draw_Interpretor& theDi,
     {
       if (++anArgIt >= theArgsNb)
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -10892,7 +10999,7 @@ static int VLight (Draw_Interpretor& theDi,
 
       if (aLightOld.IsNull())
       {
-        std::cerr << "Light " << theArgVec[anArgIt] << " is undefined!\n";
+        Message::SendFail() << "Error: Light " << theArgVec[anArgIt] << " is undefined";
         return 1;
       }
     }
@@ -10904,7 +11011,7 @@ static int VLight (Draw_Interpretor& theDi,
       Handle(V3d_Light) aLightDel;
       if (++anArgIt >= theArgsNb)
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -10958,16 +11065,17 @@ static int VLight (Draw_Interpretor& theDi,
           || anArgCase.IsEqual ("-COLOR")
           || anArgCase.IsEqual ("-COLOUR"))
     {
-      if (++anArgIt >= theArgsNb
+      Quantity_Color aColor;
+      Standard_Integer aNbParsed = Draw::ParseColor (theArgsNb - anArgIt - 1,
+                                                     theArgVec + anArgIt + 1,
+                                                     aColor);
+      anArgIt += aNbParsed;
+      if (aNbParsed == 0
        || aLightCurr.IsNull())
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
-
-      TCollection_AsciiString anArgNext (theArgVec[anArgIt]);
-      anArgNext.UpperCase();
-      const Quantity_Color aColor = ViewerTest::GetColorFromName (anArgNext.ToCString());
       aLightCurr->SetColor (aColor);
     }
     else if (anArgCase.IsEqual ("POS")
@@ -10980,7 +11088,7 @@ static int VLight (Draw_Interpretor& theDi,
        || (aLightCurr->Type() != Graphic3d_TOLS_POSITIONAL
         && aLightCurr->Type() != Graphic3d_TOLS_SPOT))
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -10999,7 +11107,7 @@ static int VLight (Draw_Interpretor& theDi,
        || (aLightCurr->Type() != Graphic3d_TOLS_DIRECTIONAL
         && aLightCurr->Type() != Graphic3d_TOLS_SPOT))
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -11016,7 +11124,7 @@ static int VLight (Draw_Interpretor& theDi,
       if (++anArgIt >= theArgsNb
        || aLightCurr.IsNull())
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -11052,7 +11160,7 @@ static int VLight (Draw_Interpretor& theDi,
       if (++anArgIt >= theArgsNb
        || aLightCurr.IsNull())
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -11068,7 +11176,7 @@ static int VLight (Draw_Interpretor& theDi,
        || aLightCurr.IsNull()
        || aLightCurr->Type() != Graphic3d_TOLS_SPOT)
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -11085,7 +11193,7 @@ static int VLight (Draw_Interpretor& theDi,
        || (aLightCurr->Type() != Graphic3d_TOLS_POSITIONAL
         && aLightCurr->Type() != Graphic3d_TOLS_SPOT))
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -11105,7 +11213,7 @@ static int VLight (Draw_Interpretor& theDi,
        || (aLightCurr->Type() != Graphic3d_TOLS_POSITIONAL
         && aLightCurr->Type() != Graphic3d_TOLS_SPOT))
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -11126,11 +11234,25 @@ static int VLight (Draw_Interpretor& theDi,
        || aLightCurr.IsNull()
        || aLightCurr->Type() != Graphic3d_TOLS_SPOT)
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       aLightCurr->SetConcentration ((Standard_ShortReal )Atof (theArgVec[anArgIt]));
+    }
+    else if (anArgCase.IsEqual("RANGE")
+          || anArgCase.IsEqual("-RANGE"))
+    {
+      if (++anArgIt >= theArgsNb
+       || aLightCurr.IsNull()
+       || aLightCurr->Type() == Graphic3d_TOLS_AMBIENT
+       || aLightCurr->Type() == Graphic3d_TOLS_DIRECTIONAL)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      aLightCurr->SetRange ((Standard_ShortReal)Atof (theArgVec[anArgIt]));
     }
     else if (anArgCase.IsEqual ("HEAD")
           || anArgCase.IsEqual ("HEADLIGHT")
@@ -11140,13 +11262,13 @@ static int VLight (Draw_Interpretor& theDi,
       if (aLightCurr.IsNull()
        || aLightCurr->Type() == Graphic3d_TOLS_AMBIENT)
       {
-        std::cerr << "Wrong syntax at argument '" << anArg << "'!\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       Standard_Boolean isHeadLight = Standard_True;
       if (anArgIt + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIt + 1], isHeadLight))
+       && Draw::ParseOnOff (theArgVec[anArgIt + 1], isHeadLight))
       {
         ++anArgIt;
       }
@@ -11154,11 +11276,53 @@ static int VLight (Draw_Interpretor& theDi,
     }
     else
     {
-      std::cerr << "Warning: unknown argument '" << anArg << "'\n";
+      Message::SendFail() << "Warning: unknown argument '" << anArg << "'";
     }
   }
 
   addLight (aLightNew, aLayer, isGlobal);
+  return 0;
+}
+
+//===============================================================================================
+//function : VPBREnvironment
+//purpose  :
+//===============================================================================================
+static int VPBREnvironment (Draw_Interpretor&,
+                            Standard_Integer theArgsNb,
+                            const char**     theArgVec)
+{
+  if (theArgsNb > 2)
+  {
+    Message::SendFail ("Syntax error: 'vpbrenv' command has only one argument");
+    return 1;
+  }
+
+  Handle(V3d_View) aView = ViewerTest::CurrentView();
+  if (aView.IsNull())
+  {
+    Message::SendFail ("Error: no active viewer");
+    return 1;
+  }
+
+  TCollection_AsciiString anArg = TCollection_AsciiString (theArgVec[1]);
+  anArg.LowerCase();
+
+  if (anArg == "-generate"
+   || anArg == "-gen")
+  {
+    aView->GeneratePBREnvironment (Standard_True);
+  }
+  else if (anArg == "-clear")
+  {
+    aView->ClearPBREnvironment (Standard_True);
+  }
+  else
+  {
+    Message::SendFail() << "Syntax error: unknown argument [" << theArgVec[1] << "] for 'vpbrenv' command";
+    return 1;
+  }
+
   return 0;
 }
 
@@ -11208,6 +11372,7 @@ static Standard_Boolean parsePerfStatsFlag (const TCollection_AsciiString& theVa
         || aVal == "triangles")  aFlag = Graphic3d_RenderingParams::PerfCounters_Triangles;
   else if (aVal == "pnts"
         || aVal == "points")     aFlag = Graphic3d_RenderingParams::PerfCounters_Points;
+  else if (aVal == "lines")      aFlag = Graphic3d_RenderingParams::PerfCounters_Lines;
   else if (aVal == "mem"
         || aVal == "gpumem"
         || aVal == "estimmem")   aFlag = Graphic3d_RenderingParams::PerfCounters_EstimMem;
@@ -11288,7 +11453,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cerr << "Error: no active viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -11322,13 +11487,13 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else
       {
-        std::cout << "Error: unknown argument '" << theArgVec[1] << "'\n";
+        Message::SendFail() << "Syntax error: unknown argument '" << theArgVec[1] << "'";
         return 1;
       }
     }
     else
     {
-      std::cout << "Error: wrong number of arguments\n";
+      Message::SendFail ("Syntax error: wrong number of arguments");
       return 1;
     }
   }
@@ -11368,11 +11533,13 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     theDI << "shadingModel: ";
     switch (aView->ShadingModel())
     {
-      case Graphic3d_TOSM_DEFAULT:  theDI << "default"; break;
-      case Graphic3d_TOSM_UNLIT:    theDI << "unlit";   break;
-      case Graphic3d_TOSM_FACET:    theDI << "flat";    break;
-      case Graphic3d_TOSM_VERTEX:   theDI << "gouraud"; break;
-      case Graphic3d_TOSM_FRAGMENT: theDI << "phong";   break;
+      case Graphic3d_TOSM_DEFAULT:   theDI << "default";   break;
+      case Graphic3d_TOSM_UNLIT:     theDI << "unlit";     break;
+      case Graphic3d_TOSM_FACET:     theDI << "flat";      break;
+      case Graphic3d_TOSM_VERTEX:    theDI << "gouraud";   break;
+      case Graphic3d_TOSM_FRAGMENT:  theDI << "phong";     break;
+      case Graphic3d_TOSM_PBR:       theDI << "pbr";       break;
+      case Graphic3d_TOSM_PBR_FACET: theDI << "pbr_facet"; break;
     }
     {
       theDI << "perfCounters:";
@@ -11399,6 +11566,10 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_Triangles) != 0)
       {
         theDI << " tris";
+      }
+      if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_Lines) != 0)
+      {
+        theDI << " lines";
       }
       if ((aParams.CollectedStats & Graphic3d_RenderingParams::PerfCounters_Points) != 0)
       {
@@ -11431,7 +11602,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     return 0;
   }
 
-  Standard_Boolean toPrint = Standard_False;
+  bool toPrint = false, toSyncDefaults = false, toSyncAllViews = false;
   ViewerTest_AutoUpdater anUpdateTool (ViewerTest::GetAISContext(), aView);
   for (Standard_Integer anArgIter = 1; anArgIter < theArgNb; ++anArgIter)
   {
@@ -11448,6 +11619,32 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       toPrint = Standard_True;
       anUpdateTool.Invalidate();
     }
+    else if (aFlag == "-reset")
+    {
+      aParams = ViewerTest::GetViewerFromContext()->DefaultRenderingParams();
+    }
+    else if (aFlag == "-sync"
+          && (anArgIter + 1 < theArgNb))
+    {
+      TCollection_AsciiString aSyncFlag (theArgVec[++anArgIter]);
+      aSyncFlag.LowerCase();
+      if (aSyncFlag == "default"
+       || aSyncFlag == "defaults"
+       || aSyncFlag == "viewer")
+      {
+        toSyncDefaults = true;
+      }
+      else if (aSyncFlag == "allviews"
+            || aSyncFlag == "views")
+      {
+        toSyncAllViews = true;
+      }
+      else
+      {
+        Message::SendFail ("Syntax error: unknown parameter to -sync argument");
+        return 1;
+      }
+    }
     else if (aFlag == "-mode"
           || aFlag == "-rendermode"
           || aFlag == "-render_mode")
@@ -11463,7 +11660,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
     }
@@ -11476,7 +11673,13 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
         continue;
       }
 
-      aParams.Method = Graphic3d_RM_RAYTRACING;
+      bool isRayTrace = true;
+      if (anArgIter + 1 < theArgNb
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], isRayTrace))
+      {
+        ++anArgIter;
+      }
+      aParams.Method = isRayTrace ? Graphic3d_RM_RAYTRACING : Graphic3d_RM_RASTERIZATION;
     }
     else if (aFlag == "-rast"
           || aFlag == "-raster"
@@ -11488,7 +11691,13 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
         continue;
       }
 
-      aParams.Method = Graphic3d_RM_RASTERIZATION;
+      bool isRaster = true;
+      if (anArgIter + 1 < theArgNb
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], isRaster))
+      {
+        ++anArgIter;
+      }
+      aParams.Method = isRaster ? Graphic3d_RM_RASTERIZATION : Graphic3d_RM_RAYTRACING;
     }
     else if (aFlag == "-msaa")
     {
@@ -11499,14 +11708,14 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       const Standard_Integer aNbSamples = Draw::Atoi (theArgVec[anArgIter]);
       if (aNbSamples < 0)
       {
-        std::cerr << "Error: invalid number of MSAA samples " << aNbSamples << ".\n";
+        Message::SendFail() << "Syntax error: invalid number of MSAA samples " << aNbSamples << "";
         return 1;
       }
       else
@@ -11525,7 +11734,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -11533,7 +11742,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       const Standard_ShortReal aFeather = (Standard_ShortReal) Draw::Atof (theArgVec[anArgIter]);
       if (aFeather <= 0.0f)
       {
-        std::cerr << "Error: invalid value of line width feather " << aFeather << ". Should be > 0\n";
+        Message::SendFail() << "Syntax error: invalid value of line width feather " << aFeather << ". Should be > 0";
         return 1;
       }
       aParams.LineFeather = aFeather;
@@ -11554,7 +11763,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -11565,7 +11774,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
         const Standard_ShortReal aWeight = (Standard_ShortReal) Draw::Atof (theArgVec[anArgIter]);
         if (aWeight < 0.f || aWeight > 1.f)
         {
-          std::cerr << "Error: invalid value of Weighted Order-Independent Transparency depth weight factor " << aWeight << ". Should be within range [0.0; 1.0]\n";
+          Message::SendFail() << "Syntax error: invalid value of Weighted Order-Independent Transparency depth weight factor " << aWeight << ". Should be within range [0.0; 1.0]";
           return 1;
         }
 
@@ -11578,7 +11787,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
     }
@@ -11591,7 +11800,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       aParams.ToEnableDepthPrepass = Standard_True;
       if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], aParams.ToEnableDepthPrepass))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], aParams.ToEnableDepthPrepass))
       {
         ++anArgIter;
       }
@@ -11606,7 +11815,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       aParams.ToEnableAlphaToCoverage = Standard_True;
       if (anArgIter + 1 < theArgNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], aParams.ToEnableAlphaToCoverage))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], aParams.ToEnableAlphaToCoverage))
       {
         ++anArgIter;
       }
@@ -11622,14 +11831,14 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       const Standard_Real aScale = Draw::Atof (theArgVec[anArgIter]);
       if (aScale < 0.01)
       {
-        std::cerr << "Error: invalid rendering resolution scale " << aScale << ".\n";
+        Message::SendFail() << "Syntax error: invalid rendering resolution scale " << aScale << "";
         return 1;
       }
       else
@@ -11647,7 +11856,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -11656,7 +11865,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       // We allow RaytracingDepth be more than 10 in case of GI enabled
       if (aDepth < 1 || (aDepth > 10 && !aParams.IsGlobalIlluminationEnabled))
       {
-        std::cerr << "Error: invalid ray-tracing depth " << aDepth << ". Should be within range [1; 10]\n";
+        Message::SendFail() << "Syntax error: invalid ray-tracing depth " << aDepth << ". Should be within range [1; 10]";
         return 1;
       }
       else
@@ -11675,7 +11884,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -11692,7 +11901,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -11708,7 +11917,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -11724,7 +11933,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -11740,7 +11949,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -11761,7 +11970,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-        && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+        && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -11776,21 +11985,21 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       const TCollection_AsciiString aMaxRadStr = theArgVec[anArgIter];
       if (!aMaxRadStr.IsRealValue())
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       const Standard_Real aMaxRadiance = aMaxRadStr.RealValue();
       if (aMaxRadiance <= 0.0)
       {
-        std::cerr << "Error: invalid radiance clamping value " << aMaxRadiance << ".\n";
+        Message::SendFail() << "Syntax error: invalid radiance clamping value " << aMaxRadiance;
         return 1;
       }
       else
@@ -11808,7 +12017,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-        && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+        && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -11824,7 +12033,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-      && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+      && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -11840,7 +12049,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-        && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+        && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -11855,14 +12064,14 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       const Standard_Integer aTileSize = Draw::Atoi (theArgVec[anArgIter]);
       if (aTileSize < 1)
       {
-        std::cerr << "Error: invalid size of ISS tile " << aTileSize << ".\n";
+        Message::SendFail() << "Syntax error: invalid size of ISS tile " << aTileSize;
         return 1;
       }
       aParams.RayTracingTileSize = aTileSize;
@@ -11876,21 +12085,21 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
       const Standard_Integer aNbTiles = Draw::Atoi (theArgVec[anArgIter]);
       if (aNbTiles < -1)
       {
-        std::cerr << "Error: invalid number of ISS tiles " << aNbTiles << ".\n";
+        Message::SendFail() << "Syntax error: invalid number of ISS tiles " << aNbTiles;
         return 1;
       }
       else if (aNbTiles > 0
             && (aNbTiles < 64
              || aNbTiles > 1024))
       {
-        std::cerr << "Warning: suboptimal number of ISS tiles " << aNbTiles << ". Recommended range: [64, 1024].\n";
+        Message::SendWarning() << "Warning: suboptimal number of ISS tiles " << aNbTiles << ". Recommended range: [64, 1024].";
       }
       aParams.NbRayTracingTiles = aNbTiles;
     }
@@ -11904,11 +12113,27 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-        && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+        && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
       aParams.UseEnvironmentMapBackground = toEnable;
+    }
+    else if (aFlag == "-ignorenormalmap")
+    {
+      if (toPrint)
+      {
+        theDI << (aParams.ToIgnoreNormalMapInRayTracing ? "on" : "off") << " ";
+        continue;
+      }
+
+      Standard_Boolean toEnable = Standard_True;
+      if (++anArgIter < theArgNb
+        && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
+      {
+        --anArgIter;
+      }
+      aParams.ToIgnoreNormalMapInRayTracing = toEnable;
     }
     else if (aFlag == "-twoside")
     {
@@ -11920,7 +12145,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-        && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+        && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -11934,18 +12159,20 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       {
         switch (aView->ShadingModel())
         {
-          case Graphic3d_TOSM_DEFAULT:  theDI << "default";  break;
-          case Graphic3d_TOSM_UNLIT:    theDI << "unlit ";   break;
-          case Graphic3d_TOSM_FACET:    theDI << "flat ";    break;
-          case Graphic3d_TOSM_VERTEX:   theDI << "gouraud "; break;
-          case Graphic3d_TOSM_FRAGMENT: theDI << "phong ";   break;
+          case Graphic3d_TOSM_DEFAULT:   theDI << "default";   break;
+          case Graphic3d_TOSM_UNLIT:     theDI << "unlit ";    break;
+          case Graphic3d_TOSM_FACET:     theDI << "flat ";     break;
+          case Graphic3d_TOSM_VERTEX:    theDI << "gouraud ";  break;
+          case Graphic3d_TOSM_FRAGMENT:  theDI << "phong ";    break;
+          case Graphic3d_TOSM_PBR:       theDI << "pbr";       break;
+          case Graphic3d_TOSM_PBR_FACET: theDI << "pbr_facet"; break;
         }
         continue;
       }
 
       if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
       }
 
       Graphic3d_TypeOfShadingModel aModel = Graphic3d_TOSM_DEFAULT;
@@ -11956,15 +12183,106 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else
       {
-        std::cout << "Error: unknown shading model '" << theArgVec[anArgIter] << "'\n";
+        Message::SendFail() << "Syntax error: unknown shading model '" << theArgVec[anArgIter] << "'";
         return 1;
       }
+    }
+    else if (aFlag == "-pbrenvpow2size"
+          || aFlag == "-pbrenvp2s"
+          || aFlag == "-pep2s")
+    {
+      if (++anArgIter >= theArgNb)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      const Standard_Integer aPbrEnvPow2Size = Draw::Atoi (theArgVec[anArgIter]);
+      if (aPbrEnvPow2Size < 1)
+      {
+        Message::SendFail ("Syntax error: 'Pow2Size' of PBR Environment has to be greater or equal 1");
+        return 1;
+      }
+      aParams.PbrEnvPow2Size = aPbrEnvPow2Size;
+    }
+    else if (aFlag == "-pbrenvspecmaplevelsnumber"
+          || aFlag == "-pbrenvspecmapnblevels"
+          || aFlag == "-pbrenvspecmaplevels"
+          || aFlag == "-pbrenvsmln"
+          || aFlag == "-pesmln")
+    {
+      if (++anArgIter >= theArgNb)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      const Standard_Integer aPbrEnvSpecMapNbLevels = Draw::Atoi (theArgVec[anArgIter]);
+      if (aPbrEnvSpecMapNbLevels < 2)
+      {
+        Message::SendFail ("Syntax error: 'SpecMapLevelsNumber' of PBR Environment has to be greater or equal 2");
+        return 1;
+      }
+      aParams.PbrEnvSpecMapNbLevels = aPbrEnvSpecMapNbLevels;
+    }
+    else if (aFlag == "-pbrenvbakngdiffsamplesnumber"
+          || aFlag == "-pbrenvbakingdiffsamples"
+          || aFlag == "-pbrenvbdsn")
+    {
+      if (++anArgIter >= theArgNb)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+
+      const Standard_Integer aPbrEnvBakingDiffNbSamples = Draw::Atoi (theArgVec[anArgIter]);
+      if (aPbrEnvBakingDiffNbSamples < 1)
+      {
+        Message::SendFail ("Syntax error: 'BakingDiffSamplesNumber' of PBR Environtment has to be greater or equal 1");
+        return 1;
+      }
+      aParams.PbrEnvBakingDiffNbSamples = aPbrEnvBakingDiffNbSamples;
+    }
+    else if (aFlag == "-pbrenvbakngspecsamplesnumber"
+          || aFlag == "-pbrenvbakingspecsamples"
+          || aFlag == "-pbrenvbssn")
+    {
+    if (++anArgIter >= theArgNb)
+    {
+      Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+      return 1;
+    }
+
+    const Standard_Integer aPbrEnvBakingSpecNbSamples = Draw::Atoi(theArgVec[anArgIter]);
+    if (aPbrEnvBakingSpecNbSamples < 1)
+    {
+      Message::SendFail ("Syntax error: 'BakingSpecSamplesNumber' of PBR Environtment has to be greater or equal 1");
+      return 1;
+    }
+    aParams.PbrEnvBakingSpecNbSamples = aPbrEnvBakingSpecNbSamples;
+    }
+    else if (aFlag == "-pbrenvbakingprobability"
+          || aFlag == "-pbrenvbp")
+    {
+      if (++anArgIter >= theArgNb)
+      {
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
+        return 1;
+      }
+      const Standard_ShortReal aPbrEnvBakingProbability = static_cast<Standard_ShortReal>(Draw::Atof (theArgVec[anArgIter]));
+      if (aPbrEnvBakingProbability < 0.f
+       || aPbrEnvBakingProbability > 1.f)
+      {
+        Message::SendFail ("Syntax error: 'BakingProbability' of PBR Environtment has to be in range of [0, 1]");
+        return 1;
+      }
+      aParams.PbrEnvBakingProbability = aPbrEnvBakingProbability;
     }
     else if (aFlag == "-resolution")
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cerr << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -11975,7 +12293,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else
       {
-        std::cout << "Error: wrong syntax at argument'" << anArg << "'.\n";
+        Message::SendFail() << "Syntax error: wrong syntax at argument'" << anArg << "'";
         return 1;
       }
     }
@@ -11990,7 +12308,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
 
       Standard_Boolean toEnable = Standard_True;
       if (++anArgIter < theArgNb
-          && !ViewerTest::ParseOnOff (theArgVec[anArgIter], toEnable))
+          && !Draw::ParseOnOff (theArgVec[anArgIter], toEnable))
       {
         --anArgIter;
       }
@@ -12000,7 +12318,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -12010,14 +12328,14 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
         float aFocalDist = static_cast<float> (aParam.RealValue());
         if (aFocalDist < 0)
         {
-          std::cout << "Error: parameter can't be negative at argument '" << anArg << "'.\n";
+          Message::SendFail() << "Error: parameter can't be negative at argument '" << anArg << "'";
           return 1;
         }
         aView->ChangeRenderingParams().CameraFocalPlaneDist = aFocalDist;
       }
       else
       {
-        std::cout << "Error: wrong syntax at argument'" << anArg << "'.\n";
+        Message::SendFail() << "Syntax error at argument'" << anArg << "'";
         return 1;
       }
     }
@@ -12025,7 +12343,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -12035,14 +12353,14 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
         float aApertureSize = static_cast<float> (aParam.RealValue());
         if (aApertureSize < 0)
         {
-          std::cout << "Error: parameter can't be negative at argument '" << anArg << "'.\n";
+          Message::SendFail() << "Error: parameter can't be negative at argument '" << anArg << "'";
           return 1;
         }
         aView->ChangeRenderingParams().CameraApertureRadius = aApertureSize;
       }
       else
       {
-        std::cout << "Error: wrong syntax at argument'" << anArg << "'.\n";
+        Message::SendFail() << "Syntax error at argument'" << anArg << "'";
         return 1;
       }
     }
@@ -12050,7 +12368,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -12061,7 +12379,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else
       {
-        std::cout << "Error: wrong syntax at argument'" << anArg << "'.\n";
+        Message::SendFail() << "Syntax error at argument'" << anArg << "'";
         return 1;
       }
     }
@@ -12069,7 +12387,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -12080,7 +12398,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else
       {
-        std::cout << "Error: wrong syntax at argument'" << anArg << "'.\n";
+        Message::SendFail() << "Syntax error at argument'" << anArg << "'";
         return 1;
       }
     }
@@ -12088,7 +12406,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -12105,7 +12423,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       }
       else
       {
-        std::cout << "Error: wrong syntax at argument'" << anArg << "'.\n";
+        Message::SendFail() << "Syntax error at argument'" << anArg << "'";
         return 1;
       }
     }
@@ -12117,7 +12435,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
 
@@ -12126,7 +12444,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
       Graphic3d_RenderingParams::PerfCounters aFlags = aView->ChangeRenderingParams().CollectedStats;
       if (!convertToPerfStatsFlags (aFlagsStr, aFlags))
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
       aView->ChangeRenderingParams().CollectedStats = aFlags;
@@ -12137,7 +12455,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
       aView->ChangeRenderingParams().StatsUpdateInterval = (Standard_ShortReal )Draw::Atof (theArgVec[anArgIter]);
@@ -12147,7 +12465,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
       aView->ChangeRenderingParams().StatsNbFrames = Draw::Atoi (theArgVec[anArgIter]);
@@ -12157,7 +12475,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     {
       if (++anArgIter >= theArgNb)
       {
-        std::cout << "Error: wrong syntax at argument '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at argument '" << anArg << "'";
         return 1;
       }
       aView->ChangeRenderingParams().StatsMaxChartTime = (Standard_ShortReal )Draw::Atof (theArgVec[anArgIter]);
@@ -12179,7 +12497,7 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
         TCollection_AsciiString aStateStr(theArgVec[anArgIter]);
         aStateStr.LowerCase();
         bool toEnable = true;
-        if (ViewerTest::ParseOnOff (aStateStr.ToCString(), toEnable))
+        if (Draw::ParseOnOff (aStateStr.ToCString(), toEnable))
         {
           aState = toEnable ? Graphic3d_RenderingParams::FrustumCulling_On : Graphic3d_RenderingParams::FrustumCulling_Off;
         }
@@ -12197,11 +12515,23 @@ static Standard_Integer VRenderParams (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Error: wrong syntax, unknown flag '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error: unknown flag '" << anArg << "'";
       return 1;
     }
   }
 
+  // set current view parameters as defaults
+  if (toSyncDefaults)
+  {
+    ViewerTest::GetViewerFromContext()->SetDefaultRenderingParams (aParams);
+  }
+  if (toSyncAllViews)
+  {
+    for (V3d_ListOfViewIterator aViewIter = ViewerTest::GetViewerFromContext()->DefinedViewIterator(); aViewIter.More(); aViewIter.Next())
+    {
+      aViewIter.Value()->ChangeRenderingParams() = aParams;
+    }
+  }
   return 0;
 }
 
@@ -12233,7 +12563,7 @@ static Standard_Integer VStatProfiler (Draw_Interpretor& theDI,
   Handle(V3d_View) aView = ViewerTest::CurrentView();
   if (aView.IsNull())
   {
-    std::cerr << "Error: no active viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -12258,7 +12588,9 @@ static Standard_Integer VStatProfiler (Draw_Interpretor& theDI,
       else if (aFlag == "alllayers"
             || aFlag == "layers")     aParam = Graphic3d_RenderingParams::PerfCounters_Layers;
       else if (aFlag == "allstructs"
-            || aFlag == "structs")    aParam = Graphic3d_RenderingParams::PerfCounters_Structures;
+            || aFlag == "allstructures"
+            || aFlag == "structs"
+            || aFlag == "structures") aParam = Graphic3d_RenderingParams::PerfCounters_Structures;
       else if (aFlag == "groups")     aParam = Graphic3d_RenderingParams::PerfCounters_Groups;
       else if (aFlag == "allarrays"
             || aFlag == "fillarrays"
@@ -12266,6 +12598,7 @@ static Standard_Integer VStatProfiler (Draw_Interpretor& theDI,
             || aFlag == "pointarrays"
             || aFlag == "textarrays") aParam = Graphic3d_RenderingParams::PerfCounters_GroupArrays;
       else if (aFlag == "triangles")  aParam = Graphic3d_RenderingParams::PerfCounters_Triangles;
+      else if (aFlag == "lines")      aParam = Graphic3d_RenderingParams::PerfCounters_Lines;
       else if (aFlag == "points")     aParam = Graphic3d_RenderingParams::PerfCounters_Points;
       else if (aFlag == "geommem"
             || aFlag == "texturemem"
@@ -12281,7 +12614,7 @@ static Standard_Integer VStatProfiler (Draw_Interpretor& theDI,
             || aFlag == "cpudynmax")  aParam = Graphic3d_RenderingParams::PerfCounters_FrameTime;
       else
       {
-        std::cerr << "Unknown argument '" << theArgVec[anArgIter] << "'!\n";
+        Message::SendFail() << "Error: unknown argument '" << theArgVec[anArgIter] << "'";
         continue;
       }
 
@@ -12327,13 +12660,20 @@ static Standard_Integer VStatProfiler (Draw_Interpretor& theDI,
       {
         theDI << searchInfo (aDict, "Rendered layers") << " ";
       }
-      else if (aFlag == "allstructs")
+      else if (aFlag == "allstructs"
+            || aFlag == "allstructures")
       {
         theDI << searchInfo (aDict, "Structs") << " ";
       }
-      else if (aFlag == "structs")
+      else if (aFlag == "structs"
+            || aFlag == "structures")
       {
-        theDI << searchInfo (aDict, "Rendered structs") << " ";
+        TCollection_AsciiString aRend = searchInfo (aDict, "Rendered structs");
+        if (aRend.IsEmpty()) // all structures rendered
+        {
+          aRend = searchInfo (aDict, "Structs");
+        }
+        theDI << aRend << " ";
       }
       else if (aFlag == "groups")
       {
@@ -12482,11 +12822,10 @@ static int VManipulator (Draw_Interpretor& theDi,
 {
   Handle(V3d_View)   aCurrentView   = ViewerTest::CurrentView();
   Handle(V3d_Viewer) aViewer = ViewerTest::GetViewerFromContext();
-  ViewerTest::GetAISContext()->MainSelector()->SetPickClosest (Standard_False);
   if (aCurrentView.IsNull()
    || aViewer.IsNull())
   {
-    std::cerr << "No active viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -12539,7 +12878,7 @@ static int VManipulator (Draw_Interpretor& theDi,
 
   if (aName.IsEmpty())
   {
-    std::cerr << theArgVec[0] << " error: please specify AIS manipulator's name as the first argument.\n";
+    Message::SendFail ("Syntax error: please specify AIS manipulator's name as the first argument");
     return 1;
   }
 
@@ -12551,14 +12890,14 @@ static int VManipulator (Draw_Interpretor& theDi,
   {
     if (!aMapAIS.IsBound2 (aName))
     {
-      std::cerr << theArgVec[0] << " error: could not find \"" << aName << "\" AIS object.\n";
+      Message::SendFail() << "Syntax error: could not find \"" << aName << "\" AIS object";
       return 1;
     }
 
     Handle(AIS_Manipulator) aManipulator = Handle(AIS_Manipulator)::DownCast (aMapAIS.Find2 (aName));
     if (aManipulator.IsNull())
     {
-      std::cerr << theArgVec[0] << " error: \"" << aName << "\" is not an AIS manipulator.\n";
+      Message::SendFail() << "Syntax error: \"" << aName << "\" is not an AIS manipulator";
       return 1;
     }
 
@@ -12587,7 +12926,7 @@ static int VManipulator (Draw_Interpretor& theDi,
     aManipulator = Handle(AIS_Manipulator)::DownCast (aMapAIS.Find2 (aName));
     if (aManipulator.IsNull())
     {
-      std::cerr << theArgVec[0] << " error: \"" << aName << "\" is not an AIS manipulator.\n";
+      Message::SendFail() << "Syntax error: \"" << aName << "\" is not an AIS manipulator";
       return 1;
     }
   }
@@ -12623,7 +12962,7 @@ static int VManipulator (Draw_Interpretor& theDi,
     Standard_Boolean aOnOff = aCmd.ArgBool ("part", 2);
     if (aMode < 1 || aMode > 4)
     {
-      std::cerr << theArgVec[0] << " error: mode value should be in range [1, 4].\n";
+      Message::SendFail ("Syntax error: mode value should be in range [1, 4]");
       return 1;
     }
 
@@ -12635,7 +12974,7 @@ static int VManipulator (Draw_Interpretor& theDi,
     Standard_Boolean aOnOff = aCmd.ArgBool("parts", 1);
     if (aMode < 1 || aMode > 4)
     {
-      std::cerr << theArgVec[0] << " error: mode value should be in range [1, 4].\n";
+      Message::SendFail ("Syntax error: mode value should be in range [1, 4]");
       return 1;
     }
 
@@ -12680,7 +13019,7 @@ static int VManipulator (Draw_Interpretor& theDi,
     Handle(AIS_InteractiveObject) anObject;
     if (!aMapAIS.Find2 (anObjName, anObject))
     {
-      std::cerr << theArgVec[0] << " error: AIS object \"" << anObjName << "\" does not exist.\n";
+      Message::SendFail() << "Syntax error: AIS object \"" << anObjName << "\" does not exist";
       return 1;
     }
 
@@ -12692,7 +13031,7 @@ static int VManipulator (Draw_Interpretor& theDi,
        && aManip->IsAttached()
        && aManip->Object() == anObject)
       {
-        std::cerr << theArgVec[0] << " error: AIS object \"" << anObjName << "\" already has manipulator.\n";
+        Message::SendFail() << "Syntax error: AIS object \"" << anObjName << "\" already has manipulator";
         return 1;
       }
     }
@@ -12731,13 +13070,13 @@ static int VManipulator (Draw_Interpretor& theDi,
         ViewerTest_Names aViewNames (aViewString);
         if (!ViewerTest_myViews.IsBound1 (aViewNames.GetViewName()))
         {
-          std::cerr << theArgVec[0] << " error: wrong view name '" << aViewString << "'\n";
+          Message::SendFail() << "Syntax error: wrong view name '" << aViewString << "'";
           return 1;
         }
         aView = ViewerTest_myViews.Find1 (aViewNames.GetViewName());
         if (aView.IsNull())
         {
-          std::cerr << theArgVec[0] << " error: cannot find view with name '" << aViewString << "'\n";
+          Message::SendFail() << "Syntax error: cannot find view with name '" << aViewString << "'";
           return 1;
         }
       }
@@ -12804,7 +13143,7 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
   const Handle(AIS_InteractiveContext)& aCtx = ViewerTest::GetAISContext();
   if (aCtx.IsNull())
   {
-    std::cerr << "No active viewer!\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
@@ -12818,9 +13157,9 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
       return 0;
     }
     else if (theArgsNb != 2
-         || !ViewerTest::ParseOnOff (theArgVec[1], toEnable))
+         || !Draw::ParseOnOff (theArgVec[1], toEnable))
     {
-      std::cout << "Syntax error: wrong number of parameters.";
+      Message::SendFail ("Syntax error: wrong number of parameters");
       return 1;
     }
     if (toEnable != aCtx->ToHilightSelected())
@@ -12890,7 +13229,7 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
     {
       Standard_Boolean toEnable = Standard_True;
       if (anArgIter + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
       {
         ++anArgIter;
       }
@@ -12903,7 +13242,7 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
     {
       Standard_Boolean toEnable = Standard_True;
       if (anArgIter + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
       {
         ++anArgIter;
       }
@@ -12917,7 +13256,7 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
     {
       Standard_Boolean toEnable = Standard_True;
       if (anArgIter + 1 < theArgsNb
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toEnable))
       {
         ++anArgIter;
       }
@@ -12930,7 +13269,7 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
     {
       if (++anArgIter >= theArgsNb)
       {
-        std::cout << "Syntax error: type of highlighting is undefined\n";
+        Message::SendFail ("Syntax error: type of highlighting is undefined");
         return 1;
       }
 
@@ -12950,7 +13289,7 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
       }
       else
       {
-        std::cout << "Syntax error: unknwon picking strategy '" << aVal << "'\n";
+        Message::SendFail() << "Syntax error: unknown picking strategy '" << aVal << "'";
         return 1;
       }
 
@@ -12961,13 +13300,59 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
     {
       aCtx->SetPixelTolerance (Draw::Atoi (theArgVec[++anArgIter]));
     }
+    else if (anArg == "-preferclosest")
+    {
+      bool toPreferClosest = true;
+      if (anArgIter + 1 < theArgsNb
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toPreferClosest))
+      {
+        ++anArgIter;
+      }
+      aCtx->MainSelector()->SetPickClosest (toPreferClosest);
+    }
+    else if ((anArg == "-depthtol"
+           || anArg == "-depthtolerance")
+          && anArgIter + 1 < theArgsNb)
+    {
+      TCollection_AsciiString aTolType (theArgVec[++anArgIter]);
+      aTolType.LowerCase();
+      if (aTolType == "uniform")
+      {
+        if (anArgIter + 1 >= theArgsNb)
+        {
+          Message::SendFail() << "Syntax error: wrong number of arguments";
+          return 1;
+        }
+        aCtx->MainSelector()->SetDepthTolerance (SelectMgr_TypeOfDepthTolerance_Uniform,
+                                                 Draw::Atof (theArgVec[++anArgIter]));
+      }
+      else if (aTolType == "uniformpx")
+      {
+        if (anArgIter + 1 >= theArgsNb)
+        {
+          Message::SendFail() << "Syntax error: wrong number of arguments";
+          return 1;
+        }
+        aCtx->MainSelector()->SetDepthTolerance (SelectMgr_TypeOfDepthTolerance_UniformPixels,
+                                                 Draw::Atof (theArgVec[++anArgIter]));
+      }
+      else if (aTolType == "sensfactor")
+      {
+        aCtx->MainSelector()->SetDepthTolerance (SelectMgr_TypeOfDepthTolerance_SensitivityFactor, 0.0);
+      }
+      else
+      {
+        Message::SendFail() << "Syntax error at '" << aTolType << "'";
+        return 1;
+      }
+    }
     else if ((anArg == "-mode"
            || anArg == "-dispmode")
           && anArgIter + 1 < theArgsNb)
     {
       if (aType == Prs3d_TypeOfHighlight_None)
       {
-        std::cout << "Syntax error: type of highlighting is undefined\n";
+        Message::SendFail ("Syntax error: type of highlighting is undefined");
         return 1;
       }
 
@@ -12981,7 +13366,7 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
     {
       if (aType == Prs3d_TypeOfHighlight_None)
       {
-        std::cout << "Syntax error: type of highlighting is undefined\n";
+        Message::SendFail ("Syntax error: type of highlighting is undefined");
         return 1;
       }
 
@@ -12989,7 +13374,7 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
       Graphic3d_ZLayerId aNewLayer = Graphic3d_ZLayerId_UNKNOWN;
       if (!ViewerTest::ParseZLayer (theArgVec[anArgIter], aNewLayer))
       {
-        std::cerr << "Error: wrong syntax at " << theArgVec[anArgIter] << ".\n";
+        Message::SendFail() << "Syntax error at " << theArgVec[anArgIter];
         return 1;
       }
 
@@ -13011,17 +13396,17 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
       }
       else if (aType == Prs3d_TypeOfHighlight_None)
       {
-        std::cout << "Syntax error: type of highlighting is undefined\n";
+        Message::SendFail ("Syntax error: type of highlighting is undefined");
         return 1;
       }
 
       Quantity_Color aColor;
-      Standard_Integer aNbParsed = ViewerTest::ParseColor (theArgsNb - anArgIter - 1,
-                                                           theArgVec + anArgIter + 1,
-                                                           aColor);
+      Standard_Integer aNbParsed = Draw::ParseColor (theArgsNb - anArgIter - 1,
+                                                     theArgVec + anArgIter + 1,
+                                                     aColor);
       if (aNbParsed == 0)
       {
-        std::cout << "Syntax error: need more arguments.\n";
+        Message::SendFail ("Syntax error: need more arguments");
         return 1;
       }
       anArgIter += aNbParsed;
@@ -13048,7 +13433,7 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
       }
       else if (aType == Prs3d_TypeOfHighlight_None)
       {
-        std::cout << "Syntax error: type of highlighting is undefined\n";
+        Message::SendFail ("Syntax error: type of highlighting is undefined");
         return 1;
       }
 
@@ -13063,13 +13448,13 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
     {
       if (aType == Prs3d_TypeOfHighlight_None)
       {
-        std::cout << "Syntax error: type of highlighting is undefined\n";
+        Message::SendFail ("Syntax error: type of highlighting is undefined");
         return 1;
       }
 
       const Handle(Prs3d_Drawer)& aStyle = aCtx->HighlightStyle (aType);
       Graphic3d_NameOfMaterial aMatName = Graphic3d_MaterialAspect::MaterialFromName (theArgVec[anArgIter + 1]);
-      if (aMatName != Graphic3d_NOM_DEFAULT)
+      if (aMatName != Graphic3d_NameOfMaterial_DEFAULT)
       {
         ++anArgIter;
         Handle(Graphic3d_AspectFillArea3d) anAspect = new Graphic3d_AspectFillArea3d();
@@ -13089,7 +13474,8 @@ static int VSelectionProperties (Draw_Interpretor& theDi,
     }
     else
     {
-      std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+      Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
+      return 1;
     }
   }
 
@@ -13129,19 +13515,21 @@ static int VDumpSelectionImage (Draw_Interpretor& /*theDi*/,
 {
   if (theArgsNb < 2)
   {
-    std::cout << "Syntax error: wrong number arguments for '" << theArgVec[0] << "'\n";
+    Message::SendFail() << "Syntax error: wrong number arguments for '" << theArgVec[0] << "'";
     return 1;
   }
 
   const Handle(AIS_InteractiveContext)& aContext = ViewerTest::GetAISContext();
+  const Handle(V3d_View)& aView = ViewerTest::CurrentView();
   if (aContext.IsNull())
   {
-    std::cout << "Error: no active view.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
 
   TCollection_AsciiString aFile;
   StdSelect_TypeOfSelectionImage aType = StdSelect_TypeOfSelectionImage_NormalizedDepth;
+  Handle(Graphic3d_Camera) aCustomCam;
   Image_Format anImgFormat = Image_Format_BGR;
   Standard_Integer aPickedIndex = 1;
   for (Standard_Integer anArgIter = 1; anArgIter < theArgsNb; ++anArgIter)
@@ -13152,7 +13540,7 @@ static int VDumpSelectionImage (Draw_Interpretor& /*theDi*/,
     {
       if (++anArgIter >= theArgsNb)
       {
-        std::cout << "Syntax error: wrong number parameters of flag '-depth'.\n";
+        Message::SendFail ("Syntax error: wrong number parameters of flag '-depth'");
         return 1;
       }
 
@@ -13209,11 +13597,35 @@ static int VDumpSelectionImage (Draw_Interpretor& /*theDi*/,
     {
       if (++anArgIter >= theArgsNb)
       {
-        std::cout << "Syntax error: wrong number parameters at '" << aParam << "'.\n";
+        Message::SendFail() << "Syntax error: wrong number parameters at '" << aParam << "'";
         return 1;
       }
 
       aPickedIndex = Draw::Atoi (theArgVec[anArgIter]);
+    }
+    else if (anArgIter + 1 < theArgsNb
+          && aParam == "-xrpose")
+    {
+      TCollection_AsciiString anXRArg (theArgVec[++anArgIter]);
+      anXRArg.LowerCase();
+      if (anXRArg == "base")
+      {
+        aCustomCam = aView->View()->BaseXRCamera();
+      }
+      else if (anXRArg == "head")
+      {
+        aCustomCam = aView->View()->PosedXRCamera();
+      }
+      else
+      {
+        Message::SendFail() << "Syntax error: unknown XR pose '" << anXRArg << "'";
+        return 1;
+      }
+      if (aCustomCam.IsNull())
+      {
+        Message::SendFail() << "Error: undefined XR pose";
+        return 0;
+      }
     }
     else if (aFile.IsEmpty())
     {
@@ -13221,34 +13633,46 @@ static int VDumpSelectionImage (Draw_Interpretor& /*theDi*/,
     }
     else
     {
-      std::cout << "Syntax error: unknown argument '" << theArgVec[anArgIter] << "'.\n";
+      Message::SendFail() << "Syntax error: unknown argument '" << theArgVec[anArgIter] << "'";
       return 1;
     }
   }
   if (aFile.IsEmpty())
   {
-    std::cout << "Syntax error: image file name is missing.\n";
+    Message::SendFail ("Syntax error: image file name is missing");
     return 1;
   }
 
-  const Handle(V3d_View)& aView = ViewerTest::CurrentView();
   Standard_Integer aWidth = 0, aHeight = 0;
   aView->Window()->Size (aWidth, aHeight);
 
   Image_AlienPixMap aPixMap;
   if (!aPixMap.InitZero (anImgFormat, aWidth, aHeight))
   {
-    std::cout << "Error: can't allocate image.\n";
+    Message::SendFail ("Error: can't allocate image");
     return 1;
+  }
+
+  const bool wasImmUpdate = aView->SetImmediateUpdate (false);
+  Handle(Graphic3d_Camera) aCamBack = aView->Camera();
+  if (!aCustomCam.IsNull())
+  {
+    aView->SetCamera (aCustomCam);
   }
   if (!aContext->MainSelector()->ToPixMap (aPixMap, aView, aType, aPickedIndex))
   {
-    std::cout << "Error: can't generate selection image.\n";
+    Message::SendFail ("Error: can't generate selection image");
     return 1;
   }
+  if (!aCustomCam.IsNull())
+  {
+    aView->SetCamera (aCamBack);
+  }
+  aView->SetImmediateUpdate (wasImmUpdate);
+
   if (!aPixMap.Save (aFile))
   {
-    std::cout << "Error: can't save selection image.\n";
+    Message::SendFail ("Error: can't save selection image");
     return 0;
   }
   return 0;
@@ -13266,12 +13690,12 @@ static int VViewCube (Draw_Interpretor& ,
   const Handle(V3d_View)& aView = ViewerTest::CurrentView();
   if (aContext.IsNull() || aView.IsNull())
   {
-    std::cout << "Error: no active view.\n";
+    Message::SendFail ("Error: no active viewer");
     return 1;
   }
   else if (theNbArgs < 2)
   {
-    std::cout << "Syntax error: wrong number arguments\n";
+    Message::SendFail ("Syntax error: wrong number arguments");
     return 1;
   }
 
@@ -13292,7 +13716,7 @@ static int VViewCube (Draw_Interpretor& ,
       aName = theArgVec[anArgIter];
       if (aName.StartsWith ("-"))
       {
-        std::cout << "Syntax error: object name should be specified.\n";
+        Message::SendFail ("Syntax error: object name should be specified");
         return 1;
       }
       Handle(AIS_InteractiveObject) aPrs;
@@ -13321,12 +13745,12 @@ static int VViewCube (Draw_Interpretor& ,
           || anArg == "-innercolor"
           || anArg == "-textcolor")
     {
-      Standard_Integer aNbParsed = ViewerTest::ParseColor (theNbArgs - anArgIter - 1,
-                                                           theArgVec + anArgIter + 1,
-                                                           aColorRgb);
+      Standard_Integer aNbParsed = Draw::ParseColor (theNbArgs - anArgIter - 1,
+                                                     theArgVec + anArgIter + 1,
+                                                     aColorRgb);
       if (aNbParsed == 0)
       {
-        std::cerr << "Error: wrong syntax at '" << anArg << "'\n";
+        Message::SendFail() << "Syntax error at '" << anArg << "'";
         return 1;
       }
       anArgIter += aNbParsed;
@@ -13372,7 +13796,7 @@ static int VViewCube (Draw_Interpretor& ,
       const Standard_Real aValue = Draw::Atof (theArgVec[++anArgIter]);
       if (aValue < 0.0 || aValue > 1.0)
       {
-        std::cout << "Syntax error: invalid transparency value " << theArgVec[anArgIter] << "\n";
+        Message::SendFail() << "Syntax error: invalid transparency value " << theArgVec[anArgIter];
         return 1;
       }
 
@@ -13393,7 +13817,7 @@ static int VViewCube (Draw_Interpretor& ,
     {
       bool toShow = true;
       if (anArgIter + 1 < theNbArgs
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toShow))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toShow))
       {
         ++anArgIter;
       }
@@ -13419,7 +13843,7 @@ static int VViewCube (Draw_Interpretor& ,
     {
       bool isOn = true;
       if (anArgIter + 1 < theNbArgs
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], isOn))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], isOn))
       {
         ++anArgIter;
       }
@@ -13490,19 +13914,196 @@ static int VViewCube (Draw_Interpretor& ,
     {
       aViewCube->SetDuration (Draw::Atof (theArgVec[++anArgIter]));
     }
+    else if (anArgIter + 1 < theNbArgs
+          && anArg == "-axesradius")
+    {
+      aViewCube->SetAxesRadius (Draw::Atof (theArgVec[++anArgIter]));
+    }
+    else if (anArgIter + 1 < theNbArgs
+          && anArg == "-axesconeradius")
+    {
+      aViewCube->SetAxesConeRadius (Draw::Atof (theArgVec[++anArgIter]));
+    }
+    else if (anArgIter + 1 < theNbArgs
+          && anArg == "-axessphereradius")
+    {
+      aViewCube->SetAxesSphereRadius (Draw::Atof (theArgVec[++anArgIter]));
+    }
     else
     {
-      std::cout << "Syntax error: unknown argument '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error: unknown argument '" << anArg << "'";
       return 1;
     }
   }
   if (aViewCube.IsNull())
   {
-    std::cout << "Syntax error: wrong number of arguments\n";
+    Message::SendFail ("Syntax error: wrong number of arguments");
     return 1;
   }
 
   ViewerTest::Display (aName, aViewCube, false);
+  return 0;
+}
+
+//===============================================================================================
+//function : VColorConvert
+//purpose  :
+//===============================================================================================
+static int VColorConvert (Draw_Interpretor& theDI, Standard_Integer  theNbArgs, const char** theArgVec)
+{
+  if (theNbArgs != 6)
+  {
+    std::cerr << "Error: command syntax is incorrect, see help" << std::endl;
+    return 1;
+  }
+
+  Standard_Boolean convertFrom = (! strcasecmp (theArgVec[1], "from"));
+  if (! convertFrom && strcasecmp (theArgVec[1], "to"))
+  {
+    std::cerr << "Error: first argument must be either \"to\" or \"from\"" << std::endl;
+    return 1;
+  }
+
+  const char* aTypeStr = theArgVec[2];
+  Quantity_TypeOfColor aType = Quantity_TOC_RGB;
+  if (! strcasecmp (aTypeStr, "srgb"))
+  {
+    aType = Quantity_TOC_sRGB;
+  }
+  else if (! strcasecmp (aTypeStr, "hls"))
+  {
+    aType = Quantity_TOC_HLS;
+  }
+  else if (! strcasecmp (aTypeStr, "lab"))
+  {
+    aType = Quantity_TOC_CIELab;
+  }
+  else if (! strcasecmp (aTypeStr, "lch"))
+  {
+    aType = Quantity_TOC_CIELch;
+  }
+  else
+  {
+    std::cerr << "Error: unknown colorspace type: " << aTypeStr << std::endl;
+    return 1;
+  }
+
+  double aC1 = Draw::Atof (theArgVec[3]);
+  double aC2 = Draw::Atof (theArgVec[4]);
+  double aC3 = Draw::Atof (theArgVec[5]);
+
+  Quantity_Color aColor (aC1, aC2, aC3, convertFrom ? aType : Quantity_TOC_RGB);
+  aColor.Values (aC1, aC2, aC3, convertFrom ? Quantity_TOC_RGB : aType);
+
+  // print values with 6 decimal digits
+  char buffer[1024];
+  Sprintf (buffer, "%.6f %.6f %.6f", aC1, aC2, aC3);
+  theDI << buffer;
+
+  return 0;
+}
+ 
+//===============================================================================================
+//function : VColorDiff
+//purpose  :
+//===============================================================================================
+static int VColorDiff (Draw_Interpretor& theDI, Standard_Integer  theNbArgs, const char** theArgVec)
+{
+  if (theNbArgs != 7)
+  {
+    std::cerr << "Error: command syntax is incorrect, see help" << std::endl;
+    return 1;
+  }
+
+  double aR1 = Draw::Atof (theArgVec[1]);
+  double aG1 = Draw::Atof (theArgVec[2]);
+  double aB1 = Draw::Atof (theArgVec[3]);
+  double aR2 = Draw::Atof (theArgVec[4]);
+  double aG2 = Draw::Atof (theArgVec[5]);
+  double aB2 = Draw::Atof (theArgVec[6]);
+
+  Quantity_Color aColor1 (aR1, aG1, aB1, Quantity_TOC_RGB);
+  Quantity_Color aColor2 (aR2, aG2, aB2, Quantity_TOC_RGB);
+
+  theDI << aColor1.DeltaE2000 (aColor2);
+
+  return 0;
+}
+ 
+//===============================================================================================
+//function : VBVHPrebuid
+//purpose  :
+//===============================================================================================
+static int VSelBvhBuild (Draw_Interpretor& /*theDI*/, Standard_Integer theNbArgs, const char** theArgVec)
+{
+  const Handle(AIS_InteractiveContext) aCtx = ViewerTest::GetAISContext();
+  if (aCtx.IsNull())
+  {
+    Message::SendFail ("Error: no active viewer");
+    return 1;
+  }
+
+  if (theNbArgs < 2)
+  {
+    Message::SendFail ("Error: command syntax is incorrect, see help");
+    return 1;
+  }
+
+  Standard_Integer toEnable = -1;
+  Standard_Integer aThreadsNb = -1;
+  Standard_Boolean toWait = Standard_False;
+
+  for (Standard_Integer anArgIter = 1; anArgIter < theNbArgs; ++anArgIter)
+  {
+    TCollection_AsciiString anArg (theArgVec[anArgIter]);
+    anArg.LowerCase();
+
+    if (anArg == "-nbthreads"
+        && anArgIter + 1 < theNbArgs)
+    {
+      aThreadsNb = Draw::Atoi (theArgVec[++anArgIter]);
+      if (aThreadsNb < 1)
+      {
+        aThreadsNb = Max (1, OSD_Parallel::NbLogicalProcessors() - 1);
+      }
+    }
+    else if (anArg == "-wait")
+    {
+      toWait = Standard_True;
+    }
+    else if (toEnable == -1)
+    {
+      Standard_Boolean toEnableValue = Standard_True;
+      if (Draw::ParseOnOff (anArg.ToCString(), toEnableValue))
+      {
+        toEnable = toEnableValue ? 1 : 0;
+      }
+      else
+      {
+        Message::SendFail() << "Syntax error: unknown argument '" << anArg << "'";
+        return 1;
+      }
+    }
+    else
+    {
+      Message::SendFail() << "Syntax error: unknown argument '" << anArg << "'";
+      return 1;
+    }
+  }
+
+  if (aThreadsNb == -1)
+  {
+    aThreadsNb = 1;
+  }
+  if (toEnable != -1)
+  {
+    aCtx->MainSelector()->SetToPrebuildBVH (toEnable == 1, aThreadsNb);
+  }
+  if (toWait)
+  {
+    aCtx->MainSelector()->WaitForBVHBuild();
+  }
+
   return 0;
 }
 
@@ -13748,9 +14349,11 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "\n\t\t:       [-labels Label1 Label2 ...] [-label Index Label]"
     "\n\t\t:       [-freeLabels NbOfLabels Label1 Label2 ...]"
     "\n\t\t:       [-xy Left=0 Bottom=0]"
+    "\n\t\t:       [-uniform lightness hue_from hue_to]"
     "\n\t\t:  -demo     - displays a color scale with demonstratio values"
     "\n\t\t:  -colors   - set colors for all intervals"
     "\n\t\t:  -color    - set color for specific interval"
+    "\n\t\t:  -uniform  - generate colors with the same lightness"
     "\n\t\t:  -textpos  - horizontal label position relative to color scale bar"
     "\n\t\t:  -labelAtBorder - vertical label position relative to color interval;"
     "\n\t\t:              at border means the value inbetween neighbor intervals,"
@@ -13762,7 +14365,7 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "\n\t\t:  -title    - set title"
     "\n\t\t:  -reversed - setup smooth color transition between intervals"
     "\n\t\t:  -smoothTransition - swap colorscale direction"
-    "\n\t\t:  -hueRange - set hue angles corresponding to minimum and maximum values"
+    "\n\t\t:  -hueRange - set hue angles corresponding to minimum and maximum values",
     __FILE__, VColorScale, group);
   theCommands.Add("vgraduatedtrihedron",
     "vgraduatedtrihedron : -on/-off [-xname Name] [-yname Name] [-zname Name] [-arrowlength Value]\n"
@@ -13868,8 +14471,12 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     __FILE__, VVbo, group);
   theCommands.Add ("vstereo",
             "vstereo [0|1] [-mode Mode] [-reverse {0|1}]"
+    "\n\t\t:         [-mirrorComposer] [-hmdfov2d AngleDegrees] [-unitFactor MetersFactor]"
     "\n\t\t:         [-anaglyph Filter]"
-    "\n\t\t: Control stereo output mode. Available modes for -mode:"
+    "\n\t\t: Control stereo output mode."
+    "\n\t\t: When -mirrorComposer is specified, VR rendered frame will be mirrored in window (debug)."
+    "\n\t\t: Parameter -unitFactor specifies meters scale factor for mapping VR input."
+    "\n\t\t: Available modes for -mode:"
     "\n\t\t:  quadBuffer        - OpenGL QuadBuffer stereo,"
     "\n\t\t:                     requires driver support."
     "\n\t\t:                     Should be called BEFORE vinit!"
@@ -13879,22 +14486,25 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "\n\t\t:  chessBoard       - chess-board output"
     "\n\t\t:  sideBySide       - horizontal pair"
     "\n\t\t:  overUnder        - vertical   pair"
+    "\n\t\t:  openVR           - OpenVR (HMD)"
     "\n\t\t: Available Anaglyph filters for -anaglyph:"
     "\n\t\t:  redCyan, redCyanSimple, yellowBlue, yellowBlueSimple,"
     "\n\t\t:  greenMagentaSimple",
     __FILE__, VStereo, group);
   theCommands.Add ("vcaps",
-            "vcaps [-vbo {0|1}] [-sprites {0|1}] [-ffp {0|1}] [-polygonMode {0|1}]"
-    "\n\t\t:       [-compatibleProfile {0|1}]"
+            "vcaps [-sRGB {0|1}] [-vbo {0|1}] [-sprites {0|1}] [-ffp {0|1}] [-polygonMode {0|1}]"
+    "\n\t\t:       [-compatibleProfile {0|1}] [-compressedTextures {0|1}]"
     "\n\t\t:       [-vsync {0|1}] [-useWinBuffer {0|1}]"
     "\n\t\t:       [-quadBuffer {0|1}] [-stereo {0|1}]"
     "\n\t\t:       [-softMode {0|1}] [-noupdate|-update]"
     "\n\t\t:       [-noExtensions {0|1}] [-maxVersion Major Minor]"
     "\n\t\t: Modify particular graphic driver options:"
+    "\n\t\t:  sRGB     - enable/disable sRGB rendering"
     "\n\t\t:  FFP      - use fixed-function pipeline instead of"
     "\n\t\t:             built-in GLSL programs"
     "\n\t\t:            (requires compatible profile)"
     "\n\t\t:  polygonMode - use Polygon Mode instead of built-in GLSL programs"
+    "\n\t\t:  compressedTexture - allow uploading of GPU-supported compressed texture formats"
     "\n\t\t:  VBO      - use Vertex Buffer Object (copy vertex"
     "\n\t\t:             arrays to GPU memory)"
     "\n\t\t:  sprite   - use textured sprites instead of bitmaps"
@@ -13916,7 +14526,7 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     " with f option returns free memory in bytes",
     __FILE__, VMemGpu, group);
   theCommands.Add ("vreadpixel",
-    "vreadpixel xPixel yPixel [{rgb|rgba|depth|hls|rgbf|rgbaf}=rgba] [-name|-hex]"
+    "vreadpixel xPixel yPixel [{rgb|rgba|sRGB|sRGBa|depth|hls|rgbf|rgbaf}=rgba] [-name|-hex]"
     " : Read pixel value for active view",
     __FILE__, VReadPixel, group);
   theCommands.Add("diffimage",
@@ -13933,10 +14543,10 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "- 1) single click selection\n"
     "- 2) selection with rectangle having corners at pixel positions (x1,y1) and (x2,y2)\n"
     "- 3) selection with polygon having corners in pixel positions (x1,y1), (x2,y2),...,(xn,yn)\n"
-    "- 4) -allowoverlap manages overlap and inclusion detection in rectangular selection.\n"
-    "     If the flag is set to 1, both sensitives that were included completely and overlapped partially by defined rectangle will be detected,\n"
-    "     otherwise algorithm will chose only fully included sensitives. Default behavior is to detect only full inclusion. "
-    " (partial inclusion - overlap - is not allowed by default)\n"
+    "- 4) -allowoverlap manages overlap and inclusion detection in rectangular and polygonal selection.\n"
+    "     If the flag is set to 1, both sensitives that were included completely and overlapped partially by defined \n"
+    "     rectangle or polygon will be detected, otherwise algorithm will chose only fully included sensitives.\n"
+    "     Default behavior is to detect only full inclusion. (partial inclusion - overlap - is not allowed by default)\n"
     "- 5) any of these selections with shift button pressed",
     __FILE__, VSelect, group);
   theCommands.Add ("vmoveto",
@@ -14046,6 +14656,8 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
       "\n\t\t:         [-stereo] [-leftEye] [-rightEye]"
       "\n\t\t:         [-iod [Distance]] [-iodType    [absolute|relative]]"
       "\n\t\t:         [-zfocus [Value]] [-zfocusType [absolute|relative]]"
+      "\n\t\t:         [-fov2d  [Angle]] [-lockZup {0|1}]"
+      "\n\t\t:         [-xrPose base|head=base]"
       "\n\t\t: Manages camera parameters."
       "\n\t\t: Displays frustum when presntation name PrsName is specified."
       "\n\t\t: Prints current value when option called without argument."
@@ -14054,7 +14666,9 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
       "\n\t\t: Perspective camera:"
       "\n\t\t:   -persp      activate perspective  projection (mono)"
       "\n\t\t:   -fovy       field of view in y axis, in degrees"
+      "\n\t\t:   -fov2d      field of view limit for 2d on-screen elements"
       "\n\t\t:   -distance   distance of eye from camera center"
+      "\n\t\t:   -lockZup    lock Z up (tunrtable mode)"
       "\n\t\t: Stereoscopic camera:"
       "\n\t\t:   -stereo     perspective  projection (stereo)"
       "\n\t\t:   -leftEye    perspective  projection (left  eye)"
@@ -14177,10 +14791,17 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "\n        -{linearAtten}uation value"
     "\n        -angle angleDeg"
     "\n        -{spotexp}onent value"
+    "\n        -range value"
     "\n        -local|-global"
     "\n\n        example: vlight -add positional -head 1 -pos 0 1 1 -color red"
     "\n        example: vlight -change 0 -direction 0 -1 0 -linearAttenuation 0.2",
     __FILE__, VLight, group);
+  theCommands.Add("vpbrenv",
+    "vpbrenv -clear|-generate"
+    "\n\t\t: Clears or generates PBR environment map of active view."
+    "\n\t\t:  -clear clears PBR environment (fills by white color)"
+    "\n\t\t:  -generate generates PBR environment from current background cubemap",
+    __FILE__, VPBREnvironment, group);
   theCommands.Add("vraytrace",
             "vraytrace [0|1]"
     "\n\t\t: Turns on/off ray-tracing renderer."
@@ -14188,54 +14809,87 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "\n\t\t:   'vraytrace 1' alias for 'vrenderparams -rayTrace'.",
     __FILE__, VRenderParams, group);
   theCommands.Add("vrenderparams",
-    "\n    Manages rendering parameters: "
-    "\n      '-raster'                   Disables GPU ray-tracing"
-    "\n      '-msaa         0..4'        Specifies number of samples for MSAA"
-    "\n      '-lineFeather  > 0'         Sets line feather factor"
-    "\n      '-oit          off|0.0-1.0' Enables/disables OIT and sets depth weight factor"
-    "\n      '-depthPrePass on|off'      Enables/disables depth pre-pass"
-    "\n      '-alphatocoverage on|off'   Enables/disables alpha to coverage (needs MSAA)"
-    "\n      '-rendScale    value        Rendering resolution scale factor"
-    "\n      '-rayTrace'                 Enables  GPU ray-tracing"
-    "\n      '-rayDepth     0..10'       Defines maximum ray-tracing depth"
-    "\n      '-shadows      on|off'      Enables/disables shadows rendering"
-    "\n      '-reflections  on|off'      Enables/disables specular reflections"
-    "\n      '-fsaa         on|off'      Enables/disables adaptive anti-aliasing"
-    "\n      '-gleam        on|off'      Enables/disables transparency shadow effects"
-    "\n      '-gi           on|off'      Enables/disables global illumination effects"
-    "\n      '-brng         on|off'      Enables/disables blocked RNG (fast coherent PT)"
-    "\n      '-env          on|off'      Enables/disables environment map background"
-    "\n      '-twoside      on|off'      Enables/disables two-sided BSDF models (PT mode)"
-    "\n      '-iss          on|off'      Enables/disables adaptive screen sampling (PT mode)"
-    "\n      '-issd         on|off'      Shows screen sampling distribution in ISS mode"
-    "\n      '-maxrad       > 0.0'       Value used for clamping radiance estimation (PT mode)"
-    "\n      '-tileSize     1..4096'     Specifies   size of screen tiles in ISS mode (32 by default)"
-    "\n      '-nbtiles      64..1024'    Specifies number of screen tiles per Redraw in ISS mode (256 by default)"
-    "\n      '-rebuildGlsl  on|off'      Rebuild Ray-Tracing GLSL programs (for debugging)"
-    "\n      '-shadingModel model'       Controls shading model from enumeration"
-    "\n                                  unlit, flat, gouraud, phong"
-    "\n      '-resolution   value'       Sets a new pixels density (PPI), defines scaling factor for parameters like text size"
-    "\n      '-aperture     >= 0.0'      Aperture size  of perspective camera for depth-of-field effect (0 disables DOF)"
-    "\n      '-focal        >= 0.0'      Focal distance of perspective camera for depth-of-field effect"
-    "\n      '-exposure     value'       Exposure value for tone mapping (0.0 value disables the effect)"
-    "\n      '-whitepoint   value'       White point value for filmic tone mapping"
-    "\n      '-tonemapping  mode'        Tone mapping mode (disabled, filmic)"
-    "\n      '-perfCounters none|fps|cpu|layers|structures|groups|arrays|triagles|points"
-    "\n      '              |gpuMem|frameTime|basic|extended|full|nofps|skipImmediate'"
-    "\n                                  Show/hide performance counters (flags can be combined)"
-    "\n      '-perfUpdateInterval nbSeconds' Performance counters update interval"
-    "\n      '-perfChart    nbFrames'    Show frame timers chart limited by specified number of frames"
-    "\n      '-perfChartMax seconds'     Maximum time in seconds with the chart"
-    "\n      '-frustumCulling on|off|noupdate' Enable/disable objects frustum clipping or"
-    "\n                                        set state to check structures culled previously."
-    "\n    Unlike vcaps, these parameters dramatically change visual properties."
-    "\n    Command is intended to control presentation quality depending on"
-    "\n    hardware capabilities and performance.",
+    "\n\t\t: Manages rendering parameters, affecting visual appearance, quality and performance."
+    "\n\t\t: Should be applied taking into account GPU hardware capabilities and performance."
+    "\n\t\t: Common parameters:"
+    "\n\t\t: vrenderparams [-raster] [-shadingModel {unlit|facet|gouraud|phong|pbr|pbr_facet}=gouraud]"
+    "\n\t\t:               [-msaa 0..8=0] [-rendScale scale=1] [-resolution value=72]"
+    "\n\t\t:               [-oit {off|0.0-1.0}=off]"
+    "\n\t\t:               [-depthPrePass {on|off}=off] [-alphaToCoverage {on|off}=on]"
+    "\n\t\t:               [-frustumCulling {on|off|noupdate}=on] [-lineFeather width=1.0]"
+    "\n\t\t:               [-sync {default|views}] [-reset]"
+    "\n\t\t:   -raster          Disables GPU ray-tracing."
+    "\n\t\t:   -shadingModel    Controls shading model."
+    "\n\t\t:   -msaa            Specifies number of samples for MSAA."
+    "\n\t\t:   -rendScale       Rendering resolution scale factor (supersampling, alternative to MSAA)."
+    "\n\t\t:   -resolution      Sets new pixels density (PPI) used as text scaling factor."
+    "\n\t\t:   -lineFeather     Sets line feather factor while displaying mesh edges."
+    "\n\t\t:   -alphaToCoverage Enables/disables alpha to coverage (needs MSAA)."
+    "\n\t\t:   -oit             Enables/disables order-independent transparency (OIT) rendering;"
+    "\n\t\t:                    weight OIT fixes transparency artifacts at the cost of blurry result,"
+    "\n\t\t:                    it is managed by depth weight factor (0.0 value also enables weight OIT)."
+    "\n\t\t:   -depthPrePass    Enables/disables depth pre-pass."
+    "\n\t\t:   -frustumCulling  Enables/disables objects frustum clipping or"
+    "\n\t\t:                    sets state to check structures culled previously."
+    "\n\t\t:   -sync            Sets active View parameters as Viewer defaults / to other Views."
+    "\n\t\t:   -reset           Resets active View parameters to Viewer defaults."
+    "\n\t\t: Diagnostic output (on-screen overlay):"
+    "\n\t\t: vrenderparams [-perfCounters none|fps|cpu|layers|structures|groups|arrays|triangles|points"
+    "\n\t\t:                             |gpuMem|frameTime|basic|extended|full|nofps|skipImmediate]"
+    "\n\t\t:               [-perfUpdateInterval nbSeconds=1] [-perfChart nbFrames=1] [-perfChartMax seconds=0.1]"
+    "\n\t\t:   -perfCounters       Show/hide performance counters (flags can be combined)."
+    "\n\t\t:   -perfUpdateInterval Performance counters update interval."
+    "\n\t\t:   -perfChart          Show frame timers chart limited by specified number of frames."
+    "\n\t\t:   -perfChartMax       Maximum time in seconds with the chart."
+    "\n\t\t: Ray-Tracing options:"
+    "\n\t\t: vrenderparams [-rayTrace] [-rayDepth {0..10}=3] [-shadows {on|off}=on] [-reflections {on|off}=off]"
+    "\n\t\t:               [-fsaa {on|off}=off] [-gleam {on|off}=off] [-env {on|off}=off]"
+    "\n\t\t:               [-gi {on|off}=off] [-brng {on|off}=off]"
+    "\n\t\t:               [-iss {on|off}=off] [-tileSize {1..4096}=32] [-nbTiles {64..1024}=256]"
+    "\n\t\t:               [-ignoreNormalMap {on|off}=off] [-twoSide {on|off}=off]"
+    "\n\t\t:               [-maxRad {value>0}=30.0]"
+    "\n\t\t:               [-aperture {value>=0}=0.0] [-focal {value>=0.0}=1.0]"
+    "\n\t\t:               [-exposure value=0.0] [-whitePoint value=1.0] [-toneMapping {disabled|filmic}=disabled]"
+    "\n\t\t:   -rayTrace     Enables  GPU ray-tracing."
+    "\n\t\t:   -rayDepth     Defines maximum ray-tracing depth."
+    "\n\t\t:   -shadows      Enables/disables shadows rendering."
+    "\n\t\t:   -reflections  Enables/disables specular reflections."
+    "\n\t\t:   -fsaa         Enables/disables adaptive anti-aliasing."
+    "\n\t\t:   -gleam        Enables/disables transparency shadow effects."
+    "\n\t\t:   -gi           Enables/disables global illumination effects (Path-Tracing)."
+    "\n\t\t:   -env          Enables/disables environment map background."
+    "\n\t\t:   -ignoreNormalMap Enables/disables normal map ignoring during path tracing."
+    "\n\t\t:   -twoSide      Enables/disables two-sided BSDF models (PT mode)."
+    "\n\t\t:   -iss          Enables/disables adaptive screen sampling (PT mode)."
+    "\n\t\t:   -maxRad       Value used for clamping radiance estimation (PT mode)."
+    "\n\t\t:   -tileSize     Specifies   size of screen tiles in ISS mode (32 by default)."
+    "\n\t\t:   -nbTiles      Specifies number of screen tiles per Redraw in ISS mode (256 by default)."
+    "\n\t\t:   -aperture     Aperture size  of perspective camera for depth-of-field effect (0 disables DOF)."
+    "\n\t\t:   -focal        Focal distance of perspective camera for depth-of-field effect."
+    "\n\t\t:   -exposure     Exposure value for tone mapping (0.0 value disables the effect)."
+    "\n\t\t:   -whitePoint   White point value for filmic tone mapping."
+    "\n\t\t:   -toneMapping  Tone mapping mode (disabled, filmic)."
+    "\n\t\t: PBR environment baking parameters (advanced/debug):"
+    "\n\t\t: vrenderparams [-pbrEnvPow2size {power>0}=9] [-pbrEnvSMLN {levels>1}=6] [-pbrEnvBP {0..1}=0.99]"
+    "\n\t\t:               [-pbrEnvBDSN {samples>0}=1024] [-pbrEnvBSSN {samples>0}=256]"
+    "\n\t\t:   -pbrEnvPow2size Controls size of IBL maps (real size can be calculates as 2^pbrenvpow2size)."
+    "\n\t\t:   -pbrEnvSMLN     Controls number of mipmap levels used in specular IBL map."
+    "\n\t\t:   -pbrEnvBDSN     Controls number of samples in Monte-Carlo integration during"
+    "\n\t\t:                   diffuse IBL map's sherical harmonics calculation."
+    "\n\t\t:   -pbrEnvBSSN     Controls maximum number of samples per mipmap level"
+    "\n\t\t:                   in Monte-Carlo integration during specular IBL maps generation."
+    "\n\t\t:   -pbrEnvBP       Controls strength of samples number reducing"
+    "\n\t\t:                   during specular IBL maps generation (1 disables reducing)."
+    "\n\t\t: Debug options:"
+    "\n\t\t: vrenderparams [-issd {on|off}=off] [-rebuildGlsl on|off]"
+    "\n\t\t:   -issd         Shows screen sampling distribution in ISS mode."
+    "\n\t\t:   -rebuildGlsl  Rebuild Ray-Tracing GLSL programs (for debugging)."
+    "\n\t\t:   -brng         Enables/disables blocked RNG (fast coherent PT).",
     __FILE__, VRenderParams, group);
   theCommands.Add("vstatprofiler",
     "\n vstatprofiler [fps|cpu|allLayers|layers|allstructures|structures|groups"
     "\n                |allArrays|fillArrays|lineArrays|pointArrays|textArrays"
-    "\n                |triagles|points|geomMem|textureMem|frameMem"
+    "\n                |triangles|points|geomMem|textureMem|frameMem"
     "\n                |elapsedFrame|cpuFrameAverage|cpuPickingAverage|cpuCullingAverage|cpuDynAverage"
     "\n                |cpuFrameMax|cpuPickingMax|cpuCullingMax|cpuDynMax]"
     "\n                [-noredraw]"
@@ -14291,6 +14945,9 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
     "\n                            'first'   to pick first acceptable (default)"
     "\n                            'topmost' to pick only topmost (and nothing, if topmost is rejected by filters)"
     "\n    -pixTol    value        : sets up pixel tolerance"
+    "\n    -depthTol {uniform|uniformpx} value : sets tolerance for sorting results by depth"
+    "\n    -depthTol {sensfactor}  : use sensitive factor for sorting results by depth"
+    "\n    -preferClosest {0|1}    : sets if depth should take precedence over priority while sorting results"
     "\n    -dispMode  dispMode     : sets display mode for highlighting"
     "\n    -layer     ZLayer       : sets ZLayer for highlighting"
     "\n    -color     {name|r g b} : sets highlight color"
@@ -14304,6 +14961,7 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
 
   theCommands.Add ("vseldump",
                    "vseldump file -type {depth|unnormDepth|object|owner|selMode|entity}=depth -pickedIndex Index=1"
+                   "\n\t\t:       [-xrPose base|head=base]"
                    "\n\t\t: Generate an image based on detection results:"
                    "\n\t\t:   depth       normalized depth values"
                    "\n\t\t:   unnormDepth unnormalized depth values"
@@ -14341,8 +14999,26 @@ void ViewerTest::ViewerCommands(Draw_Interpretor& theCommands)
                    "\n\t\t:   -boxCornerMinSize Value  minimal box corner size"
                    "\n\t\t:   -axesPadding Value       padding between box and arrows"
                    "\n\t\t:   -roundRadius Value       relative radius of corners of sides within [0.0, 0.5] range"
+                   "\n\t\t:   -axesRadius Value        radius of axes of the trihedron"
+                   "\n\t\t:   -axesConeRadius Value    radius of the cone (arrow) of the trihedron"
+                   "\n\t\t:   -axesSphereRadius Value  radius of the sphere (central point) of trihedron"
                    "\n\t\t:   -fixedanimation {0|1}    uninterruptible animation loop"
                    "\n\t\t:   -duration Seconds        animation duration in seconds",
     __FILE__, VViewCube, group);
 
+  theCommands.Add("vcolorconvert" ,
+                  "vcolorconvert {from|to} type C1 C2 C2"
+                  "\n\t\t: vcolorconvert from type C1 C2 C2: Converts color from specified color space to linear RGB"
+                  "\n\t\t: vcolorconvert to type R G B: Converts linear RGB color to specified color space"
+                  "\n\t\t: type can be sRGB, HLS, Lab, or Lch",
+                  __FILE__,VColorConvert,group);
+  theCommands.Add("vcolordiff" ,
+                  "vcolordiff R1 G1 B1 R2 G2 B2: returns CIEDE2000 color difference between two RGB colors",
+                  __FILE__,VColorDiff,group);
+  theCommands.Add("vselbvhbuild",
+                  "vselbvhbuild [{0|1}] [-nbThreads value] [-wait]"
+                  "\n\t\t: Turns on/off prebuilding of BVH within background thread(s)"
+                  "\n\t\t:   -nbThreads   number of threads, 1 by default; if < 1 then used (NbLogicalProcessors - 1)"
+                  "\n\t\t:   -wait        waits for building all of BVH",
+                  __FILE__,VSelBvhBuild,group);
 }

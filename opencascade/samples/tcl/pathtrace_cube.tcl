@@ -12,11 +12,8 @@ vinit name=View1 w=512 h=512
 vglinfo
 
 # setup light sources
-vlight del 0
-vlight del 1
-vlight add positional head 0 pos 0.5 0.5 0.85
-vlight change 0 sm 0.06
-vlight change 0 int 30.0
+vlight -clear
+vlight -add positional -head 0 -pos 0.5 0.5 0.85 -sm 0.06 -int 30.0
 
 vvbo 0
 vsetdispmode 1
@@ -57,16 +54,14 @@ vbsdf s -absorpCoeff 6
 # setup first inner box
 box c 0.3 0.3 0.2
 vdisplay     -noupdate c
-vlocation    -noupdate c -setLocation 0.55 0.3 0.0
-vlocation    -noupdate c -rotate 0 0 0 0 0 1 -30
+vlocation    -noupdate c -reset -rotate 0 0 0 0 0 1 -30 -translate 0.55 0.3 0.0
 vsetmaterial -noupdate c plastic
 vbsdf c -kd 1.0 0.8 0.2 -ks 0.3 -n
 
 # setup second inner box
 box g 0.15 0.15 0.3
 vdisplay     -noupdate g
-vlocation    -noupdate g -setLocation 0.7 0.25 0.2
-vlocation    -noupdate g -rotate 0 0 0 0 0 1 10
+vlocation    -noupdate g -reset -rotate 0 0 0 0 0 1 10 -translate 0.7 0.25 0.2
 vsetmaterial -noupdate g glass
 vbsdf g -absorpColor 0.8 1.0 0.8
 vbsdf g -absorpCoeff 6

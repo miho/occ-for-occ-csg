@@ -17,13 +17,14 @@
 
 #include <CDF_Application.hxx>
 #include <CDF_MetaDataDriver.hxx>
-#include <CDF_Session.hxx>
 #include <CDM_Document.hxx>
 #include <CDM_MetaData.hxx>
 #include <PCDM_ReferenceIterator.hxx>
 #include <Standard_NotImplemented.hxx>
 #include <Standard_Type.hxx>
+#include <Standard_NullObject.hxx>
 #include <TCollection_ExtendedString.hxx>
+#include <OSD_Thread.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(CDF_MetaDataDriver,Standard_Transient)
 
@@ -68,15 +69,17 @@ void CDF_MetaDataDriver::CreateDependsOn(const Handle(CDM_MetaData)& ,
 //purpose  : 
 //=======================================================================
 
-void CDF_MetaDataDriver::CreateReference(const Handle(CDM_MetaData)& ,const Handle(CDM_MetaData)& , const Standard_Integer , const Standard_Integer ) {}
+void CDF_MetaDataDriver::CreateReference(const Handle(CDM_MetaData)& ,
+  const Handle(CDM_MetaData)& , const Standard_Integer , const Standard_Integer ) {}
 
 //=======================================================================
 //function : ReferenceIterator
 //purpose  : 
 //=======================================================================
 
-Handle(PCDM_ReferenceIterator) CDF_MetaDataDriver::ReferenceIterator() {
-  return new PCDM_ReferenceIterator(CDF_Session::CurrentSession()->CurrentApplication()->MessageDriver());
+Handle(PCDM_ReferenceIterator) CDF_MetaDataDriver::ReferenceIterator(const Handle(Message_Messenger)& theMessageDriver)
+{
+  return new PCDM_ReferenceIterator(theMessageDriver);
 }
 
 //=======================================================================
@@ -84,7 +87,9 @@ Handle(PCDM_ReferenceIterator) CDF_MetaDataDriver::ReferenceIterator() {
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean CDF_MetaDataDriver::Find(const TCollection_ExtendedString& aFolder, const TCollection_ExtendedString& aName) {
+Standard_Boolean CDF_MetaDataDriver::Find(const TCollection_ExtendedString& aFolder, 
+  const TCollection_ExtendedString& aName) 
+{
   TCollection_ExtendedString aVersion;
   return Find(aFolder,aName,aVersion);
 }

@@ -221,9 +221,7 @@ void  OCC_3dBaseDoc::Popup (const Standard_Integer theMouseX,
    }
 
   POINT winCoord = { theMouseX , theMouseY };
-  Handle(WNT_Window) aWNTWindow=
-  Handle(WNT_Window)::DownCast(theView->Window());
-  ClientToScreen ( (HWND)(aWNTWindow->HWindow()),&winCoord);
+  ClientToScreen ((HWND )theView->Window()->NativeHandle(), &winCoord);
   pPopup->TrackPopupMenu (TPM_LEFTALIGN | TPM_RIGHTBUTTON,
                           winCoord.x,
                           winCoord.y,
@@ -489,8 +487,7 @@ void OCC_3dBaseDoc::OnUpdateV3dButtons (CCmdUI* pCmdUI)
 // Common function to change raytracing params and redraw view
 void OCC_3dBaseDoc::OnObjectRayTracingAction()
 {
-  myAISContext->CurrentViewer()->InitActiveViews();
-  Handle(V3d_View) aView = myAISContext->CurrentViewer()->ActiveView();
+  Handle(V3d_View) aView = myAISContext->CurrentViewer()->ActiveViews().First();
   Graphic3d_RenderingParams& aParams = aView->ChangeRenderingParams();
   if (myRayTracingIsOn)
     aParams.Method = Graphic3d_RM_RAYTRACING;

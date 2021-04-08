@@ -30,6 +30,8 @@
 
 #include "Graphic3d_Structure.pxx"
 
+#include <Standard_Dump.hxx>
+
 #include <stdio.h>
 
 IMPLEMENT_STANDARD_RTTIEXT(Graphic3d_Structure,Standard_Transient)
@@ -47,8 +49,11 @@ Graphic3d_Structure::Graphic3d_Structure (const Handle(Graphic3d_StructureManage
 {
   if (!theLinkPrs.IsNull())
   {
-    myOwner         = theLinkPrs->myOwner;
-    myVisual        = theLinkPrs->myVisual;
+    myOwner = theLinkPrs->myOwner;
+    if (theLinkPrs->myVisual != Graphic3d_TOS_COMPUTED)
+    {
+      myVisual = theLinkPrs->myVisual;
+    }
     myComputeVisual = theLinkPrs->myComputeVisual;
     myCStructure = theLinkPrs->myCStructure->ShadowLink (theManager);
   }
@@ -71,10 +76,10 @@ Graphic3d_Structure::~Graphic3d_Structure()
 }
 
 //=============================================================================
-//function : Clear
+//function : clear
 //purpose  :
 //=============================================================================
-void Graphic3d_Structure::Clear (const Standard_Boolean theWithDestruction)
+void Graphic3d_Structure::clear (const Standard_Boolean theWithDestruction)
 {
   if (IsDeleted()) return;
 
@@ -204,10 +209,10 @@ void Graphic3d_Structure::ResetDisplayPriority()
 }
 
 //=============================================================================
-//function : Erase
+//function : erase
 //purpose  :
 //=============================================================================
-void Graphic3d_Structure::Erase()
+void Graphic3d_Structure::erase()
 {
   if (IsDeleted())
   {
@@ -429,7 +434,7 @@ void Graphic3d_Structure::SetVisual (const Graphic3d_TypeOfStructure theVisual)
   }
   else
   {
-    Erase();
+    erase();
     myVisual = theVisual;
     SetComputeVisual (theVisual);
     Display();
@@ -667,7 +672,7 @@ void Graphic3d_Structure::DisconnectAll (const Graphic3d_TypeOfConnection theTyp
 //function : SetTransform
 //purpose  :
 //=============================================================================
-void Graphic3d_Structure::SetTransformation (const Handle(Geom_Transformation)& theTrsf)
+void Graphic3d_Structure::SetTransformation (const Handle(TopLoc_Datum3D)& theTrsf)
 {
   if (IsDeleted()) return;
 
@@ -676,7 +681,7 @@ void Graphic3d_Structure::SetTransformation (const Handle(Geom_Transformation)& 
   if (!theTrsf.IsNull()
     && theTrsf->Trsf().Form() == gp_Identity)
   {
-    myCStructure->SetTransformation (Handle(Geom_Transformation)());
+    myCStructure->SetTransformation (Handle(TopLoc_Datum3D)());
   }
   else
   {
@@ -1026,4 +1031,32 @@ void Graphic3d_Structure::SetZLayer (const Graphic3d_ZLayerId theLayerId)
 
   myStructureManager->ChangeZLayer (this, theLayerId);
   myCStructure->SetZLayer (theLayerId);
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Graphic3d_Structure::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myStructureManager)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myCStructure.get())
+
+  for (NCollection_IndexedMap<Graphic3d_Structure*>::Iterator anIter (myAncestors); anIter.More(); anIter.Next())
+  {
+    Graphic3d_Structure* anAncestor = anIter.Value();
+    OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, anAncestor)
+  }
+
+  for (NCollection_IndexedMap<Graphic3d_Structure*>::Iterator anIter (myDescendants); anIter.More(); anIter.Next())
+  {
+    Graphic3d_Structure* aDescendant = anIter.Value();
+    OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, aDescendant)
+  }
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myOwner)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myVisual)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myComputeVisual)
 }

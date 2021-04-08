@@ -21,7 +21,6 @@
 #include <Prs3d_LineAspect.hxx>
 #include <Prs3d_PointAspect.hxx>
 #include <Prs3d_Presentation.hxx>
-#include <Prs3d_Projector.hxx>
 #include <Prs3d_ShadingAspect.hxx>
 #include <PrsMgr_Presentation.hxx>
 #include <PrsMgr_PresentationManager.hxx>
@@ -78,7 +77,7 @@ PrsMgr_PresentableObject::~PrsMgr_PresentableObject()
 
   for (PrsMgr_ListOfPresentableObjectsIter anIter (myChildren); anIter.More(); anIter.Next())
   {
-    anIter.Value()->SetCombinedParentTransform (Handle(Geom_Transformation)());
+    anIter.Value()->SetCombinedParentTransform (Handle(TopLoc_Datum3D)());
     anIter.Value()->myParent = NULL;
   }
 }
@@ -99,22 +98,12 @@ void PrsMgr_PresentableObject::Fill (const Handle(PrsMgr_PresentationManager)& t
 }
 
 //=======================================================================
-//function : Compute
-//purpose  : 
+//function : computeHLR
+//purpose  :
 //=======================================================================
-void PrsMgr_PresentableObject::Compute(const Handle(Prs3d_Projector)& /*aProjector*/,
-                                       const Handle(Prs3d_Presentation)& /*aPresentation*/)
-{
-  throw Standard_NotImplemented("cannot compute under a specific projector");
-}
-
-//=======================================================================
-//function : Compute
-//purpose  : 
-//=======================================================================
-void PrsMgr_PresentableObject::Compute(const Handle(Prs3d_Projector)& /* aProjector*/,
-                                       const Handle(Geom_Transformation)& /*aTrsf*/,
-				                               const Handle(Prs3d_Presentation)& /*aPresentation*/)
+void PrsMgr_PresentableObject::computeHLR (const Handle(Graphic3d_Camera)& ,
+                                           const Handle(TopLoc_Datum3D)& ,
+                                           const Handle(Prs3d_Presentation)& )
 {
   throw Standard_NotImplemented("cannot compute under a specific projector");
 }
@@ -257,7 +246,7 @@ void PrsMgr_PresentableObject::SetTypeOfPresentation (const PrsMgr_TypeOfPresent
 //function : setLocalTransformation
 //purpose  :
 //=======================================================================
-void PrsMgr_PresentableObject::setLocalTransformation (const Handle(Geom_Transformation)& theTransformation)
+void PrsMgr_PresentableObject::setLocalTransformation (const Handle(TopLoc_Datum3D)& theTransformation)
 {
   myLocalTransformation = theTransformation;
   UpdateTransformation();
@@ -269,14 +258,14 @@ void PrsMgr_PresentableObject::setLocalTransformation (const Handle(Geom_Transfo
 //=======================================================================
 void PrsMgr_PresentableObject::ResetTransformation() 
 {
-  setLocalTransformation (Handle(Geom_Transformation)());
+  setLocalTransformation (Handle(TopLoc_Datum3D)());
 }
 
 //=======================================================================
 //function : SetCombinedParentTransform
 //purpose  : 
 //=======================================================================
-void PrsMgr_PresentableObject::SetCombinedParentTransform (const Handle(Geom_Transformation)& theTrsf)
+void PrsMgr_PresentableObject::SetCombinedParentTransform (const Handle(TopLoc_Datum3D)& theTrsf)
 {
   myCombinedParentTransform = theTrsf;
   UpdateTransformation();
@@ -295,7 +284,7 @@ void PrsMgr_PresentableObject::UpdateTransformation()
     if (!myLocalTransformation.IsNull() && myLocalTransformation->Form() != gp_Identity)
     {
       const gp_Trsf aTrsf = myCombinedParentTransform->Trsf() * myLocalTransformation->Trsf();
-      myTransformation    = new Geom_Transformation (aTrsf);
+      myTransformation    = new TopLoc_Datum3D (aTrsf);
       myInvTransformation = aTrsf.Inverted();
     }
     else
@@ -431,7 +420,7 @@ void PrsMgr_PresentableObject::RemoveChild (const Handle(PrsMgr_PresentableObjec
     if (anIter.Value() == theObject)
     {
       theObject->myParent = NULL;
-      theObject->SetCombinedParentTransform (Handle(Geom_Transformation)());
+      theObject->SetCombinedParentTransform (Handle(TopLoc_Datum3D)());
       myChildren.Remove (anIter);
       break;
     }
@@ -842,17 +831,48 @@ void PrsMgr_PresentableObject::PolygonOffsets (Standard_Integer&   theMode,
 // function : DumpJson
 // purpose  :
 // =======================================================================
-void PrsMgr_PresentableObject::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const
+void PrsMgr_PresentableObject::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
-  OCCT_DUMP_CLASS_BEGIN (theOStream, PrsMgr_PresentableObject);
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
 
-  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myParent);
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myParent)
 
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOwnWidth);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, hasOwnColor);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, hasOwnMaterial);
+  for (PrsMgr_Presentations::Iterator anIterator (myPresentations); anIterator.More(); anIterator.Next())
+  {
+    const Handle(PrsMgr_Presentation)& aPresentation = anIterator.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aPresentation.get())
+  }
 
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myInfiniteState);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsMutable);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnPresentations);
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myClipPlanes.get())
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDrawer.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myHilightDrawer.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDynHilightDrawer.get())
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTransformPersistence.get())
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myLocalTransformation.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTransformation.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myCombinedParentTransform.get())
+
+  for (PrsMgr_ListOfPresentableObjects::Iterator anIterator (myChildren); anIterator.More(); anIterator.Next())
+  {
+    const Handle(PrsMgr_PresentableObject)& aChildObject = anIterator.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aChildObject.get())
+  }
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myInvTransformation)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTypeOfPresentation3d)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCurrentFacingModel)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOwnWidth)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, hasOwnColor)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, hasOwnMaterial)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myInfiniteState)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsMutable)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnPresentations)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToPropagateVisualState)
 }

@@ -1,4 +1,4 @@
-STEP processor  {#occt_user_guides__step}
+STEP Translator  {#occt_user_guides__step}
 ========================
 
 @tableofcontents
@@ -22,9 +22,7 @@ File translation is performed in the programming mode, via C++ calls.
 
 @ref occt_user_guides__shape_healing "Shape Healing" toolkit provides tools to heal various problems, which may be encountered in translated shapes, and to make them valid in Open CASCADE. The Shape Healing is smoothly connected to STEP translator using the same API, only the names of API packages change.
 
-For testing the STEP component in DRAW Test Harness, a set of commands for reading and writing STEP files and analysis of relevant data are provided by the *TKXSDRAW* plugin. 
-
-See also our <a href="https://www.opencascade.com/content/tutorial-learning">E-learning & Training</a> offerings.
+For testing the STEP component in DRAW Test Harness, a set of commands for reading and writing STEP files and analysis of relevant data are provided by the *TKXSDRAW* plugin.
 
 @subsection occt_step_1_1 STEP Exchanges in Open Cascade technology
 
@@ -405,6 +403,47 @@ if(!Interface_Static::SetIVal(;read.step.shape.aspect;,1))
 .. error .. 
 ~~~~~
 Default value is 1 (ON). 
+
+<h4>read.step.constructivegeom.relationship:</h4>
+
+Boolean flag regulating translation of "CONSTRUCTIVE_GEOMETRY_REPRESENTATION_RELATIONSHIP" entities that define
+position of constructive geometry entities contained in "CONSTRUCTIVE_GEOMETRY_REPRESENTATION" with respect to the
+main representation of the shape (product).
+
+By default, the flag is set to 0 (OFF) so these entities are not translated. 
+Set this flag to 1 (ON) if you need to translate constructive geometry entities associated with the parts:
+
+~~~~~
+if (!Interface_Static::SetIVal("read.step.constructivegeom.relationship", 1)) { .. error .. }
+~~~~~
+
+The "CONSTRUCTIVE_GEOMETRY_REPRESENTATION" entity is translated into compound of two unlimited planar faces, 
+whose location is result of translation of corresponding "AXIS_PLACEMENT" entity.
+Note that appropriate interpretation of the translated data should be done after translation.
+
+The result of translation can be obtained either for the "CONSTRUCTIVE_GEOMETRY_REPRESENTATION_RELATIONSHIP" entity,
+of for each of the two "AXIS2_PLACEMENT_3D" entities referenced by it. as follows:
+
+~~~~~
+  STEPControl_Reader aReader;
+  ... // translate file and parse STEP model to find relevant axis entity
+  Handle(StepGeom_Axis2Placement3d) aSTEPAxis = ...;
+  Handle(Transfer_Binder) aBinder = aReader->WS()->TransferReader()->TransientProcess()->Find(aSTEPAxis);
+  Handle(TransferBRep_ShapeBinder) aShBinder = Handle(TransferBRep_ShapeBinder)::DownCast(aBinder);
+  if (! aShBinder.IsNull())
+  {
+    TopoDS_Face aFace = TopoDS::Face (aShBinder->Result());
+    if (! aFace.IsNull())
+    {
+      Handle(Geom_Plane) aSurf = Handle(Geom_Plane)::DownCast (BRep_Tool::Surface (aFace));
+      if (! aSurf.IsNull())
+      {
+        gp_Ax3 anAxis = aSurf->Placement();
+        ... // use the axis placement data
+      }
+    }
+  }
+~~~~~
 
 @subsubsection occt_step_2_3_4 Performing the STEP file translation
 

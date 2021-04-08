@@ -50,6 +50,11 @@ Standard_Boolean Select3D_SensitiveTriangle::Matches (SelectBasics_SelectingVolu
 {
   if (!theMgr.IsOverlapAllowed())
   {
+    if (theMgr.GetActiveSelectionType() == SelectBasics_SelectingVolumeManager::Polyline)
+    {
+      SelectBasics_PickResult aDummy;
+      return theMgr.Overlaps (myPoints[0], myPoints[1], myPoints[2], mySensType, aDummy);
+    }
     return theMgr.Overlaps (myPoints[0])
         && theMgr.Overlaps (myPoints[1])
         && theMgr.Overlaps (myPoints[2]);
@@ -92,4 +97,23 @@ Select3D_BndBox3d Select3D_SensitiveTriangle::BoundingBox()
                                                  Max (myPoints[0].Y(), Max (myPoints[1].Y(), myPoints[2].Y())),
                                                  Max (myPoints[0].Z(), Max (myPoints[1].Z(), myPoints[2].Z())));
   return Select3D_BndBox3d (aMinPnt, aMaxPnt);
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  :
+//=======================================================================
+void Select3D_SensitiveTriangle::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveEntity)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySensType)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoints[0])
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoints[1])
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myPoints[2])
+
+  Select3D_BndBox3d aBoundingBox = ((Select3D_SensitiveTriangle*)this)->BoundingBox();
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aBoundingBox)
 }

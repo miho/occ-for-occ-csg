@@ -23,6 +23,7 @@
 // for the class
 
 #include <Graphic3d_DataStructureManager.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(Graphic3d_DataStructureManager,Standard_Transient)
@@ -31,4 +32,13 @@ IMPLEMENT_STANDARD_RTTIEXT(Graphic3d_DataStructureManager,Standard_Transient)
 //-Global data definitions
 //-Constructors
 Graphic3d_DataStructureManager::Graphic3d_DataStructureManager () {
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void Graphic3d_DataStructureManager::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
 }

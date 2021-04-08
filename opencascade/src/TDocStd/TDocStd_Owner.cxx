@@ -14,14 +14,15 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <TDocStd_Owner.hxx>
 
+#include <Standard_Dump.hxx>
 #include <Standard_GUID.hxx>
 #include <Standard_Type.hxx>
 #include <TDF_Attribute.hxx>
 #include <TDF_Data.hxx>
 #include <TDF_RelocationTable.hxx>
 #include <TDocStd_Document.hxx>
-#include <TDocStd_Owner.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(TDocStd_Owner,TDF_Attribute)
 
@@ -42,12 +43,31 @@ const Standard_GUID& TDocStd_Owner::GetID()
 //=======================================================================
 
 void TDocStd_Owner::SetDocument (const Handle(TDF_Data)& indata,
-				 const Handle(TDocStd_Document)& D) 
+				 const Handle(TDocStd_Document)& doc) 
 {
   Handle(TDocStd_Owner) A;
   if (!indata->Root().FindAttribute (TDocStd_Owner::GetID(), A)) {
     A = new TDocStd_Owner (); 
-    A->SetDocument(D);
+    A->SetDocument(doc);
+    indata->Root().AddAttribute(A);
+  }
+  else {  
+    throw Standard_DomainError("TDocStd_Owner::SetDocument : already called");
+  }
+}
+
+//=======================================================================
+//function : SetDocument
+//purpose  : 
+//=======================================================================
+
+void TDocStd_Owner::SetDocument (const Handle(TDF_Data)& indata,
+         TDocStd_Document* doc) 
+{
+  Handle(TDocStd_Owner) A;
+  if (!indata->Root().FindAttribute (TDocStd_Owner::GetID(), A)) {
+    A = new TDocStd_Owner (); 
+    A->SetDocument(doc);
     indata->Root().AddAttribute(A);
   }
   else {  
@@ -74,7 +94,7 @@ Handle(TDocStd_Document) TDocStd_Owner::GetDocument (const Handle(TDF_Data)& ofd
 //purpose  : 
 //=======================================================================
 
-TDocStd_Owner::TDocStd_Owner () { }
+TDocStd_Owner::TDocStd_Owner() { }
 
 
 //=======================================================================
@@ -82,19 +102,29 @@ TDocStd_Owner::TDocStd_Owner () { }
 //purpose  : 
 //=======================================================================
 
-void TDocStd_Owner::SetDocument(const Handle( TDocStd_Document)& D) 
+void TDocStd_Owner::SetDocument (const Handle( TDocStd_Document)& document) 
 {
-  myDocument = D;
+  myDocument = document.get();
 }
 
+//=======================================================================
+//function : SetDocument
+//purpose  : 
+//=======================================================================
+
+void TDocStd_Owner::SetDocument (TDocStd_Document* document)
+{
+  myDocument = document;
+}
 
 //=======================================================================
 //function : Get
 //purpose  : 
 //=======================================================================
 
-Handle(TDocStd_Document) TDocStd_Owner::GetDocument () const 
-{ return myDocument; 
+Handle(TDocStd_Document) TDocStd_Owner::GetDocument() const 
+{
+  return Handle(TDocStd_Document)(myDocument); 
 }
 
 
@@ -103,7 +133,7 @@ Handle(TDocStd_Document) TDocStd_Owner::GetDocument () const
 //purpose  : 
 //=======================================================================
 
-const Standard_GUID& TDocStd_Owner::ID () const { return GetID(); }
+const Standard_GUID& TDocStd_Owner::ID() const { return GetID(); }
 
 
 //=======================================================================
@@ -111,7 +141,7 @@ const Standard_GUID& TDocStd_Owner::ID () const { return GetID(); }
 //purpose  : 
 //=======================================================================
 
-Handle(TDF_Attribute) TDocStd_Owner::NewEmpty () const
+Handle(TDF_Attribute) TDocStd_Owner::NewEmpty() const
 {
   Handle(TDF_Attribute) dummy;
   return dummy;
@@ -122,7 +152,7 @@ Handle(TDF_Attribute) TDocStd_Owner::NewEmpty () const
 //purpose  : 
 //=======================================================================
 
-void TDocStd_Owner::Restore(const Handle(TDF_Attribute)&) 
+void TDocStd_Owner::Restore (const Handle(TDF_Attribute)&) 
 {
 }
 
@@ -145,5 +175,16 @@ Standard_OStream& TDocStd_Owner::Dump (Standard_OStream& anOS) const
 {  
   anOS << "Owner";
   return anOS;
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void TDocStd_Owner::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDocument)
 }
 

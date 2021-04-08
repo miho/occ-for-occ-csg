@@ -13,15 +13,12 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
-
-#include <Standard_GUID.hxx>
-#include <Standard_Type.hxx>
 #include <TDataStd_Tick.hxx>
-#include <TDF_Attribute.hxx>
-#include <TDF_Label.hxx>
-#include <TDF_RelocationTable.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(TDataStd_Tick,TDF_Attribute)
+#include <TDF_Label.hxx>
+#include <Standard_GUID.hxx>
+
+IMPLEMENT_DERIVED_ATTRIBUTE(TDataStd_Tick,TDataStd_GenericEmpty)
 
 //=======================================================================
 //function : GetID
@@ -64,34 +61,6 @@ const Standard_GUID& TDataStd_Tick::ID () const
 { 
   return GetID(); 
 }
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-Handle(TDF_Attribute) TDataStd_Tick::NewEmpty() const
-{ 
-  return new TDataStd_Tick(); 
-}
-
-//=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-void TDataStd_Tick::Restore (const Handle(TDF_Attribute)& ) 
-{
-  // There are no fields in this attribute.
-}
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-void TDataStd_Tick::Paste(const Handle(TDF_Attribute)& ,
-			  const Handle(TDF_RelocationTable)& ) const
-{
-  // There are no fields in this attribute.
-}    
 
 //=======================================================================
 //function : Dump

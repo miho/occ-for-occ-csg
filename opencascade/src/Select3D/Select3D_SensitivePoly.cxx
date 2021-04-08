@@ -254,6 +254,11 @@ Standard_Boolean Select3D_SensitivePoly::elementIsInside (SelectBasics_Selecting
   }
 
   const Standard_Integer aSegmentIdx = mySegmentIndexes->Value (theElemIdx);
+  if (theMgr.GetActiveSelectionType() == SelectBasics_SelectingVolumeManager::Polyline)
+  {
+    SelectBasics_PickResult aDummy;
+    return theMgr.Overlaps (myPolyg.Pnt3d (aSegmentIdx + 0), myPolyg.Pnt3d (aSegmentIdx + 1), aDummy);
+  }
   return theMgr.Overlaps (myPolyg.Pnt3d (aSegmentIdx + 0))
       && theMgr.Overlaps (myPolyg.Pnt3d (aSegmentIdx + 1));
 }
@@ -284,7 +289,7 @@ Standard_Real Select3D_SensitivePoly::distanceToCOG (SelectBasics_SelectingVolum
 // Function: NbSubElements
 // Purpose : Returns the amount of segments in poly
 //==================================================
-Standard_Integer Select3D_SensitivePoly::NbSubElements()
+Standard_Integer Select3D_SensitivePoly::NbSubElements() const
 {
   return myPolyg.Size();
 }
@@ -309,4 +314,17 @@ gp_Pnt Select3D_SensitivePoly::CenterOfGeometry() const
   }
 
   return myCOG;
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Select3D_SensitivePoly::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsComputed)
 }

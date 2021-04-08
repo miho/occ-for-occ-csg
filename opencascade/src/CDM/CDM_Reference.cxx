@@ -19,6 +19,7 @@
 #include <CDM_Document.hxx>
 #include <CDM_MetaData.hxx>
 #include <CDM_Reference.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_Type.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(CDM_Reference,Standard_Transient)
@@ -27,7 +28,8 @@ CDM_Reference::CDM_Reference(const Handle(CDM_Document)& aFromDocument, const Ha
 myToDocument(aToDocument),
 myFromDocument(aFromDocument.operator->()),
 myReferenceIdentifier(aReferenceIdentifier),
-myDocumentVersion(aToDocumentVersion) 
+myDocumentVersion(aToDocumentVersion),
+myUseStorageConfiguration(Standard_False)
 {}
 
 CDM_Reference::CDM_Reference(const Handle(CDM_Document)& aFromDocument, const Handle(CDM_MetaData)& aToDocument, const Standard_Integer aReferenceIdentifier, const Handle(CDM_Application)& anApplication, const Standard_Integer aToDocumentVersion, const Standard_Boolean UseStorageConfiguration):
@@ -119,4 +121,24 @@ Standard_Boolean CDM_Reference::IsInSession() const {
 }
 Standard_Boolean CDM_Reference::IsStored() const {
   return !myMetaData.IsNull();
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void CDM_Reference::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myToDocument.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myFromDocument)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myReferenceIdentifier)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myApplication.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myMetaData.get())
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDocumentVersion)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUseStorageConfiguration)
 }

@@ -12,6 +12,7 @@
 // commercial license or contractual agreement.
 
 #include <XCAFDoc_DimTolTool.hxx>
+
 #include <Precision.hxx>
 #include <Standard_GUID.hxx>
 #include <Standard_Type.hxx>
@@ -39,7 +40,7 @@
 #include <XCAFDoc_ShapeTool.hxx>
 
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_DimTolTool,TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE_WITH_TYPE(XCAFDoc_DimTolTool,TDataStd_GenericEmpty,"xcaf","DimTolTool")
 
 //=======================================================================
 //function : XCAFDoc_DimTolTool
@@ -963,37 +964,6 @@ const Standard_GUID& XCAFDoc_DimTolTool::ID() const
 
 
 //=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_DimTolTool::Restore(const Handle(TDF_Attribute)& /*with*/) 
-{
-}
-
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-
-Handle(TDF_Attribute) XCAFDoc_DimTolTool::NewEmpty() const
-{
-  return new XCAFDoc_DimTolTool;
-}
-
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_DimTolTool::Paste(const Handle(TDF_Attribute)& /*into*/,
-                               const Handle(TDF_RelocationTable)& /*RT*/) const
-{
-}
-
-//=======================================================================
 //function : GetGDTPresentations
 //purpose  : 
 //=======================================================================
@@ -1089,4 +1059,17 @@ void XCAFDoc_DimTolTool::SetGDTPresentations(NCollection_IndexedDataMap<TDF_Labe
       continue;
     }
   }
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void XCAFDoc_DimTolTool::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, TDF_Attribute)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myShapeTool.get())
 }

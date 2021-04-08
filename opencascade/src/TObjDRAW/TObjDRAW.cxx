@@ -30,6 +30,7 @@
 #include <TObj_Model.hxx>
 #include <TObj_Object.hxx>
 #include <TObj_ObjectIterator.hxx>
+#include <TObj_OcafObjectIterator.hxx>
 #include <TObj_TModel.hxx>
 #include <TObj_TNameContainer.hxx>
 #include <TObjDRAW.hxx>
@@ -193,7 +194,7 @@ static Standard_Integer saveModel (Draw_Interpretor& di, Standard_Integer argc, 
   if ( aModel.IsNull() ) return 1;
   Standard_Boolean isSaved = Standard_False; 
   if (argc > 2 )
-    isSaved = aModel->SaveAs( argv[2] );
+    isSaved = aModel->SaveAs( TCollection_ExtendedString (argv[2], Standard_True) );
   else
     isSaved = aModel->Save();
   
@@ -214,11 +215,12 @@ static Standard_Integer loadModel (Draw_Interpretor& di, Standard_Integer argc, 
   
   Standard_Boolean isLoaded = Standard_False;
   Handle(TObj_Model) aModel = getModelByName(argv[1]);
+  TCollection_ExtendedString aPath(argv[2], Standard_True);
   if ( aModel.IsNull() )
   {
     // create new
     aModel = new TObjDRAW_Model();
-    isLoaded = aModel->Load( argv[2] );
+    isLoaded = aModel->Load(aPath);
     if ( isLoaded )
     {
       Handle(TDocStd_Document) D = aModel->GetDocument();
@@ -229,7 +231,9 @@ static Standard_Integer loadModel (Draw_Interpretor& di, Standard_Integer argc, 
     }
   }
   else
-    isLoaded = aModel->Load( argv[2] );
+  {
+    isLoaded = aModel->Load(aPath);
+  }
   
   
   if (!isLoaded) {
@@ -419,12 +423,17 @@ static Standard_Integer addChild (Draw_Interpretor& di, Standard_Integer argc, c
 }
 
 //=======================================================================
-//function : getChild
+//function : getChildren
 //purpose  :
 //=======================================================================
-static Standard_Integer getChild (Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+static Standard_Integer getChildren (Draw_Interpretor& di, Standard_Integer argc, const char** argv)
 {
-  if (argc < 3) {di<<"Use "<< argv[0] << "DocName ObjName\n";return 1;}
+  if (argc < 3)
+  {
+    di << "Use " << argv[0] << "DocName ObjName [-all]\n";
+    di << "    -all: recurse to list children of all levels\n";
+    return 1;
+  }
 
   Handle(TObjDRAW_Object) tObj = getObjByName( argv[1], argv[2] );
   if ( tObj.IsNull() )
@@ -432,7 +441,12 @@ static Standard_Integer getChild (Draw_Interpretor& di, Standard_Integer argc, c
     di << "Error: Object " << argv[2] << " not found\n";
     return 1;
   }
-  Handle(TObj_ObjectIterator) anItr = tObj->GetChildren();
+
+  bool aGetSubs = (argc > 3 && ! strcasecmp (argv[3], "-all")); 
+  Handle(TObj_ObjectIterator) anItr = aGetSubs ?
+    new TObj_OcafObjectIterator(tObj->GetChildLabel(), NULL, Standard_True, Standard_True) :
+    tObj->GetChildren();
+
   int i = 0;
   for ( ; anItr->More(); anItr->Next(), i++ )
   {
@@ -447,6 +461,28 @@ static Standard_Integer getChild (Draw_Interpretor& di, Standard_Integer argc, c
   return 0;
 }
 
+//=======================================================================
+//function : hasModifications
+//purpose  :
+//=======================================================================
+static Standard_Integer hasModifications(Draw_Interpretor& di, Standard_Integer argc, const char** argv)
+{
+  if (argc < 3) 
+  { 
+    di << "Use " << argv[0] << "DocName ObjName\n";
+    return 1; 
+  }
+
+  Handle(TObjDRAW_Object) tObj = getObjByName(argv[1], argv[2]);
+  if (tObj.IsNull())
+  {
+    di << "Error: Object " << argv[2] << " not found\n";
+    return 1;
+  }
+  di << "Status modifications : " << (tObj->HasModifications() ? 1 : 0) << "\n";
+  
+  return 0;
+}
 //=======================================================================
 //function : Init
 //purpose  :
@@ -497,9 +533,11 @@ void TObjDRAW::Init(Draw_Interpretor& di)
   di.Add ("TObjAddChild","DocName ObjName chldName \t: Add child object to indicated object",
 		   __FILE__, addChild, g);
   
-  di.Add ("TObjGetChildren","DocName ObjName \t: Returns list of children objects",
-		   __FILE__, getChild, g);
+  di.Add ("TObjGetChildren","DocName ObjName [-all]\t: Returns list of children objects (-all to recurse)",
+		   __FILE__, getChildren, g);
   
+  di.Add("TObjHasModifications", "DocName ObjName \t: Returns status of modification of the object (if object has been modified 1, otherwise 0)", __FILE__, hasModifications, g);
+ 
 }
 
 
@@ -510,12 +548,11 @@ void TObjDRAW::Init(Draw_Interpretor& di)
 void TObjDRAW::Factory(Draw_Interpretor& theDI)
 {
   // Initialize TObj OCAF formats
-  Handle(TDocStd_Application) anApp = DDocStd::GetApplication();
+  Handle(TDocStd_Application) anApp = TObj_Application::GetInstance();//DDocStd::GetApplication();
   BinTObjDrivers::DefineFormat(anApp);
   XmlTObjDrivers::DefineFormat(anApp);
 
   // define formats for TObj specific application
-  anApp = TObj_Application::GetInstance();
   BinTObjDrivers::DefineFormat(anApp);
   XmlTObjDrivers::DefineFormat(anApp);
 

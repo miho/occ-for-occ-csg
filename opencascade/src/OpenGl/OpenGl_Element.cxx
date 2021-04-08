@@ -15,6 +15,9 @@
 
 #include <OpenGl_Element.hxx>
 
+#include <Graphic3d_FrameStatsData.hxx>
+#include <Standard_Dump.hxx>
+
 // =======================================================================
 // function : OpenGl_Element
 // purpose  :
@@ -31,4 +34,33 @@ OpenGl_Element::OpenGl_Element()
 OpenGl_Element::~OpenGl_Element()
 {
   //
+}
+
+// =======================================================================
+// function : UpdateMemStats
+// purpose  :
+// =======================================================================
+void OpenGl_Element::UpdateMemStats (Graphic3d_FrameStatsDataTmp& theStats) const
+{
+  theStats[Graphic3d_FrameStatsCounter_EstimatedBytesGeom] += EstimatedDataSize();
+}
+
+// =======================================================================
+// function : UpdateDrawStats
+// purpose  :
+// =======================================================================
+void OpenGl_Element::UpdateDrawStats (Graphic3d_FrameStatsDataTmp& ,
+                                      bool ) const
+{
+  //
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_Element::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_Element)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this)
 }

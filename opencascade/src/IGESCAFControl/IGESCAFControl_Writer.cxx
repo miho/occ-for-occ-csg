@@ -22,6 +22,7 @@
 #include <IGESGraph_DefinitionLevel.hxx>
 #include <IGESSolid_Face.hxx>
 #include <IGESBasic_Name.hxx>
+#include <Message_ProgressScope.hxx>
 #include <NCollection_DataMap.hxx>
 #include <Standard_Transient.hxx>
 #include <TCollection_AsciiString.hxx>
@@ -142,7 +143,8 @@ IGESCAFControl_Writer::IGESCAFControl_Writer (const Handle(XSControl_WorkSession
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean IGESCAFControl_Writer::Transfer (const Handle(TDocStd_Document) &doc)
+Standard_Boolean IGESCAFControl_Writer::Transfer (const Handle(TDocStd_Document) &doc,
+                                                  const Message_ProgressRange& theProgress)
 {  
   // translate free top-level shapes of the DECAF document
   Handle(XCAFDoc_ShapeTool) STool = XCAFDoc_DocumentTool::ShapeTool( doc->Main() );
@@ -150,7 +152,7 @@ Standard_Boolean IGESCAFControl_Writer::Transfer (const Handle(TDocStd_Document)
 
   TDF_LabelSequence labels;
   STool->GetFreeShapes ( labels );
-  return Transfer (labels);
+  return Transfer (labels, theProgress);
 }  
 
 //=======================================================================
@@ -158,11 +160,12 @@ Standard_Boolean IGESCAFControl_Writer::Transfer (const Handle(TDocStd_Document)
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean IGESCAFControl_Writer::Transfer (const TDF_Label& label)
+Standard_Boolean IGESCAFControl_Writer::Transfer (const TDF_Label& label,
+                                                  const Message_ProgressRange& theProgress)
 {
   TDF_LabelSequence labels;
   labels.Append( label );
-  return Transfer( labels );
+  return Transfer( labels, theProgress );
 }
 
 //=======================================================================
@@ -170,13 +173,16 @@ Standard_Boolean IGESCAFControl_Writer::Transfer (const TDF_Label& label)
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean IGESCAFControl_Writer::Transfer (const TDF_LabelSequence& labels)
+Standard_Boolean IGESCAFControl_Writer::Transfer (const TDF_LabelSequence& labels,
+                                                  const Message_ProgressRange& theProgress)
 {  
   if ( labels.Length() <=0 ) return Standard_False;
-  for ( Standard_Integer i=1; i <= labels.Length(); i++ ) {
+  Message_ProgressScope aPS(theProgress, "Labels", labels.Length());
+  for ( Standard_Integer i=1; i <= labels.Length() && aPS.More(); i++ )
+  {
     TopoDS_Shape shape = XCAFDoc_ShapeTool::GetShape ( labels.Value(i) );
     if ( ! shape.IsNull() ) 
-      AddShape ( shape );
+      AddShape (shape, aPS.Next());
 //      IGESControl_Writer::Transfer ( shape );
   }
   
@@ -205,9 +211,10 @@ Standard_Boolean IGESCAFControl_Writer::Transfer (const TDF_LabelSequence& label
 //=======================================================================
 
 Standard_Boolean IGESCAFControl_Writer::Perform (const Handle(TDocStd_Document) &doc,
-						 const Standard_CString filename)
+                                                 const Standard_CString filename,
+                                                 const Message_ProgressRange& theProgress)
 {
-  if ( ! Transfer ( doc ) ) return Standard_False;
+  if ( ! Transfer ( doc, theProgress ) ) return Standard_False;
   return Write ( filename ) == IFSelect_RetDone;
 }
   
@@ -217,9 +224,10 @@ Standard_Boolean IGESCAFControl_Writer::Perform (const Handle(TDocStd_Document) 
 //=======================================================================
 
 Standard_Boolean IGESCAFControl_Writer::Perform (const Handle(TDocStd_Document) &doc,
-						 const TCollection_AsciiString &filename)
+                                                 const TCollection_AsciiString &filename,
+                                                 const Message_ProgressRange& theProgress)
 {
-  if ( ! Transfer ( doc ) ) return Standard_False;
+  if ( ! Transfer ( doc, theProgress ) ) return Standard_False;
   return Write ( filename.ToCString() ) == IFSelect_RetDone;
 }
   
@@ -276,6 +284,7 @@ void IGESCAFControl_Writer::MakeColors (const TopoDS_Shape &S,
     XCAFPrs_Style own = settings.FindFromKey(S);
     if ( own.IsSetColorCurv() ) style.SetColorCurv ( own.GetColorCurv() );
     if ( own.IsSetColorSurf() ) style.SetColorSurf ( own.GetColorSurf() );
+    style.SetMaterial (own.Material());
   }
   
   // analyze whether current entity should get a color 
@@ -285,6 +294,12 @@ void IGESCAFControl_Writer::MakeColors (const TopoDS_Shape &S,
     if ( style.IsSetColorSurf() ) {
       hasColor = Standard_True;
       col = style.GetColorSurf();
+    }
+    else if (!style.Material().IsNull()
+          && !style.Material()->IsEmpty())
+    {
+      hasColor = Standard_True;
+      col = style.Material()->BaseColor().GetRGB();
     }
   }
   else if ( S.ShapeType() == TopAbs_EDGE || S.ShapeType() == TopAbs_WIRE ) {
@@ -308,7 +323,9 @@ void IGESCAFControl_Writer::MakeColors (const TopoDS_Shape &S,
 	Handle(TCollection_HAsciiString) str = 
 	  new TCollection_HAsciiString ( col.StringName ( col.Name() ) );
 	colent = new IGESGraph_Color;
-	colent->Init ( col.Red() * 100., col.Green() * 100., col.Blue() * 100., str );
+	NCollection_Vec3<Standard_Real> aColor_sRGB;
+	col.Values (aColor_sRGB.r(), aColor_sRGB.g(), aColor_sRGB.b(), Quantity_TOC_sRGB);
+	colent->Init ( aColor_sRGB.r() * 100., aColor_sRGB.g() * 100., aColor_sRGB.b() * 100., str );
 	AddEntity ( colent );
 	colors.Bind ( c, colent );
       }

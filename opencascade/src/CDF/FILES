@@ -1,5 +1,3 @@
-CDF.cxx
-CDF.hxx
 CDF_Application.cxx
 CDF_Application.hxx
 CDF_Directory.cxx
@@ -13,8 +11,6 @@ CDF_MetaDataDriver.hxx
 CDF_MetaDataDriverError.hxx
 CDF_MetaDataDriverFactory.cxx
 CDF_MetaDataDriverFactory.hxx
-CDF_Session.cxx
-CDF_Session.hxx
 CDF_Store.cxx
 CDF_Store.hxx
 CDF_StoreList.cxx

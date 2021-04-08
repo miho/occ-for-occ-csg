@@ -1,7 +1,13 @@
+SelectMgr.cxx
+SelectMgr.hxx
 SelectMgr_AndFilter.cxx
 SelectMgr_AndFilter.hxx
+SelectMgr_AndOrFilter.cxx
+SelectMgr_AndOrFilter.hxx
 SelectMgr_BaseFrustum.cxx
 SelectMgr_BaseFrustum.hxx
+SelectMgr_BVHThreadPool.cxx
+SelectMgr_BVHThreadPool.hxx
 SelectMgr_CompositionFilter.cxx
 SelectMgr_CompositionFilter.hxx
 SelectMgr_CompositionFilter.lxx
@@ -9,6 +15,7 @@ SelectMgr_EntityOwner.cxx
 SelectMgr_EntityOwner.hxx
 SelectMgr_Filter.cxx
 SelectMgr_Filter.hxx
+SelectMgr_FilterType.hxx
 SelectMgr_Frustum.hxx
 SelectMgr_Frustum.lxx
 SelectMgr_FrustumBuilder.cxx
@@ -30,6 +37,8 @@ SelectMgr_SelectingVolumeManager.cxx
 SelectMgr_SelectingVolumeManager.hxx
 SelectMgr_Selection.cxx
 SelectMgr_Selection.hxx
+SelectMgr_SelectionImageFiller.cxx
+SelectMgr_SelectionImageFiller.hxx
 SelectMgr_SelectionManager.cxx
 SelectMgr_SelectionManager.hxx
 SelectMgr_SensitiveEntity.cxx
@@ -39,7 +48,6 @@ SelectMgr_SensitiveEntitySet.hxx
 SelectMgr_SequenceOfFilter.hxx
 SelectMgr_SequenceOfOwner.hxx
 SelectMgr_SequenceOfSelection.hxx
-SelectMgr_SOPtr.hxx
 SelectMgr_SortCriterion.hxx
 SelectMgr_StateOfSelection.hxx
 SelectMgr_ToleranceMap.hxx
@@ -49,9 +57,12 @@ SelectMgr_TriangularFrustum.hxx
 SelectMgr_TriangularFrustumSet.cxx
 SelectMgr_TriangularFrustumSet.hxx
 SelectMgr_TypeOfBVHUpdate.hxx
+SelectMgr_TypeOfDepthTolerance.hxx
 SelectMgr_TypeOfUpdate.hxx
 SelectMgr_VectorTypes.hxx
 SelectMgr_ViewClipRange.cxx
 SelectMgr_ViewClipRange.hxx
 SelectMgr_ViewerSelector.cxx
 SelectMgr_ViewerSelector.hxx
+SelectMgr_ViewerSelector3d.cxx
+SelectMgr_ViewerSelector3d.hxx

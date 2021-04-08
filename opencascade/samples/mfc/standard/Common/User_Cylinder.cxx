@@ -20,7 +20,7 @@ IMPLEMENT_STANDARD_RTTIEXT(User_Cylinder,AIS_InteractiveObject)
 #include <GProp_PGProps.hxx>
 #include <Quantity_Color.hxx>
 #include <BRepMesh_IncrementalMesh.hxx>
-#include <Prs3d.hxx>
+#include <StdPrs_ToolTriangulatedShape.hxx>
 
 #include <AIS_GraphicTool.hxx>
 
@@ -76,7 +76,7 @@ case 6: //color
 
     Handle(Graphic3d_StructureManager) aStrucMana = GetContext()->MainPrsMgr()->StructureManager();
 
-    Handle(Graphic3d_Group) mygroup = Prs3d_Root::CurrentGroup(aPresentation);
+    Handle(Graphic3d_Group) mygroup = aPresentation->CurrentGroup();
     myAspect = (new Prs3d_ShadingAspect())->Aspect();
     Graphic3d_MaterialAspect material = myAspect->FrontMaterial();
     material.SetAmbientColor (Quantity_NOC_BLACK);
@@ -88,7 +88,7 @@ case 6: //color
     mygroup->SetPrimitivesAspect(myAspect);
     myAspect->SetEdgeOn();
 
-    myDeflection = Prs3d::GetDeflection(myShape,myDrawer);
+    myDeflection = StdPrs_ToolTriangulatedShape::GetDeflection(myShape,myDrawer);
     BRepMesh_IncrementalMesh(myShape,myDeflection);
 
     myX1OnOff = Standard_False;
@@ -281,7 +281,7 @@ case 6: //color
         } // end of "if the triangle is valid
       } // end of the "parcours" of the triangles
 
-      Prs3d_Root::CurrentGroup (aPresentation)->AddPrimitiveArray (aOP);
+      aPresentation->CurrentGroup()->AddPrimitiveArray (aOP);
 
       mygroup->SetGroupPrimitivesAspect(myAspect);
     }// end of the exploration of the shape in faces
@@ -291,15 +291,17 @@ case 6: //color
   }
 }
 
-void User_Cylinder::Compute(const Handle(Prs3d_Projector)& aProjector,
-                            const Handle(Prs3d_Presentation)& aPresentation)
+void User_Cylinder::computeHLR (const Handle(Graphic3d_Camera)& aProjector,
+                                const Handle(TopLoc_Datum3D)& ,
+                                const Handle(Prs3d_Presentation)& aPresentation)
 {
   Handle (Prs3d_Drawer) aDefDrawer = GetContext()->DefaultDrawer();
   if (aDefDrawer->DrawHiddenLine())
     myDrawer->EnableDrawHiddenLine();
   else
     myDrawer->DisableDrawHiddenLine();
-  StdPrs_HLRPolyShape::Add(aPresentation,myShape,myDrawer,aProjector);
+  StdPrs_HLRPolyShape aTool;
+  aTool.ComputeHLR (aPresentation,myShape,myDrawer,aProjector);
 }
 
 void User_Cylinder::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,

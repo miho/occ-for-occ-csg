@@ -314,6 +314,11 @@ Standard_Boolean Select3D_SensitiveTriangulation::elementIsInside (SelectBasics_
   {
     const gp_Pnt& aSegmPnt1 = myTriangul->Nodes().Value (myFreeEdges->Value (aPrimitiveIdx * 2 + 1));
     const gp_Pnt& aSegmPnt2 = myTriangul->Nodes().Value (myFreeEdges->Value (aPrimitiveIdx * 2 + 2));
+    if (theMgr.GetActiveSelectionType() == SelectBasics_SelectingVolumeManager::Polyline)
+    {
+      SelectBasics_PickResult aDummy;
+      return theMgr.Overlaps (aSegmPnt1, aSegmPnt2, aDummy);
+    }
     return theMgr.Overlaps (aSegmPnt1) && theMgr.Overlaps (aSegmPnt2);
   }
   else
@@ -324,6 +329,11 @@ Standard_Boolean Select3D_SensitiveTriangulation::elementIsInside (SelectBasics_
     const gp_Pnt& aPnt1 = myTriangul->Nodes().Value (aNode1);
     const gp_Pnt& aPnt2 = myTriangul->Nodes().Value (aNode2);
     const gp_Pnt& aPnt3 = myTriangul->Nodes().Value (aNode3);
+    if (theMgr.GetActiveSelectionType() == SelectBasics_SelectingVolumeManager::Polyline)
+    {
+      SelectBasics_PickResult aDummy;
+      return theMgr.Overlaps (aPnt1, aPnt2, aPnt3, mySensType, aDummy);
+    }
     return theMgr.Overlaps (aPnt1)
         && theMgr.Overlaps (aPnt2)
         && theMgr.Overlaps (aPnt3);
@@ -421,7 +431,7 @@ gp_Pnt Select3D_SensitiveTriangulation::CenterOfGeometry() const
 // function : NbSubElements
 // purpose  : Returns the amount of nodes in triangulation
 //=======================================================================
-Standard_Integer Select3D_SensitiveTriangulation::NbSubElements()
+Standard_Integer Select3D_SensitiveTriangulation::NbSubElements() const
 {
   return myTriangul->Nodes().Length();
 }
@@ -442,4 +452,20 @@ Standard_Boolean Select3D_SensitiveTriangulation::HasInitLocation() const
 gp_GTrsf Select3D_SensitiveTriangulation::InvInitLocation() const
 {
   return myInvInitLocation;
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Select3D_SensitiveTriangulation::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveSet)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTriangul.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myInitLocation)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mySensType)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPrimitivesNb)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBndBox)
 }

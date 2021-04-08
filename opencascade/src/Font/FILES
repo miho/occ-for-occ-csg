@@ -1,6 +1,4 @@
-Font_BRepFont.cxx
 Font_BRepFont.hxx
-Font_BRepTextBuilder.cxx
 Font_BRepTextBuilder.hxx
 Font_FontAspect.hxx
 Font_FontMgr.cxx
@@ -18,3 +16,4 @@ Font_SystemFont.hxx
 Font_TextFormatter.hxx
 Font_TextFormatter.cxx
 Font_UnicodeSubset.hxx
+Font_DejavuSans_Latin_woff.pxx

@@ -29,7 +29,7 @@
 #include <XCAFDoc.hxx>
 #include <XCAFView_Object.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_View, TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE(XCAFDoc_View, TDataStd_GenericEmpty)
 
 enum ChildLab
 {
@@ -284,32 +284,4 @@ Handle(XCAFView_Object) XCAFDoc_View::GetObject()  const
 const Standard_GUID& XCAFDoc_View::ID() const
 {
   return GetID();
-}
-
-//=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-void XCAFDoc_View::Restore(const Handle(TDF_Attribute)& /*With*/) 
-{
-}
-
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-Handle(TDF_Attribute) XCAFDoc_View::NewEmpty() const
-{
-  return new XCAFDoc_View();
-}
-
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-void XCAFDoc_View::Paste(const Handle(TDF_Attribute)& /*Into*/,
-                         const Handle(TDF_RelocationTable)& /*RT*/) const
-{
 }

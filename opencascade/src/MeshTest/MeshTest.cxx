@@ -32,13 +32,21 @@
 #include <CSLib.hxx>
 #include <DBRep.hxx>
 #include <Draw_Appli.hxx>
+#include <Draw_ProgressIndicator.hxx>
 #include <Draw_Segment2D.hxx>
 #include <DrawTrSurf.hxx>
 #include <GeometryTest.hxx>
 #include <IMeshData_Status.hxx>
+#include <Message.hxx>
+#include <Message_ProgressRange.hxx>
 #include <Poly_Connect.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopTools_MapIteratorOfMapOfShape.hxx>
+
+#include <BRepMesh_Context.hxx>
+#include <BRepMesh_FaceDiscret.hxx>
+#include <BRepMesh_MeshAlgoFactory.hxx>
+#include <BRepMesh_DelabellaMeshAlgoFactory.hxx>
 
 //epa Memory leaks test
 //OAN: for triepoints
@@ -88,7 +96,11 @@ options:\n\
         -surf_def_off   disables control of deflection of mesh from real\n\
                         surface (enabled by default)\n\
         -parallel       enables parallel execution (switched off by default)\n\
-        -adjust_min     enables local adjustment of min size depending on edge size (switched off by default)\n";
+        -adjust_min     enables local adjustment of min size depending on edge size (switched off by default)\n\
+        -force_face_def disables usage of shape tolerances for computing face deflection (switched off by default)\n\
+        -decrease       enforces the meshing of the shape even if current mesh satisfies the new criteria\
+                        (switched off by default).\n\
+        -algo {watson|delabella} changes core triangulation algorithm to one with specified id (watson is used by default)\n";
     return 0;
   }
 
@@ -103,6 +115,7 @@ options:\n\
   aMeshParams.Deflection = aMeshParams.DeflectionInterior = 
     Max(Draw::Atof(argv[2]), Precision::Confusion());
 
+  Handle (IMeshTools_Context) aContext = new BRepMesh_Context;
   if (nbarg > 3)
   {
     Standard_Integer i = 3;
@@ -123,25 +136,60 @@ options:\n\
         aMeshParams.ControlSurfaceDeflection = Standard_False;
       else if (aOpt == "-adjust_min")
         aMeshParams.AdjustMinSize = Standard_True;
+      else if (aOpt == "-force_face_def")
+        aMeshParams.ForceFaceDeflection = Standard_True;
+      else if (aOpt == "-decrease")
+        aMeshParams.AllowQualityDecrease = Standard_True;
       else if (i < nbarg)
       {
-        Standard_Real aVal = Draw::Atof(argv[i++]);
-        if (aOpt == "-a")
+        if (aOpt == "-algo")
         {
-          aMeshParams.Angle = aVal * M_PI / 180.;
-        }
-        else if (aOpt == "-ai")
-        {
-          aMeshParams.AngleInterior = aVal * M_PI / 180.;
-        }
-        else if (aOpt == "-min")
-          aMeshParams.MinSize = aVal;
-        else if (aOpt == "-di")
-        {
-          aMeshParams.DeflectionInterior = aVal;
+          TCollection_AsciiString anAlgoStr (argv[i++]);
+          anAlgoStr.LowerCase();
+          if (anAlgoStr == "watson"
+           || anAlgoStr == "0")
+          {
+            aMeshParams.MeshAlgo = IMeshTools_MeshAlgoType_Watson;
+            aContext->SetFaceDiscret (new BRepMesh_FaceDiscret (new BRepMesh_MeshAlgoFactory));
+          }
+          else if (anAlgoStr == "delabella"
+                || anAlgoStr == "1")
+          {
+            aMeshParams.MeshAlgo = IMeshTools_MeshAlgoType_Delabella;
+            aContext->SetFaceDiscret (new BRepMesh_FaceDiscret (new BRepMesh_DelabellaMeshAlgoFactory));
+          }
+          else if (anAlgoStr == "-1"
+                || anAlgoStr == "default")
+          {
+            // already handled by BRepMesh_Context constructor
+            //aMeshParams.MeshAlgo = IMeshTools_MeshAlgoType_DEFAULT;
+          }
+          else
+          {
+            di << "Syntax error at " << anAlgoStr;
+            return 1;
+          }
         }
         else
-          --i;
+        {
+          Standard_Real aVal = Draw::Atof(argv[i++]);
+          if (aOpt == "-a")
+          {
+            aMeshParams.Angle = aVal * M_PI / 180.;
+          }
+          else if (aOpt == "-ai")
+          {
+            aMeshParams.AngleInterior = aVal * M_PI / 180.;
+          }
+          else if (aOpt == "-min")
+            aMeshParams.MinSize = aVal;
+          else if (aOpt == "-di")
+          {
+            aMeshParams.DeflectionInterior = aVal;
+          }
+          else
+            --i;
+        }
       }
     }
   }
@@ -149,7 +197,12 @@ options:\n\
   di << "Incremental Mesh, multi-threading "
      << (aMeshParams.InParallel ? "ON" : "OFF") << "\n";
 
-  BRepMesh_IncrementalMesh aMesher (aShape, aMeshParams);
+  Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator(di, 1);
+  BRepMesh_IncrementalMesh aMesher;
+  aMesher.SetShape (aShape);
+  aMesher.ChangeParameters() = aMeshParams;
+
+  aMesher.Perform (aContext, aProgress->Start());
 
   di << "Meshing statuses: ";
   const Standard_Integer aStatus = aMesher.GetStatusFlags();
@@ -160,7 +213,7 @@ options:\n\
   else
   {
     Standard_Integer i;
-    for (i = 0; i < 8; i++)
+    for (i = 0; i < 9; i++)
     {
       Standard_Integer aFlag = aStatus & (1 << i);
       if (aFlag)
@@ -191,6 +244,9 @@ options:\n\
         case IMeshData_Reused:
           di << "Reused ";
           break;
+        case IMeshData_UserBreak:
+          di << "User break";
+          break;
         case IMeshData_NoError:
         default:
           break;
@@ -210,7 +266,7 @@ static Standard_Integer tessellate (Draw_Interpretor& /*di*/, Standard_Integer n
 {
   if (nbarg != 5)
   {
-    std::cerr << "Builds regular triangulation with specified number of triangles\n"
+    Message::SendFail() << "Builds regular triangulation with specified number of triangles\n"
                  "    Usage: tessellate result {surface|face} nbu nbv\n"
                  "    Triangulation is put into the face with natural bounds (result);\n"
                  "    it will have 2*nbu*nbv triangles and (nbu+1)*(nbv+1) nodes";
@@ -224,7 +280,7 @@ static Standard_Integer tessellate (Draw_Interpretor& /*di*/, Standard_Integer n
 
   if (aNbU <= 0 || aNbV <= 0)
   {
-    std::cerr << "Error: Arguments nbu and nbv must be both greater than 0\n";
+    Message::SendFail() << "Error: Arguments nbu and nbv must be both greater than 0";
     return 1;
   }
 
@@ -239,14 +295,14 @@ static Standard_Integer tessellate (Draw_Interpretor& /*di*/, Standard_Integer n
     TopoDS_Shape aShape = DBRep::Get(aSrcName);
     if (aShape.IsNull() || aShape.ShapeType() != TopAbs_FACE)
     {
-      std::cerr << "Error: " << aSrcName << " is not a face\n";
+      Message::SendFail() << "Error: " << aSrcName << " is not a face";
       return 1;
     }
     TopoDS_Face aFace = TopoDS::Face (aShape);
     aSurf = BRep_Tool::Surface (aFace);
     if (aSurf.IsNull())
     {
-      std::cerr << "Error: Face " << aSrcName << " has no surface\n";
+      Message::SendFail() << "Error: Face " << aSrcName << " has no surface";
       return 1;
     }
 
@@ -255,14 +311,14 @@ static Standard_Integer tessellate (Draw_Interpretor& /*di*/, Standard_Integer n
   if (Precision::IsInfinite (aUMin) || Precision::IsInfinite (aUMax) || 
       Precision::IsInfinite (aVMin) || Precision::IsInfinite (aVMax))
   {
-    std::cerr << "Error: surface has infinite parametric range, aborting\n";
+    Message::SendFail() << "Error: surface has infinite parametric range, aborting";
     return 1;
   }
 
   BRepBuilderAPI_MakeFace aFaceMaker (aSurf, aUMin, aUMax, aVMin, aVMax, Precision::Confusion());
   if (! aFaceMaker.IsDone())
   {
-    std::cerr << "Error: cannot build face with natural bounds, aborting\n";
+    Message::SendFail() << "Error: cannot build face with natural bounds, aborting";
     return 1;
   }
   TopoDS_Face aFace = aFaceMaker;
@@ -805,7 +861,7 @@ static Standard_Integer wavefront(Draw_Interpretor&, Standard_Integer nbarg, con
         k1 = n1+totalnodes;
         k2 = n2+totalnodes;
         k3 = n3+totalnodes;
-        fprintf(outfile, "%s %d%s%d %d%s%d %d%s%d\n", "fo", k1,"//", k1, k2,"//", k2, k3,"//", k3);
+        fprintf(outfile, "f %d%s%d %d%s%d %d%s%d\n", k1,"//", k1, k2,"//", k2, k3,"//", k3);
       }
       nbpolygons += nbTriangles;
       totalnodes += nbNodes;

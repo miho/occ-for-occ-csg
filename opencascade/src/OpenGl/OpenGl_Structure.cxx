@@ -39,7 +39,7 @@ void OpenGl_Structure::renderBoundingBox (const Handle(OpenGl_Workspace)& theWor
   }
 
   const Handle(OpenGl_Context)& aCtx = theWorkspace->GetGlContext();
-  const Handle(OpenGl_TextureSet) aPrevTexture = aCtx->BindTextures (Handle(OpenGl_TextureSet)());
+  const Handle(OpenGl_TextureSet) aPrevTexture = aCtx->BindTextures (Handle(OpenGl_TextureSet)(), Handle(OpenGl_ShaderProgram)());
   const Graphic3d_ZLayerSettings& aLayer = myGraphicDriver->ZLayerSettings (myZLayer);
   const Graphic3d_Vec3d aMoveVec = myTrsfPers.IsNull()
                                && !aLayer.OriginTransformation().IsNull()
@@ -95,7 +95,7 @@ void OpenGl_Structure::renderBoundingBox (const Handle(OpenGl_Workspace)& theWor
     aCtx->core11->glDisableClientState (GL_VERTEX_ARRAY);
   }
 #endif
-  aCtx->BindTextures (aPrevTexture);
+  aCtx->BindTextures (aPrevTexture, Handle(OpenGl_ShaderProgram)());
 }
 
 // =======================================================================
@@ -135,16 +135,17 @@ void OpenGl_Structure::SetZLayer (const Graphic3d_ZLayerId theLayerIndex)
 // function : SetTransformation
 // purpose  :
 // =======================================================================
-void OpenGl_Structure::SetTransformation (const Handle(Geom_Transformation)& theTrsf)
+void OpenGl_Structure::SetTransformation (const Handle(TopLoc_Datum3D)& theTrsf)
 {
   myTrsf = theTrsf;
   myIsMirrored = Standard_False;
   if (!myTrsf.IsNull())
   {
     // Determinant of transform matrix less then 0 means that mirror transform applied.
-    const Standard_Real aDet = myTrsf->Value(1, 1) * (myTrsf->Value (2, 2) * myTrsf->Value (3, 3) - myTrsf->Value (3, 2) * myTrsf->Value (2, 3))
-                             - myTrsf->Value(1, 2) * (myTrsf->Value (2, 1) * myTrsf->Value (3, 3) - myTrsf->Value (3, 1) * myTrsf->Value (2, 3))
-                             + myTrsf->Value(1, 3) * (myTrsf->Value (2, 1) * myTrsf->Value (3, 2) - myTrsf->Value (3, 1) * myTrsf->Value (2, 2));
+    const gp_Trsf& aTrsf = myTrsf->Transformation();
+    const Standard_Real aDet = aTrsf.Value(1, 1) * (aTrsf.Value (2, 2) * aTrsf.Value (3, 3) - aTrsf.Value (3, 2) * aTrsf.Value (2, 3))
+                             - aTrsf.Value(1, 2) * (aTrsf.Value (2, 1) * aTrsf.Value (3, 3) - aTrsf.Value (3, 1) * aTrsf.Value (2, 3))
+                             + aTrsf.Value(1, 3) * (aTrsf.Value (2, 1) * aTrsf.Value (3, 2) - aTrsf.Value (3, 1) * aTrsf.Value (2, 2));
     myIsMirrored = aDet < 0.0;
   }
 
@@ -426,7 +427,7 @@ void OpenGl_Structure::Render (const Handle(OpenGl_Workspace) &theWorkspace) con
   if (aCtx->core11 != NULL
   && !myTrsf.IsNull())
   {
-    const Standard_Real aScale = myTrsf->ScaleFactor();
+    const Standard_Real aScale = myTrsf->Trsf().ScaleFactor();
     if (Abs (aScale - 1.0) > Precision::Confusion())
     {
       aCtx->SetGlNormalizeEnabled (Standard_True);
@@ -438,7 +439,7 @@ void OpenGl_Structure::Render (const Handle(OpenGl_Workspace) &theWorkspace) con
   {
     aCtx->WorldViewState.Push();
     OpenGl_Mat4& aWorldView = aCtx->WorldViewState.ChangeCurrent();
-    myTrsfPers->Apply (theWorkspace->View()->Camera(),
+    myTrsfPers->Apply (aCtx->Camera(),
                        aCtx->ProjectionState.Current(), aWorldView,
                        aCtx->VirtualViewport()[2], aCtx->VirtualViewport()[3]);
 
@@ -638,4 +639,21 @@ void OpenGl_Structure::ReleaseGlResources (const Handle(OpenGl_Context)& theGlCt
 Handle(Graphic3d_CStructure) OpenGl_Structure::ShadowLink (const Handle(Graphic3d_StructureManager)& theManager) const
 {
   return new OpenGl_StructureShadow (theManager, this);
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void OpenGl_Structure::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Graphic3d_CStructure)
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myInstancedStructure)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsRaytracable)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myModificationState)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsMirrored)
 }

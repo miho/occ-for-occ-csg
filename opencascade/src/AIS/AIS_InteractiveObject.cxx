@@ -57,6 +57,20 @@ void AIS_InteractiveObject::Redisplay (const Standard_Boolean AllModes)
 }
 
 //=======================================================================
+//function : ProcessDragging
+//purpose  :
+//=======================================================================
+Standard_Boolean AIS_InteractiveObject::ProcessDragging (const Handle(AIS_InteractiveContext)&,
+                                                         const Handle(V3d_View)&,
+                                                         const Handle(SelectMgr_EntityOwner)&,
+                                                         const Graphic3d_Vec2i&,
+                                                         const Graphic3d_Vec2i&,
+                                                         const AIS_DragAction)
+{
+  return Standard_False;
+}
+
+//=======================================================================
 //function : 
 //purpose  : 
 //=======================================================================
@@ -148,11 +162,11 @@ void AIS_InteractiveObject::SetAspect(const Handle(Prs3d_BasicAspect)& theAspect
 //function : DumpJson
 //purpose  : 
 //=======================================================================
-void AIS_InteractiveObject::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+void AIS_InteractiveObject::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
-  OCCT_DUMP_CLASS_BEGIN (theOStream, AIS_InteractiveObject);
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
 
-  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, SelectMgr_SelectableObject);
-  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myCTXPtr);
-  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myOwner);
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, SelectMgr_SelectableObject)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myCTXPtr)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myOwner)
 }

@@ -128,24 +128,26 @@ void IVtkOCC_ShapePickerAlgo::SetSelectionMode (const IVtk_IShape::Handle& theSh
 
     // Update the selection for the given mode according to its status.
     const Handle(SelectMgr_Selection)& aSel = aSelObj->Selection (theMode);
-
     switch (aSel->UpdateStatus())
     {
       case SelectMgr_TOU_Full:
+      {
         // Recompute the sensitive primitives which correspond to the mode.
         myViewerSelector->RemoveSelectionOfObject (aSelObj, aSelObj->Selection (theMode));
         aSelObj->RecomputePrimitives (theMode);
         myViewerSelector->AddSelectionToObject (aSelObj, aSelObj->Selection (theMode));
         myViewerSelector->RebuildObjectsTree();
         myViewerSelector->RebuildSensitivesTree (aSelObj);
+      }
+      Standard_FALLTHROUGH
       case SelectMgr_TOU_Partial:
+      {
+        if (aSelObj->HasTransformation())
         {
-          if (aSelObj->HasTransformation())
-          {
-            myViewerSelector->RebuildObjectsTree();
-          }
-          break;
+          myViewerSelector->RebuildObjectsTree();
         }
+        break;
+      }
       default:
         break;
     }
@@ -310,14 +312,14 @@ bool IVtkOCC_ShapePickerAlgo::processPicked()
 
       if (aSelectable.IsNull())
       {
-        anOutput << "Error: EntityOwner having null SelectableObject picked!";
+        anOutput->SendAlarm() << "Error: EntityOwner having null SelectableObject picked!";
         continue;
       }
 
       Handle(IVtkOCC_Shape) aSelShape = aSelectable->GetShape();
       if (aSelShape.IsNull())
       {
-        anOutput << "Error: SelectableObject with null OccShape pointer picked!";
+        anOutput->SendAlarm() << "Error: SelectableObject with null OccShape pointer picked!";
         continue;
       }
 
@@ -334,12 +336,12 @@ bool IVtkOCC_ShapePickerAlgo::processPicked()
       TopoDS_Shape aSubShape      = anEntityOwner->Shape();
       if (aTopLevelShape.IsNull())
       {
-        anOutput << "Error: OccShape with null top-level TopoDS_Shape picked!";
+        anOutput->SendAlarm() << "Error: OccShape with null top-level TopoDS_Shape picked!";
         continue;
       }
       if (aSubShape.IsNull())
       {
-        anOutput << "Error: EntityOwner with null TopoDS_Shape picked!";
+        anOutput->SendAlarm() << "Error: EntityOwner with null TopoDS_Shape picked!";
         continue;
       }
 

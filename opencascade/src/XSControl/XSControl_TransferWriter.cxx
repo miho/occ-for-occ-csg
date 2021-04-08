@@ -16,6 +16,7 @@
 #include <Interface_CheckIterator.hxx>
 #include <Interface_InterfaceModel.hxx>
 #include <Interface_Macros.hxx>
+#include <Interface_Static.hxx>
 #include <Message_Messenger.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_Failure.hxx>
@@ -29,6 +30,7 @@
 #include <XSControl_Controller.hxx>
 #include <XSControl_TransferWriter.hxx>
 #include <XSControl_Utils.hxx>
+#include <ShapeUpgrade_RemoveLocations.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(XSControl_TransferWriter,Standard_Transient)
 
@@ -52,15 +54,15 @@ void XSControl_TransferWriter::Clear (const Standard_Integer mode)
 
 void XSControl_TransferWriter::PrintStats (const Standard_Integer , const Standard_Integer ) const
 {
-  Handle(Message_Messenger) sout = myTransferWriter->Messenger();
+  Message_Messenger::StreamBuffer sout = myTransferWriter->Messenger()->SendInfo();
 //  A ameliorer ... !
   sout<<"\n*******************************************************************\n";
-  sout << "******        Statistics on Transfer (Write)                 ******"<<Message_EndLine;
+  sout << "******        Statistics on Transfer (Write)                 ******"<<std::endl;
   sout<<"\n*******************************************************************\n";
   sout << "******        Transfer Mode = "<<myTransferMode;
   Standard_CString modehelp = myController->ModeWriteHelp (myTransferMode);
   if (modehelp && modehelp[0] != 0) sout<<"  I.E.  "<<modehelp;
-  sout<<"       ******"<<Message_EndLine;
+  sout<<"       ******"<<std::endl;
 }
 
 
@@ -87,7 +89,8 @@ Standard_Boolean XSControl_TransferWriter::RecognizeTransient (const Handle(Stan
 
 IFSelect_ReturnStatus XSControl_TransferWriter::TransferWriteTransient
   (const Handle(Interface_InterfaceModel)& model,
-   const Handle(Standard_Transient)& obj)
+   const Handle(Standard_Transient)& obj,
+   const Message_ProgressRange& theProgress)
 {
   IFSelect_ReturnStatus status = IFSelect_RetVoid;
   if (myController.IsNull()) return IFSelect_RetError;
@@ -97,19 +100,19 @@ IFSelect_ReturnStatus XSControl_TransferWriter::TransferWriteTransient
   Handle(Transfer_ActorOfFinderProcess) nulact;
   myTransferWriter->SetActor (nulact);
   Handle(Standard_Transient) resultat;
-  Handle(Message_Messenger) sout = myTransferWriter->Messenger();
+  Message_Messenger::StreamBuffer sout = myTransferWriter->Messenger()->SendInfo();
   try {
     OCC_CATCH_SIGNALS
     PrintStats(myTransferMode);
     sout << "******        Transferring Transient, CDL Type = ";
-    sout<<obj->DynamicType()->Name()<<"   ******"<<Message_EndLine;
+    sout<<obj->DynamicType()->Name()<<"   ******"<<std::endl;
     status = myController->TransferWriteTransient
-      (obj,myTransferWriter,model,myTransferMode);
+      (obj,myTransferWriter,model, myTransferMode, theProgress);
   }
   catch(Standard_Failure const& anException) {
     sout<<"****  ****  TransferWriteShape, EXCEPTION : ";
     sout<<anException.GetMessageString(); 
-    sout<<Message_EndLine;
+    sout<<std::endl;
     status = IFSelect_RetFail;
   }
   return status;
@@ -133,31 +136,42 @@ Standard_Boolean XSControl_TransferWriter::RecognizeShape (const TopoDS_Shape& s
 //=======================================================================
 
 IFSelect_ReturnStatus XSControl_TransferWriter::TransferWriteShape
-  (const Handle(Interface_InterfaceModel)& model,
-   const TopoDS_Shape& shape)
+  (const Handle(Interface_InterfaceModel)& theModel,
+   const TopoDS_Shape& theShape,
+   const Message_ProgressRange& theProgress)
 {
   IFSelect_ReturnStatus status = IFSelect_RetVoid;
   if (myController.IsNull()) return IFSelect_RetError;
-  if (model.IsNull()) return IFSelect_RetVoid;
+  if (theModel.IsNull()) return IFSelect_RetVoid;
+
+  TopoDS_Shape aShape = theShape;
+  Standard_Boolean isNMMode = Interface_Static::IVal("write.step.nonmanifold") != 0;
+  if (isNMMode)
+  {
+    ShapeUpgrade_RemoveLocations aRemLoc;
+    aRemLoc.SetRemoveLevel(TopAbs_COMPOUND);
+    aRemLoc.Remove(aShape);
+    aShape = aRemLoc.GetResult();
+  }
 
   if (myTransferWriter.IsNull()) myTransferWriter = new Transfer_FinderProcess;
 //  effacer l actor : Controller s en charge
   Handle(Transfer_ActorOfFinderProcess) nulact;
   myTransferWriter->SetActor (nulact);
   Handle(Standard_Transient) resultat;
-  Handle(Message_Messenger) sout = myTransferWriter->Messenger();
+  Message_Messenger::StreamBuffer sout = myTransferWriter->Messenger()->SendInfo();
   try {
     OCC_CATCH_SIGNALS
     PrintStats(myTransferMode);
-    sout << "******        Transferring Shape, ShapeType = " << shape.ShapeType();
-    sout<<"                      ******"<<Message_EndLine;
+    sout << "******        Transferring Shape, ShapeType = " << aShape.ShapeType();
+    sout<<"                      ******"<<std::endl;
     status = myController->TransferWriteShape
-      (shape,myTransferWriter,model,myTransferMode);
+      (aShape,myTransferWriter, theModel, myTransferMode, theProgress);
   }
   catch(Standard_Failure const& anException) {
     sout<<"****  ****  TransferWriteShape, EXCEPTION : "; 
     sout<<anException.GetMessageString(); 
-    sout<<Message_EndLine;
+    sout<<std::endl;
     status = IFSelect_RetFail;
   }
   return status;

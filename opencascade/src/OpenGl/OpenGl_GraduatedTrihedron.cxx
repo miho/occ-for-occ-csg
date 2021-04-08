@@ -422,7 +422,7 @@ void OpenGl_GraduatedTrihedron::renderAxis (const Handle(OpenGl_Workspace)& theW
   const Standard_Integer aHeight = theWorkspace->Height();
 
   // Take into account Transform Persistence
-  aContext->ModelWorldState.SetCurrent (aTransMode.Compute (theWorkspace->View()->Camera(), aProjection, aWorldView, aWidth, aHeight));
+  aContext->ModelWorldState.SetCurrent (aTransMode.Compute (aContext->Camera(), aProjection, aWorldView, aWidth, aHeight));
   aContext->ApplyModelViewMatrix();
 
   anAxis.Arrow.Render (theWorkspace);
@@ -837,4 +837,15 @@ void OpenGl_GraduatedTrihedron::Axis::Release (OpenGl_Context* theCtx)
   Tickmark.Release (theCtx);
   Line    .Release (theCtx);
   Arrow   .Release (theCtx);
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_GraduatedTrihedron::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_GraduatedTrihedron)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, OpenGl_Element)
 }

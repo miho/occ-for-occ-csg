@@ -20,7 +20,6 @@
 #include <Aspect_TypeOfLine.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
 #include <Geom_Point.hxx>
-#include <Geom_Transformation.hxx>
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_Group.hxx>
@@ -28,7 +27,6 @@
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_PointAspect.hxx>
 #include <Prs3d_Presentation.hxx>
-#include <Prs3d_Projector.hxx>
 #include <Quantity_Color.hxx>
 #include <Select3D_SensitivePoint.hxx>
 #include <SelectMgr_EntityOwner.hxx>
@@ -93,26 +91,13 @@ void AIS_Point::Compute(const Handle(PrsMgr_PresentationManager3d)& /*aPresentat
     StdPrs_Point::Add(aPresentation,myComponent,myDrawer);
   else if (aMode== -99)
     {
-      Handle(Graphic3d_Group) TheGroup = Prs3d_Root::CurrentGroup(aPresentation);
+      Handle(Graphic3d_Group) TheGroup = aPresentation->CurrentGroup();
       TheGroup->SetPrimitivesAspect (myHilightDrawer->PointAspect()->Aspect());
       Handle(Graphic3d_ArrayOfPoints) aPoint = new Graphic3d_ArrayOfPoints (1);
       aPoint->AddVertex (myComponent->X(),myComponent->Y(),myComponent->Z());
       TheGroup->AddPrimitiveArray (aPoint);
     }
     
-}
-
-//=======================================================================
-//function : Compute
-//purpose  : 
-//=======================================================================
-
-void AIS_Point::Compute(const Handle(Prs3d_Projector)& aProjector,
-                        const Handle(Geom_Transformation)& aTransformation,
-                        const Handle(Prs3d_Presentation)& aPresentation)
-{
-// throw Standard_NotImplemented("AIS_Point::Compute(const Handle(Prs3d_Projector)&, const Handle(Geom_Transformation)&, const Handle(Prs3d_Presentation)&)");
- PrsMgr_PresentableObject::Compute( aProjector , aTransformation , aPresentation) ;
 }
 
 //=======================================================================
@@ -158,16 +143,6 @@ TopoDS_Vertex AIS_Point::Vertex() const
 {
   gp_Pnt P = myComponent->Pnt();
   return BRepBuilderAPI_MakeVertex(P);
-}
-
-
-//=======================================================================
-//function : Compute
-//purpose  : to avoid warning
-//=======================================================================
-void AIS_Point::Compute(const Handle(Prs3d_Projector)&, 
-			   const Handle(Prs3d_Presentation)&)
-{
 }
 
 //=======================================================================

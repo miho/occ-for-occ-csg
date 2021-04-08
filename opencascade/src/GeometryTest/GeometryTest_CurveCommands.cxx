@@ -98,7 +98,7 @@
 #include <Approx_CurveOnSurface.hxx>
 #include <Precision.hxx>
 #include <Geom2dAdaptor.hxx>
-
+#include <Message.hxx>
 
 #include <Precision.hxx>
 
@@ -367,9 +367,8 @@ static Standard_Integer gproject(Draw_Interpretor& di, Standard_Integer n, const
         return 0;
         }
       else {
-        Approx_CurveOnSurface appr(HPCur, hsur, Udeb, Ufin, myTol3d, 
-				   myContinuity, myMaxDegree, myMaxSeg, 
-				   Only3d, Only2d);
+        Approx_CurveOnSurface appr(HPCur, hsur, Udeb, Ufin, myTol3d);
+        appr.Perform(myMaxSeg, myMaxDegree, myContinuity, Only3d, Only2d);
         if(!Only3d) {
 	  PCur2d = appr.Curve2d();
 	  di << " Error in 2d is " << appr.MaxError2dU()
@@ -945,7 +944,7 @@ static Standard_Integer crvpoints (Draw_Interpretor& di, Standard_Integer /*n*/,
     TopoDS_Wire aWire = TopoDS::Wire(DBRep::Get(a[2], TopAbs_WIRE));
     if (aWire.IsNull())
     {
-      std::cout << "cannot evaluate the argument " << a[2] << " as a curve" << std::endl;
+      Message::SendFail() << "cannot evaluate the argument " << a[2] << " as a curve";
       return 1;
     }
     BRepAdaptor_CompCurve aCompCurve(aWire);
@@ -1008,7 +1007,7 @@ static Standard_Integer crvpoints (Draw_Interpretor& di, Standard_Integer /*n*/,
 
 static Standard_Integer crvtpoints (Draw_Interpretor& di, Standard_Integer n, const char** a)
 {
-  Standard_Integer i, nbp;
+  Standard_Integer i, nbp, aMinPntsNb = 2;
   Standard_Real defl, angle = Precision::Angular();
 
   Handle(Adaptor3d_HCurve) aHCurve;
@@ -1019,7 +1018,7 @@ static Standard_Integer crvtpoints (Draw_Interpretor& di, Standard_Integer n, co
     TopoDS_Wire aWire = TopoDS::Wire(DBRep::Get(a[2], TopAbs_WIRE));
     if (aWire.IsNull())
     {
-      std::cout << "cannot evaluate the argument " << a[2] << " as a curve" << std::endl;
+      Message::SendFail() << "cannot evaluate the argument " << a[2] << " as a curve";
       return 1;
     }
     BRepAdaptor_CompCurve aCompCurve(aWire);
@@ -1031,10 +1030,13 @@ static Standard_Integer crvtpoints (Draw_Interpretor& di, Standard_Integer n, co
   }
   defl = Draw::Atof(a[3]);
 
-  if(n > 3)
+  if(n > 4)
     angle = Draw::Atof(a[4]);
 
-  GCPnts_TangentialDeflection PntGen(aHCurve->Curve(), angle, defl, 2);
+  if(n > 5)
+    aMinPntsNb = Draw::Atoi (a[5]);
+
+  GCPnts_TangentialDeflection PntGen(aHCurve->Curve(), angle, defl, aMinPntsNb);
   
   nbp = PntGen.NbPoints();
   di << "Nb points : " << nbp << "\n";

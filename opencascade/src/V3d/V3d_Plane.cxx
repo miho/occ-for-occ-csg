@@ -66,7 +66,7 @@ void V3d_Plane::Display (const Handle(V3d_View)& theView,
   myGraphicStructure = new Graphic3d_Structure (aViewer->StructureManager());
   Handle(Graphic3d_Group)            aGroup = myGraphicStructure->NewGroup();
   Handle(Graphic3d_AspectFillArea3d) anAsp  = new Graphic3d_AspectFillArea3d();
-  Graphic3d_MaterialAspect aPlastic (Graphic3d_NOM_PLASTIC);
+  Graphic3d_MaterialAspect aPlastic (Graphic3d_NameOfMaterial_Plastified);
   aPlastic.SetColor (theColor);
   aPlastic.SetTransparency (0.5);
   anAsp->SetFrontMaterial (aPlastic);
@@ -143,5 +143,5 @@ void V3d_Plane::Update()
   gp_Trsf aTransform;
   aTransform.SetTransformation (aGeomPln.Position());
   aTransform.Invert();
-  myGraphicStructure->SetTransformation (new Geom_Transformation (aTransform));
+  myGraphicStructure->SetTransformation (new TopLoc_Datum3D (aTransform));
 }

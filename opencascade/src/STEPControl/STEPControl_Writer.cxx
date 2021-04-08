@@ -11,13 +11,12 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <STEPControl_Writer.hxx>
 
 #include <Interface_InterfaceModel.hxx>
 #include <Interface_Macros.hxx>
-#include <Message_ProgressIndicator.hxx>
 #include <STEPControl_ActorWrite.hxx>
 #include <STEPControl_Controller.hxx>
-#include <STEPControl_Writer.hxx>
 #include <StepData_StepModel.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Shape.hxx>
@@ -121,8 +120,10 @@ void STEPControl_Writer::UnsetTolerance ()
 //=======================================================================
 
 IFSelect_ReturnStatus STEPControl_Writer::Transfer
-  (const TopoDS_Shape& sh, const STEPControl_StepModelType mode,
-   const Standard_Boolean compgraph) 
+  (const TopoDS_Shape& sh,
+   const STEPControl_StepModelType mode,
+   const Standard_Boolean compgraph,
+   const Message_ProgressRange& theProgress)
 {
   Standard_Integer mws = -1;
   switch (mode) {
@@ -136,16 +137,7 @@ IFSelect_ReturnStatus STEPControl_Writer::Transfer
   if (mws < 0) return IFSelect_RetError;    // cas non reconnu
   thesession->TransferWriter()->SetTransferMode (mws);
 
-  // for progress indicator.
-  Handle(Message_ProgressIndicator) progress = WS()->TransferWriter()->FinderProcess()->GetProgress();
-  if ( ! progress.IsNull() ) {
-    Standard_Integer nbfaces=0;
-    for( TopExp_Explorer exp(sh, TopAbs_FACE); exp.More(); exp.Next())  nbfaces++;
-    progress->SetScale ( "Face", 0, nbfaces, 1 );
-    progress->Show();
-  }
-
-  return thesession->TransferWriteShape(sh,compgraph);
+  return thesession->TransferWriteShape(sh, compgraph, theProgress);
 }
 
 

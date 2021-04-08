@@ -28,7 +28,7 @@ IMPLEMENT_STANDARD_RTTIEXT(Prs3d_ShadingAspect, Prs3d_BasicAspect)
 //=======================================================================
 Prs3d_ShadingAspect::Prs3d_ShadingAspect()
 {
-  const Graphic3d_MaterialAspect aMat (Graphic3d_NOM_BRASS);
+  const Graphic3d_MaterialAspect aMat (Graphic3d_NameOfMaterial_Brass);
   const Quantity_Color aColor = aMat.AmbientColor();
   myAspect = new Graphic3d_AspectFillArea3d (Aspect_IS_SOLID,
 					     aColor,
@@ -144,12 +144,14 @@ void Prs3d_ShadingAspect::SetTransparency (const Standard_Real theValue,
    || theModel == Aspect_TOFM_BOTH_SIDE)
   {
     myAspect->ChangeFrontMaterial().SetTransparency (Standard_ShortReal(theValue));
+    myAspect->SetInteriorColor (Quantity_ColorRGBA (myAspect->InteriorColor(), 1.0f - Standard_ShortReal(theValue)));
   }
 
   if (theModel == Aspect_TOFM_BACK_SIDE
    || theModel == Aspect_TOFM_BOTH_SIDE)
   {
     myAspect->ChangeBackMaterial().SetTransparency (Standard_ShortReal(theValue));
+    myAspect->SetBackInteriorColor (Quantity_ColorRGBA (myAspect->BackInteriorColor(), 1.0f - Standard_ShortReal(theValue)));
   }
 }
 
@@ -174,9 +176,9 @@ Standard_Real Prs3d_ShadingAspect::Transparency (const Aspect_TypeOfFacingModel 
 // function : DumpJson
 // purpose  :
 // =======================================================================
-void Prs3d_ShadingAspect::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+void Prs3d_ShadingAspect::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
-  OCCT_DUMP_CLASS_BEGIN (theOStream, Prs3d_ShadingAspect);
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspect.get());
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myAspect.get())
 }
 

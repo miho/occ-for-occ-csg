@@ -13,6 +13,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <IVtkOCC_ShapeMesher.hxx>
+
 #include <Adaptor3d_IsoCurve.hxx>
 #include <Bnd_Box.hxx>
 #include <BRep_Tool.hxx>
@@ -29,7 +31,7 @@
 #include <GeomAdaptor_Curve.hxx>
 #include <gp_Dir2d.hxx>
 #include <gp_Pnt2d.hxx>
-#include <IVtkOCC_ShapeMesher.hxx>
+#include <Message.hxx>
 #include <NCollection_Array1.hxx>
 #include <Poly_Polygon3D.hxx>
 #include <Poly_PolygonOnTriangulation.hxx>
@@ -40,6 +42,7 @@
 #include <Prs3d_IsoAspect.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <StdPrs_Isolines.hxx>
+#include <StdPrs_ToolTriangulatedShape.hxx>
 #include <TColgp_SequenceOfPnt2d.hxx>
 #include <TColStd_Array1OfReal.hxx>
 #include <TopExp.hxx>
@@ -94,7 +97,7 @@ Standard_Real IVtkOCC_ShapeMesher::GetDeflection() const
     Handle(Prs3d_Drawer) aDefDrawer = new Prs3d_Drawer();
     aDefDrawer->SetTypeOfDeflection (Aspect_TOD_RELATIVE);
     aDefDrawer->SetDeviationCoefficient (GetDeviationCoeff());
-    myDeflection = Prs3d::GetDeflection (GetShapeObj()->GetShape(), aDefDrawer);
+    myDeflection = StdPrs_ToolTriangulatedShape::GetDeflection (GetShapeObj()->GetShape(), aDefDrawer);
   }
 
   return myDeflection;
@@ -135,8 +138,11 @@ void IVtkOCC_ShapeMesher::meshShape()
       anAlgo->Perform();
     }
   }
-  catch (Standard_Failure)
-  { }
+  catch (const Standard_Failure& anException)
+  {
+    Message::SendFail (TCollection_AsciiString("Error: IVtkOCC_ShapeMesher::meshShape() triangulation builder has failed (")
+                     + anException.GetMessageString() + ")");
+  }
 }
 
 //================================================================
@@ -179,16 +185,16 @@ void IVtkOCC_ShapeMesher::addEdges()
                                  TopAbs_EDGE, 
                                  TopAbs_FACE,
                                  anEdgesMap);
-
   int aNbFaces;
   IVtk_MeshType aType;
   myEdgesTypes.Clear();
 
-  TopExp_Explorer anEdgeIter (GetShapeObj()->GetShape(), TopAbs_EDGE);
-  for (; anEdgeIter.More(); anEdgeIter.Next())
+  TopTools_IndexedDataMapOfShapeListOfShape::Iterator aEdgeIt(anEdgesMap);
+  for (; aEdgeIt.More(); aEdgeIt.Next())
   {
-    const TopoDS_Edge& anOcctEdge = TopoDS::Edge (anEdgeIter.Current());
-    aNbFaces = anEdgesMap.FindFromKey (anOcctEdge).Extent();
+    const TopoDS_Edge& anOcctEdge = TopoDS::Edge (aEdgeIt.Key());
+    const TopTools_ListOfShape& aFaceList = aEdgeIt.Value();
+    aNbFaces = aFaceList.Extent();
     if (aNbFaces == 0)
     {
       aType = MT_FreeEdge;
@@ -199,7 +205,8 @@ void IVtkOCC_ShapeMesher::addEdges()
     }
     else
     {
-      aType = MT_SharedEdge;
+      aType = (aNbFaces >= 2) && (BRep_Tool::MaxContinuity(anOcctEdge) > GeomAbs_G2) ?
+        MT_SeamEdge : MT_SharedEdge;
     }
     addEdge (anOcctEdge, GetShapeObj()->GetSubShapeId (anOcctEdge), aType);
     myEdgesTypes.Bind (anOcctEdge, aType);
@@ -228,8 +235,11 @@ void IVtkOCC_ShapeMesher::addWireFrameFaces()
       addWFFace (anOcctFace, 
                  GetShapeObj()->GetSubShapeId (anOcctFace));
     }
-    catch (Standard_Failure)
-    { }
+    catch (const Standard_Failure& anException)
+    {
+      Message::SendFail (TCollection_AsciiString("Error: addWireFrameFaces() wireframe presentation builder has failed (")
+                       + anException.GetMessageString() + ")");
+    }
   }
 }
 

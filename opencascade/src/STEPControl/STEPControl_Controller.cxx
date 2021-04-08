@@ -199,6 +199,56 @@ STEPControl_Controller::STEPControl_Controller ()
     Interface_Static::Init("step", "read.step.all.shapes", '&', "eval On");
     Interface_Static::SetIVal("read.step.all.shapes", 0);
 
+     // Mode for reading constructive geometry representation relationship to read
+    //StepRepr_ConstructiveGeometryRepresentation method implemented only for StepGeom_MakeAxis2Placement3d
+    //for axis placements representing axis for suplemented geometry. Axis placements are translated to planar faces with CS 
+    //equal to translated axis placements
+    Interface_Static::Init("step","read.step.constructivegeom.relationship",'e',"");
+    Interface_Static::Init("step","read.step.constructivegeom.relationship",'&',"enum 0");
+    Interface_Static::Init("step","read.step.constructivegeom.relationship",'&',"eval OFF");
+    Interface_Static::Init("step","read.step.constructivegeom.relationship",'&',"eval ON");
+    Interface_Static::SetCVal("read.step.constructivegeom.relationship","OFF");
+
+    // Mode to variate apply or not transformation placed in the root shape representation.
+    // Issues #29068 and #31491.
+    Interface_Static::Init("step", "read.step.root.transformation", 'e', "");
+    Interface_Static::Init("step", "read.step.root.transformation", '&', "enum 0");
+    Interface_Static::Init("step", "read.step.root.transformation", '&', "eval ON");
+    Interface_Static::Init("step", "read.step.root.transformation", '&', "eval OFF");
+    Interface_Static::SetCVal("read.step.root.transformation", "ON");
+
+    // STEP file encoding for names translation
+    // Note: the numbers should be consistent with Resource_FormatType enumeration
+    Interface_Static::Init("step", "read.step.codepage", 'e', "");
+    Interface_Static::Init("step", "read.step.codepage", '&', "enum 0");
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval SJIS");         // Resource_FormatType_SJIS
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval EUC");          // Resource_FormatType_EUC
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval NoConversion"); // Resource_FormatType_NoConversion
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval GB");           // Resource_FormatType_GB
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval UTF8");         // Resource_FormatType_UTF8
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval SystemLocale"); // Resource_FormatType_SystemLocale
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval CP1250");       // Resource_FormatType_CP1250
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval CP1251");       // Resource_FormatType_CP1251
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval CP1252");       // Resource_FormatType_CP1252
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval CP1253");       // Resource_FormatType_CP1253
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval CP1254");       // Resource_FormatType_CP1254
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval CP1255");       // Resource_FormatType_CP1255
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval CP1256");       // Resource_FormatType_CP1256
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval CP1257");       // Resource_FormatType_CP1257
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval CP1258");       // Resource_FormatType_CP1258
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval iso8859-1");    // Resource_FormatType_iso8859_1
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval iso8859-2");    // Resource_FormatType_iso8859_2
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval iso8859-3");    // Resource_FormatType_iso8859_3
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval iso8859-4");    // Resource_FormatType_iso8859_4
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval iso8859-5");    // Resource_FormatType_iso8859_5
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval iso8859-6");    // Resource_FormatType_iso8859_6
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval iso8859-7");    // Resource_FormatType_iso8859_7
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval iso8859-8");    // Resource_FormatType_iso8859_8
+    Interface_Static::Init("step", "read.step.codepage", '&', "eval iso8859-9");    // Resource_FormatType_iso8859_9
+    Interface_Static::SetCVal("read.step.codepage", "UTF8");
+
+    Standard_STATIC_ASSERT((int)Resource_FormatType_iso8859_9 - (int)Resource_FormatType_CP1250 == 17); // "Error: Invalid Codepage Enumeration"
+
     init = Standard_True;
   }
 
@@ -291,7 +341,8 @@ IFSelect_ReturnStatus  STEPControl_Controller::TransferWriteShape
   (const TopoDS_Shape& shape,
    const Handle(Transfer_FinderProcess)& FP,
    const Handle(Interface_InterfaceModel)& model,
-   const Standard_Integer modeshape) const
+   const Standard_Integer modeshape,
+   const Message_ProgressRange& theProgress) const
 {
   if (modeshape < 0 || modeshape > 4) return IFSelect_RetError;
   Handle(STEPControl_ActorWrite) ActWrite =
@@ -300,7 +351,7 @@ IFSelect_ReturnStatus  STEPControl_Controller::TransferWriteShape
   if (!ActWrite.IsNull()) 
     ActWrite->SetGroupMode (Interface_Static::IVal("write.step.assembly"));
 
-  return XSControl_Controller::TransferWriteShape (shape,FP,model,modeshape);
+  return XSControl_Controller::TransferWriteShape(shape, FP, model, modeshape, theProgress);
 }
 
 Standard_Boolean STEPControl_Controller::Init ()

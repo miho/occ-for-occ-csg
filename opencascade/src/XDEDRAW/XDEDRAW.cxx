@@ -24,6 +24,7 @@
 #include <DDocStd_DrawDocument.hxx>
 #include <Draw.hxx>
 #include <Draw_PluginMacro.hxx>
+#include <Draw_ProgressIndicator.hxx>
 #include <Geom_Axis2Placement.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_LineAspect.hxx>
@@ -147,11 +148,13 @@ static Standard_Integer saveDoc (Draw_Interpretor& di, Standard_Integer argc, co
     if (!DDocStd::GetDocument(argv[1],D)) return 1;
   }
 
+  Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator (di);
+
   PCDM_StoreStatus aStatus = PCDM_SS_Doc_IsNull;
   if (argc == 3)
   {
     TCollection_ExtendedString path (argv[2]);
-    aStatus = A->SaveAs (D, path);
+    aStatus = A->SaveAs (D, path, aProgress->Start());
   }
   else if (!D->IsSaved())
   {
@@ -160,7 +163,7 @@ static Standard_Integer saveDoc (Draw_Interpretor& di, Standard_Integer argc, co
   }
   else
   {
-    aStatus = A->Save(D);
+    aStatus = A->Save (D, aProgress->Start());
   }
 
   switch (aStatus)
@@ -185,6 +188,9 @@ static Standard_Integer saveDoc (Draw_Interpretor& di, Standard_Integer argc, co
     case PCDM_SS_Info_Section_Error:
       di << "Storage error: section error\n";
       break;
+    case PCDM_SS_UserBreak:
+      di << "Storage error: user break\n";
+      break;
   }
 
   return 0;
@@ -206,7 +212,7 @@ static Standard_Integer openDoc (Draw_Interpretor& di, Standard_Integer argc, co
     return 1;
   }
 
-  Standard_CString Filename = argv[1];
+  TCollection_AsciiString Filename = argv[1];
   Standard_CString DocName = argv[2];
 
   if ( DDocStd::GetDocument(DocName, D, Standard_False) )
@@ -215,7 +221,8 @@ static Standard_Integer openDoc (Draw_Interpretor& di, Standard_Integer argc, co
     return 1;
   }
 
-  if ( A->Open(Filename, D) != PCDM_RS_OK )
+  Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator (di);
+  if ( A->Open(Filename, D, aProgress->Start()) != PCDM_RS_OK )
   {
     di << "cannot open XDE document\n";
     return 1;
@@ -284,8 +291,7 @@ static void StatAssembly(const TDF_Label L,
   if(L.FindAttribute(TDataStd_Name::GetID(), Name)) {
     NbShapesWithName++;
     if(PrintStructMode) {
-      TCollection_AsciiString AsciiStringName(Name->Get(),'?');
-      di<<" "<<AsciiStringName.ToCString()<<"  has attributes: ";
+      di << " " << Name->Get() << "  has attributes: ";
     }
   }
   else {
@@ -356,7 +362,7 @@ static void StatAssembly(const TDF_Label L,
     if(PrintStructMode) {
       di<<"Layer(";
       for(Standard_Integer i=1; i<=aLayerS->Length(); i++) {
-        TCollection_AsciiString Entry2(aLayerS->Value(i),'?');
+        TCollection_AsciiString Entry2(aLayerS->Value(i));
         if(i==1)
           di<<"\""<<Entry2.ToCString()<<"\"";
         else
@@ -453,8 +459,7 @@ static Standard_Integer statdoc (Draw_Interpretor& di, Standard_Integer argc, co
       TDF_Label aLabel = LLabels.Value(i);
       TCollection_ExtendedString layerName;
       LTool->GetLayer(aLabel, layerName);
-      TCollection_AsciiString Entry(layerName,'?');
-      di<<"\""<<Entry.ToCString() <<"\" ";
+      di << "\"" << layerName << "\" ";
     }
     di<<"\n";
   }
@@ -503,7 +508,7 @@ static Standard_Integer setPrs (Draw_Interpretor& di, Standard_Integer argc, con
     Handle(TPrsStd_AISPresentation) prs;
     if ( ! seq.Value(i).FindAttribute ( TPrsStd_AISPresentation::GetID(), prs ) ) {
       prs = TPrsStd_AISPresentation::Set(seq.Value(i),XCAFPrs_Driver::GetID());
-      prs->SetMaterial ( Graphic3d_NOM_PLASTIC );
+      prs->SetMaterial (Graphic3d_NameOfMaterial_Plastified);
     }
 //    Quantity_Color Col;
 //    if ( colors.GetColor ( seq.Value(i), XCAFDoc_ColorSurf, Col ) )
@@ -568,7 +573,7 @@ static Standard_Integer show (Draw_Interpretor& di, Standard_Integer argc, const
     Handle(TPrsStd_AISPresentation) prs;
     if ( ! seq.Value(i).FindAttribute ( TPrsStd_AISPresentation::GetID(), prs ) ) {
       prs = TPrsStd_AISPresentation::Set(seq.Value(i),XCAFPrs_Driver::GetID());
-      prs->SetMaterial ( Graphic3d_NOM_PLASTIC );
+      prs->SetMaterial (Graphic3d_NameOfMaterial_Plastified);
     }
 //    Quantity_Color Col;
 //    if ( colors.GetColor ( seq.Value(i), XCAFDoc_ColorSurf, Col ) )
@@ -745,7 +750,7 @@ private:
       {
         myToPrefixDocName = Standard_True;
         if (anArgIter + 1 < theNbArgs
-         && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], myToPrefixDocName))
+         && Draw::ParseOnOff (theArgVec[anArgIter + 1], myToPrefixDocName))
         {
           ++anArgIter;
         }
@@ -759,7 +764,7 @@ private:
       {
         myToGetNames = Standard_True;
         if (anArgIter + 1 < theNbArgs
-         && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], myToGetNames))
+         && Draw::ParseOnOff (theArgVec[anArgIter + 1], myToGetNames))
         {
           ++anArgIter;
         }
@@ -773,7 +778,7 @@ private:
       {
         myToExplore = Standard_True;
         if (anArgIter + 1 < theNbArgs
-         && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], myToExplore))
+         && Draw::ParseOnOff (theArgVec[anArgIter + 1], myToExplore))
         {
           ++anArgIter;
         }
@@ -966,18 +971,15 @@ static Standard_Integer XAttributeValue (Draw_Interpretor& di, Standard_Integer 
   }
   else if ( att->IsKind(STANDARD_TYPE(TDataStd_Name)) ) {
     Handle(TDataStd_Name) val = Handle(TDataStd_Name)::DownCast ( att );
-    TCollection_AsciiString str ( val->Get(), '?' );
-    di << str.ToCString();
+    di << val->Get();
   }
   else if ( att->IsKind(STANDARD_TYPE(TDataStd_Comment)) ) {
     Handle(TDataStd_Comment) val = Handle(TDataStd_Comment)::DownCast ( att );
-    TCollection_AsciiString str ( val->Get(), '?' );
-    di << str.ToCString();
+    di << val->Get();
   }
   else if ( att->IsKind(STANDARD_TYPE(TDataStd_AsciiString)) ) {
     Handle(TDataStd_AsciiString) val = Handle(TDataStd_AsciiString)::DownCast ( att );
-    TCollection_AsciiString str ( val->Get(), '?' );
-    di << str.ToCString();
+    di << val->Get();
   }
   else if ( att->IsKind(STANDARD_TYPE(TDataStd_IntegerArray)) ) {
     Handle(TDataStd_IntegerArray) val = Handle(TDataStd_IntegerArray)::DownCast ( att );
@@ -1216,7 +1218,7 @@ static Standard_Integer XSetTransparency (Draw_Interpretor& di, Standard_Integer
     Handle(TPrsStd_AISPresentation) prs;
     if ( ! seq.Value(i).FindAttribute ( TPrsStd_AISPresentation::GetID(), prs ) ) {
       prs = TPrsStd_AISPresentation::Set(seq.Value(i),XCAFPrs_Driver::GetID());
-      prs->SetMaterial ( Graphic3d_NOM_PLASTIC );
+      prs->SetMaterial (Graphic3d_NameOfMaterial_Plastified);
     }
     prs->SetTransparency( aTransparency );
   }

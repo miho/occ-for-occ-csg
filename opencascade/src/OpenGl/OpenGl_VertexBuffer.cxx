@@ -161,6 +161,33 @@ bool OpenGl_VertexBuffer::subData (const Handle(OpenGl_Context)& theGlCtx,
 }
 
 // =======================================================================
+// function : getSubData
+// purpose  :
+// =======================================================================
+bool OpenGl_VertexBuffer::getSubData (const Handle(OpenGl_Context)& theGlCtx,
+                                      const GLsizei theElemFrom,
+                                      const GLsizei theElemsNb,
+                                      void*         theData,
+                                      const GLenum  theDataType)
+{
+  if (!IsValid() || myDataType != theDataType
+   || theElemFrom < 0 || ((theElemFrom + theElemsNb) > myElemsNb)
+   || !theGlCtx->hasGetBufferData)
+  {
+    return false;
+  }
+
+  Bind (theGlCtx);
+  const size_t  aDataSize = sizeOfGlType (theDataType);
+  const GLintptr anOffset = GLintptr (theElemFrom) * GLintptr  (myComponentsNb) * aDataSize;
+  const GLsizeiptr  aSize = GLsizeiptr(theElemsNb) * GLsizeiptr(myComponentsNb) * aDataSize;
+  bool isDone = theGlCtx->GetBufferSubData (GetTarget(), anOffset, aSize, theData);
+  isDone = isDone && (glGetError() == GL_NO_ERROR);
+  Unbind (theGlCtx);
+  return isDone;
+}
+
+// =======================================================================
 // function : BindVertexAttrib
 // purpose  :
 // =======================================================================
@@ -250,3 +277,21 @@ void OpenGl_VertexBuffer::unbindFixedColor (const Handle(OpenGl_Context)& theCtx
   theCtx->ShaderManager()->UpdateMaterialState();
 }
 #endif
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_VertexBuffer::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, OpenGl_Resource)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, GetTarget())
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myOffset)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myBufferId)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myComponentsNb)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myElemsNb)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDataType)
+}

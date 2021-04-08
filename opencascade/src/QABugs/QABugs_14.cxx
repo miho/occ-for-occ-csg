@@ -239,7 +239,8 @@ static Standard_Integer BUC60854 (Draw_Interpretor& /*di*/, Standard_Integer arg
     else
       return 1;
   }
-  for (i++; i<argc; i+=2) {
+  i++;
+  while (argv[i][0] != '#') {
     TopoDS_Shape Ew,Es;
     TopoDS_Shape aLocalShape(DBRep::Get(argv[i],TopAbs_EDGE));
     Es = TopoDS::Edge(aLocalShape);
@@ -252,13 +253,24 @@ static Standard_Integer BUC60854 (Draw_Interpretor& /*di*/, Standard_Integer arg
       return 1;
     }
     Spls.Add(TopoDS::Edge(Ew),TopoDS::Edge(Es));
+    i += 2;
   }
   Spls.Build();
   const TopTools_ListOfShape& aLeftPart = Spls.Left();
+  const TopTools_ListOfShape& aRightPart = Spls.Right();
   BRep_Builder BB;
   TopoDS_Shape aShell;
   BB.MakeShell(TopoDS::Shell(aShell));
-  TopTools_ListIteratorOfListOfShape anIter(aLeftPart);
+  TopTools_ListIteratorOfListOfShape anIter;
+  if (argv[argc - 1][0] == 'L') {
+    anIter.Initialize(aLeftPart);
+  } 
+  else if (argv[argc - 1][0] == 'R') {
+    anIter.Initialize(aRightPart);
+  }
+  else {
+    return 1;
+  }
   for(; anIter.More(); anIter.Next()) BB.Add(aShell, anIter.Value());
   aShell.Closed (BRep_Tool::IsClosed (aShell));
   DBRep::Set(argv[1],aShell);
@@ -662,10 +674,6 @@ static Standard_Integer  OCC983 (Draw_Interpretor& di, Standard_Integer argc, co
     di << "       AttributeValue = " << itemValue.ToCString() << "\n";
   }
 
-//  LDOM_Element element;
-//  for ( element = (const LDOM_Element&) root.getFirstChild();
-//       !element.isNull();
-//       element = (const LDOM_Element&) element.getNextSibling() ) {
   LDOM_Element element;
   LDOM_Node    node;
   for ( node = root.getFirstChild(), element = (const LDOM_Element&) node;
@@ -681,6 +689,25 @@ static Standard_Integer  OCC983 (Draw_Interpretor& di, Standard_Integer argc, co
       di << "       AttributeName = " << itemName2.ToCString() << "\n";
       di << "       AttributeValue = " << itemValue2.ToCString() << "\n";
     }
+  }
+  if (aParser.GetBOM() != LDOM_OSStream::BOM_UNDEFINED)
+  {
+    di << "BOM is ";
+    switch (aParser.GetBOM()) {
+    case LDOM_OSStream::BOM_UTF8: di << "UTF-8"; break;
+    case LDOM_OSStream::BOM_UTF16BE: di << "UTF-16 (BE)"; break;
+    case LDOM_OSStream::BOM_UTF16LE: di << "UTF-16 (LE)"; break;
+    case LDOM_OSStream::BOM_UTF32BE: di << "UTF-32 (BE)"; break;
+    case LDOM_OSStream::BOM_UTF32LE: di << "UTF-32 (LE)"; break;
+    case LDOM_OSStream::BOM_UTF7: di << "UTF-7"; break;
+    case LDOM_OSStream::BOM_UTF1: di << "UTF-1"; break;
+    case LDOM_OSStream::BOM_UTFEBCDIC: di << "UTF-EBCDIC"; break;
+    case LDOM_OSStream::BOM_SCSU: di << "SCSU"; break;
+    case LDOM_OSStream::BOM_BOCU1: di << "BOCU-1"; break;
+    case LDOM_OSStream::BOM_GB18030: di << "GB-18030"; break;
+    default: di << "unexpected";
+    }
+    di << "\n";
   }
 
   return 0;
@@ -1044,7 +1071,7 @@ void QABugs::Commands_14(Draw_Interpretor& theCommands) {
   theCommands.Add ("BUC60897", "BUC60897", __FILE__, BUC60897, group);
   theCommands.Add ("BUC60889", "BUC60889 point_1 point_2 name_of_edge bndbox_X1 bndbox_Y1 bndbox_Z1 bndbox_X2 bndbox_Y2 bndbox_Z2", __FILE__, BUC60889, group);
   theCommands.Add ("BUC60852", "BUC60852 name_of_edge bndbox_X1 bndbox_Y1 bndbox_Z1 bndbox_X2 bndbox_Y2 bndbox_Z2", __FILE__, BUC60852, group);
-  theCommands.Add ("BUC60854", "BUC60854 result_shape name_of_shape name_of_face name_of_wire/name_of_edge [ name_of_wire/name_of_edge ... ] [ name_of_face name_of_wire/name_of_edge [ name_of_wire/name_of_edge ... ] ... ] [ @ edge_on_shape edge_on_wire [ edge_on_shape edge_on_wire ... ] ] ", __FILE__, BUC60854, group);
+  theCommands.Add ("BUC60854", "BUC60854 result_shape name_of_shape name_of_face name_of_wire/name_of_edge [ name_of_wire/name_of_edge ... ] [ name_of_face name_of_wire/name_of_edge [ name_of_wire/name_of_edge ... ] ... ] [ @ edge_on_shape edge_on_wire [ edge_on_shape edge_on_wire ... ] ] [ # L/R ]", __FILE__, BUC60854, group);
   theCommands.Add ("BUC60870", "BUC60870 result name_of_shape_1 name_of_shape_2 dev", __FILE__, BUC60870, group);
   theCommands.Add ("BUC60902", "BUC60902", __FILE__, BUC60902, group);
   theCommands.Add ("BUC60944", "BUC60944 path", __FILE__, BUC60944, group);

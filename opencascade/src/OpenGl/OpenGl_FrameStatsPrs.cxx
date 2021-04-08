@@ -389,7 +389,7 @@ void OpenGl_FrameStatsPrs::Render (const Handle(OpenGl_Workspace)& theWorkspace)
     aCtx->WorldViewState.Push();
     if (!myCountersTrsfPers.IsNull())
     {
-      myCountersTrsfPers->Apply (theWorkspace->View()->Camera(),
+      myCountersTrsfPers->Apply (aCtx->Camera(),
                                  aCtx->ProjectionState.Current(), aCtx->WorldViewState.ChangeCurrent(),
                                  aCtx->VirtualViewport()[2], aCtx->VirtualViewport()[3]);
     }
@@ -453,4 +453,15 @@ void OpenGl_FrameStatsPrs::Render (const Handle(OpenGl_Workspace)& theWorkspace)
     theWorkspace->UseDepthWrite() = wasEnabledDepth;
     glDepthMask (wasEnabledDepth ? GL_TRUE : GL_FALSE);
   }
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_FrameStatsPrs::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_FrameStatsPrs)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, OpenGl_Element)
 }

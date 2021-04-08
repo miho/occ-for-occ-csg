@@ -86,6 +86,13 @@
 #include <Extrema_ExtPS.hxx>
 #include <BRepTools.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
+#include <ElCLib.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
+#include <GCPnts_AbscissaPoint.hxx>
+#include <ElSLib.hxx>
+#include <GeomProjLib.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(ShapeUpgrade_UnifySameDomain,Standard_Transient)
 
@@ -483,12 +490,14 @@ static Standard_Boolean FindClosestPoints(const TopoDS_Edge& theEdge1,
 //purpose  : auxilary
 //=======================================================================
 static void ReconstructMissedSeam(const TopTools_SequenceOfShape& theEdges,
+                                  const TopTools_SequenceOfShape& theRemovedEdges,
                                   const TopTools_MapOfShape&      theUsedEdges,
                                   const TopoDS_Face&              theFrefFace,
                                   const TopoDS_Vertex&            theCurVertex,
                                   const gp_Pnt2d&                 theCurPoint,
-                                  const Standard_Real             theUperiod,
-                                  const Standard_Real             theFaceUmin,
+                                  const Standard_Real             thePeriod,
+                                  const Standard_Real             theFaceCoordMin,
+                                  const Standard_Boolean          theIsU,
                                   const Standard_Real             theCoordTol,
                                   TopoDS_Edge&                    theNextEdge,
                                   TopoDS_Wire&                    theNewWire,
@@ -499,16 +508,24 @@ static void ReconstructMissedSeam(const TopTools_SequenceOfShape& theEdges,
                                   
 {
   Handle(Geom_Surface) RefSurf = BRep_Tool::Surface(theFrefFace);
-  GeomAbs_Shape aContinuity = (RefSurf->IsUPeriodic())? GeomAbs_CN : GeomAbs_C0;
+  GeomAbs_Shape aContinuity;
+  if (theIsU)
+    aContinuity = (RefSurf->IsUPeriodic())? GeomAbs_CN : GeomAbs_C0;
+  else
+    aContinuity = (RefSurf->IsVPeriodic())? GeomAbs_CN : GeomAbs_C0;
+
+  Standard_Integer IndCoord = theIsU? 1 : 2;
   
-  Standard_Real Ydir = 1.; //up
-  if (Abs(theCurPoint.X() - theFaceUmin) <= theCoordTol)
-    Ydir = -1.; //down
+  Standard_Real SeamDir = 1.; //up or right
+  if (theIsU && Abs(theCurPoint.Coord(IndCoord) - theFaceCoordMin) <= theCoordTol)
+    SeamDir = -1.; //down
+  else if (!theIsU && Abs(theCurPoint.Coord(IndCoord) - theFaceCoordMin) > theCoordTol)
+    SeamDir = -1.; //left
 
   //Consider as the candidate to be next edge:
-  //only the edge that has first point with X-coordinate close to X-coordinate of theCurPoint
-  //Choose from candidates the edge that is closest to theCurPoint in the defined direction Ydir
-  Standard_Real MinDeltaY = RealLast();
+  //only the edge that has first point with X(or Y)-coordinate close to X(or Y)-coordinate of theCurPoint
+  //Choose from candidates the edge that is closest to theCurPoint in the defined direction SeamDir
+  Standard_Real MinDeltaSeamCoord = RealLast();
   for (Standard_Integer ind = 1; ind <= theEdges.Length(); ind++)
   {
     const TopoDS_Edge& aCandidate = TopoDS::Edge(theEdges(ind));
@@ -518,17 +535,17 @@ static void ReconstructMissedSeam(const TopTools_SequenceOfShape& theEdges,
     Standard_Real CandParam = (aCandidate.Orientation() == TopAbs_FORWARD)?
       BAcurve2d.FirstParameter() : BAcurve2d.LastParameter();
     gp_Pnt2d CandPoint = BAcurve2d.Value(CandParam);
-    Standard_Real DeltaX = Abs(CandPoint.X() - theCurPoint.X());
-    if (DeltaX > theCoordTol)
+    Standard_Real DeltaCoord = Abs(CandPoint.Coord(IndCoord) - theCurPoint.Coord(IndCoord));
+    if (DeltaCoord > theCoordTol)
       continue;
     
-    Standard_Real DeltaY = CandPoint.Y() - theCurPoint.Y();
-    DeltaY *= Ydir;
-    if (DeltaY < 0.) //on the other side from CurPoint
+    Standard_Real DeltaSeamCoord = CandPoint.Coord(3-IndCoord) - theCurPoint.Coord(3-IndCoord);
+    DeltaSeamCoord *= SeamDir;
+    if (DeltaSeamCoord < 0.) //on the other side from CurPoint
       continue;
-    if (DeltaY < MinDeltaY)
+    if (DeltaSeamCoord < MinDeltaSeamCoord)
     {
-      MinDeltaY = DeltaY;
+      MinDeltaSeamCoord = DeltaSeamCoord;
       theNextEdge = aCandidate;
       theStartOfNextEdge = CandPoint;
     }
@@ -536,52 +553,143 @@ static void ReconstructMissedSeam(const TopTools_SequenceOfShape& theEdges,
   
   //Build missed seam edge
   theLastVertexOfSeam = TopExp::FirstVertex(theNextEdge, Standard_True); //with orientation
-  Standard_Real CurTol  = BRep_Tool::Tolerance(theCurVertex);
-  Standard_Real LastTol = BRep_Tool::Tolerance(theLastVertexOfSeam);
-  Standard_Real anU = (CurTol < LastTol)? theCurPoint.X() : theStartOfNextEdge.X();
-  Handle(Geom_Curve) Uiso = RefSurf->UIso(anU);
   TopoDS_Vertex V1, V2;
-  Standard_Real Param1, Param2;
-  if (Ydir > 0)
-  {
-    V1 = theCurVertex; V2 = theLastVertexOfSeam;
-    Param1 = theCurPoint.Y(); Param2 = theStartOfNextEdge.Y();
-  }
-  else
-  {
-    V1 = theLastVertexOfSeam; V2 = theCurVertex;
-    Param1 = theStartOfNextEdge.Y(); Param2 = theCurPoint.Y();
-  }
-  TopoDS_Edge MissedSeam = BRepLib_MakeEdge(Uiso, V1, V2, Param1, Param2);
-  Standard_Real Vorigin = 0.;
-  //Correct Param1 and Param2 if needed:
-  //when Uiso-curve is periodic and Param1 and Param2 do not fit into V-range of surface,
-  //BRepLib_MakeEdge may shift Param1 and Param2
-  Standard_Real InitialParam1 = Param1, InitialParam2 = Param2;
-  Handle(Geom_Curve) MissedCurve = BRep_Tool::Curve(MissedSeam, Param1, Param2);
-  if ((Param1 != InitialParam1 || Param2 != InitialParam2) &&
-      MissedCurve->IsPeriodic())
-  {
-    //Vorigin = -(MissedCurve->Period());
-    Vorigin = -(Param1 - InitialParam1);
-  }
-  /////////////////////////////////////
-  Handle(Geom2d_Line) PC1 = new Geom2d_Line(gp_Pnt2d(anU, Vorigin), gp_Dir2d(0., 1.));
-  gp_Vec2d Offset(theUperiod, 0.);
-  if (Ydir > 0)
-    Offset *= -1;
-  Handle(Geom2d_Curve) PC2 = Handle(Geom2d_Curve)::DownCast(PC1->Copy());
-  PC2->Translate(Offset);
+  Standard_Real Param1, Param2, aCoord = 0.;
+  Handle(Geom_Curve) Iso;
   
-  BRep_Builder BB;
-  if (Ydir > 0)
-    BB.UpdateEdge(MissedSeam, PC1, PC2, theFrefFace, 0.);
+  TopoDS_Edge aRemovedEdge; //try to find it in <RemovedEdges>
+  for (Standard_Integer i = 1; i <= theRemovedEdges.Length(); i++)
+  {
+    const TopoDS_Edge& anEdge = TopoDS::Edge(theRemovedEdges(i));
+    Handle(Geom2d_Curve) aPC = BRep_Tool::CurveOnSurface(anEdge, theFrefFace, Param1, Param2);
+    if (aPC.IsNull())
+      continue;
+    
+    GeomAbs_Shape aContOnRefFace = BRep_Tool::Continuity(anEdge, theFrefFace, theFrefFace);
+    if (aContOnRefFace > aContinuity)
+      aContinuity = aContOnRefFace;
+    
+    TopoDS_Vertex aV1, aV2;
+    TopExp::Vertices(anEdge, aV1, aV2);
+    if ((aV1.IsSame(theCurVertex) && aV2.IsSame(theLastVertexOfSeam)) ||
+        (aV1.IsSame(theLastVertexOfSeam) && aV2.IsSame(theCurVertex)))
+    {
+      aRemovedEdge = anEdge;
+      break;
+    }
+  }
+  if (aRemovedEdge.IsNull())
+  {
+    Standard_Real CurTol  = BRep_Tool::Tolerance(theCurVertex);
+    Standard_Real LastTol = BRep_Tool::Tolerance(theLastVertexOfSeam);
+    aCoord = (CurTol < LastTol)? theCurPoint.Coord(IndCoord) : theStartOfNextEdge.Coord(IndCoord);
+    Iso = (theIsU)? RefSurf->UIso(aCoord) : RefSurf->VIso(aCoord);
+    if (SeamDir > 0)
+    {
+      V1 = theCurVertex; V2 = theLastVertexOfSeam;
+      Param1 = theCurPoint.Coord(3-IndCoord); Param2 = theStartOfNextEdge.Coord(3-IndCoord);
+    }
+    else
+    {
+      V1 = theLastVertexOfSeam; V2 = theCurVertex;
+      Param1 = theStartOfNextEdge.Coord(3-IndCoord); Param2 = theCurPoint.Coord(3-IndCoord);
+    }
+  }
   else
-    BB.UpdateEdge(MissedSeam, PC2, PC1, theFrefFace, 0.);
-  BB.Continuity(MissedSeam, theFrefFace, theFrefFace, aContinuity);
-  if (Ydir < 0)
-    MissedSeam.Reverse();
+  {
+    TopExp::Vertices(aRemovedEdge, V1, V2);
+    Iso = BRep_Tool::Curve(aRemovedEdge, Param1, Param2);
+  }
+  
+  TopoDS_Edge MissedSeam = BRepLib_MakeEdge(Iso, V1, V2, Param1, Param2);
+  BRep_Builder BB;
+  
+  //gp_Vec2d Offset(theUperiod, 0.);
+  gp_Vec2d Offset;
+  if (theIsU)
+    Offset.SetCoord(thePeriod, 0.);
+  else
+    Offset.SetCoord(0., thePeriod);
+  if (aRemovedEdge.IsNull())
+  {
+    Standard_Real SeamCoordOrigin = 0.;
+    //Correct Param1 and Param2 if needed:
+    //when iso-curve is periodic and Param1 and Param2 do not fit into SeamCoord-range of surface,
+    //(for example, V-range of sphere)
+    //BRepLib_MakeEdge may shift Param1 and Param2
+    Standard_Real InitialParam1 = Param1, InitialParam2 = Param2;
+    Handle(Geom_Curve) MissedCurve = BRep_Tool::Curve(MissedSeam, Param1, Param2);
+    if ((Param1 != InitialParam1 || Param2 != InitialParam2) &&
+        MissedCurve->IsPeriodic())
+    {
+      //Vorigin = -(MissedCurve->Period());
+      SeamCoordOrigin = -(Param1 - InitialParam1);
+    }
+    /////////////////////////////////////
+    //Handle(Geom2d_Line) PC1 = new Geom2d_Line(gp_Pnt2d(anU, Vorigin), gp_Dir2d(0., 1.));
+    Handle(Geom2d_Line) PC1;
+    if (theIsU)
+      PC1 = new Geom2d_Line(gp_Pnt2d(aCoord, SeamCoordOrigin), gp_Dir2d(0., 1.));
+    else
+      PC1 = new Geom2d_Line(gp_Pnt2d(SeamCoordOrigin, aCoord), gp_Dir2d(1., 0.));
+    
+    Handle(Geom2d_Curve) PC2 = Handle(Geom2d_Curve)::DownCast(PC1->Copy());
+    if (theIsU && SeamDir > 0)
+      Offset *= -1;
+    else if (!theIsU && SeamDir < 0)
+      Offset *= -1;
+    PC2->Translate(Offset);
+    
+    if (SeamDir > 0)
+      BB.UpdateEdge(MissedSeam, PC1, PC2, theFrefFace, 0.);
+    else
+      BB.UpdateEdge(MissedSeam, PC2, PC1, theFrefFace, 0.);
 
+    if (SeamDir < 0)
+      MissedSeam.Reverse();
+  }
+  else
+  {
+    TopoDS_Edge aSeam = aRemovedEdge;
+    aSeam.Orientation(TopAbs_FORWARD);
+    Handle(Geom2d_Curve) PC1 = BRep_Tool::CurveOnSurface(aSeam, theFrefFace, Param1, Param2);
+    aSeam.Reverse();
+    Handle(Geom2d_Curve) PC2 = BRep_Tool::CurveOnSurface(aSeam, theFrefFace, Param1, Param2);
+    Standard_Boolean IsSeam = (PC1 != PC2);
+    if (!IsSeam) //it was not a seam
+    {
+      aCoord = theCurPoint.Coord(IndCoord);
+      gp_Pnt2d PointOnRemovedEdge = PC1->Value(Param1);
+      Standard_Real CoordOfRemovededge = PointOnRemovedEdge.Coord(IndCoord);
+      if (Abs(aCoord - CoordOfRemovededge) > thePeriod/2)
+      {
+        Standard_Real Sign = (aCoord > CoordOfRemovededge)? 1 : -1;
+        Offset *= Sign;
+        PC1 = Handle(Geom2d_Curve)::DownCast(PC2->Copy());
+        PC1->Translate(Offset);
+      }
+      else
+      {
+        if (SeamDir > 0)
+          Offset *= -1;
+        PC2 = Handle(Geom2d_Curve)::DownCast(PC1->Copy());
+        PC2->Translate(Offset);
+      }
+    }
+    if (theCurVertex.IsSame(V1))
+      BB.UpdateEdge(MissedSeam, PC1, PC2, theFrefFace, 0.);
+    else
+    {
+      if (IsSeam)
+        BB.UpdateEdge(MissedSeam, PC1, PC2, theFrefFace, 0.);
+      else
+        BB.UpdateEdge(MissedSeam, PC2, PC1, theFrefFace, 0.);
+      
+      MissedSeam.Reverse();
+    }
+  }
+
+  BB.Continuity(MissedSeam, theFrefFace, theFrefFace, aContinuity);
   BB.Add(theNewWire, MissedSeam);
   //add newly created edge into VEmap
   MissedSeam.Reverse();
@@ -594,6 +702,142 @@ static void ReconstructMissedSeam(const TopTools_SequenceOfShape& theEdges,
 }
 
 //=======================================================================
+//function : SameSurf
+//purpose  : auxilary
+//=======================================================================
+static Standard_Boolean SameSurf(const Handle(Geom_Surface)& theS1, const Handle(Geom_Surface)& theS2)
+{
+  static Standard_Real aCoefs[2] = { 0.3399811, 0.7745966 };
+
+  Standard_Real uf1, ul1, vf1, vl1, uf2, ul2, vf2, vl2;
+  theS1->Bounds(uf1, ul1, vf1, vl1);
+  theS2->Bounds(uf2, ul2, vf2, vl2);
+  Standard_Real aPTol = Precision::PConfusion();
+  if (Precision::IsNegativeInfinite(uf1))
+  {
+    if (!Precision::IsNegativeInfinite(uf2))
+    {
+      return Standard_False;
+    }
+    else
+    {
+      uf1 = Min(-1., (ul1 - 1.));
+    }
+  }
+  else
+  {
+    if (Precision::IsNegativeInfinite(uf2))
+    {
+      return Standard_False;
+    }
+    else
+    {
+      if (Abs(uf1 - uf2) > aPTol)
+      {
+        return Standard_False;
+      }
+    }
+  }
+  //
+  if (Precision::IsNegativeInfinite(vf1))
+  {
+    if (!Precision::IsNegativeInfinite(vf2))
+    {
+      return Standard_False;
+    }
+    else
+    {
+      vf1 = Min(-1., (vl1 - 1.));
+    }
+  }
+  else
+  {
+    if (Precision::IsNegativeInfinite(vf2))
+    {
+      return Standard_False;
+    }
+    else
+    {
+      if (Abs(vf1 - vf2) > aPTol)
+      {
+        return Standard_False;
+      }
+    }
+  }
+  //
+  if (Precision::IsPositiveInfinite(ul1))
+  {
+    if (!Precision::IsPositiveInfinite(ul2))
+    {
+      return Standard_False;
+    }
+    else
+    {
+      ul1 = Max(1., (uf1 + 1.));
+    }
+  }
+  else
+  {
+    if (Precision::IsPositiveInfinite(ul2))
+    {
+      return Standard_False;
+    }
+    else
+    {
+      if (Abs(ul1 - ul2) > aPTol)
+      {
+        return Standard_False;
+      }
+    }
+  }
+  //
+  if (Precision::IsPositiveInfinite(vl1))
+  {
+    if (!Precision::IsPositiveInfinite(vl2))
+    {
+      return Standard_False;
+    }
+    else
+    {
+      vl1 = Max(1., (vf1 + 1.));
+    }
+  }
+  else
+  {
+    if (Precision::IsPositiveInfinite(vl2))
+    {
+      return Standard_False;
+    }
+    else
+    {
+      if (Abs(vl1 - vl2) > aPTol)
+      {
+        return Standard_False;
+      }
+    }
+  }
+  //
+
+  Standard_Real u, v, du = (ul1 - uf1), dv = (vl1 - vf1);
+  Standard_Integer i, j;
+  for (i = 0; i < 2; ++i)
+  {
+    u = uf1 + aCoefs[i] * du;
+    for (j = 0; j < 2; ++j)
+    {
+      v = vf1 + aCoefs[j] * dv;
+      gp_Pnt aP1 = theS1->Value(u, v);
+      gp_Pnt aP2 = theS2->Value(u, v);
+      if (!aP1.IsEqual(aP2, aPTol))
+      {
+        return Standard_False;
+      }
+    }
+  }
+
+  return Standard_True;
+}
+//=======================================================================
 //function : TransformPCurves
 //purpose  : auxilary
 //=======================================================================
@@ -601,129 +845,120 @@ static void TransformPCurves(const TopoDS_Face& theRefFace,
                              const TopoDS_Face& theFace,
                              TopTools_MapOfShape& theMapEdgesWithTemporaryPCurves)
 {
-  BRepAdaptor_Surface BAsurf(theFace, Standard_False);
-
-  Standard_Real Uperiod = 0., Vperiod = 0.;
   Handle(Geom_Surface) RefSurf = BRep_Tool::Surface(theRefFace);
   if (RefSurf->IsKind(STANDARD_TYPE(Geom_RectangularTrimmedSurface)))
     RefSurf = (Handle(Geom_RectangularTrimmedSurface)::DownCast(RefSurf))->BasisSurface();
-  if (RefSurf->IsUPeriodic())
-    Uperiod = RefSurf->UPeriod();
-  if (RefSurf->IsVPeriodic())
-    Vperiod = RefSurf->VPeriod();
 
-  GeomAdaptor_Surface RefGAsurf(RefSurf);
+  Handle(Geom_Surface) SurfFace = BRep_Tool::Surface(theFace);
+  if (SurfFace->IsKind(STANDARD_TYPE(Geom_RectangularTrimmedSurface)))
+    SurfFace = (Handle(Geom_RectangularTrimmedSurface)::DownCast(SurfFace))->BasisSurface();
 
-  Standard_Real Ufirst = BAsurf.FirstUParameter(),
-    Ulast = BAsurf.LastUParameter(),
-    Vfirst = BAsurf.FirstVParameter(),
-    Vlast = BAsurf.LastVParameter();
-
-  Standard_Real u_mid = (Ufirst + Ulast)/2, v_mid = (Vfirst + Vlast)/2;
-  gp_Pnt MidPoint = BAsurf.Value(u_mid, v_mid);
-  Extrema_ExtPS ProjPS(MidPoint, RefGAsurf,
-                       Precision::PConfusion(), Precision::PConfusion());
-  Standard_Integer indmin = 1;
-  for (Standard_Integer iext = 2; iext <= ProjPS.NbExt(); iext++)
-    if (ProjPS.SquareDistance(iext) < ProjPS.SquareDistance(indmin))
-      indmin = iext;
+  Standard_Boolean ToModify = Standard_False,
+    ToTranslate = Standard_False,
+    ToRotate = Standard_False,
+    X_Reverse = Standard_False,
+    Y_Reverse = Standard_False,
+    ToProject = Standard_False;
   
-  Standard_Real uu, vv;
-  ProjPS.Point(indmin).Parameter(uu,vv);
-  //Check uu and vv
-  if (Abs(u_mid + Uperiod - uu) <= Precision::PConfusion())
-    uu = u_mid;
-  if (Abs(u_mid - uu) <= Precision::PConfusion())
-    uu = u_mid;
-  if (Abs(v_mid + Vperiod - vv) <= Precision::PConfusion())
-    vv = v_mid;
-  if (Abs(v_mid - vv) <= Precision::PConfusion())
-    vv = v_mid;
-  gp_Vec2d Translation(uu - u_mid, vv - v_mid);
+  Standard_Real aTranslation = 0., anAngle = 0.;
 
-  Standard_Boolean X_Reverse = Standard_False, Y_Reverse = Standard_False;
-  Standard_Real u_dx, v_dx, u_dy, v_dy;
+  //Get axes of surface of face and of surface of RefFace
+  Handle(Geom_ElementarySurface) ElemSurfFace = Handle(Geom_ElementarySurface)::DownCast(SurfFace);
+  Handle(Geom_ElementarySurface) ElemRefSurf = Handle(Geom_ElementarySurface)::DownCast(RefSurf);
 
-  Standard_Real Delta = (Precision::IsInfinite(Ufirst) || Precision::IsInfinite(Ulast))?
-    1. : (Ulast - Ufirst)/4;
-  Standard_Real Offset = (Uperiod == 0.)? Delta : Min(Uperiod/8, Delta);
-  Standard_Real u1 = u_mid + Offset, v1 = v_mid;
-  gp_Pnt DX = BAsurf.Value(u1, v1);
-  ProjPS.Perform(DX);
-  indmin = 1;
-  for (Standard_Integer iext = 2; iext <= ProjPS.NbExt(); iext++)
-    if (ProjPS.SquareDistance(iext) < ProjPS.SquareDistance(indmin))
-      indmin = iext;
-
-  ProjPS.Point(indmin).Parameter(u_dx, v_dx);
-  if (Uperiod != 0. &&
-      Abs(uu - u_dx) > Uperiod/2)
+  if (!ElemSurfFace.IsNull() && !ElemRefSurf.IsNull())
   {
-    if (uu   < Uperiod/2 &&
-        u_dx > Uperiod/2)
+    gp_Ax3 AxisOfSurfFace = ElemSurfFace->Position();
+    gp_Ax3 AxisOfRefSurf = ElemRefSurf->Position();
+  
+    gp_Pnt OriginRefSurf  = AxisOfRefSurf.Location();
+
+    Standard_Real aParam = ElCLib::LineParameter(AxisOfSurfFace.Axis(), OriginRefSurf);
+
+    if (Abs(aParam) > Precision::PConfusion())
+      aTranslation = -aParam;
+
+    gp_Dir VdirSurfFace = AxisOfSurfFace.Direction();
+    gp_Dir VdirRefSurf  = AxisOfRefSurf.Direction();
+    gp_Dir XdirSurfFace = AxisOfSurfFace.XDirection();
+    gp_Dir XdirRefSurf  = AxisOfRefSurf.XDirection();
+  
+    gp_Dir CrossProd1 = AxisOfRefSurf.XDirection() ^ AxisOfRefSurf.YDirection();
+    gp_Dir CrossProd2 = AxisOfSurfFace.XDirection() ^ AxisOfSurfFace.YDirection();
+    if (CrossProd1 * CrossProd2 < 0.)
       X_Reverse = Standard_True;
-  }
-  else if (u_dx < uu)
-    X_Reverse = Standard_True;
 
-  Delta = (Precision::IsInfinite(Vfirst) || Precision::IsInfinite(Vlast))?
-    1. : (Vlast - Vfirst)/4;
-  Offset = (Vperiod == 0.)? Delta : Min(Vperiod/8, Delta);
-  Standard_Real u2 = u_mid, v2 = v_mid + Offset;
-  gp_Pnt DY = BAsurf.Value(u2, v2);
-  ProjPS.Perform(DY);
-  indmin = 1;
-  for (Standard_Integer iext = 2; iext <= ProjPS.NbExt(); iext++)
-    if (ProjPS.SquareDistance(iext) < ProjPS.SquareDistance(indmin))
-      indmin = iext;
-  
-  ProjPS.Point(indmin).Parameter(u_dy, v_dy);
-  if (Vperiod != 0. &&
-      Abs(vv - v_dy) > Vperiod/2)
-  {
-    if (vv   < Vperiod/2 &&
-        v_dy > Vperiod/2)
+    Standard_Real ScalProd = VdirSurfFace * VdirRefSurf;
+    if (ScalProd < 0.)
       Y_Reverse = Standard_True;
-  }
-  else if (v_dy < vv)
-    Y_Reverse = Standard_True;
-    
-  gp_Trsf2d aTrsf;
-  if (X_Reverse && Y_Reverse)
-    aTrsf.SetMirror(gp::Origin2d());
-  else if (X_Reverse)
-    aTrsf.SetMirror(gp::OY2d());
-  else if (Y_Reverse)
-    aTrsf.SetMirror(gp::OX2d());
 
-  aTrsf.SetTranslationPart(Translation);
+    if (!X_Reverse && !Y_Reverse)
+    {
+      gp_Dir DirRef = VdirRefSurf;
+      if (!AxisOfRefSurf.Direct())
+        DirRef.Reverse();
+      anAngle = XdirRefSurf.AngleWithRef(XdirSurfFace, DirRef);
+    }
+    else
+      anAngle = XdirRefSurf.Angle(XdirSurfFace);
+
+    ToRotate = (Abs(anAngle) > Precision::PConfusion());
+
+    ToTranslate = (Abs(aTranslation) > Precision::PConfusion());
+
+    ToModify = ToTranslate || ToRotate || X_Reverse || Y_Reverse;
+  }
+  else
+  {
+    if (!SameSurf(RefSurf, SurfFace))
+    {
+      ToProject = Standard_True;
+    }
+  }
 
   BRep_Builder BB;
   TopExp_Explorer Explo(theFace, TopAbs_EDGE);
   for (; Explo.More(); Explo.Next())
   {
     const TopoDS_Edge& anEdge = TopoDS::Edge(Explo.Current());
-    if (BRep_Tool::Degenerated(anEdge) &&
-        aTrsf.Form() != gp_Identity)
+    if (BRep_Tool::Degenerated(anEdge) && ToModify)
       continue;
     if (BRepTools::IsReallyClosed(anEdge, theFace))
       continue;
 
     Standard_Real fpar, lpar;
     Handle(Geom2d_Curve) PCurveOnRef = BRep_Tool::CurveOnSurface(anEdge, theRefFace, fpar, lpar);
-    if (!PCurveOnRef.IsNull())
+    if (!PCurveOnRef.IsNull() && !(ToModify || ToProject))
       continue;
 
     Handle(Geom2d_Curve) aPCurve = BRep_Tool::CurveOnSurface(anEdge, theFace, fpar, lpar);
-    Handle(Geom2d_Curve) aNewPCurve = Handle(Geom2d_Curve)::DownCast(aPCurve->Copy());
-    if (aTrsf.Form() != gp_Identity)
-      aNewPCurve->Transform(aTrsf);
+    Handle(Geom2d_Curve) aNewPCurve;
+    if (ToProject)
+    {
+      Handle(Geom_Curve) aC3d = BRep_Tool::Curve(anEdge, fpar, lpar);
+      aC3d = new Geom_TrimmedCurve(aC3d, fpar, lpar);
+      Standard_Real tol = BRep_Tool::Tolerance(anEdge);
+      tol = Min(tol, Precision::Approximation());
+      aNewPCurve =
+        GeomProjLib::Curve2d(aC3d, RefSurf);
+    }
+    else
+    {
+      aNewPCurve = Handle(Geom2d_Curve)::DownCast(aPCurve->Copy());
+    }
+    if (ToTranslate)
+      aNewPCurve->Translate(gp_Vec2d(0., aTranslation));
+    if (Y_Reverse)
+      aNewPCurve->Mirror(gp::OX2d());
+    if (X_Reverse)
+    {
+      aNewPCurve->Mirror(gp::OY2d());
+      aNewPCurve->Translate(gp_Vec2d(2*M_PI, 0.));
+    }
+    if (ToRotate)
+      aNewPCurve->Translate(gp_Vec2d(anAngle, 0.));
 
-    Standard_Real tmp_first, tmp_last;
-    Handle(Geom2d_Curve) aPCurveOnRefFace = BRep_Tool::CurveOnSurface(anEdge, theRefFace,
-                                                                      tmp_first, tmp_last);
-    if (aPCurveOnRefFace.IsNull())
-      theMapEdgesWithTemporaryPCurves.Add(anEdge);
+    theMapEdgesWithTemporaryPCurves.Add(anEdge);
     
     BB.UpdateEdge(anEdge, aNewPCurve, theRefFace, 0.);
     BB.Range(anEdge, fpar, lpar);
@@ -746,7 +981,8 @@ static void AddPCurves(const TopTools_SequenceOfShape& theFaces,
 
   for (Standard_Integer i = 1; i <= theFaces.Length(); i++)
   {
-    const TopoDS_Face& aFace = TopoDS::Face(theFaces(i));
+    TopoDS_Face aFace = TopoDS::Face(theFaces(i));
+    aFace.Orientation(TopAbs_FORWARD);
     if (aFace.IsSame(theRefFace))
       continue;
 
@@ -763,7 +999,8 @@ static void AddPCurves(const TopTools_SequenceOfShape& theFaces,
 // Returns true if one of original edges dropped
 static Standard_Boolean AddOrdinaryEdges(TopTools_SequenceOfShape& edges,
                                          const TopoDS_Shape aShape,
-                                         Standard_Integer& anIndex)
+                                         Standard_Integer& anIndex,
+                                         TopTools_SequenceOfShape& theRemovedEdges)
 {
   //map of edges
   TopTools_IndexedMapOfShape aNewEdges;
@@ -771,7 +1008,10 @@ static Standard_Boolean AddOrdinaryEdges(TopTools_SequenceOfShape& edges,
   for(TopExp_Explorer exp(aShape,TopAbs_EDGE); exp.More(); exp.Next()) {
     TopoDS_Shape edge = exp.Current();
     if(aNewEdges.Contains(edge))
+    {
       aNewEdges.RemoveKey(edge);
+      theRemovedEdges.Append(edge);
+    }
     else
       aNewEdges.Add(edge);
   }
@@ -785,6 +1025,7 @@ static Standard_Boolean AddOrdinaryEdges(TopTools_SequenceOfShape& edges,
 
       aNewEdges.RemoveKey(current);
       edges.Remove(i);
+      theRemovedEdges.Append(current);
       i--;
 
       if(!isDropped) {
@@ -924,7 +1165,8 @@ static Standard_Boolean GetNormalToSurface(const TopoDS_Face& theFace,
 static Standard_Boolean IsSameDomain(const TopoDS_Face& aFace,
                                      const TopoDS_Face& aCheckedFace,
                                      const Standard_Real theLinTol,
-                                     const Standard_Real theAngTol)
+                                     const Standard_Real theAngTol,
+                                     ShapeUpgrade_UnifySameDomain::DataMapOfFacePlane& theFacePlaneMap)
 {
   //checking the same handles
   TopLoc_Location L1, L2;
@@ -958,7 +1200,19 @@ static Standard_Boolean IsSameDomain(const TopoDS_Face& aFace,
       gp_Pln aPln2 = aPlanarityChecker2.Plan();
 
       if (aPln1.Position().Direction().IsParallel(aPln2.Position().Direction(), theAngTol) &&
-        aPln1.Distance(aPln2) < theLinTol) {
+        aPln1.Distance(aPln2) < theLinTol)
+      {
+        Handle(Geom_Plane) aPlaneOfFaces;
+        if (theFacePlaneMap.IsBound(aFace))
+          aPlaneOfFaces = theFacePlaneMap(aFace);
+        else if (theFacePlaneMap.IsBound(aCheckedFace))
+          aPlaneOfFaces = theFacePlaneMap(aCheckedFace);
+        else
+          aPlaneOfFaces = new Geom_Plane(aPln1);
+
+        theFacePlaneMap.Bind(aFace, aPlaneOfFaces);
+        theFacePlaneMap.Bind(aCheckedFace, aPlaneOfFaces);
+        
         return Standard_True;
       }
     }
@@ -1888,6 +2142,7 @@ void ShapeUpgrade_UnifySameDomain::Initialize(const TopoDS_Shape& aShape,
 
   myContext->Clear();
   myKeepShapes.Clear();
+  myFacePlaneMap.Clear();
   myHistory->Clear();
 }
 
@@ -2009,9 +2264,10 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
 
     // Boundary edges for the new face
     TopTools_SequenceOfShape edges;
+    TopTools_SequenceOfShape RemovedEdges;
 
     Standard_Integer dummy;
-    AddOrdinaryEdges(edges, aFace, dummy);
+    AddOrdinaryEdges(edges, aFace, dummy, RemovedEdges);
 
     // Faces to get unified with the current faces
     TopTools_SequenceOfShape faces;
@@ -2021,7 +2277,7 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
 
     // surface and location to construct result
     TopLoc_Location aBaseLocation;
-    Handle(Geom_Surface) aBaseSurface = BRep_Tool::Surface(aFace,aBaseLocation);
+    Handle(Geom_Surface) aBaseSurface = BRep_Tool::Surface(aFace);
     aBaseSurface = ClearRts(aBaseSurface);
     TopAbs_Orientation RefFaceOrientation = aFace.Orientation();
 
@@ -2034,6 +2290,7 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
     //these edges may be updated by temporary pcurves
     
     Standard_Real Uperiod = (aBaseSurface->IsUPeriodic())? aBaseSurface->UPeriod() : 0.;
+    Standard_Real Vperiod = (aBaseSurface->IsVPeriodic())? aBaseSurface->VPeriod() : 0.;
 
     // find adjacent faces to union
     Standard_Integer i;
@@ -2093,9 +2350,9 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
           }
         }
         //
-        if (IsSameDomain(aFace,aCheckedFace, myLinTol, myAngTol)) {
+        if (IsSameDomain(aFace,aCheckedFace, myLinTol, myAngTol, myFacePlaneMap)) {
 
-          if (AddOrdinaryEdges(edges,aCheckedFace,dummy)) {
+          if (AddOrdinaryEdges(edges, aCheckedFace, dummy, RemovedEdges)) {
             // sequence edges is modified
             i = dummy;
           }
@@ -2108,8 +2365,16 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
     }
 
     if (faces.Length() > 1) {
+      if (myFacePlaneMap.IsBound(faces(1)))
+      {
+        const Handle(Geom_Plane)& aPlane = myFacePlaneMap(faces(1));
+        TopLoc_Location aLoc;
+        BB.UpdateFace(RefFace, aPlane, aLoc, Precision::Confusion());
+      }
       //Add correct pcurves for the reference surface to the edges of other faces
-      AddPCurves(faces, RefFace, MapEdgesWithTemporaryPCurves);
+      TopoDS_Face F_RefFace = RefFace;
+      F_RefFace.Orientation(TopAbs_FORWARD);
+      AddPCurves(faces, F_RefFace, MapEdgesWithTemporaryPCurves);
       
       // fill in the connectivity map for selected faces
       TopTools_IndexedDataMapOfShapeListOfShape aMapEF;
@@ -2159,7 +2424,7 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
                 }
               }
               if (!hasConnectAnotherFaces) {
-                AddOrdinaryEdges(edges, faces(i), dummy);
+                AddOrdinaryEdges(edges, faces(i), dummy, RemovedEdges);
                 faces.Remove(i);
                 i--;
               }
@@ -2182,7 +2447,7 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
                 for (i = 1; i <= faces.Length(); i++) {
                   if (faces(i).IsEqual(aLF.First()) ||
                       faces(i).IsEqual(aLF.Last())) {
-                    AddOrdinaryEdges(edges, faces(i), dummy);
+                    AddOrdinaryEdges(edges, faces(i), dummy, RemovedEdges);
                     faces.Remove(i);
                     i--;
                   }
@@ -2246,6 +2511,10 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
     if (faces.Length() > 1)
     {
       Standard_Real CoordTol = Precision::Confusion();
+      TopTools_MapOfShape edgesMap;
+      CoordTol = ComputeMinEdgeSize(edges, F_RefFace, edgesMap);
+      CoordTol /= 10.;
+      CoordTol = Max(CoordTol, Precision::Confusion());
 
       TopTools_IndexedDataMapOfShapeListOfShape VEmap;
       for (Standard_Integer ind = 1; ind <= edges.Length(); ind++)
@@ -2255,11 +2524,6 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
       //Define boundaries in 2d space of RefFace
       if (Uperiod != 0.)
       {
-        TopTools_MapOfShape edgesMap;
-        CoordTol = ComputeMinEdgeSize(edges, F_RefFace, edgesMap);
-        CoordTol /= 10.;
-        CoordTol = Max(CoordTol, Precision::Confusion());
-
         //try to find a real seam edge - if it exists, do nothing
         Standard_Boolean SeamFound = Standard_False;
         for (Standard_Integer ii = 1; ii <= faces.Length(); ii++)
@@ -2361,32 +2625,41 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
       
       TopTools_SequenceOfShape NewFaces, NewWires;
       
-      if (Uperiod == 0)
+      if (Uperiod == 0 || Vperiod == 0)
       {
-        //Set the "period" for closed non-periodic surface
+        //Set the "periods" for closed non-periodic surface
         TopLoc_Location aLoc;
         Handle(Geom_Surface) aSurf = BRep_Tool::Surface(RefFace, aLoc);
         if (aSurf->IsKind(STANDARD_TYPE(Geom_RectangularTrimmedSurface)))
           aSurf = (Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurf))->BasisSurface();
         Standard_Real Ufirst, Ulast, Vfirst, Vlast;
         aSurf->Bounds(Ufirst, Ulast, Vfirst, Vlast);
-        if (aSurf->IsUClosed())
+        if (Uperiod == 0 && aSurf->IsUClosed())
           Uperiod = Ulast - Ufirst;
+        if (Vperiod == 0 && aSurf->IsVClosed())
+          Vperiod = Vlast - Vfirst;
       }
 
       TopTools_MapOfShape UsedEdges;
 
       Standard_Real FaceUmin = RealLast();
+      Standard_Real FaceVmin = RealLast();
       for (Standard_Integer ii = 1; ii <= edges.Length(); ii++)
       {
         const TopoDS_Edge& anEdge = TopoDS::Edge(edges(ii));
         BRepAdaptor_Curve2d aBAcurve(anEdge, F_RefFace);
         gp_Pnt2d aFirstPoint = aBAcurve.Value(aBAcurve.FirstParameter());
         gp_Pnt2d aLastPoint  = aBAcurve.Value(aBAcurve.LastParameter());
+        
         if (aFirstPoint.X() < FaceUmin)
           FaceUmin = aFirstPoint.X();
         if (aLastPoint.X() < FaceUmin)
           FaceUmin = aLastPoint.X();
+        
+        if (aFirstPoint.Y() < FaceVmin)
+          FaceVmin = aFirstPoint.Y();
+        if (aLastPoint.Y() < FaceVmin)
+          FaceVmin = aLastPoint.Y();
       }
 
       //Building new wires from <edges>
@@ -2443,8 +2716,19 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
                 //<edges> do not contain seams => we must reconstruct the seam up to <NextEdge>
                 gp_Pnt2d StartOfNextEdge;
                 TopoDS_Vertex LastVertexOfSeam;
-                ReconstructMissedSeam(edges, UsedEdges, F_RefFace, CurVertex,
-                                      CurPoint, Uperiod, FaceUmin, CoordTol,
+                ReconstructMissedSeam(edges, RemovedEdges, UsedEdges, F_RefFace, CurVertex,
+                                      CurPoint, Uperiod, FaceUmin, Standard_True, CoordTol,
+                                      NextEdge, aNewWire, NextPoint,
+                                      StartOfNextEdge, LastVertexOfSeam, VEmap);
+              }
+              else if (Vperiod != 0. &&
+                       Abs(StartPoint.Y() - CurPoint.Y()) > Vperiod/2) //end of parametric space
+              {
+                //<edges> do not contain seams => we must reconstruct the seam up to <NextEdge>
+                gp_Pnt2d StartOfNextEdge;
+                TopoDS_Vertex LastVertexOfSeam;
+                ReconstructMissedSeam(edges, RemovedEdges, UsedEdges, F_RefFace, CurVertex,
+                                      CurPoint, Vperiod, FaceVmin, Standard_False, CoordTol,
                                       NextEdge, aNewWire, NextPoint,
                                       StartOfNextEdge, LastVertexOfSeam, VEmap);
               }
@@ -2472,7 +2756,7 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
               TmpElist.Append(anEdge);
             }
             if (TmpElist.Extent() <= 1 ||
-                Uperiod != 0.)
+                (Uperiod != 0. || Vperiod != 0))
               TrueElist.Assign(TmpElist);
             else
             {
@@ -2515,20 +2799,25 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
               Handle(Geom2d_Curve) aPCurve = BRep_Tool::CurveOnSurface(anEdge, F_RefFace, fpar, lpar);
               Standard_Real aParam = (anEdge.Orientation() == TopAbs_FORWARD)? fpar : lpar;
               gp_Pnt2d aPoint = aPCurve->Value(aParam);
-              Standard_Real Diff = Abs(aPoint.X() - CurPoint.X());
+              Standard_Real DiffU = Abs(aPoint.X() - CurPoint.X());
+              Standard_Real DiffV = Abs(aPoint.Y() - CurPoint.Y());
               if (Uperiod != 0. &&
-                  Diff > CoordTol &&
-                  Abs(Diff - Uperiod) > CoordTol) //may be is is a deg.vertex
+                  DiffU > CoordTol &&
+                  Abs(DiffU - Uperiod) > CoordTol) //may be is is a deg.vertex
+                continue;
+              if (Vperiod != 0. &&
+                  DiffV > CoordTol &&
+                  Abs(DiffV - Vperiod) > CoordTol) //may be is is a deg.vertex
                 continue;
               
               //Check: may be <CurPoint> and <aPoint> are on Period from each other
-              if (Uperiod != 0. && Diff > Uperiod/2) //end of parametric space
+              if (Uperiod != 0. && DiffU > Uperiod/2) //end of parametric space
               {
                 //<edges> do not contain seams => we must reconstruct the seam up to <NextEdge>
                 gp_Pnt2d StartOfNextEdge;
                 TopoDS_Vertex LastVertexOfSeam;
-                ReconstructMissedSeam(edges, UsedEdges, F_RefFace, CurVertex,
-                                      CurPoint, Uperiod, FaceUmin, CoordTol,
+                ReconstructMissedSeam(edges, RemovedEdges, UsedEdges, F_RefFace, CurVertex,
+                                      CurPoint, Uperiod, FaceUmin, Standard_True, CoordTol,
                                       NextEdge, aNewWire, NextPoint,
                                       StartOfNextEdge, LastVertexOfSeam, VEmap);
                 
@@ -2539,6 +2828,23 @@ void ShapeUpgrade_UnifySameDomain::IntUnifyFaces(const TopoDS_Shape& theInpShape
                 
                 break;
               } //if (Uperiod != 0. && Abs(aPoint.X() - CurPoint.X()) > Uperiod/2)
+              else if (Vperiod != 0. && DiffV > Vperiod/2) //end of parametric space
+              {
+                //<edges> do not contain seams => we must reconstruct the seam up to <NextEdge>
+                gp_Pnt2d StartOfNextEdge;
+                TopoDS_Vertex LastVertexOfSeam;
+                ReconstructMissedSeam(edges, RemovedEdges, UsedEdges, F_RefFace, CurVertex,
+                                      CurPoint, Vperiod, FaceVmin, Standard_False, CoordTol,
+                                      NextEdge, aNewWire, NextPoint,
+                                      StartOfNextEdge, LastVertexOfSeam, VEmap);
+                
+                //Check: may be it is the end
+                if (LastVertexOfSeam.IsSame(StartVertex) &&
+                    Abs(StartPoint.Y() - StartOfNextEdge.Y()) < Vperiod/2)
+                  EndOfWire = Standard_True;
+                
+                break;
+              }
               else
               {
                 NextEdge = anEdge;

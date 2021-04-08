@@ -13,12 +13,12 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <TDataStd_DeltaOnModificationOfRealArray.hxx>
 
 #include <Standard_Type.hxx>
 #include <TColStd_HArray1OfReal.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <TColStd_ListOfInteger.hxx>
-#include <TDataStd_DeltaOnModificationOfRealArray.hxx>
 #include <TDataStd_RealArray.hxx>
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_DeltaOnModification.hxx>
@@ -36,7 +36,9 @@ IMPLEMENT_STANDARD_RTTIEXT(TDataStd_DeltaOnModificationOfRealArray,TDF_DeltaOnMo
 
 TDataStd_DeltaOnModificationOfRealArray::
   TDataStd_DeltaOnModificationOfRealArray(const Handle(TDataStd_RealArray)& OldAtt)
-: TDF_DeltaOnModification(OldAtt)
+: TDF_DeltaOnModification(OldAtt),
+  myUp1(0),
+  myUp2(0)
 {
   Handle(TDataStd_RealArray) CurrAtt;
   if (Label().FindAttribute(OldAtt->ID(),CurrAtt)) {

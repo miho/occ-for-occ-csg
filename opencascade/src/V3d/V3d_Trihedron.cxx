@@ -292,6 +292,7 @@ void V3d_Trihedron::compute()
   Standard_Integer aGroupIter = myStructure->Groups().Lower();
   {
     Handle(Graphic3d_Group) aSphereGroup = addGroup (myStructure, aGroupIter);
+    aSphereGroup->SetClosed (!myIsWireframe);
 
     // Display origin.
     if (myIsWireframe)
@@ -322,6 +323,7 @@ void V3d_Trihedron::compute()
     for (Standard_Integer anIter = 0; anIter < 3; ++anIter)
     {
       Handle(Graphic3d_Group) anAxisGroup = addGroup (myStructure, aGroupIter);
+      anAxisGroup->SetClosed (!myIsWireframe);
       if (myIsWireframe)
       {
         // create a tube
@@ -356,4 +358,38 @@ void V3d_Trihedron::compute()
       Prs3d_Text::Draw (aLabelGroup, myTextAspect, aLabels[anAxisIter], aPoints[anAxisIter]);
     }
   }
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void V3d_Trihedron::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySphereShadingAspect.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, mySphereLineAspect.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTextAspect.get())
+
+  for (Standard_Integer anIter = 0; anIter < 3; anIter++)
+  {
+    const Handle(Prs3d_ShadingAspect)& anArrowShadinAspect = myArrowShadingAspects[anIter];
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, anArrowShadinAspect.get())
+  }
+  for (Standard_Integer anIter = 0; anIter < 3; anIter++)
+  {
+    const Handle(Prs3d_LineAspect)& anArrowLineAspect = myArrowLineAspects[anIter];
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, anArrowLineAspect.get())
+  }
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myStructure.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTransformPers.get())
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myScale)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myRatio)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDiameter)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNbFacettes)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsWireframe)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToCompute)
 }

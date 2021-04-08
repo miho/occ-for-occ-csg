@@ -18,7 +18,6 @@
 #include <CDF_Application.hxx>
 #include <CDF_MetaDataDriver.hxx>
 #include <CDF_MetaDataDriverError.hxx>
-#include <CDF_Session.hxx>
 #include <CDF_StoreList.hxx>
 #include <CDM_Document.hxx>
 #include <CDM_MetaData.hxx>
@@ -74,9 +73,11 @@ void CDF_StoreList::Next() {
 Handle(CDM_Document) CDF_StoreList::Value() const {
   return myIterator.Key();
 }
-PCDM_StoreStatus CDF_StoreList::Store (Handle(CDM_MetaData)& aMetaData, TCollection_ExtendedString& aStatusAssociatedText) {
-
-  Handle(CDF_MetaDataDriver) theMetaDataDriver = CDF_Session::CurrentSession()->MetaDataDriver();
+PCDM_StoreStatus CDF_StoreList::Store (Handle(CDM_MetaData)& aMetaData, 
+                                      TCollection_ExtendedString& aStatusAssociatedText, 
+                                      const Message_ProgressRange& theRange)
+{
+  Handle(CDF_MetaDataDriver) theMetaDataDriver = Handle(CDF_Application)::DownCast((myMainDocument->Application()))->MetaDataDriver();
 
   PCDM_StoreStatus status = PCDM_SS_OK;
   {
@@ -101,6 +102,10 @@ PCDM_StoreStatus CDF_StoreList::Store (Handle(CDM_MetaData)& aMetaData, TCollect
             throw Standard_Failure(aMsg.str().c_str());
           }
 
+          // Reset the store-status.
+          // It has sense in multi-threaded access to the storage driver - this way we reset the status for each call.
+          aDocumentStorageDriver->SetStoreStatus(PCDM_SS_OK);
+
           if(!theMetaDataDriver->FindFolder(theDocument->RequestedFolder())) {
             Standard_SStream aMsg; aMsg << "could not find the active dbunit";
             aMsg << TCollection_ExtendedString(theDocument->RequestedFolder())<< (char)0;
@@ -108,7 +113,7 @@ PCDM_StoreStatus CDF_StoreList::Store (Handle(CDM_MetaData)& aMetaData, TCollect
           }
           TCollection_ExtendedString theName=theMetaDataDriver->BuildFileName(theDocument);
 
-          aDocumentStorageDriver->Write(theDocument,theName);
+          aDocumentStorageDriver->Write(theDocument, theName, theRange);
           status = aDocumentStorageDriver->GetStoreStatus();
           aMetaData = theMetaDataDriver->CreateMetaData(theDocument,theName);
           theDocument->SetMetaData(aMetaData);

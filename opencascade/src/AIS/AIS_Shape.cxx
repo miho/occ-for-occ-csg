@@ -23,7 +23,6 @@
 #include <BRepBndLib.hxx>
 #include <BRepTools.hxx>
 #include <BRepTools_ShapeSet.hxx>
-#include <Geom_Transformation.hxx>
 #include <gp_Pnt.hxx>
 #include <Graphic3d_ArrayOfPolylines.hxx>
 #include <Graphic3d_AspectFillArea3d.hxx>
@@ -43,10 +42,8 @@
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_IsoAspect.hxx>
 #include <Prs3d_Presentation.hxx>
-#include <Prs3d_Projector.hxx>
-#include <Prs3d_Root.hxx>
 #include <Prs3d_ShadingAspect.hxx>
-#include <StdPrs_BndBox.hxx>
+#include <Prs3d_BndBox.hxx>
 #include <StdPrs_ToolTriangulatedShape.hxx>
 #include <Quantity_Color.hxx>
 #include <Select3D_SensitiveBox.hxx>
@@ -61,7 +58,6 @@
 #include <StdSelect.hxx>
 #include <StdSelect_BRepOwner.hxx>
 #include <StdSelect_BRepSelectionTool.hxx>
-#include <StdSelect_DisplayMode.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <TopExp.hxx>
 
@@ -156,9 +152,8 @@ void AIS_Shape::Compute(const Handle(PrsMgr_PresentationManager3d)& /*aPresentat
       }
       catch (Standard_Failure const& anException)
       {
-        Message::DefaultMessenger()->Send (TCollection_AsciiString()
-                                         + "Error: AIS_Shape::Compute() wireframe presentation builder has failed ("
-                                         + anException.GetMessageString() + ")", Message_Fail);
+        Message::SendFail (TCollection_AsciiString("Error: AIS_Shape::Compute() wireframe presentation builder has failed (")
+                         + anException.GetMessageString() + ")");
       }
       break;
     }
@@ -187,9 +182,8 @@ void AIS_Shape::Compute(const Handle(PrsMgr_PresentationManager3d)& /*aPresentat
           }
           catch (Standard_Failure const& anException)
           {
-            Message::DefaultMessenger()->Send (TCollection_AsciiString()
-                                               + "Error: AIS_Shape::Compute() shaded presentation builder has failed ("
-                                               + anException.GetMessageString() + ")", Message_Fail);
+            Message::SendFail (TCollection_AsciiString("Error: AIS_Shape::Compute() shaded presentation builder has failed (")
+                             + anException.GetMessageString() + ")");
             StdPrs_WFShape::Add (aPrs, myshape, myDrawer);
           }
         }
@@ -211,7 +205,7 @@ void AIS_Shape::Compute(const Handle(PrsMgr_PresentationManager3d)& /*aPresentat
       }
       else
       {
-        StdPrs_BndBox::Add (aPrs, BoundingBox(), myDrawer);
+        Prs3d_BndBox::Add (aPrs, BoundingBox(), myDrawer);
       }
     }
   }
@@ -224,7 +218,7 @@ void AIS_Shape::Compute(const Handle(PrsMgr_PresentationManager3d)& /*aPresentat
 //function : computeHlrPresentation
 //purpose  :
 //=======================================================================
-void AIS_Shape::computeHlrPresentation (const Handle(Prs3d_Projector)& theProjector,
+void AIS_Shape::computeHlrPresentation (const Handle(Graphic3d_Camera)& theProjector,
                                         const Handle(Prs3d_Presentation)& thePrs,
                                         const TopoDS_Shape& theShape,
                                         const Handle(Prs3d_Drawer)& theDrawer)
@@ -282,19 +276,24 @@ void AIS_Shape::computeHlrPresentation (const Handle(Prs3d_Projector)& theProjec
       switch (theDrawer->TypeOfHLR())
       {
         case Prs3d_TOH_Algo:
-          StdPrs_HLRShape::Add (thePrs, theShape, theDrawer, theProjector);
+        {
+          StdPrs_HLRShape aBuilder;
+          aBuilder.ComputeHLR (thePrs, theShape, theDrawer, theProjector);
           break;
+        }
         case Prs3d_TOH_PolyAlgo:
-        default:
-          StdPrs_HLRPolyShape::Add (thePrs, theShape, theDrawer, theProjector);
+        case Prs3d_TOH_NotSet:
+        {
+          StdPrs_HLRPolyShape aBuilder;
+          aBuilder.ComputeHLR (thePrs, theShape, theDrawer, theProjector);
           break;
+        }
       }
     }
     catch (Standard_Failure const& anException)
     {
-      Message::DefaultMessenger()->Send (TCollection_AsciiString()
-                                       + "Error: AIS_Shape::Compute() HLR Algorithm has failed ("
-                                       + anException.GetMessageString() + ")", Message_Fail);
+      Message::SendFail (TCollection_AsciiString("Error: AIS_Shape::Compute() HLR Algorithm has failed (")
+                       + anException.GetMessageString() + ")");
       StdPrs_WFShape::Add (thePrs, theShape, theDrawer);
     }
   }
@@ -322,7 +321,7 @@ void AIS_Shape::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
 
 // POP protection against crash in low layers
 
-  Standard_Real aDeflection = Prs3d::GetDeflection(shape, myDrawer);
+  Standard_Real aDeflection = StdPrs_ToolTriangulatedShape::GetDeflection(shape, myDrawer);
   try
   {
     OCC_CATCH_SIGNALS
@@ -331,14 +330,13 @@ void AIS_Shape::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                       shape,
                                       TypOfSel,
                                       aDeflection,
-                                      myDrawer->HLRAngle(),
+                                      myDrawer->DeviationAngle(),
                                       myDrawer->IsAutoTriangulation());
   }
   catch (Standard_Failure const& anException)
   {
-    Message::DefaultMessenger()->Send (TCollection_AsciiString()
-                                       + "Error: AIS_Shape::ComputeSelection(" + aMode + ") has failed ("
-                                       + anException.GetMessageString() + ")", Message_Fail);
+    Message::SendFail (TCollection_AsciiString("Error: AIS_Shape::ComputeSelection(") + aMode + ") has failed ("
+                     + anException.GetMessageString() + ")");
     if (aMode == 0)
     {
       aSelection->Clear();
@@ -491,7 +489,7 @@ void AIS_Shape::UnsetColor()
         || IsTransparent()
         || myDrawer->ShadingAspect()->Aspect()->ToMapTexture())
   {
-    const Graphic3d_MaterialAspect aDefaultMat (Graphic3d_NOM_BRASS);
+    const Graphic3d_MaterialAspect aDefaultMat (Graphic3d_NameOfMaterial_Brass);
     Graphic3d_MaterialAspect mat = aDefaultMat;
     Quantity_Color anInteriorColors[2] = {Quantity_NOC_CYAN1, Quantity_NOC_CYAN1};
     if (myDrawer->HasLink())
@@ -815,20 +813,6 @@ Standard_Boolean AIS_Shape::SetOwnDeviationCoefficient ()
 }
 
 //=======================================================================
-//function : SetHLROwnDeviationCoefficient
-//purpose  : resets myhasOwnHLRDeviationCoefficient to Standard_False and
-//           returns Standard_True if it change
-//=======================================================================
-
-Standard_Boolean AIS_Shape::SetOwnHLRDeviationCoefficient ()
-{
-  Standard_Boolean itSet = myDrawer->HasOwnHLRDeviationCoefficient();
-  if(itSet)  myDrawer->SetHLRDeviationCoefficient();
-  return itSet;
-
-}
-
-//=======================================================================
 //function : SetOwnDeviationAngle
 //purpose  : resets myhasOwnDeviationAngle to Standard_False and
 //           returns Standard_True if it change
@@ -843,20 +827,6 @@ Standard_Boolean AIS_Shape::SetOwnDeviationAngle ()
 }
 
 //=======================================================================
-//function : SetOwnHLRDeviationAngle
-//purpose  : resets myhasOwnHLRDeviationAngle to Standard_False and
-//           returns Standard_True if it change
-//=======================================================================
-
-Standard_Boolean AIS_Shape::SetOwnHLRDeviationAngle ()
-{
-  Standard_Boolean itSet = myDrawer->HasOwnHLRDeviationAngle();
-  if(itSet)  myDrawer->SetHLRAngle();
-  return itSet;
-
-}
-//***** SetOwn
-//=======================================================================
 //function : SetOwnDeviationCoefficient
 //purpose  : 
 //=======================================================================
@@ -865,17 +835,6 @@ void AIS_Shape::SetOwnDeviationCoefficient ( const Standard_Real  aCoefficient )
 {
   myDrawer->SetDeviationCoefficient( aCoefficient );
   SetToUpdate();
-}
-
-//=======================================================================
-//function : SetOwnHLRDeviationCoefficient
-//purpose  : 
-//=======================================================================
-
-void AIS_Shape::SetOwnHLRDeviationCoefficient ( const Standard_Real  aCoefficient )
-{
-  myDrawer->SetHLRDeviationCoefficient( aCoefficient );
-  
 }
 
 //=======================================================================
@@ -913,31 +872,6 @@ Standard_Real AIS_Shape::UserAngle() const
   return myInitAng ==0. ? GetContext()->DeviationAngle(): myInitAng;
 }
 
-
-//=======================================================================
-//function : SetHLRAngleAndDeviation
-//purpose  : 
-//=======================================================================
-
-void AIS_Shape::SetHLRAngleAndDeviation ( const Standard_Real  anAngle )
-{
-  Standard_Real OutAngl,OutDefl;
-  HLRBRep::PolyHLRAngleAndDeflection(anAngle,OutAngl,OutDefl);
-  SetOwnHLRDeviationAngle( OutAngl );
-  SetOwnHLRDeviationCoefficient(OutDefl);
-
-}
-//=======================================================================
-//function : SetOwnHLRDeviationAngle
-//purpose  : 
-//=======================================================================
-
-void AIS_Shape::SetOwnHLRDeviationAngle ( const Standard_Real  anAngle )
-{
-  myDrawer->SetHLRAngle( anAngle );
-}
-
-//***** GetOwn
 //=======================================================================
 //function : OwnDeviationCoefficient
 //purpose  : 
@@ -949,20 +883,6 @@ Standard_Boolean AIS_Shape::OwnDeviationCoefficient ( Standard_Real &  aCoeffici
   aCoefficient = myDrawer->DeviationCoefficient();
   aPreviousCoefficient = myDrawer->PreviousDeviationCoefficient ();
   return myDrawer->HasOwnDeviationCoefficient() ;
-}
-
-//=======================================================================
-//function : OwnHLRDeviationCoefficient
-//purpose  : 
-//=======================================================================
-
-Standard_Boolean AIS_Shape::OwnHLRDeviationCoefficient ( Standard_Real & aCoefficient,
-                                                         Standard_Real & aPreviousCoefficient ) const
-{
-  aCoefficient = myDrawer->HLRDeviationCoefficient();
-  aPreviousCoefficient = myDrawer->PreviousHLRDeviationCoefficient ();
-  return myDrawer->HasOwnHLRDeviationCoefficient();
-
 }
 
 //=======================================================================
@@ -979,14 +899,17 @@ Standard_Boolean AIS_Shape::OwnDeviationAngle ( Standard_Real &  anAngle,
 }
 
 //=======================================================================
-//function : OwnHLRDeviationAngle
+//function : DumpJson
 //purpose  : 
 //=======================================================================
-
-Standard_Boolean AIS_Shape::OwnHLRDeviationAngle ( Standard_Real &  anAngle,
-                                                   Standard_Real & aPreviousAngle ) const
+void AIS_Shape::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
-  anAngle = myDrawer->HLRAngle();
-  aPreviousAngle = myDrawer->PreviousHLRDeviationAngle (); 
-  return myDrawer->HasOwnHLRDeviationAngle();
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, AIS_InteractiveObject)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myshape)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBB)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myInitAng)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCompBB)
 }

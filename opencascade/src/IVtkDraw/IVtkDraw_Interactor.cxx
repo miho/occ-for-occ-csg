@@ -14,9 +14,7 @@
 // commercial license or contractual agreement.
 
 // prevent disabling some MSVC warning messages by VTK headers 
-#ifdef _MSC_VER
-#pragma warning(push)
-#endif
+#include <Standard_WarningsDisable.hxx>
 #ifdef _WIN32
 #include <vtkWin32RenderWindowInteractor.h>
 #include <vtkWin32OpenGLRenderWindow.h>
@@ -30,12 +28,9 @@
 #include <vtkCommand.h>
 #include <vtkObjectFactory.h>
 #include <vtkSmartPointer.h>
+#include <Standard_WarningsRestore.hxx>
 
 #include <IVtkDraw_Interactor.hxx>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #include <IVtkTools_ShapePicker.hxx>
 #include <IVtkTools_SubPolyDataFilter.hxx>
@@ -187,6 +182,10 @@ void IVtkDraw_Interactor::Initialize()
   this->Size[1] = aSize[1];
 }
 
+#ifdef _WIN32
+LRESULT CALLBACK WndProc(HWND theHWnd, UINT theUMsg, WPARAM theWParam, LPARAM theLParam);
+#endif
+
 //===========================================================
 // Function : Enable
 // Purpose  :
@@ -249,7 +248,7 @@ void IVtkDraw_Interactor::MoveTo (Standard_Integer theX, Standard_Integer theY)
       Handle(Message_Messenger) anOutput = Message::DefaultMessenger();
       if (!myPipelines->IsBound(aShapeID))
       {
-        anOutput << "Warning: there is no VTK pipeline registered for highlighted shape" << Message_EndLine;
+        anOutput->SendWarning() << "Warning: there is no VTK pipeline registered for highlighted shape" << std::endl;
         continue;
       }
 
@@ -314,7 +313,7 @@ void IVtkDraw_Interactor::OnSelection()
       Handle(Message_Messenger) anOutput = Message::DefaultMessenger();
       if (!myPipelines->IsBound (aShapeID))
       {
-        anOutput << "Warning: there is no VTK pipeline registered for picked shape" << Message_EndLine;
+        anOutput->SendWarning() << "Warning: there is no VTK pipeline registered for picked shape" << std::endl;
         continue;
       }
 
@@ -622,7 +621,7 @@ LRESULT CALLBACK WndProc (HWND theHWnd,UINT theUMsg,
   LRESULT aRes = 0;
   IVtkDraw_Interactor *anInteractor = 0;
 
-  anInteractor = (IVtkDraw_Interactor *)GetWindowLongPtr (theHWnd, GWLP_USERDATA);
+  anInteractor = (IVtkDraw_Interactor *)GetWindowLongPtrW (theHWnd, GWLP_USERDATA);
 
   if (anInteractor && anInteractor->GetReferenceCount() > 0)
   {
@@ -711,7 +710,7 @@ LRESULT CALLBACK ViewerWindowProc (HWND theHWnd,
     theInteractor->OnTimer (theHWnd, (UINT)theWParam);
     break;
   }
-  return DefWindowProc(theHWnd, theMsg, theWParam, theLParam);
+  return DefWindowProcW (theHWnd, theMsg, theWParam, theLParam);
 }
 
 #else

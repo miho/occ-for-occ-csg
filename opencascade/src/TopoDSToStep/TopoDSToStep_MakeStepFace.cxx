@@ -90,6 +90,7 @@
 // Constructors
 // ----------------------------------------------------------------------------
 TopoDSToStep_MakeStepFace::TopoDSToStep_MakeStepFace()
+: myError(TopoDSToStep_FaceOther)
 {
   done = Standard_False;
 }
@@ -179,6 +180,8 @@ void TopoDSToStep_MakeStepFace::Init(const TopoDS_Face& aFace,
     return;
   }
   
+  try
+  {
   // -----------------
   // Translate Surface
   // -----------------
@@ -462,6 +465,13 @@ void TopoDSToStep_MakeStepFace::Init(const TopoDS_Face& aFace,
 
     FP->AddWarning(errShape, " No Wires of this Face were mapped");
     myError = TopoDSToStep_NoWireMapped;
+    done    = Standard_False;
+  }
+  }
+  catch (Standard_Failure const& theFailure) 
+  {
+    FP->AddFail(errShape, theFailure.GetMessageString());
+    myError = TopoDSToStep_FaceOther;
     done    = Standard_False;
   }
 }

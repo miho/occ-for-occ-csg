@@ -13,6 +13,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <XCAFDoc_ViewTool.hxx>
+
 #include <Standard_GUID.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd_Name.hxx>
@@ -26,10 +28,8 @@
 #include <XCAFDoc_GraphNode.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
 #include <XCAFDoc_View.hxx>
-#include <XCAFDoc_ViewTool.hxx>
 
-
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_ViewTool, TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE_WITH_TYPE(XCAFDoc_ViewTool,TDataStd_GenericEmpty,"xcaf","ViewTool")
 
 //=======================================================================
 //function : XCAFDoc_ViewTool
@@ -761,33 +761,3 @@ const Standard_GUID& XCAFDoc_ViewTool::ID() const
 {
   return GetID();
 }
-
-
-//=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-void XCAFDoc_ViewTool::Restore(const Handle(TDF_Attribute)& /*with*/) 
-{
-}
-
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-Handle(TDF_Attribute) XCAFDoc_ViewTool::NewEmpty() const
-{
-  return new XCAFDoc_ViewTool;
-}
-
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-void XCAFDoc_ViewTool::Paste(const Handle(TDF_Attribute)& /*into*/,
-                             const Handle(TDF_RelocationTable)& /*RT*/) const
-{
-}
-

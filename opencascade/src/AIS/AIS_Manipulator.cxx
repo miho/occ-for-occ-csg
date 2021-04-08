@@ -19,11 +19,8 @@
 #include <AIS_ManipulatorOwner.hxx>
 #include <Extrema_ExtElC.hxx>
 #include <gce_MakeDir.hxx>
-#include <Geom_Circle.hxx>
-#include <Geom_Transformation.hxx>
 #include <IntAna_IntConicQuad.hxx>
 #include <Prs3d_Arrow.hxx>
-#include <Prs3d_Root.hxx>
 #include <Prs3d_ShadingAspect.hxx>
 #include <Prs3d_ToolDisk.hxx>
 #include <Prs3d_ToolSector.hxx>
@@ -86,10 +83,10 @@ namespace
   public:
     //! Main constructor.
     ManipSensCircle (const Handle(SelectMgr_EntityOwner)& theOwnerId,
-                     const Handle(Geom_Circle)& theCircle,
+                     const gp_Circ& theCircle,
                      const Standard_Integer theNbPnts)
     : Select3D_SensitiveCircle (theOwnerId, theCircle, Standard_False, theNbPnts),
-      ManipSensRotation (theCircle->Position().Direction()) {}
+      ManipSensRotation (theCircle.Position().Direction()) {}
 
     //! Checks whether the circle overlaps current selecting volume
     virtual Standard_Boolean Matches (SelectBasics_SelectingVolumeManager& theMgr,
@@ -643,6 +640,44 @@ Standard_Boolean AIS_Manipulator::ObjectTransformation (const Standard_Integer t
 }
 
 //=======================================================================
+//function : ProcessDragging
+//purpose  :
+//=======================================================================
+Standard_Boolean AIS_Manipulator::ProcessDragging (const Handle(AIS_InteractiveContext)&,
+                                                   const Handle(V3d_View)& theView,
+                                                   const Handle(SelectMgr_EntityOwner)&,
+                                                   const Graphic3d_Vec2i& theDragFrom,
+                                                   const Graphic3d_Vec2i& theDragTo,
+                                                   const AIS_DragAction theAction)
+{
+  switch (theAction)
+  {
+    case AIS_DragAction_Start:
+    {
+      if (HasActiveMode())
+      {
+        StartTransform (theDragFrom.x(), theDragFrom.y(), theView);
+        return Standard_True;
+      }
+      break;
+    }
+    case AIS_DragAction_Update:
+    {
+      Transform (theDragTo.x(), theDragTo.y(), theView);
+      return Standard_True;
+    }
+    case AIS_DragAction_Abort:
+    {
+      StopTransform (false);
+      return Standard_True;
+    }
+    case AIS_DragAction_Stop:
+      break;
+  }
+  return Standard_False;
+}
+
+//=======================================================================
 //function : StartTransform
 //purpose  : 
 //=======================================================================
@@ -703,7 +738,7 @@ void AIS_Manipulator::Transform (const gp_Trsf& theTrsf)
     {
       const Handle(AIS_InteractiveObject)& anObj = anObjIter.ChangeValue();
       const gp_Trsf& anOldTrsf = aTrsfIter.Value();
-      const Handle(Geom_Transformation)& aParentTrsf = anObj->CombinedParentTransformation();
+      const Handle(TopLoc_Datum3D)& aParentTrsf = anObj->CombinedParentTransformation();
       if (!aParentTrsf.IsNull()
         && aParentTrsf->Form() != gp_Identity)
       {
@@ -782,7 +817,7 @@ void AIS_Manipulator::updateTransformation()
     aTrsf.SetTransformation (gp_Ax2 (gp::Origin(), aVDir, aXDir), gp::XOY());
   }
 
-  Handle(Geom_Transformation) aGeomTrsf = new Geom_Transformation (aTrsf);
+  Handle(TopLoc_Datum3D) aGeomTrsf = new TopLoc_Datum3D (aTrsf);
   // we explicitly call here setLocalTransformation() of the base class
   // since AIS_Manipulator::setLocalTransformation() implementation throws exception
   // as protection from external calls
@@ -920,7 +955,7 @@ void AIS_Manipulator::setTransformPersistence (const Handle(Graphic3d_TransformP
 //function : setLocalTransformation
 //purpose  :
 //=======================================================================
-void AIS_Manipulator::setLocalTransformation (const Handle(Geom_Transformation)& /*theTrsf*/)
+void AIS_Manipulator::setLocalTransformation (const Handle(TopLoc_Datum3D)& /*theTrsf*/)
 {
   Standard_ASSERT_INVOKE ("AIS_Manipulator::setLocalTransformation: "
                           "Custom transformation is not supported by this class");
@@ -1131,7 +1166,7 @@ void AIS_Manipulator::ComputeSelection (const Handle(SelectMgr_Selection)& theSe
         anOwner = new AIS_ManipulatorOwner (this, anIt, AIS_MM_Rotation, 9);
       }
       // define sensitivity by circle
-      Handle(Geom_Circle) aGeomCircle = new Geom_Circle (gp_Ax2 (gp::Origin(), anAxis.ReferenceAxis().Direction()), anAxis.RotatorDiskRadius());
+      const gp_Circ aGeomCircle (gp_Ax2 (gp::Origin(), anAxis.ReferenceAxis().Direction()), anAxis.RotatorDiskRadius());
       Handle(Select3D_SensitiveCircle) aCircle = new ManipSensCircle (anOwner, aGeomCircle, anAxis.FacettesNumber());
       aCircle->SetSensitivityFactor (15);
       theSelection->Add (aCircle);
@@ -1215,7 +1250,8 @@ void AIS_Manipulator::Disk::Init (const Standard_ShortReal theInnerRadius,
   gp_Ax3 aSystem (myPosition.Location(), myPosition.Direction());
   gp_Trsf aTrsf;
   aTrsf.SetTransformation (aSystem, gp_Ax3());
-  aTool.FillArray (myArray, myTriangulation, aTrsf);
+  myArray = aTool.CreateTriangulation (aTrsf);
+  myTriangulation = aTool.CreatePolyTriangulation (aTrsf);
 }
 
 //=======================================================================
@@ -1234,7 +1270,8 @@ void AIS_Manipulator::Sphere::Init (const Standard_ShortReal theRadius,
   Prs3d_ToolSphere aTool (theRadius, theSlicesNb, theStacksNb);
   gp_Trsf aTrsf;
   aTrsf.SetTranslation (gp_Vec(gp::Origin(), thePosition));
-  aTool.FillArray (myArray, myTriangulation, aTrsf);
+  myArray = aTool.CreateTriangulation (aTrsf);
+  myTriangulation = aTool.CreatePolyTriangulation (aTrsf);
 }
 
 //=======================================================================
@@ -1270,24 +1307,24 @@ void AIS_Manipulator::Cube::Init (const gp_Ax1& thePosition, const Standard_Shor
   addTriangle (1, aBottomLeft, aV3, aV4, -thePosition.Direction());
 
   // Front
-  addTriangle (2, aV3, aV4, aV5, aFront);
-  addTriangle (3, aV3, aV5, aTopRight, aFront);
+  addTriangle (2, aV3, aV5, aV4, -aFront);
+  addTriangle (3, aV3, aTopRight, aV5, -aFront);
 
   // Back
-  addTriangle (4, aBottomLeft, aV2, aV7, -aFront);
-  addTriangle (5, aBottomLeft, aV7, aV6, -aFront);
+  addTriangle (4, aBottomLeft, aV7, aV2, aFront);
+  addTriangle (5, aBottomLeft, aV6, aV7, aFront);
 
   // aTop
   addTriangle (6, aV7, aV6, aV5, thePosition.Direction());
   addTriangle (7, aTopRight, aV7, aV5, thePosition.Direction());
 
-  //Left
-  addTriangle (8, aV6, aV5, aV4, -aRight);
-  addTriangle (9, aBottomLeft, aV6, aV4, -aRight);
+  // Left
+  addTriangle (8, aV6, aV4, aV5, aRight);
+  addTriangle (9, aBottomLeft, aV4, aV6, aRight);
 
   // Right
-  addTriangle (10, aV3, aTopRight, aV7, aRight);
-  addTriangle (11, aV3, aV7, aV2, aRight);
+  addTriangle (10, aV3, aV7, aTopRight, -aRight);
+  addTriangle (11, aV3, aV2, aV7, -aRight);
 }
 
 //=======================================================================
@@ -1324,7 +1361,8 @@ void AIS_Manipulator::Sector::Init (const Standard_ShortReal theRadius,
   gp_Ax3 aSystem(thePosition.Location(), thePosition.Direction(), theXDirection);
   gp_Trsf aTrsf;
   aTrsf.SetTransformation(aSystem, gp_Ax3());
-  aTool.FillArray(myArray, myTriangulation, aTrsf);
+  myArray = aTool.CreateTriangulation (aTrsf);
+  myTriangulation = aTool.CreatePolyTriangulation (aTrsf);
 }
 
 //=======================================================================
@@ -1376,7 +1414,8 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
                                                myAxisRadius * 1.5,
                                                anArrowLength,
                                                myFacettesNumber);
-    myTranslatorGroup = thePrs->NewGroup ();
+    myTranslatorGroup = thePrs->NewGroup();
+    myTranslatorGroup->SetClosed (true);
     myTranslatorGroup->SetGroupPrimitivesAspect (theAspect->Aspect());
     myTranslatorGroup->AddPrimitiveArray (myTriangleArray);
 
@@ -1389,7 +1428,7 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
       myHighlightTranslator->Clear();
     }
     {
-      Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (myHighlightTranslator);
+      Handle(Graphic3d_Group) aGroup = myHighlightTranslator->CurrentGroup();
       aGroup->SetGroupPrimitivesAspect (theAspect->Aspect());
       aGroup->AddPrimitiveArray (myTriangleArray);
     }
@@ -1400,7 +1439,8 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
     myCubePos = myReferenceAxis.Direction().XYZ() * (myLength + myIndent);
     myCube.Init (gp_Ax1 (myCubePos, myReferenceAxis.Direction()), myBoxSize);
 
-    myScalerGroup = thePrs->NewGroup ();
+    myScalerGroup = thePrs->NewGroup();
+    myScalerGroup->SetClosed (true);
     myScalerGroup->SetGroupPrimitivesAspect (theAspect->Aspect());
     myScalerGroup->AddPrimitiveArray (myCube.Array());
 
@@ -1413,7 +1453,7 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
       myHighlightScaler->Clear();
     }
     {
-      Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (myHighlightScaler);
+      Handle(Graphic3d_Group) aGroup = myHighlightScaler->CurrentGroup();
       aGroup->SetGroupPrimitivesAspect (theAspect->Aspect());
       aGroup->AddPrimitiveArray (myCube.Array());
     }
@@ -1436,7 +1476,7 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
       myHighlightRotator->Clear();
     }
     {
-      Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (myHighlightRotator);
+      Handle(Graphic3d_Group) aGroup = myHighlightRotator->CurrentGroup();
       aGroup->SetGroupPrimitivesAspect (theAspect->Aspect());
       aGroup->AddPrimitiveArray (myCircle.Array());
     }
@@ -1468,7 +1508,7 @@ void AIS_Manipulator::Axis::Compute (const Handle(PrsMgr_PresentationManager)& t
       myHighlightDragger->Clear();
     }
     {
-      Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(myHighlightDragger);
+      Handle(Graphic3d_Group) aGroup = myHighlightDragger->CurrentGroup();
       aGroup->SetGroupPrimitivesAspect(aFillArea);
       aGroup->AddPrimitiveArray(mySector.Array());
     }

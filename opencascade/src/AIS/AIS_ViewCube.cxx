@@ -24,7 +24,6 @@
 #include <Prs3d.hxx>
 #include <Prs3d_Arrow.hxx>
 #include <Prs3d_DatumAspect.hxx>
-#include <Prs3d_Root.hxx>
 #include <Prs3d_Text.hxx>
 #include <Prs3d_ToolDisk.hxx>
 #include <Prs3d_ToolSphere.hxx>
@@ -137,6 +136,9 @@ AIS_ViewCube::AIS_ViewCube()
   myBoxEdgeGap (0.0),
   myBoxFacetExtension (1.0),
   myAxesPadding (1.0),
+  myAxesRadius (1.0),
+  myAxesConeRadius (3.0),
+  myAxesSphereRadius (4.0),
   myCornerMinSize (2.0),
   myRoundRadius  (0.0),
   myToDisplayAxes (true),
@@ -146,12 +148,12 @@ AIS_ViewCube::AIS_ViewCube()
   myViewAnimation (new AIS_AnimationCamera ("AIS_ViewCube", Handle(V3d_View)())),
   myStartState(new Graphic3d_Camera()),
   myEndState  (new Graphic3d_Camera()),
-  myDuration (0.5),
   myToAutoStartAnim (true),
   myIsFixedAnimation (true),
   myToFitSelected (true),
   myToResetCameraUp (false)
 {
+  myViewAnimation->SetOwnDuration (0.5);
   myInfiniteState = true;
   myIsMutable = true;
   myDrawer->SetZLayer (Graphic3d_ZLayerId_Topmost);
@@ -198,7 +200,7 @@ void AIS_ViewCube::setDefaultAttributes()
   // this should be forced back-face culling regardless Closed flag
   myDrawer->TextAspect()->Aspect()->SetSuppressBackFaces (true);
 
-  Graphic3d_MaterialAspect aMat (Graphic3d_NOM_UserDefined);
+  Graphic3d_MaterialAspect aMat (Graphic3d_NameOfMaterial_UserDefined);
   aMat.SetColor (Quantity_NOC_WHITE);
   aMat.SetAmbientColor (Quantity_NOC_GRAY60);
 
@@ -596,10 +598,11 @@ void AIS_ViewCube::Compute (const Handle(PrsMgr_PresentationManager3d)& ,
       }
 
       Handle(Graphic3d_Group) anAxisGroup = thePrs->NewGroup();
+      anAxisGroup->SetClosed (true);
       anAxisGroup->SetGroupPrimitivesAspect (aDatumAspect->ShadingAspect (aPart)->Aspect());
 
       const Standard_Real anArrowLength = 0.2 * anAxisSize;
-      Handle(Graphic3d_ArrayOfTriangles) aTriangleArray = Prs3d_Arrow::DrawShaded (anAx1, 1.0, anAxisSize, 3.0, anArrowLength, THE_NB_ARROW_FACETTES);
+      Handle(Graphic3d_ArrayOfTriangles) aTriangleArray = Prs3d_Arrow::DrawShaded (anAx1, myAxesRadius, anAxisSize, myAxesConeRadius, anArrowLength, THE_NB_ARROW_FACETTES);
       anAxisGroup->AddPrimitiveArray (aTriangleArray);
 
       TCollection_AsciiString anAxisLabel;
@@ -618,10 +621,11 @@ void AIS_ViewCube::Compute (const Handle(PrsMgr_PresentationManager3d)& ,
     // Display center
     {
       Handle(Graphic3d_Group) aGroup = thePrs->NewGroup();
+      aGroup->SetClosed (true);
       Handle(Prs3d_ShadingAspect) anAspectCen = new Prs3d_ShadingAspect();
       anAspectCen->SetColor (Quantity_NOC_WHITE);
       aGroup->SetGroupPrimitivesAspect (anAspectCen->Aspect());
-      Prs3d_ToolSphere aTool (4.0, THE_NB_DISK_SLICES, THE_NB_DISK_SLICES);
+      Prs3d_ToolSphere aTool (myAxesSphereRadius, THE_NB_DISK_SLICES, THE_NB_DISK_SLICES);
       gp_Trsf aTrsf;
       aTrsf.SetTranslation (gp_Vec (gp::Origin(), aLocation));
       Handle(Graphic3d_ArrayOfTriangles) aCenterArray;
@@ -822,6 +826,24 @@ void AIS_ViewCube::ComputeSelection (const Handle(SelectMgr_Selection)& theSelec
 }
 
 //=======================================================================
+//function : Duration
+//purpose  :
+//=======================================================================
+Standard_Real AIS_ViewCube::Duration() const
+{
+  return myViewAnimation->OwnDuration();
+}
+
+//=======================================================================
+//function : SetDuration
+//purpose  :
+//=======================================================================
+void AIS_ViewCube::SetDuration (Standard_Real theDurationSec)
+{
+  myViewAnimation->SetOwnDuration (theDurationSec);
+}
+
+//=======================================================================
 //function : HasAnimation
 //purpose  :
 //=======================================================================
@@ -910,7 +932,6 @@ void AIS_ViewCube::StartAnimation (const Handle(AIS_ViewCubeOwner)& theOwner)
   myViewAnimation->SetView (aView);
   myViewAnimation->SetCameraStart (myStartState);
   myViewAnimation->SetCameraEnd   (myEndState);
-  myViewAnimation->SetOwnDuration (myDuration);
   myViewAnimation->StartTimer (0.0, 1.0, true, false);
 }
 
@@ -921,7 +942,7 @@ void AIS_ViewCube::StartAnimation (const Handle(AIS_ViewCubeOwner)& theOwner)
 Standard_Boolean AIS_ViewCube::updateAnimation()
 {
   const Standard_Real aPts = myViewAnimation->UpdateTimer();
-  if (aPts >= myDuration)
+  if (aPts >= myViewAnimation->OwnDuration())
   {
     myViewAnimation->Stop();
     onAnimationFinished();

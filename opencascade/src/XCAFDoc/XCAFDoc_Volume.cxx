@@ -13,15 +13,16 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <XCAFDoc_Volume.hxx>
 
+#include <Standard_Dump.hxx>
 #include <Standard_GUID.hxx>
 #include <Standard_Type.hxx>
 #include <TDF_Attribute.hxx>
 #include <TDF_Label.hxx>
 #include <TDF_RelocationTable.hxx>
-#include <XCAFDoc_Volume.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_Volume,TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE_WITH_TYPE(XCAFDoc_Volume,TDataStd_Real,"xcaf","Volume")
 
 //=======================================================================
 //function : Constructor
@@ -75,8 +76,7 @@ Handle(XCAFDoc_Volume) XCAFDoc_Volume::Set (const TDF_Label& L,const Standard_Re
 
 void XCAFDoc_Volume::Set (const Standard_Real V) 
 {
-  Backup();
-  myValue = V;
+  TDataStd_Real::Set(V);
 }
 
 //=======================================================================
@@ -84,7 +84,10 @@ void XCAFDoc_Volume::Set (const Standard_Real V)
 //purpose  : 
 //=======================================================================
 
-Standard_Real XCAFDoc_Volume::Get() const { return myValue; }
+Standard_Real XCAFDoc_Volume::Get() const
+{
+  return TDataStd_Real::Get();
+}
 
 //=======================================================================
 //function : Get
@@ -102,40 +105,6 @@ Standard_Boolean XCAFDoc_Volume::Get(const TDF_Label& label,Standard_Real& vol)
 }
 
 //=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-
-Handle(TDF_Attribute) XCAFDoc_Volume::NewEmpty () const
-{  
-  return new XCAFDoc_Volume(); 
-}
-
-//=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_Volume::Restore(const Handle(TDF_Attribute)& With) 
-{
-  Handle(XCAFDoc_Volume) R = Handle(XCAFDoc_Volume)::DownCast (With);
-  myValue = R->Get();
-}
-
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_Volume::Paste (const Handle(TDF_Attribute)& Into,
-			   const Handle(TDF_RelocationTable)& /* RT */) const
-{ 
-  Handle(XCAFDoc_Volume) R = Handle(XCAFDoc_Volume)::DownCast (Into);
-  R->Set(myValue);
-}
-
-//=======================================================================
 //function : Dump
 //purpose  : 
 //=======================================================================
@@ -145,4 +114,17 @@ Standard_OStream& XCAFDoc_Volume::Dump (Standard_OStream& anOS) const
   anOS << "Volume "; 
   anOS << Get();
   return anOS;
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void XCAFDoc_Volume::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, TDF_Attribute)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myValue)
 }

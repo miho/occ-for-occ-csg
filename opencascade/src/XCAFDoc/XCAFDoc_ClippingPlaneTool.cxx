@@ -13,6 +13,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <XCAFDoc_ClippingPlaneTool.hxx>
 
 #include <TCollection_HAsciiString.hxx>
 #include <TDataStd_Integer.hxx>
@@ -23,9 +24,8 @@
 #include <TDF_Attribute.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <XCAFDoc.hxx>
-#include <XCAFDoc_ClippingPlaneTool.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_ClippingPlaneTool, TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE_WITH_TYPE(XCAFDoc_ClippingPlaneTool,TDataStd_GenericEmpty,"xcaf","ClippingPlaneTool")
 
 //=======================================================================
 //function : BaseLabel
@@ -308,35 +308,6 @@ const Standard_GUID& XCAFDoc_ClippingPlaneTool::ID() const
 }
 
 //=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_ClippingPlaneTool::Restore(const Handle(TDF_Attribute)& /*with*/)
-{
-}
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-
-Handle(TDF_Attribute) XCAFDoc_ClippingPlaneTool::NewEmpty() const
-{
-  return new XCAFDoc_ClippingPlaneTool;
-}
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_ClippingPlaneTool::Paste(const Handle(TDF_Attribute)& /*into*/,
-  const Handle(TDF_RelocationTable)& /*RT*/) const
-{
-}
-
-//=======================================================================
 //function : XCAFDoc_ClippingPlaneTool
 //purpose  : 
 //=======================================================================
@@ -344,4 +315,3 @@ void XCAFDoc_ClippingPlaneTool::Paste(const Handle(TDF_Attribute)& /*into*/,
 XCAFDoc_ClippingPlaneTool::XCAFDoc_ClippingPlaneTool()
 {
 }
-

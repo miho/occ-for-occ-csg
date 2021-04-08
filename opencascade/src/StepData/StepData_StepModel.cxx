@@ -20,7 +20,6 @@
 #include <Interface_InterfaceModel.hxx>
 #include <Interface_Macros.hxx>
 #include <Interface_ShareTool.hxx>
-#include <Message_Messenger.hxx>
 #include <Standard_NoSuchObject.hxx>
 #include <Standard_Transient.hxx>
 #include <Standard_Type.hxx>
@@ -29,12 +28,14 @@
 #include <StepData_StepModel.hxx>
 #include <StepData_StepWriter.hxx>
 #include <TCollection_HAsciiString.hxx>
+#include <Interface_Static.hxx>
 
 #include <stdio.h>
 IMPLEMENT_STANDARD_RTTIEXT(StepData_StepModel,Interface_InterfaceModel)
 
 // Entete de fichier : liste d entites
-StepData_StepModel::StepData_StepModel ()  {  }
+StepData_StepModel::StepData_StepModel () :mySourceCodePage((Resource_FormatType)Interface_Static::IVal("read.step.codepage"))
+{}
 
 
 Handle(Standard_Transient) StepData_StepModel::Entity
@@ -103,14 +104,13 @@ void StepData_StepModel::VerifyCheck(Handle(Interface_Check)& ach) const
 }
 
 
-void StepData_StepModel::DumpHeader
-(const Handle(Message_Messenger)& S, const Standard_Integer /*level*/) const
+void StepData_StepModel::DumpHeader (Standard_OStream& S, const Standard_Integer /*level*/) const
 {
   //  NB : level n est pas utilise
 
   Handle(StepData_Protocol) stepro = StepData::HeaderProtocol();
   Standard_Boolean iapro = !stepro.IsNull();
-  if (!iapro) S<<" -- WARNING : StepModel DumpHeader, Protocol not defined\n";
+  if (!iapro) S <<" -- WARNING : StepModel DumpHeader, Protocol not defined\n";
 
   Interface_EntityIterator iter = Header();
   Standard_Integer nb = iter.NbEntities();
@@ -119,16 +119,14 @@ void StepData_StepModel::DumpHeader
     S << "  "  << iter.Value()->DynamicType()->Name() << "\n";
   }
   if (!iapro || nb == 0) return;
-  S << " --  --        STEP MODEL    HEADER  CONTENT      --  --" << Message_EndLine;
+  S << " --  --        STEP MODEL    HEADER  CONTENT      --  --" << "\n";
   S << " --   Dumped with Protocol : " << stepro->DynamicType()->Name()
-    << "   --"<<Message_EndLine;
+    << "   --\n";
 
-  Standard_SStream aSStream;
   Handle(StepData_StepModel) me (this);
   StepData_StepWriter SW(me);
   SW.SendModel(stepro,Standard_True);    // envoi HEADER seul
-  SW.Print(aSStream);
-  S << aSStream.str().c_str();
+  SW.Print(S);
 }
 
 
@@ -171,13 +169,13 @@ Standard_Integer  StepData_StepModel::IdentLabel
  }
 
 void  StepData_StepModel::PrintLabel
-(const Handle(Standard_Transient)& ent, const Handle(Message_Messenger)& S) const
+(const Handle(Standard_Transient)& ent, Standard_OStream& S) const
 {
   Standard_Integer num = (theidnums.IsNull() ? 0 : Number(ent));
   Standard_Integer  nid = (!num ? 0 : theidnums->Value(num));
-  if      (nid > 0) S<<"#"<<nid;
-  else if (num > 0) S<<"(#"<<num<<")";
-  else              S<<"(#0..)";
+  if      (nid > 0) S <<"#"<<nid;
+  else if (num > 0) S <<"(#"<<num<<")";
+  else              S <<"(#0..)";
 }
 
 Handle(TCollection_HAsciiString) StepData_StepModel::StringLabel

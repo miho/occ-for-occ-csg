@@ -55,7 +55,9 @@
 #include <OSD_Exception_ACCESS_VIOLATION.hxx>
 #include <OSD_Exception_STACK_OVERFLOW.hxx>
 #include <OSD.hxx>
+#include <OSD_Timer.hxx>
 #include <OSD_ThreadPool.hxx>
+#include <OSD_Parallel.hxx>
 #include <STEPCAFControl_Writer.hxx>
 #include <STEPControl_StepModelType.hxx>
 #include <Interface_Static.hxx>
@@ -91,6 +93,8 @@
 #include <BRepFeat_SplitShape.hxx>
 #include <BRepAlgoAPI_Section.hxx>
 #include <TColStd_PackedMapOfInteger.hxx>
+#include <Message.hxx>
+#include <Draw_Printer.hxx>
 
 #if ! defined(_WIN32)
 extern ViewerTest_DoubleMapOfInteractiveAndName& GetMapOfAIS();
@@ -120,7 +124,7 @@ static Standard_Integer  OCC128 (Draw_Interpretor& di, Standard_Integer /*argc*/
   TopoDS_Shape shape1 = BRepPrimAPI_MakeBox(50,50,50).Shape();
   Handle(AIS_Shape) AS = new AIS_Shape(shape1);
   AS->SetDisplayMode(1);
-  Graphic3d_MaterialAspect mat(Graphic3d_NOM_PLASTIC);
+  Graphic3d_MaterialAspect mat (Graphic3d_NameOfMaterial_Plastified);
   AS->SetMaterial(mat);
   AS->SetColor(Quantity_NOC_RED);
   myAISContext->Display (AS, Standard_False);
@@ -1671,6 +1675,7 @@ static Standard_Integer OCC921 (Draw_Interpretor& di, Standard_Integer argc, con
 #include <Expr_NamedUnknown.hxx>
 #include <Expr_GeneralExpression.hxx>
 #include <Expr_Exponential.hxx>
+#include <ExprIntrp_GenExp.hxx>
 //=======================================================================
 //function :  OCC902
 //purpose  : 
@@ -1683,16 +1688,32 @@ static Standard_Integer OCC902(Draw_Interpretor& di, Standard_Integer argc, cons
     return 1;
   }
 
- TCollection_AsciiString  myStr(argv[1]);
+  TCollection_AsciiString  anExpStr(argv[1]);
+  anExpStr.AssignCat("*x");
+  anExpStr.Prepend("Exp(");
+  anExpStr.AssignCat(")");
 
- Handle (Expr_NamedUnknown)      myNamed = new Expr_NamedUnknown(myStr);
- Handle (Expr_Exponential)       oldExpr = new Expr_Exponential(myNamed); 
- Handle (Expr_GeneralExpression) newExpr = oldExpr->Derivative(myNamed);
+  Handle(ExprIntrp_GenExp) exprIntrp = ExprIntrp_GenExp::Create();
+
+  //
+  // Create the expression
+  exprIntrp->Process(anExpStr);
+
+  if (!exprIntrp->IsDone())
+  {
+    di << "Interpretation of expression " << argv[1] << " failed\n";
+    return 1;
+  }
+
+
+  Handle(Expr_GeneralExpression) anExpr = exprIntrp->Expression();
+  Handle(Expr_NamedUnknown) aVar = new Expr_NamedUnknown("x");
+  Handle (Expr_GeneralExpression) newExpr = anExpr->Derivative(aVar);
 
  
  TCollection_AsciiString  res        = newExpr->String();
  Standard_CString         resStr     = res.ToCString();
- TCollection_AsciiString  res_old    = oldExpr->String();
+ TCollection_AsciiString  res_old    = anExpr->String();
  Standard_CString         res_oldStr = res_old.ToCString();
  
 
@@ -1735,39 +1756,6 @@ static Standard_Integer OCC1029_AISTransparency (Draw_Interpretor& di,
          di << "Transparency = " << prs->Transparency() << "\n";
       }
       return 0;
-    }
-  }
-  di << arg[0] << " : Error\n";
-  return 1;
-}
-
-//=======================================================================
-//function : OCC1030_AISColor 
-//purpose  : OCC1030_AISColor (DOC,entry,[color])
-//=======================================================================
-
-static Standard_Integer OCC1030_AISColor (Draw_Interpretor& di,
-				      Standard_Integer nb, 
-				      const char ** arg) 
-{
-  if (nb >= 3) {     
-    Handle(TDocStd_Document) D;
-    if (!DDocStd::GetDocument(arg[1],D)) return 1;  
-    TDF_Label L;
-    if (!DDF::FindLabel(D->GetData(),arg[2],L)) return 1;  
-
-    Handle(TPrsStd_AISViewer) viewer;
-    if( !TPrsStd_AISViewer::Find(L, viewer) ) return 1;  
-
-    Handle(TPrsStd_AISPresentation) prs;
-    if(L.FindAttribute( TPrsStd_AISPresentation::GetID(), prs) ) {   
-      if( nb == 4 ) {
-	prs->SetColor((Quantity_NameOfColor)Draw::Atoi(arg[3]));
-	TPrsStd_AISViewer::Update(L);
-      }
-      else
-         di << "Color = " << prs->Color() << "\n";
-      return 0; 
     }
   }
   di << arg[0] << " : Error\n";
@@ -2207,7 +2195,7 @@ static int StackOverflow (int i = -1)
 #endif
 
 // this code does not work with optimize mode on Windows
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma optimize( "", off )
 #endif
 static Standard_Integer OCC6143 (Draw_Interpretor& di, Standard_Integer argc, const char ** argv)
@@ -2521,7 +2509,7 @@ static Standard_Integer OCC30775 (Draw_Interpretor& theDI, Standard_Integer theN
   return 0;
 }
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 #pragma optimize( "", on )
 #endif
 
@@ -4468,7 +4456,7 @@ static Standard_Integer OCC12584 (Draw_Interpretor& di, Standard_Integer argc, c
 #include <XSControl_WorkSession.hxx>
 #include <Transfer_TransientProcess.hxx>
 #include <TColStd_HSequenceOfTransient.hxx>
-#include <Message_ProgressSentry.hxx>
+#include <Message_ProgressScope.hxx>
 #include <XSControl_TransferReader.hxx>
 
 #include <Geom_Plane.hxx>
@@ -4781,23 +4769,150 @@ Standard_Integer OCC28478 (Draw_Interpretor& di, Standard_Integer argc, const ch
 {	
   Standard_Integer nbOuter = (argc > 1 ? Draw::Atoi(argv[1]) : 3);
   Standard_Integer nbInner = (argc > 2 ? Draw::Atoi(argv[2]) : 2);
+  Standard_Boolean isInf = (argc > 3 && ! strcmp (argv[3], "-inf"));
 
-  // test behavior of progress indicator when using nested scopes with names set by Sentry objects
+  // test behavior of progress indicator when using nested scopes with names
   Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator (di, 1);
-  aProgress->SetTextMode (Standard_True);
 
   // Outer cycle
-  Message_ProgressSentry anOuter (aProgress, "Outer", 0, nbOuter, 1);
-  for (int i = 0; i < nbOuter && anOuter.More(); i++, anOuter.Next())
+  Message_ProgressScope anOuter (aProgress->Start(), "Outer", nbOuter);
+  for (int i = 0; i < nbOuter && anOuter.More(); i++)
   {
     // Inner cycle
-    Message_ProgressSentry anInner (aProgress, "Inner", 0, nbInner, 1);
-    for (int j = 0; j < nbInner && anInner.More(); j++, anInner.Next())
+    Message_ProgressScope anInner (anOuter.Next(), "Inner", nbInner, isInf);
+    for (int j = 0; j < (isInf ? 2 * nbInner : nbInner) && anInner.More(); j++, anInner.Next())
     {
       // Cycle body
     }
   }
 
+  return 0;
+}
+
+Standard_Integer OCC31189 (Draw_Interpretor& theDI, Standard_Integer /*argc*/, const char ** /*argv*/)
+{
+  // redirect output of default messenger to DRAW (temporarily)
+  const Handle(Message_Messenger)& aMsgMgr = Message::DefaultMessenger();
+  Message_SequenceOfPrinters aPrinters;
+  aPrinters.Append (aMsgMgr->ChangePrinters());
+  aMsgMgr->AddPrinter (new Draw_Printer (theDI));
+
+  // scope block to test output of message on destruction of a stream buffer
+  {
+    Message_Messenger::StreamBuffer aSender = Message::SendInfo();
+	
+    // check that messages output to sender and directly to messenger do not intermix
+    aSender << "Sender message 1: start ...";
+    aMsgMgr->Send ("Direct message 1");
+    aSender << "... end" << std::endl; // endl should send the message
+
+	// check that empty stream buffer does not produce output on destruction
+	Message::SendInfo();
+
+    // additional message to check that they go in expected order
+    aMsgMgr->Send ("Direct message 2");
+
+	// check that empty stream buffer does produce empty line if std::endl is passed
+	Message::SendInfo() << std::endl;
+
+    // last message should be sent on destruction of a sender
+	aSender << "Sender message 2";
+  }
+
+  // restore initial output queue
+  aMsgMgr->RemovePrinters (STANDARD_TYPE(Draw_Printer));
+  aMsgMgr->ChangePrinters().Append (aPrinters);
+
+  return 0;
+}
+
+namespace
+{
+  struct Task
+  {
+    Message_ProgressRange Range;
+    math_Matrix Mat1, Mat2, Mat3;
+
+    Task(const Message_ProgressRange& thePR, int theSize)
+    : Range(thePR),
+      Mat1(1, theSize, 1, theSize, 0.12345), Mat2(1, theSize, 1, theSize, 12345),
+      Mat3(1, theSize, 1, theSize)
+    {}
+  };
+  struct Functor
+  {
+    void operator()(Task& theTask) const
+    {
+      if (theTask.Range.More())
+      {
+        if (theTask.Mat1.RowNumber() > 1)
+          theTask.Mat3 = theTask.Mat1 * theTask.Mat2;
+      }
+      theTask.Range.Close();
+    }
+  };
+}
+
+Standard_Integer OCC25748(Draw_Interpretor& di, Standard_Integer argc, const char ** argv)
+{
+  // test behavior of progress indicator in multi-threaded execution
+  Standard_Integer nIter = 1000;
+  Standard_Integer aMatSize = 1;
+  Standard_Boolean isProgress = false;
+  Standard_Boolean isParallel = false;
+
+  for (int i = 1; i < argc; i++)
+  {
+    if (strcmp(argv[i], "-niter") == 0)
+      nIter = Draw::Atoi(argv[++i]);
+    else if (strcmp(argv[i], "-matsize") == 0)
+      aMatSize = Draw::Atoi(argv[++i]);
+    else if (strcmp(argv[i], "-progr") == 0)
+      isProgress = true;
+    else if (strcmp(argv[i], "-parallel") == 0)
+      isParallel = true;
+    else
+    {
+      di.PrintHelp("OCC25748");
+      return 1;
+    }
+  }
+
+  OSD_Timer aTimerWhole;
+  aTimerWhole.Start();
+  
+  Handle(Draw_ProgressIndicator) aProgress;
+  if (isProgress)
+  {
+    aProgress = new Draw_ProgressIndicator(di, 1);
+  }
+  Message_ProgressScope aPS(Message_ProgressIndicator::Start(aProgress),
+                            "Parallel data processing", nIter);
+
+  std::vector<Task> aTasks;
+  aTasks.reserve (nIter);
+  for (int i = 0; i < nIter; i++)
+  {
+    aTasks.push_back (Task (aPS.Next(), aMatSize));
+  }
+
+  OSD_Timer aTimer;
+  aTimer.Start();
+  OSD_Parallel::ForEach(aTasks.begin(), aTasks.end(), Functor(), !isParallel);
+  aTimer.Stop();
+
+  aTimerWhole.Stop();
+
+  TCollection_AsciiString aText(nIter);
+  aText += (isParallel ? " parallel" : " sequential");
+  if (aMatSize > 1)
+    aText = aText + " calculations on matrices " + aMatSize + "x" + aMatSize;
+  else
+    aText += " empty tasks";
+  if (isProgress)
+    aText += " with progress";
+  di << "COUNTER " << aText << ": " << aTimer.ElapsedTime();
+  di << "\nCOUNTER " << "including preparations" << ": " << aTimerWhole.ElapsedTime();
   return 0;
 }
 
@@ -4811,14 +4926,6 @@ void QABugs::Commands_11(Draw_Interpretor& theCommands) {
 
   theCommands.Add("OCC136", "OCC136", __FILE__, OCC136, group);
   theCommands.Add("BUC60610","BUC60610 iges_input [name]",__FILE__,BUC60610,group);
-
-//====================================================
-//
-// Following commands are inserted from 
-// /dn03/KAS/dev/QAopt/src/QADraw/QADraw_TOPOLOGY.cxx
-// ( 75455 Apr 16 18:59)
-//
-//====================================================
 
   theCommands.Add("OCC105","OCC105 shape",__FILE__,OCC105,group); 
   theCommands.Add("OCC9"," result path cur1 cur2 radius [tolerance]:\t test GeomFill_Pipe", __FILE__, pipe_OCC9,group);
@@ -4866,7 +4973,6 @@ void QABugs::Commands_11(Draw_Interpretor& theCommands) {
   theCommands.Add("OCC902", "OCC902 expression", __FILE__, OCC902, group);
 
   theCommands.Add ("OCC1029_AISTransparency","OCC1029_AISTransparency (DOC, entry, [real])",__FILE__, OCC1029_AISTransparency, group);
-  theCommands.Add ("OCC1030_AISColor", "OCC1030_AISColor (DOC, entry, [color])", __FILE__, OCC1030_AISColor, group);
   theCommands.Add ("OCC1031_AISMaterial", "OCC1031_AISMaterial (DOC, entry, [material])", __FILE__, OCC1031_AISMaterial, group); 
   theCommands.Add ("OCC1032_AISWidth", "OCC1032_AISWidth (DOC, entry, [width])", __FILE__, OCC1032_AISWidth, group); 
   theCommands.Add ("OCC1033_AISMode", "OCC1033_AISMode (DOC, entry, [mode])", __FILE__, OCC1033_AISMode, group); 
@@ -4904,6 +5010,9 @@ void QABugs::Commands_11(Draw_Interpretor& theCommands) {
   theCommands.Add("OCC22558", "OCC22558 x_vec y_vec z_vec x_dir y_dir z_dit x_pnt y_pnt z_pnt", __FILE__, OCC22558, group);
   theCommands.Add("CR23403", "CR23403 string", __FILE__, CR23403, group);
   theCommands.Add("OCC23429", "OCC23429 res shape tool [appr]", __FILE__, OCC23429, group);
-  theCommands.Add("OCC28478", "OCC28478 [nb_outer=3 [nb_inner=2]: test progress indicator on nested cycles", __FILE__, OCC28478, group);
+  theCommands.Add("OCC28478", "OCC28478 [nb_outer=3 [nb_inner=2] [-inf]: test progress indicator on nested cycles", __FILE__, OCC28478, group);
+  theCommands.Add("OCC31189", "OCC31189: check stream buffer interface of Message_Messenger", __FILE__, OCC31189, group);
+  theCommands.Add("OCC25748", "OCC25748 [-niter val] [-matsize val] [-progr] [-parallel]\n"
+                  "\t\ttest progress indicator in parallel execution", __FILE__, OCC25748, group);
   return;
 }

@@ -24,6 +24,7 @@
 #include <DrawTrSurf.hxx>
 
 #include <DDF.hxx>
+#include <Message.hxx>
 
 #include <TDF_Data.hxx>
 #include <TDF_Label.hxx>
@@ -100,6 +101,10 @@
 #include <TDataStd_ReferenceList.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
 #include <TDataStd_ListIteratorOfListOfExtendedString.hxx>
+
+#include <algorithm>
+#include <vector>
+
 #define  MAXLENGTH 10
 //#define DEB_DDataStd
 
@@ -337,8 +342,7 @@ static Standard_Integer DDataStd_GetComment (Draw_Interpretor& di,
     if (!DDF::GetDF(arg[1],DF)) return 1;
     Handle(TDataStd_Comment) A;
     if (!DDF::Find(DF,arg[2],TDataStd_Comment::GetID(),A)) return 1;
-    TCollection_AsciiString s(A->Get(),'?');
-    di << A->Get().ToExtString();
+    di << A->Get();
     return 0;
   }
   di << "DDataStd_GetComment : Error\n";
@@ -610,7 +614,6 @@ static Standard_Integer DDataStd_GetIntArray (Draw_Interpretor& di,
     }
 
     for(Standard_Integer i = A->Lower(); i<=A->Upper(); i++){
-      //std::cout <<  A->Value(i)   << std::endl;
       di  <<  A->Value(i);
       if(i<A->Upper())  
         di<<" ";
@@ -1039,7 +1042,7 @@ static Standard_Integer DDataStd_SetRelation (Draw_Interpretor& di,
 
     Standard_CString expr (arg[3]);
     Handle(TDataStd_Relation) aR = TDataStd_Relation::Set(label);
-    aR->SetRelation(expr);
+    aR->SetRelation(TCollection_ExtendedString (expr, Standard_True));
     Handle(TDataStd_Variable) aV;
 
     for (Standard_Integer i = 4; i < nb; i++)
@@ -1219,7 +1222,8 @@ static Standard_Integer DDataStd_SetExtStringArray (Draw_Interpretor& di,
     if ((!isGuid && nb > 6) || (isGuid && nb > 8)) {
       j = j + 2;
       for(Standard_Integer i = From; i<=To; ++i) {
-        A->SetValue(i, arg[j] );
+        TCollection_ExtendedString aVal (arg[j], Standard_True);
+        A->SetValue(i, aVal);
         j++;
       }
     }
@@ -1253,7 +1257,8 @@ static Standard_Integer DDataStd_SetExtStringArrayValue (Draw_Interpretor&,
   Handle(TDataStd_ExtStringArray) arr;
   if (label.FindAttribute(TDataStd_ExtStringArray::GetID(), arr))
   {
-    arr->SetValue(index, arg[4]); 
+    TCollection_ExtendedString aVal(arg[4], Standard_True);
+    arr->SetValue(index, aVal); 
     return 0;
   }
 
@@ -1294,8 +1299,7 @@ static Standard_Integer DDataStd_GetExtStringArray (Draw_Interpretor& di,
     }
 
     for(Standard_Integer i = A->Lower(); i<=A->Upper(); i++){
-      TCollection_AsciiString anAsciiString(A->Value(i),'?');
-      di << anAsciiString.ToCString();
+      di << A->Value(i);
       if(i<A->Upper())  
         di<<" ";
     }
@@ -1421,7 +1425,7 @@ static Standard_Integer DDataStd_KeepUTF (Draw_Interpretor& di,
 #endif
     if (!anIS) {
       // Can not open file
-      std::cout << "Error: can't open file " << aFileName <<std::endl;;
+      Message::SendFail() << "Error: can't open file " << aFileName;
       return 1;
     }
     char buf[1024];
@@ -1480,7 +1484,7 @@ static Standard_Integer DDataStd_GetUTFtoFile (Draw_Interpretor& di,
     }
 
     if(!aES.Length()) {
-      std::cout << "Data is not found in the Document" <<std::endl;
+      Message::SendFail() << "Data is not found in the Document";
       return 1;
     }
 
@@ -1556,7 +1560,7 @@ static Standard_Integer DDataStd_SetByteArray (Draw_Interpretor& di,
       for(Standard_Integer i = From; i<=To; ++i) {
         Standard_Integer ival = Draw::Atoi(arg[j]);
         if(ival < 0 || 255 < ival) {
-          std::cout << "Bad value = " << ival<< std::endl;
+          Message::SendFail() << "Bad value = " << ival;
           return 1;
         }
         A->SetValue(i, (Standard_Byte)ival); 
@@ -1592,7 +1596,7 @@ static Standard_Integer DDataStd_SetByteArrayValue (Draw_Interpretor&,
 
   // Check the value.
   if(value < 0 || 255 < value) {
-    std::cout << "Bad value = " << value << std::endl;
+    Message::SendFail() << "Bad value = " << value;
     return 1;
   }
 
@@ -1657,7 +1661,7 @@ static Standard_Integer DDataStd_SetBooleanArray (Draw_Interpretor& di,
         Standard_Integer ival = Draw::Atoi(arg[j]);
         if(ival > 1) 
         {
-          std::cout << "Bad value (" <<i <<") = " << ival<< ". 0 or 1 is expected." << std::endl;
+          Message::SendFail() << "Bad value (" <<i <<") = " << ival<< ". 0 or 1 is expected.";
           return 1;
         }
         A->SetValue(i, ival != 0); 
@@ -1852,7 +1856,7 @@ static Standard_Integer DDataStd_SetBooleanList (Draw_Interpretor& di,
       Standard_Integer ival = Draw::Atoi(arg[i]);
       if(ival > 1) 
       {
-        std::cout << "Bad value = " << ival<< ". 0 or 1 is expected." << std::endl;
+        Message::SendFail() << "Bad value = " << ival<< ". 0 or 1 is expected.";
         return 1;
       }
       A->Append (ival != 0);
@@ -2475,7 +2479,6 @@ static Standard_Integer DDataStd_GetByteArray (Draw_Interpretor& di,
     }
 
     for(Standard_Integer i = A->Lower(); i<=A->Upper(); i++){
-      //std::cout <<  A->Value(i)   << std::endl;
       di  <<  A->Value(i);
       if(i<A->Upper())  
         di<<" ";
@@ -3202,6 +3205,7 @@ static Standard_Integer DDataStd_SetNDataIntegers2 (Draw_Interpretor& di,
   
     j = 1111;
     TCollection_ExtendedString aKey("Key_");
+    anAtt->LoadDeferredData();
     for(Standard_Integer i = 1; i<=aNumP; i++) {
       TCollection_ExtendedString key = aKey + i;
       Standard_Integer aVal = j+i;
@@ -3237,7 +3241,7 @@ static Standard_Integer DDataStd_SetNDataIntAr2 (Draw_Interpretor& di,
     if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
       anAtt = TDataStd_NamedData::Set(aLabel);
     if(anAtt.IsNull()) {
-      std::cout<< "NamedData attribute is not found or not set"  << std::endl;
+      Message::SendFail() << "NamedData attribute is not found or not set";
       return 1;}
   
     j = 15;
@@ -3247,6 +3251,7 @@ static Standard_Integer DDataStd_SetNDataIntAr2 (Draw_Interpretor& di,
       anArr->SetValue(i, aVal);
       j++;
     }
+    anAtt->LoadDeferredData();
     anAtt->SetArrayOfIntegers(aKey, anArr); 
     return 0; 
   }
@@ -3316,7 +3321,7 @@ static Standard_Integer DDataStd_GetAsciiString (Draw_Interpretor& di,
     }
     Handle(TDataStd_AsciiString) anAtt;
     if( !aLabel.FindAttribute(aGuid, anAtt) ) {
-      std::cout << "AsciiString attribute is not found or not set"  << std::endl;
+      Message::SendFail() << "AsciiString attribute is not found or not set";
       return 1;
     }
 
@@ -3363,6 +3368,7 @@ static Standard_Integer DDataStd_SetNDataIntegers (Draw_Interpretor& di,
       return 1;}
   
     j = 4;
+    anAtt->LoadDeferredData();
     for(Standard_Integer i = 1; i<=aNumP; i++) {
       TCollection_ExtendedString aKey(arg[j]);
       Standard_Integer aVal = Draw::Atoi(arg[j+1]);
@@ -3392,18 +3398,21 @@ static Standard_Integer DDataStd_GetNDIntegers (Draw_Interpretor& di,
  
 
     Handle(TDataStd_NamedData) anAtt;
-    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt)) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
+
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;
+    anAtt->LoadDeferredData();
     const TColStd_DataMapOfStringInteger& aMap = anAtt->GetIntegersContainer();
     TColStd_DataMapIteratorOfDataMapOfStringInteger itr(aMap);
     for (; itr.More(); itr.Next()){
       TCollection_ExtendedString aKey(itr.Key());
-      TCollection_AsciiString aStr(aKey,'?');
       Standard_Integer aValue = itr.Value();
-       std::cout << "Key = "  << aStr.ToCString() << " Value = " <<aValue<<std::endl;;
+      di << "Key = " << aKey << " Value = " << aValue << "\n";
       }
 
     return 0; 
@@ -3428,19 +3437,23 @@ static Standard_Integer DDataStd_GetNDInteger (Draw_Interpretor& di,
  
 
     Handle(TDataStd_NamedData) anAtt;
-    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt)) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
 
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;    
-    if(!anAtt->HasInteger(arg[3])) {
+    anAtt->LoadDeferredData();
+    TCollection_ExtendedString aKey(arg[3], Standard_True);
+    if(!anAtt->HasInteger(aKey)) {
       std::cout << "There is no data specified by Key = "<< arg[3]  << std::endl;
       return 1;
     } else {
-      std::cout << "Key = "  << arg[3]  << " Value = " <<anAtt->GetInteger(arg[3])<<std::endl;
+      std::cout << "Key = "  << arg[3]  << " Value = " <<anAtt->GetInteger(aKey)<<std::endl;
       if(nb == 5) 
-        Draw::Set(arg[4], anAtt->GetInteger(arg[3]));
+        Draw::Set(arg[4], anAtt->GetInteger(aKey));
       return 0; 
     }
   }
@@ -3468,11 +3481,14 @@ static Standard_Integer DDataStd_SetNDataReals (Draw_Interpretor& di,
     Handle(TDataStd_NamedData) anAtt;
     if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
       anAtt = TDataStd_NamedData::Set(aLabel);
-    if(anAtt.IsNull()) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;;
-      return 1;}
+    if(anAtt.IsNull())
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
   
     j = 4;
+    anAtt->LoadDeferredData();
     for(Standard_Integer i = 1; i<=aNumP; i++) {
       TCollection_ExtendedString aKey(arg[j]);
       Standard_Real aVal = Draw::Atof(arg[j+1]);
@@ -3502,17 +3518,19 @@ static Standard_Integer DDataStd_GetNDReals (Draw_Interpretor& di,
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;
     Handle(TDataStd_NamedData) anAtt;
-    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt)) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
     
+    anAtt->LoadDeferredData();
     const TDataStd_DataMapOfStringReal& aMap = anAtt->GetRealsContainer();
     TDataStd_DataMapIteratorOfDataMapOfStringReal itr(aMap);
     for (; itr.More(); itr.Next()){
       TCollection_ExtendedString aKey(itr.Key());
-      TCollection_AsciiString aStr(aKey,'?');
       Standard_Real aValue = itr.Value();
-       std::cout << "Key = "  << aStr.ToCString() << " Value = " <<aValue<<std::endl;
+      di << "Key = " << aKey << " Value = " << aValue << "\n";
       }
     return 0; 
   }
@@ -3536,19 +3554,23 @@ static Standard_Integer DDataStd_GetNDReal (Draw_Interpretor& di,
  
 
     Handle(TDataStd_NamedData) anAtt;
-    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt)) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
 
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;    
-    if(!anAtt->HasReal(arg[3])) {
-      std::cout << "There is no data specified by Key = "<< arg[3]  << std::endl;
+    anAtt->LoadDeferredData();
+    TCollection_ExtendedString aKey(arg[3], Standard_True);
+    if(!anAtt->HasReal(aKey)) {
+      Message::SendFail() << "There is no data specified by Key = " << arg[3];
       return 1;
     } else {
-      std::cout << "Key = "  << arg[3]  << " Value = " <<anAtt->GetReal(arg[3])<<std::endl;
+      std::cout << "Key = "  << arg[3]  << " Value = " <<anAtt->GetReal(aKey)<<std::endl;
       if(nb == 5) 
-        Draw::Set(arg[4], anAtt->GetReal(arg[3]));
+        Draw::Set(arg[4], anAtt->GetReal(aKey));
       return 0; 
     }
   }
@@ -3581,6 +3603,7 @@ static Standard_Integer DDataStd_SetNDataStrings (Draw_Interpretor& di,
       return 1;}
   
     j = 4;
+    anAtt->LoadDeferredData();
     for(Standard_Integer i = 1; i<=aNumP; i++) {
       TCollection_ExtendedString aKey(arg[j]);
       TCollection_ExtendedString aVal(arg[j+1]);
@@ -3596,6 +3619,19 @@ static Standard_Integer DDataStd_SetNDataStrings (Draw_Interpretor& di,
 //=======================================================================
 //function :  GetNDStrings(DF, entry )
 //=======================================================================
+namespace
+{
+  typedef std::pair<TCollection_ExtendedString, TCollection_ExtendedString>
+    DDataStd_GetNDStrings_Property;
+
+  bool isLess(
+    const DDataStd_GetNDStrings_Property& theProperty1,
+    const DDataStd_GetNDStrings_Property& theProperty2)
+  {
+    return theProperty1.first.IsLess(theProperty2.first);
+  }
+}
+
 static Standard_Integer DDataStd_GetNDStrings (Draw_Interpretor& di,
 						Standard_Integer nb, 
 						const char** arg) 
@@ -3609,21 +3645,30 @@ static Standard_Integer DDataStd_GetNDStrings (Draw_Interpretor& di,
  
 
     Handle(TDataStd_NamedData) anAtt;
-    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt)) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
+
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;    
+    anAtt->LoadDeferredData();
     const TDataStd_DataMapOfStringString& aMap = anAtt->GetStringsContainer();
-    TDataStd_DataMapIteratorOfDataMapOfStringString itr(aMap);
-    for (; itr.More(); itr.Next()){
-      TCollection_ExtendedString aKey(itr.Key());
-      TCollection_AsciiString aStr(aKey,'?');
-      TCollection_ExtendedString aVal(itr.Value());
-      TCollection_AsciiString aStrValue(aVal,'?');
-      std::cout << "Key = "  << aStr.ToCString() << " Value = " <<aStrValue.ToCString()<< std::endl;
-      }
-    return 0; 
+
+    std::vector<DDataStd_GetNDStrings_Property> aProperties;
+    for (TDataStd_DataMapIteratorOfDataMapOfStringString aIt (aMap); aIt.More(); aIt.Next())
+    {
+      aProperties.push_back(DDataStd_GetNDStrings_Property (aIt.Key(), aIt.Value()));
+    }
+    std::sort (aProperties.begin(), aProperties.end(), isLess);
+
+    for (std::vector<DDataStd_GetNDStrings_Property>::size_type aI = 0; aI < aProperties.size(); ++aI)
+    {
+      di << "Key = " << aProperties[aI].first << " Value = " << aProperties[aI].second << "\n";
+    }
+
+    return 0;
   }
   di << "DDataStd_GetNDStrings : Error\n";
   return 1;
@@ -3651,11 +3696,16 @@ static Standard_Integer DDataStd_GetNDString (Draw_Interpretor& di,
 
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;    
-    if(!anAtt->HasString(arg[3])) {
-      std::cout << "There is no data specified by Key = "<< arg[3]  << std::endl;
+    anAtt->LoadDeferredData();
+    TCollection_ExtendedString aKey(arg[3], Standard_True);
+    if (!anAtt->HasString(aKey))
+    {
+      Message::SendFail() << "There is no data specified by Key = " << arg[3];
       return 1;
-    } else {
-      TCollection_AsciiString aValue (anAtt->GetString(arg[3]), '?');
+    }
+    else
+    {
+      TCollection_AsciiString aValue (anAtt->GetString(aKey));
       std::cout << "Key = "  << arg[3]  << " Value = " << aValue.ToCString() << std::endl;
       if(nb == 5) 
         Draw::Set(arg[4], aValue.ToCString());
@@ -3686,11 +3736,14 @@ static Standard_Integer DDataStd_SetNDataBytes (Draw_Interpretor& di,
     Handle(TDataStd_NamedData) anAtt;
     if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
       anAtt = TDataStd_NamedData::Set(aLabel);
-    if(anAtt.IsNull()) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if(anAtt.IsNull())
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
   
     j = 4;
+    anAtt->LoadDeferredData();
     for(Standard_Integer i = 1; i<=aNumP; i++) {
       TCollection_ExtendedString aKey(arg[j]);
       Standard_Byte aVal = (Standard_Byte)Draw::Atoi(arg[j+1]);
@@ -3719,19 +3772,23 @@ static Standard_Integer DDataStd_GetNDBytes (Draw_Interpretor& di,
  
 
     Handle(TDataStd_NamedData) anAtt;
-    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt)) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if (!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
+
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;      
+    anAtt->LoadDeferredData();
     const TDataStd_DataMapOfStringByte& aMap = anAtt->GetBytesContainer();
     TDataStd_DataMapIteratorOfDataMapOfStringByte itr(aMap);
-    for (; itr.More(); itr.Next()){
+    for (; itr.More(); itr.Next())
+    {
       TCollection_ExtendedString aKey(itr.Key());
-      TCollection_AsciiString aStr(aKey,'?');
       Standard_Byte aValue = itr.Value();
-      std::cout << "Key = "  << aStr.ToCString() << " Value = " <<aValue<<std::endl;
-      }
+      std::cout << "Key = "  << aKey << " Value = " <<aValue<<std::endl;
+    }
     return 0; 
   }
   di << "DDataStd_GetNDBytes : Error\n";
@@ -3754,19 +3811,26 @@ static Standard_Integer DDataStd_GetNDByte (Draw_Interpretor& di,
  
 
     Handle(TDataStd_NamedData) anAtt;
-    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt)) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if (!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
 
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;      
-    if(!anAtt->HasByte(arg[3])) {
-      std::cout << "There is no data specified by Key = "<< arg[3]  << std::endl;
+    anAtt->LoadDeferredData();
+    TCollection_ExtendedString aKey(arg[3], Standard_True);
+    if (!anAtt->HasByte(aKey))
+    {
+      Message::SendFail() << "There is no data specified by Key = " << arg[3];
       return 1;
-    } else {
-      std::cout << "Key = "  << arg[3]  << " Value = " <<anAtt->GetByte(arg[3])<< std::endl;
+    }
+    else
+    {
+      std::cout << "Key = "  << arg[3]  << " Value = " <<anAtt->GetByte(aKey)<< std::endl;
       if(nb == 5) 
-        Draw::Set(arg[4], anAtt->GetByte(arg[3]));
+        Draw::Set(arg[4], anAtt->GetByte(aKey));
       return 0; 
     }
   }
@@ -3796,9 +3860,11 @@ static Standard_Integer DDataStd_SetNDataIntAr (Draw_Interpretor& di,
     Handle(TDataStd_NamedData) anAtt;
     if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
       anAtt = TDataStd_NamedData::Set(aLabel);
-    if(anAtt.IsNull()) {
-      std::cout<< "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if (anAtt.IsNull())
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
   
     j = 5;
     Handle(TColStd_HArray1OfInteger) anArr =  new TColStd_HArray1OfInteger(1, aNum);
@@ -3807,6 +3873,7 @@ static Standard_Integer DDataStd_SetNDataIntAr (Draw_Interpretor& di,
       anArr->SetValue(i, aVal);
       j++;
     }
+    anAtt->LoadDeferredData();
     anAtt->SetArrayOfIntegers(aKey, anArr); 
     return 0; 
   }
@@ -3831,17 +3898,20 @@ static Standard_Integer DDataStd_GetNDIntArrays (Draw_Interpretor& di,
     
     
     Handle(TDataStd_NamedData) anAtt;
-    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt)) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
+
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;      
+    anAtt->LoadDeferredData();
     const TDataStd_DataMapOfStringHArray1OfInteger& aMap = anAtt->GetArraysOfIntegersContainer();
     TDataStd_DataMapIteratorOfDataMapOfStringHArray1OfInteger itr(aMap);
     for (; itr.More(); itr.Next()){
       TCollection_ExtendedString aKey(itr.Key());
-      TCollection_AsciiString aStr(aKey,'?');
-      std::cout << "Key = "  << aStr.ToCString()<< std::endl;
+      std::cout << "Key = "  << aKey<< std::endl;
       Handle(TColStd_HArray1OfInteger) anArrValue = itr.Value();      
       if(!anArrValue.IsNull()) {
         Standard_Integer lower = anArrValue->Lower();
@@ -3875,19 +3945,26 @@ static Standard_Integer DDataStd_GetNDIntArray (Draw_Interpretor& di,
  
 
     Handle(TDataStd_NamedData) anAtt;
-    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt)) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if (!aLabel.FindAttribute (TDataStd_NamedData::GetID(), anAtt))
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
 
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;      
-    if(!anAtt->HasArrayOfIntegers(arg[3])) {
-      std::cout << "There is no data specified by Key = "<< arg[3]  << std::endl;
+    anAtt->LoadDeferredData();
+    TCollection_ExtendedString aKey(arg[3], Standard_True);
+    if (!anAtt->HasArrayOfIntegers(aKey))
+    {
+      Message::SendFail() << "There is no data specified by Key = " << arg[3];
       return 1;
-    } else {
+    }
+    else
+    {
       std::cout << "Key = "  << arg[3] <<std::endl;
 
-      Handle(TColStd_HArray1OfInteger) anArrValue = anAtt->GetArrayOfIntegers(arg[3]);      
+      Handle(TColStd_HArray1OfInteger) anArrValue = anAtt->GetArrayOfIntegers(aKey);
       if(!anArrValue.IsNull()) {
         Standard_Integer lower = anArrValue->Lower();
         Standard_Integer upper = anArrValue->Upper();
@@ -3926,10 +4003,12 @@ static Standard_Integer DDataStd_SetNDataRealAr (Draw_Interpretor& di,
     Handle(TDataStd_NamedData) anAtt;
     if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
       anAtt = TDataStd_NamedData::Set(aLabel);
-    if(anAtt.IsNull()) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
-  
+    if (anAtt.IsNull())
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
+
     j = 5;
     Handle(TColStd_HArray1OfReal) anArr =  new TColStd_HArray1OfReal(1, aNum);
     for(Standard_Integer i = 1; i<=aNum; i++) {
@@ -3937,6 +4016,7 @@ static Standard_Integer DDataStd_SetNDataRealAr (Draw_Interpretor& di,
       anArr->SetValue(i, aVal);
       j++;
     }
+    anAtt->LoadDeferredData();
     anAtt->SetArrayOfReals(aKey, anArr); 
     return 0; 
   }
@@ -3961,17 +4041,20 @@ static Standard_Integer DDataStd_GetNDRealArrays (Draw_Interpretor& di,
     
     
     Handle(TDataStd_NamedData) anAtt;
-    if(!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt)) {
-      std::cout << "NamedData attribute is not found or not set"  << std::endl;
-      return 1;}
+    if (!aLabel.FindAttribute(TDataStd_NamedData::GetID(), anAtt))
+    {
+      Message::SendFail() << "NamedData attribute is not found or not set";
+      return 1;
+    }
+
     std::cout <<std::endl;
     std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;      
+    anAtt->LoadDeferredData();
     const TDataStd_DataMapOfStringHArray1OfReal& aMap = anAtt->GetArraysOfRealsContainer();
     TDataStd_DataMapIteratorOfDataMapOfStringHArray1OfReal itr(aMap);
     for (; itr.More(); itr.Next()){
       TCollection_ExtendedString aKey(itr.Key());
-      TCollection_AsciiString aStr(aKey,'?');
-      std::cout << "Key = "  << aStr.ToCString()<<std::endl;
+      std::cout << "Key = "  << aKey << std::endl;
       Handle(TColStd_HArray1OfReal) anArrValue = itr.Value();      
       if(!anArrValue.IsNull()) {
         Standard_Integer lower = anArrValue->Lower();
@@ -4010,14 +4093,16 @@ static Standard_Integer DDataStd_GetNDRealArray (Draw_Interpretor& di,
       return 1;}
 
     std::cout <<std::endl;
-    std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;      
-    if(!anAtt->HasArrayOfReals(arg[3])) {
+    std::cout <<"NamedData attribute at Label = " << arg[2] <<std::endl;
+    anAtt->LoadDeferredData();
+    TCollection_ExtendedString aKey(arg[3], Standard_True);
+    if(!anAtt->HasArrayOfReals(aKey)) {
       std::cout << "There is no data specified by Key = "<< arg[3]  << std::endl;
       return 1;
     } else {
       std::cout << "Key = "  << arg[3] <<std::endl;
 
-      Handle(TColStd_HArray1OfReal) anArrValue = anAtt->GetArrayOfReals(arg[3]);      
+      Handle(TColStd_HArray1OfReal) anArrValue = anAtt->GetArrayOfReals(aKey);
       if(!anArrValue.IsNull()) {
         Standard_Integer lower = anArrValue->Lower();
         Standard_Integer upper = anArrValue->Upper();

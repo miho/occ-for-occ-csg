@@ -233,6 +233,7 @@ void V3d_View::Update() const
   myIsInvalidatedImmediate = Standard_False;
   myView->Update();
   myView->Compute();
+  AutoZFit();
   myView->Redraw();
 }
 
@@ -478,9 +479,21 @@ void V3d_View::SetBackgroundImage (const Standard_CString theFileName,
                                    const Aspect_FillMethod theFillStyle,
                                    const Standard_Boolean theToUpdate)
 {
-  myView->SetBackgroundImage (theFileName);
-  myView->SetBackgroundImageStyle (theFillStyle);
+  Handle(Graphic3d_Texture2D) aTextureMap = new Graphic3d_Texture2Dmanual (theFileName);
+  aTextureMap->DisableModulate();
+  SetBackgroundImage (aTextureMap, theFillStyle, theToUpdate);
+}
 
+//=============================================================================
+//function : SetBackgroundImage
+//purpose  :
+//=============================================================================
+void V3d_View::SetBackgroundImage (const Handle(Graphic3d_Texture2D)& theTexture,
+                                   const Aspect_FillMethod theFillStyle,
+                                   const Standard_Boolean theToUpdate)
+{
+  myView->SetBackgroundImage (theTexture);
+  myView->SetBackgroundImageStyle (theFillStyle);
   if (myImmediateUpdate || theToUpdate)
   {
     Redraw();
@@ -506,10 +519,36 @@ void V3d_View::SetBgImageStyle (const Aspect_FillMethod theFillStyle, const Stan
 //purpose  :
 //=============================================================================
 void V3d_View::SetBackgroundCubeMap (const Handle(Graphic3d_CubeMap)& theCubeMap,
+                                     Standard_Boolean                 theToUpdatePBREnv,
                                      Standard_Boolean                 theToUpdate)
 {
-  myView->SetBackgroundCubeMap (theCubeMap);
+  myView->SetBackgroundImage (theCubeMap, theToUpdatePBREnv);
+  if (myImmediateUpdate || theToUpdate)
+  {
+    Redraw();
+  }
+}
 
+//=============================================================================
+//function : GeneratePBREnvironment
+//purpose  :
+//=============================================================================
+void V3d_View::GeneratePBREnvironment (Standard_Boolean theToUpdate)
+{
+  myView->GeneratePBREnvironment();
+  if (myImmediateUpdate || theToUpdate)
+  {
+    Redraw();
+  }
+}
+
+//=============================================================================
+//function : ClearPBREnvironment
+//purpose  :
+//=============================================================================
+void V3d_View::ClearPBREnvironment (Standard_Boolean theToUpdate)
+{
+  myView->ClearPBREnvironment();
   if (myImmediateUpdate || theToUpdate)
   {
     Redraw();
@@ -592,8 +631,6 @@ void V3d_View::SetFront()
 
   aCamera->SetUp (gp_Dir (xu, yu, zu));
 
-  AutoZFit();
-
   SwitchSetFront = !SwitchSetFront;
 
   ImmediateUpdate();
@@ -648,8 +685,6 @@ void V3d_View::Rotate (const Standard_Real ax,
   aTrsf.Multiply (aRot[2]);
 
   aCamera->Transform (aTrsf);
-
-  AutoZFit();
 
   ImmediateUpdate();
 }
@@ -706,8 +741,6 @@ void V3d_View::Rotate(const Standard_Real ax, const Standard_Real ay, const Stan
   aTrsf.Multiply (aRot[2]);
 
   aCamera->Transform (aTrsf);
-
-  AutoZFit();
 
   ImmediateUpdate();
 }
@@ -777,8 +810,6 @@ void V3d_View::Rotate (const V3d_TypeOfAxe theAxe, const Standard_Real theAngle,
 
   aCamera->Transform (aRotation);
 
-  AutoZFit();
-
   ImmediateUpdate();
 }
 
@@ -813,8 +844,6 @@ void V3d_View::Rotate(const Standard_Real angle, const Standard_Boolean Start)
   aRotation.SetRotation (gp_Ax1 (aRCenter, aRAxis), Angle);
 
   aCamera->Transform (aRotation);
-
-  AutoZFit();
 
   ImmediateUpdate();
 }
@@ -865,8 +894,6 @@ void V3d_View::Turn(const Standard_Real ax, const Standard_Real ay, const Standa
   aTrsf.Multiply (aRot[2]);
 
   aCamera->Transform (aTrsf);
-
-  AutoZFit();
 
   ImmediateUpdate();
 }
@@ -922,8 +949,6 @@ void V3d_View::Turn(const Standard_Real angle, const Standard_Boolean Start)
 
   aCamera->Transform (aRotation);
 
-  AutoZFit();
-
   ImmediateUpdate();
 }
 
@@ -957,8 +982,6 @@ void V3d_View::SetTwist(const Standard_Real angle)
   aCamera->SetUp (gp_Dir (myYscreenAxis));
   aCamera->Transform (aTrsf);
 
-  AutoZFit();
-
   ImmediateUpdate();
 }
 
@@ -977,8 +1000,6 @@ void V3d_View::SetEye(const Standard_Real X,const Standard_Real Y,const Standard
   aCamera->SetEye (gp_Pnt (X, Y, Z));
 
   SetTwist (aTwistBefore);
-
-  AutoZFit();
 
   SetImmediateUpdate (wasUpdateEnabled);
 
@@ -1010,8 +1031,6 @@ void V3d_View::SetDepth(const Standard_Real Depth)
     aCamera->SetCenter (aCameraCenter);
   }
 
-  AutoZFit();
-
   ImmediateUpdate();
 }
 
@@ -1031,8 +1050,6 @@ void V3d_View::SetProj( const Standard_Real Vx,const Standard_Real Vy, const Sta
   Camera()->SetDirection (gp_Dir (Vx, Vy, Vz).Reversed());
 
   SetTwist(aTwistBefore);
-
-  AutoZFit();
 
   SetImmediateUpdate (wasUpdateEnabled);
 
@@ -1082,8 +1099,6 @@ void V3d_View::SetProj (const V3d_TypeOfOrientation theOrientation,
 
   Panning (anOriginVCS.X(), anOriginVCS.Y());
 
-  AutoZFit();
-
   ImmediateUpdate();
 }
 
@@ -1100,8 +1115,6 @@ void V3d_View::SetAt(const Standard_Real X,const Standard_Real Y,const Standard_
   Camera()->SetCenter (gp_Pnt (X, Y, Z));
 
   SetTwist (aTwistBefore);
-
-  AutoZFit();
 
   SetImmediateUpdate (wasUpdateEnabled);
 
@@ -1128,8 +1141,6 @@ void V3d_View::SetUp (const Standard_Real theVx, const Standard_Real theVy, cons
 
   aCamera->SetUp (gp_Dir (myYscreenAxis));
 
-  AutoZFit();
-
   ImmediateUpdate();
 }
 
@@ -1152,8 +1163,6 @@ void V3d_View::SetUp (const V3d_TypeOfOrientation theOrientation)
   }
 
   aCamera->SetUp (gp_Dir (myYscreenAxis));
-
-  AutoZFit();
 
   ImmediateUpdate();
 }
@@ -1183,9 +1192,6 @@ void V3d_View::SetViewMappingDefault()
 void V3d_View::ResetViewOrientation()
 {
   Camera()->CopyOrientationData (myDefaultCamera);
-
-  AutoZFit();
-
   ImmediateUpdate();
 }
 
@@ -1196,9 +1202,6 @@ void V3d_View::ResetViewOrientation()
 void V3d_View::ResetViewMapping()
 {
   Camera()->CopyMappingData (myDefaultCamera);
-
-  AutoZFit();
-
   ImmediateUpdate();
 }
 
@@ -1209,8 +1212,6 @@ void V3d_View::ResetViewMapping()
 void V3d_View::Reset (const Standard_Boolean theToUpdate)
 {
   Camera()->Copy (myDefaultCamera);
-
-  AutoZFit();
 
   SwitchSetFront = Standard_False;
 
@@ -1245,8 +1246,6 @@ void V3d_View::SetSize (const Standard_Real theSize)
   Handle(Graphic3d_Camera) aCamera = Camera();
 
   aCamera->SetScale (aCamera->Aspect() >= 1.0 ? theSize / aCamera->Aspect() : theSize);
-
-  AutoZFit();
 
   ImmediateUpdate();
 }
@@ -1349,8 +1348,6 @@ void V3d_View::SetZoom (const Standard_Real theCoef,const Standard_Boolean theTo
   aCamera->SetCenter (myCamStartOpCenter);
   aCamera->SetScale (aCamera->Scale() / aCoef);
 
-  AutoZFit();
-
   ImmediateUpdate();
 }
 
@@ -1368,8 +1365,6 @@ void V3d_View::SetScale( const Standard_Real Coef )
   aCamera->SetAspect (myDefaultCamera->Aspect());
   aCamera->SetScale (aDefaultScale / Coef);
 
-  AutoZFit();
-
   ImmediateUpdate();
 }
 
@@ -1382,8 +1377,6 @@ void V3d_View::SetAxialScale( const Standard_Real Sx, const Standard_Real Sy, co
   V3d_BadValue_Raise_if( Sx <= 0. || Sy <= 0. || Sz <= 0.,"V3d_View::SetAxialScale, bad coefficient");
 
   Camera()->SetAxialScale (gp_XYZ (Sx, Sy, Sz));
-
-  AutoZFit();
 }
 
 //=============================================================================
@@ -1436,8 +1429,6 @@ void V3d_View::FitAll (const Bnd_Box& theBox, const Standard_Real theMargin, con
   {
     return;
   }
-
-  AutoZFit();
 
   if (myImmediateUpdate || theToUpdate)
   {
@@ -1562,7 +1553,6 @@ void V3d_View::WindowFit (const Standard_Integer theMinXp,
 
     Translate (aCamera, aPanVec.X(), -aPanVec.Y());
     Scale (aCamera, aUSize, aVSize);
-    AutoZFit();
   }
   else
   {
@@ -2465,8 +2455,6 @@ void V3d_View::ZoomAtPoint (const Standard_Integer theMouseStartX,
   aCamera->SetScale (aCamera->Scale() / aCoef);
   Translate (aCamera, aZoomAtPointXv - aDxv, aZoomAtPointYv - aDyv);
 
-  AutoZFit();
-
   SetImmediateUpdate (wasUpdateEnabled);
 
   ImmediateUpdate();
@@ -2518,8 +2506,6 @@ void V3d_View::FitAll(const Standard_Real theXmin,
 
   Translate (aCamera, (theXmin + theXmax) * 0.5, (theYmin + theYmax) * 0.5);
   Scale (aCamera, aFitSizeU, aFitSizeV);
-
-  AutoZFit();
 
   ImmediateUpdate();
 }
@@ -2674,19 +2660,19 @@ Standard_Boolean V3d_View::ToPixMap (Image_PixMap&               theImage,
         case Graphic3d_BT_RGBA:                aFormat = Image_Format_RGBA;  break;
         case Graphic3d_BT_Depth:               aFormat = Image_Format_GrayF; break;
         case Graphic3d_BT_RGB_RayTraceHdrLeft: aFormat = Image_Format_RGBF;  break;
+        case Graphic3d_BT_Red:                 aFormat = Image_Format_Gray;  break;
       }
 
       if (!theImage.InitZero (aFormat, Standard_Size(aTargetSize.x()), Standard_Size(aTargetSize.y())))
       {
-        Message::DefaultMessenger()->Send (TCollection_AsciiString ("Fail to allocate an image ") + aTargetSize.x() + "x" + aTargetSize.y()
-                                                                 + " for view dump", Message_Fail);
+        Message::SendFail (TCollection_AsciiString ("Fail to allocate an image ") + aTargetSize.x() + "x" + aTargetSize.y() + " for view dump");
         return Standard_False;
       }
     }
   }
   if (theImage.IsEmpty())
   {
-    Message::DefaultMessenger()->Send (TCollection_AsciiString ("V3d_View::ToPixMap() has been called without image dimensions"), Message_Fail);
+    Message::SendFail ("V3d_View::ToPixMap() has been called without image dimensions");
     return Standard_False;
   }
   aTargetSize.x() = (Standard_Integer )theImage.SizeX();
@@ -2729,8 +2715,8 @@ Standard_Boolean V3d_View::ToPixMap (Image_PixMap&               theImage,
     if (theParams.TileSize > aMaxTexSizeX
      || theParams.TileSize > aMaxTexSizeY)
     {
-      Message::DefaultMessenger()->Send (TCollection_AsciiString ("Image dump can not be performed - specified tile size (")
-                                                                 + theParams.TileSize + ") exceeds hardware limits (" + aMaxTexSizeX + "x" + aMaxTexSizeY + ")", Message_Fail);
+      Message::SendFail (TCollection_AsciiString ("Image dump can not be performed - specified tile size (")
+                       + theParams.TileSize + ") exceeds hardware limits (" + aMaxTexSizeX + "x" + aMaxTexSizeY + ")");
       return Standard_False;
     }
 
@@ -2739,10 +2725,10 @@ Standard_Boolean V3d_View::ToPixMap (Image_PixMap&               theImage,
     {
       if (MyViewer->Driver()->InquireLimit (Graphic3d_TypeOfLimit_IsWorkaroundFBO))
       {
-        Message::DefaultMessenger ()->Send (TCollection_AsciiString ("Warning, workaround for Intel driver problem with empty FBO for images with big width is applyed."), Message_Warning);
+        Message::SendWarning ("Warning, workaround for Intel driver problem with empty FBO for images with big width is applied");
       }
-      Message::DefaultMessenger()->Send (TCollection_AsciiString ("Info, tiling image dump is used, image size (")
-                                                                 + aFBOVPSize.x() + "x" + aFBOVPSize.y() + ") exceeds hardware limits (" + aMaxTexSizeX + "x" + aMaxTexSizeY + ")", Message_Info);
+      Message::SendInfo (TCollection_AsciiString ("Info, tiling image dump is used, image size (")
+                       + aFBOVPSize.x() + "x" + aFBOVPSize.y() + ") exceeds hardware limits (" + aMaxTexSizeX + "x" + aMaxTexSizeY + ")");
       aFBOVPSize.x() = Min (aFBOVPSize.x(), aMaxTexSizeX);
       aFBOVPSize.y() = Min (aFBOVPSize.y(), aMaxTexSizeY);
       isTiling = true;
@@ -2765,7 +2751,7 @@ Standard_Boolean V3d_View::ToPixMap (Image_PixMap&               theImage,
     }
     aFBOVPSize = aWinSize;
 
-    Message::DefaultMessenger()->Send (TCollection_AsciiString ("Warning, on screen buffer is used for image dump - content might be invalid"), Message_Warning);
+    Message::SendWarning ("Warning, on screen buffer is used for image dump - content might be invalid");
   }
 
   // backup camera parameters
@@ -2801,7 +2787,6 @@ Standard_Boolean V3d_View::ToPixMap (Image_PixMap&               theImage,
   {
     aCamera->SetAspect (Standard_Real(aTargetSize.x()) / Standard_Real(aTargetSize.y()));
   }
-  AutoZFit();
 
   // render immediate structures into back buffer rather than front
   const Standard_Boolean aPrevImmediateMode = myView->SetImmediateModeDrawToFront (Standard_False);
@@ -3183,4 +3168,56 @@ const Graphic3d_RenderingParams& V3d_View::RenderingParams() const
 Graphic3d_RenderingParams& V3d_View::ChangeRenderingParams()
 {
   return myView->ChangeRenderingParams();
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void V3d_View::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOldMouseX)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOldMouseY)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCamStartOpUp)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCamStartOpDir)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCamStartOpEye)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCamStartOpCenter)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDefaultCamera.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myView.get())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myImmediateUpdate)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsInvalidatedImmediate)
+  
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, MyViewer)
+  for (V3d_ListOfLight::Iterator anIterator (myActiveLights); anIterator.More(); anIterator.Next())
+  {
+    class Handle(Graphic3d_CLight)& anActiveLight = anIterator.Value();
+    OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, anActiveLight)
+  }
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myDefaultViewAxis)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myDefaultViewPoint)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, MyWindow.get())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, sx)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, sy)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, rx)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, ry)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myRotateGravity)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myComputedMode)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, SwitchSetFront)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myZRotation)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, MyZoomAtPointX)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, MyZoomAtPointY)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTrihedron.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, MyGrid.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &MyPlane)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, MyGridEchoStructure.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, MyGridEchoGroup.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myXscreenAxis)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myYscreenAxis)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myZscreenAxis)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myViewAxis)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myGravityReferencePoint)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAutoZFitIsOn)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myAutoZFitScaleFactor)
 }

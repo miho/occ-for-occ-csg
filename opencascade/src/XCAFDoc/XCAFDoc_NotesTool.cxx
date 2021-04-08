@@ -11,6 +11,8 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <XCAFDoc_NotesTool.hxx>
+
 #include <Standard_GUID.hxx>
 #include <NCollection_Map.hxx>
 #include <TColStd_HArray1OfByte.hxx>
@@ -21,7 +23,6 @@
 #include <TDF_Tool.hxx>
 #include <XCAFDoc.hxx>
 #include <XCAFDoc_GraphNode.hxx>
-#include <XCAFDoc_NotesTool.hxx>
 #include <XCAFDoc_NoteBalloon.hxx>
 #include <XCAFDoc_NoteComment.hxx>
 #include <XCAFDoc_NoteBinData.hxx>
@@ -38,7 +39,7 @@ namespace {
 
 }
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_NotesTool, TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE(XCAFDoc_NotesTool, XCAFDoc_NoteComment)
 
 enum NotesTool_RootLabels
 {
@@ -1016,35 +1017,6 @@ const Standard_GUID&
 XCAFDoc_NotesTool::ID() const
 {
   return GetID();
-}
-
-// =======================================================================
-// function : NewEmpty
-// purpose  :
-// =======================================================================
-Handle(TDF_Attribute)
-XCAFDoc_NotesTool::NewEmpty() const
-{
-  return new XCAFDoc_NotesTool();
-}
-
-// =======================================================================
-// function : Restore
-// purpose  :
-// =======================================================================
-void
-XCAFDoc_NotesTool::Restore(const Handle(TDF_Attribute)& /*theAttr*/)
-{
-}
-
-// =======================================================================
-// function : Paste
-// purpose  :
-// =======================================================================
-void
-XCAFDoc_NotesTool::Paste(const Handle(TDF_Attribute)&       /*theAttrInto*/,
-                         const Handle(TDF_RelocationTable)& /*theRT*/) const
-{
 }
 
 // =======================================================================

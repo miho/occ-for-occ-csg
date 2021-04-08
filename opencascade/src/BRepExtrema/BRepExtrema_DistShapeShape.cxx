@@ -35,7 +35,6 @@
 #include <BRepExtrema_UnCompatibleShape.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepClass3d_SolidClassifier.hxx>
-#include <NCollection_Comparator.hxx>
 #include <NCollection_Vector.hxx>
 #include <StdFail_NotDone.hxx>
 
@@ -81,7 +80,12 @@ namespace
     Standard_Real    Distance; //!< Distance between sub-shapes
 
     //! Uninitialized constructor for collection.
-    BRepExtrema_CheckPair() {}
+    BRepExtrema_CheckPair()
+    : Index1(0),
+      Index2(0),
+      Distance(0.0)
+    {
+    }
 
     //! Creates new pair of sub-shapes.
     BRepExtrema_CheckPair (Standard_Integer theIndex1,

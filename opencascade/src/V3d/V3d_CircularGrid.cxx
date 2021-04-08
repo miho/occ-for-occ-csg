@@ -172,7 +172,7 @@ void V3d_CircularGrid::UpdateDisplay ()
                       -SinAlpha, CosAlpha, 0.0, -YOrigin(),
                             0.0,      0.0, 1.0, 0.0);
     aTrsf.Multiply (aTrsf2);
-    myStructure->SetTransformation (new Geom_Transformation (aTrsf));
+    myStructure->SetTransformation (new TopLoc_Datum3D (aTrsf));
 
     myCurAngle = RotationAngle ();
     myCurXo = XOrigin (), myCurYo = YOrigin ();
@@ -360,4 +360,30 @@ void V3d_CircularGrid::SetGraphicValues (const Standard_Real theRadius, const St
     myCurAreDefined = Standard_False;
   }
   if( !myCurAreDefined ) UpdateDisplay();
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void V3d_CircularGrid::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS(theOStream, theDepth, Aspect_CircularGrid)
+  
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myStructure.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myGroup.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCurViewPlane)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myViewer)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCurAreDefined)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToComputePrs)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCurDrawMode)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCurXo)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCurYo)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCurAngle)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCurStep)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCurDivi)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myRadius)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myOffSet)
 }

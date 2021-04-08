@@ -22,6 +22,7 @@
 #include <Interface_IntVal.hxx>
 #include <Interface_Macros.hxx>
 #include <Message_Messenger.hxx>
+#include <Message_ProgressScope.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_Failure.hxx>
 #include <TColStd_HSequenceOfTransient.hxx>
@@ -177,7 +178,7 @@ void XSControl_WorkSession::ClearContext ()
 
 Standard_Boolean  XSControl_WorkSession::PrintTransferStatus(const Standard_Integer num,
                                                              const Standard_Boolean wri,
-                                                             const Handle(Message_Messenger)& S) const
+                                                             Standard_OStream& S) const
 {
   const Handle(Transfer_FinderProcess)    &FP = myTransferWriter->FinderProcess();
   Handle(Transfer_TransientProcess) TP = myTransferReader->TransientProcess();
@@ -209,16 +210,16 @@ Standard_Boolean  XSControl_WorkSession::PrintTransferStatus(const Standard_Inte
     {
       S<<"  ** Transfer Root n0."<<ne;
     }
-    S<<Message_EndLine;
+    S<<std::endl;
     ent = FP->FindTransient(finder);
-    S<<" -> Type "<<finder->DynamicType()->Name()<<Message_EndLine;
+    S<<" -> Type "<<finder->DynamicType()->Name()<<std::endl;
     FP->StartTrace (binder,finder,0,0);  // pb sout/S
     if (!ent.IsNull()) {
       S<<" ** Resultat Transient, type "<<ent->DynamicType()->Name();
       const Handle(Interface_InterfaceModel) &model = Model();
       if (!model.IsNull())
-	{  S<<" In output Model, Entity ";  model->Print(ent,S);  }
-      S<<Message_EndLine;
+	{  S<<" In output Model, Entity ";  model->Print(ent, S);  }
+      S<<std::endl;
     }
   }
 
@@ -248,10 +249,10 @@ Standard_Boolean  XSControl_WorkSession::PrintTransferStatus(const Standard_Inte
     {
       S<<"  ** Transfer Root n0."<<ne;
     }
-    S<<Message_EndLine;
-    if (!model.IsNull())  {  S<<" In Model, Entity ";  model->Print(ent,S); }
+    S<<std::endl;
+    if (!model.IsNull())  {  S<<" In Model, Entity ";  model->Print(ent, S); }
     binder = TP->MapItem (ne);
-    S<<Message_EndLine;
+    S<<std::endl;
     TP->StartTrace (binder,ent,0,0);
 
   }
@@ -262,11 +263,11 @@ Standard_Boolean  XSControl_WorkSession::PrintTransferStatus(const Standard_Inte
     Standard_Integer i,nbw = ch->NbWarnings(), nbf = ch->NbFails();
     if (nbw > 0) {
       S<<" - Warnings : "<<nbw<<" :\n";
-      for (i = 1; i <= nbw; i ++) S<<ch->CWarning(i)<<Message_EndLine;
+      for (i = 1; i <= nbw; i ++) S<<ch->CWarning(i)<<std::endl;
     }
     if (nbf > 0) {
       S<<" - Fails : "<<nbf<<" :\n";
-      for (i = 1; i <= nbf; i ++) S<<ch->CFail(i)<<Message_EndLine;
+      for (i = 1; i <= nbf; i ++) S<<ch->CFail(i)<<std::endl;
     }
   }
   return Standard_True;
@@ -400,14 +401,17 @@ Handle(Standard_Transient)  XSControl_WorkSession::Result
 //purpose  : 
 //=======================================================================
 
-Standard_Integer XSControl_WorkSession::TransferReadOne (const Handle(Standard_Transient)& ent)
+Standard_Integer XSControl_WorkSession::TransferReadOne (const Handle(Standard_Transient)& ent,
+                                                         const Message_ProgressRange& theProgress)
 {
   Handle(Interface_InterfaceModel) model = Model();
-  if (ent == model) return TransferReadRoots();
+  if (ent == model) return TransferReadRoots(theProgress);
 
   Handle(TColStd_HSequenceOfTransient) list = GiveList(ent);
-  if (list->Length() == 1) return myTransferReader->TransferOne(list->Value(1));
-  else return myTransferReader->TransferList (list);
+  if (list->Length() == 1)
+    return myTransferReader->TransferOne(list->Value(1), Standard_True, theProgress);
+  else
+    return myTransferReader->TransferList (list, Standard_True, theProgress);
 }
 
 
@@ -416,9 +420,9 @@ Standard_Integer XSControl_WorkSession::TransferReadOne (const Handle(Standard_T
 //purpose  : 
 //=======================================================================
 
-Standard_Integer XSControl_WorkSession::TransferReadRoots ()
+Standard_Integer XSControl_WorkSession::TransferReadRoots (const Message_ProgressRange& theProgress)
 {
-  return myTransferReader->TransferRoots(Graph());
+  return myTransferReader->TransferRoots(Graph(), theProgress);
 }
 
 
@@ -453,7 +457,9 @@ Handle(Interface_InterfaceModel) XSControl_WorkSession::NewModel ()
 //purpose  : 
 //=======================================================================
 
-IFSelect_ReturnStatus XSControl_WorkSession::TransferWriteShape (const TopoDS_Shape& shape, const Standard_Boolean compgraph)
+IFSelect_ReturnStatus XSControl_WorkSession::TransferWriteShape (const TopoDS_Shape& shape,
+                                                                 const Standard_Boolean compgraph,
+                                                                 const Message_ProgressRange& theProgress)
 {
   IFSelect_ReturnStatus  status;
   if (myController.IsNull()) return IFSelect_RetError;
@@ -463,7 +469,9 @@ IFSelect_ReturnStatus XSControl_WorkSession::TransferWriteShape (const TopoDS_Sh
     return IFSelect_RetVoid;
   }
 
-  status = myTransferWriter->TransferWriteShape (model,shape);
+  status = myTransferWriter->TransferWriteShape(model, shape, theProgress);
+  if (theProgress.UserBreak())
+    return IFSelect_RetStop;
   //  qui s occupe de tout, try/catch inclus
 
   //skl insert param compgraph for XDE writing 10.12.2003

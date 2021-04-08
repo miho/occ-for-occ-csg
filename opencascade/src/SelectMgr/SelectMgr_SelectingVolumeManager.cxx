@@ -14,6 +14,7 @@
 // commercial license or contractual agreement.
 
 #include <SelectMgr_SelectingVolumeManager.hxx>
+#include <Standard_Dump.hxx>
 
 //=======================================================================
 // function : SelectMgr_SelectingVolumeManager
@@ -229,6 +230,7 @@ void SelectMgr_SelectingVolumeManager::BuildSelectingVolume (const TColgp_Array1
     return;
 
   mySelectingVolumes[FrustumSet]->Build (thePoints);
+  Handle(SelectMgr_TriangularFrustumSet)::DownCast (mySelectingVolumes[FrustumSet])->SetAllowOverlapDetection (IsOverlapAllowed());
 }
 
 //=======================================================================
@@ -401,7 +403,7 @@ void SelectMgr_SelectingVolumeManager::AllowOverlapDetection (const Standard_Boo
 //=======================================================================
 Standard_Boolean SelectMgr_SelectingVolumeManager::IsOverlapAllowed() const
 {
-  return myActiveSelectionType != Box || myToAllowOverlap;
+  return myToAllowOverlap || myActiveSelectionType == Point;
 }
 
 //=======================================================================
@@ -413,8 +415,7 @@ const gp_Pnt* SelectMgr_SelectingVolumeManager::GetVertices() const
   if (myActiveSelectionType == Polyline)
     return NULL;
 
-  const SelectMgr_RectangularFrustum* aFr =
-    reinterpret_cast<const SelectMgr_RectangularFrustum*> (mySelectingVolumes[myActiveSelectionType / 2].get());
+  const SelectMgr_RectangularFrustum* aFr = static_cast<const SelectMgr_RectangularFrustum*> (mySelectingVolumes[myActiveSelectionType / 2].get());
   return aFr->GetVertices();
 }
 
@@ -427,8 +428,7 @@ gp_Pnt SelectMgr_SelectingVolumeManager::GetNearPickedPnt() const
   if (myActiveSelectionType == Polyline)
     return gp_Pnt();
 
-   const SelectMgr_RectangularFrustum* aFr =
-     reinterpret_cast<const SelectMgr_RectangularFrustum*> (mySelectingVolumes[myActiveSelectionType / 2].get());
+  const SelectMgr_RectangularFrustum* aFr = static_cast<const SelectMgr_RectangularFrustum*> (mySelectingVolumes[myActiveSelectionType / 2].get());
   return aFr->GetNearPnt();
 }
 
@@ -441,8 +441,7 @@ gp_Pnt SelectMgr_SelectingVolumeManager::GetFarPickedPnt() const
   if (myActiveSelectionType == Polyline)
     return gp_Pnt();
 
-   const SelectMgr_RectangularFrustum* aFr =
-     reinterpret_cast<const SelectMgr_RectangularFrustum*> (mySelectingVolumes[myActiveSelectionType / 2].get());
+  const SelectMgr_RectangularFrustum* aFr = static_cast<const SelectMgr_RectangularFrustum*> (mySelectingVolumes[myActiveSelectionType / 2].get());
   return aFr->GetFarPnt();
 }
 
@@ -451,14 +450,16 @@ gp_Pnt SelectMgr_SelectingVolumeManager::GetFarPickedPnt() const
 // purpose  :
 //=======================================================================
 void SelectMgr_SelectingVolumeManager::SetViewClipping (const Handle(Graphic3d_SequenceOfHClipPlane)& theViewPlanes,
-                                                        const Handle(Graphic3d_SequenceOfHClipPlane)& theObjPlanes)
+                                                        const Handle(Graphic3d_SequenceOfHClipPlane)& theObjPlanes,
+                                                        const SelectMgr_SelectingVolumeManager* theWorldSelMgr)
 {
   myViewClipPlanes   = theViewPlanes;
   myObjectClipPlanes = theObjPlanes;
   if (myActiveSelectionType != Point)
     return;
 
-  const SelectMgr_RectangularFrustum* aFrustum = reinterpret_cast<const SelectMgr_RectangularFrustum*>(mySelectingVolumes[Frustum].get());
+  const SelectMgr_SelectingVolumeManager* aWorldSelMgr = theWorldSelMgr != NULL ? theWorldSelMgr : this;
+  const SelectMgr_RectangularFrustum* aFrustum = static_cast<const SelectMgr_RectangularFrustum*>(aWorldSelMgr->mySelectingVolumes[Frustum].get());
   myViewClipRange.SetVoid();
   if (!theViewPlanes.IsNull()
    && !theViewPlanes->IsEmpty())
@@ -481,4 +482,25 @@ void SelectMgr_SelectingVolumeManager::SetViewClipping (const SelectMgr_Selectin
   myViewClipPlanes   = theOther.myViewClipPlanes;
   myObjectClipPlanes = theOther.myObjectClipPlanes;
   myViewClipRange    = theOther.myViewClipRange;
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void SelectMgr_SelectingVolumeManager::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const 
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, SelectMgr_SelectingVolumeManager)
+
+  for (Standard_Integer anIdx = 0; anIdx < VolumeTypesNb; ++anIdx)
+  {
+    const Handle(SelectMgr_BaseFrustum)& aSelectingVolume = mySelectingVolumes[anIdx];
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aSelectingVolume.get())
+  }
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myViewClipPlanes.get())
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myObjectClipPlanes.get())
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myViewClipRange)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToAllowOverlap)
 }

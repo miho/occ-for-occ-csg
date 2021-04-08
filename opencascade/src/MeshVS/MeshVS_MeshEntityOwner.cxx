@@ -17,7 +17,6 @@
 #include <Graphic3d_Group.hxx>
 #include <MeshVS_Mesh.hxx>
 #include <MeshVS_MeshEntityOwner.hxx>
-#include <Prs3d_Root.hxx>
 #include <PrsMgr_PresentationManager.hxx>
 #include <PrsMgr_PresentationManager3d.hxx>
 #include <SelectMgr_SelectableObject.hxx>
@@ -36,7 +35,7 @@ IMPLEMENT_STANDARD_RTTIEXT(MeshVS_MeshEntityOwner,SelectMgr_EntityOwner)
 // Purpose  :
 //================================================================
 MeshVS_MeshEntityOwner::MeshVS_MeshEntityOwner
-                                   ( const SelectMgr_SOPtr& SelObj,
+                                   ( const SelectMgr_SelectableObject* SelObj,
                                      const Standard_Integer ID,
                                      const Standard_Address MeshEntity,
                                      const MeshVS_EntityType& Type,

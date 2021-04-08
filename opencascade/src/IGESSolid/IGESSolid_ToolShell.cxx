@@ -62,7 +62,7 @@ void IGESSolid_ToolShell::ReadOwnParams(const Handle(IGESSolid_Shell)& ent,
   // MGE 03/08/98
 
   //Standard_Boolean abool; //szv#4:S4163:12Mar99 moved down
-  Standard_Integer nbfaces=0;; //szv#4:S4163:12Mar99 `i` moved in for
+  Standard_Integer nbfaces=0; //szv#4:S4163:12Mar99 `i` moved in for
   //Handle(IGESSolid_Face) aface; //szv#4:S4163:12Mar99 moved down
   Handle(IGESSolid_HArray1OfFace) tempFaces;
   Handle(TColStd_HArray1OfInteger) tempOrientation;
@@ -229,28 +229,28 @@ void IGESSolid_ToolShell::OwnCheck(const Handle(IGESSolid_Shell)& ent,
 
 void IGESSolid_ToolShell::OwnDump(const Handle(IGESSolid_Shell)& ent,
                                   const IGESData_IGESDumper& dumper,
-                                  const Handle(Message_Messenger)& S,
+                                  Standard_OStream& S,
                                   const Standard_Integer level) const
 {
-  S << "IGESSolid_Shell" << Message_EndLine;
+  S << "IGESSolid_Shell\n";
   Standard_Integer upper = ent->NbFaces();
   Standard_Integer sublevel = (level <= 4) ? 0 : 1;
 
-  S << "Faces : " << Message_EndLine << "Orientation flags : ";
+  S << "Faces :\nOrientation flags : ";
   IGESData_DumpEntities(S,dumper,-level,1, ent->NbFaces(),ent->Face);
-  S << Message_EndLine;
+  S << "\n";
   if (level > 4)
     {
-      S << "[" << Message_EndLine;
+      S << "[\n";
       for (Standard_Integer i = 1; i <= upper; i ++)
 	{
-          S << "[" << i << "]:  ";
-          S << "Face : ";
+          S << "[" << i << "]:  "
+            << "Face : ";
           dumper.Dump (ent->Face(i),S, sublevel);
           S << "  - Orientation flag : ";
-          if (ent->Orientation(i)) S << "True" << Message_EndLine;
-          else                     S << "False" << Message_EndLine;
+          if (ent->Orientation(i)) S << "True\n";
+          else                     S << "False\n";
 	}
     }
-  S << Message_EndLine;
+  S << std::endl;
 }

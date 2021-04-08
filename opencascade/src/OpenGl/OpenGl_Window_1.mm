@@ -91,13 +91,19 @@ OpenGl_Window::OpenGl_Window (const Handle(OpenGl_GraphicDriver)& theDriver,
                                         kEAGLColorFormatRGBA8,            kEAGLDrawablePropertyColorFormat,
                                         NULL];
 
-    aGLContext = [[EAGLContext alloc] initWithAPI: kEAGLRenderingAPIOpenGLES2];
+    aGLContext = [[EAGLContext alloc] initWithAPI: kEAGLRenderingAPIOpenGLES3];
     if (aGLContext == NULL
     || ![EAGLContext setCurrentContext: aGLContext])
     {
-      TCollection_AsciiString aMsg ("OpenGl_Window::CreateWindow: EAGLContext creation failed");
-      throw Aspect_GraphicDeviceDefinitionError(aMsg.ToCString());
-      return;
+      aGLContext = [[EAGLContext alloc] initWithAPI: kEAGLRenderingAPIOpenGLES2];
+
+      if (aGLContext == NULL
+      || ![EAGLContext setCurrentContext: aGLContext])
+      {
+        TCollection_AsciiString aMsg ("OpenGl_Window::CreateWindow: EAGLContext creation failed");
+        throw Aspect_GraphicDeviceDefinitionError(aMsg.ToCString());
+        return;
+      }
     }
 
     myGlContext->Init (aGLContext, Standard_False);
@@ -384,11 +390,12 @@ void OpenGl_Window::Init()
 // function : SetSwapInterval
 // purpose  :
 // =======================================================================
-void OpenGl_Window::SetSwapInterval()
+void OpenGl_Window::SetSwapInterval (Standard_Boolean theToForceNoSync)
 {
-  if (mySwapInterval != myGlContext->caps->swapInterval)
+  const Standard_Integer aSwapInterval = theToForceNoSync ? 0 : myGlContext->caps->swapInterval;
+  if (mySwapInterval != aSwapInterval)
   {
-    mySwapInterval = myGlContext->caps->swapInterval;
+    mySwapInterval = aSwapInterval;
     myGlContext->SetSwapInterval (mySwapInterval);
   }
 }

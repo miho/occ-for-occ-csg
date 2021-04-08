@@ -109,7 +109,7 @@ static int mtmCommitTransaction (Draw_Interpretor& di, int n, const char** a)
     return 1;
   }
   if(n > 1)
-    sMultiTransactionManager->CommitCommand(a[1]);
+    sMultiTransactionManager->CommitCommand(TCollection_ExtendedString (a[1], Standard_True));
   else
     sMultiTransactionManager->CommitCommand();
   return 0;
@@ -266,20 +266,17 @@ static Standard_Integer XAttributeValue (Draw_Interpretor& di, Standard_Integer 
   else if ( att->IsKind(STANDARD_TYPE(TDataStd_Name)) )
   {
     Handle(TDataStd_Name) val = Handle(TDataStd_Name)::DownCast ( att );
-    TCollection_AsciiString str ( val->Get(), '?' );
-    di << str.ToCString();
+    di << val->Get();
   }
   else if ( att->IsKind(STANDARD_TYPE(TDataStd_Comment)) )
   {
     Handle(TDataStd_Comment) val = Handle(TDataStd_Comment)::DownCast ( att );
-    TCollection_AsciiString str ( val->Get(), '?' );
-    di << str.ToCString();
+    di << val->Get();
   }
   else if ( att->IsKind(STANDARD_TYPE(TDataStd_AsciiString)) )
   {
     Handle(TDataStd_AsciiString) val = Handle(TDataStd_AsciiString)::DownCast ( att );
-    TCollection_AsciiString str ( val->Get(), '?' );
-    di << str.ToCString();
+    di << val->Get();
   }
   else if ( att->IsKind(STANDARD_TYPE(TDataStd_IntegerArray)) )
   {

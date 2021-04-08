@@ -42,6 +42,13 @@ else()
   endif()
 endif()
 
+# OpenVR
+if (USE_OPENVR)
+  set (CSF_OpenVR "openvr_api")
+else()
+  set (CSF_OpenVR)
+endif()
+
 # TCL/TK
 if (USE_TCL)
   if (WIN32)
@@ -108,6 +115,7 @@ else()
   elseif (ANDROID)
     set (CSF_ThreadLibs  "c")
     set (CSF_OpenGlLibs  "EGL GLESv2")
+    set (CSF_androidlog  "log")
   elseif (UNIX)
     set (CSF_ThreadLibs  "pthread rt stdc++")
     if (USE_GLES2)

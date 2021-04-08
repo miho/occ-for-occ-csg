@@ -43,6 +43,7 @@
 #include <Quantity_HArray1OfColor.hxx>
 #include <Quantity_NameOfColor.hxx>
 #include <RWGltf_CafReader.hxx>
+#include <RWGltf_CafWriter.hxx>
 #include <RWStl.hxx>
 #include <RWObj.hxx>
 #include <RWObj_CafReader.hxx>
@@ -69,6 +70,8 @@
 #include <VrmlData_DataMapOfShapeAppearance.hxx>
 #include <VrmlData_Scene.hxx>
 #include <VrmlData_ShapeConvert.hxx>
+#include <XCAFDoc_DocumentTool.hxx>
+#include <XCAFDoc_ShapeTool.hxx>
 #include <XSDRAW.hxx>
 #include <XSDRAWIGES.hxx>
 #include <XSDRAWSTEP.hxx>
@@ -109,7 +112,7 @@ static Standard_Integer ReadGltf (Draw_Interpretor& theDI,
     {
       toUseExistingDoc = Standard_True;
       if (anArgIter + 1 < theNbArgs
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toUseExistingDoc))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toUseExistingDoc))
       {
         ++anArgIter;
       }
@@ -118,7 +121,7 @@ static Standard_Integer ReadGltf (Draw_Interpretor& theDI,
     {
       isParallel = Standard_True;
       if (anArgIter + 1 < theNbArgs
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], isParallel))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], isParallel))
       {
         ++anArgIter;
       }
@@ -141,13 +144,13 @@ static Standard_Integer ReadGltf (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+      Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
       return 1;
     }
   }
   if (aFilePath.IsEmpty())
   {
-    std::cout << "Syntax error: wrong number of arguments\n";
+    Message::SendFail() << "Syntax error: wrong number of arguments";
     return 1;
   }
 
@@ -163,14 +166,14 @@ static Standard_Integer ReadGltf (Draw_Interpretor& theDI,
     {
       if (toUseExistingDoc)
       {
-        std::cout << "Error: document with name " << aDestName << " does not exist\n";
+        Message::SendFail() << "Error: document with name " << aDestName << " does not exist";
         return 1;
       }
       anApp->NewDocument (TCollection_ExtendedString ("BinXCAF"), aDoc);
     }
     else if (!toUseExistingDoc)
     {
-      std::cout << "Error: document with name " << aDestName << " already exists\n";
+      Message::SendFail() << "Error: document with name " << aDestName << " already exists";
       return 1;
     }
   }
@@ -190,7 +193,7 @@ static Standard_Integer ReadGltf (Draw_Interpretor& theDI,
   }
   else
   {
-    aReader.Perform (aFilePath, aProgress);
+    aReader.Perform (aFilePath, aProgress->Start());
     if (isNoDoc)
     {
       DBRep::Set (aDestName.ToCString(), aReader.SingleShape());
@@ -198,10 +201,121 @@ static Standard_Integer ReadGltf (Draw_Interpretor& theDI,
     else
     {
       Handle(DDocStd_DrawDocument) aDrawDoc = new DDocStd_DrawDocument (aDoc);
-      TDataStd_Name::Set (aDoc->GetData()->Root(), aDestName.ToCString());
+      TDataStd_Name::Set (aDoc->GetData()->Root(), aDestName);
       Draw::Set (aDestName.ToCString(), aDrawDoc);
     }
   }
+  return 0;
+}
+
+//=============================================================================
+//function : WriteGltf
+//purpose  : Writes glTF file
+//=============================================================================
+static Standard_Integer WriteGltf (Draw_Interpretor& theDI,
+                                   Standard_Integer theNbArgs,
+                                   const char** theArgVec)
+{
+  TCollection_AsciiString aGltfFilePath;
+  Handle(TDocStd_Document) aDoc;
+  Handle(TDocStd_Application) anApp = DDocStd::GetApplication();
+  TColStd_IndexedDataMapOfStringString aFileInfo;
+  RWGltf_WriterTrsfFormat aTrsfFormat = RWGltf_WriterTrsfFormat_Compact;
+  bool toForceUVExport = false;
+  for (Standard_Integer anArgIter = 1; anArgIter < theNbArgs; ++anArgIter)
+  {
+    TCollection_AsciiString anArgCase (theArgVec[anArgIter]);
+    anArgCase.LowerCase();
+    if (anArgCase == "-comments"
+     && anArgIter + 1 < theNbArgs)
+    {
+      aFileInfo.Add ("Comments", theArgVec[++anArgIter]);
+    }
+    else if (anArgCase == "-author"
+          && anArgIter + 1 < theNbArgs)
+    {
+      aFileInfo.Add ("Author", theArgVec[++anArgIter]);
+    }
+    else if (anArgCase == "-forceuvexport"
+          || anArgCase == "-forceuv")
+    {
+      toForceUVExport = true;
+      if (anArgIter + 1 < theNbArgs
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toForceUVExport))
+      {
+        ++anArgIter;
+      }
+    }
+    else if (anArgCase == "-trsfformat"
+          && anArgIter + 1 < theNbArgs)
+    {
+      TCollection_AsciiString aTrsfStr (theArgVec[++anArgIter]);
+      aTrsfStr.LowerCase();
+      if (aTrsfStr == "compact")
+      {
+        aTrsfFormat = RWGltf_WriterTrsfFormat_Compact;
+      }
+      else if (aTrsfStr == "mat4")
+      {
+        aTrsfFormat = RWGltf_WriterTrsfFormat_Mat4;
+      }
+      else if (aTrsfStr == "trs")
+      {
+        aTrsfFormat = RWGltf_WriterTrsfFormat_TRS;
+      }
+      else
+      {
+        Message::SendFail() << "Syntax error at '" << anArgCase << "'";
+        return 1;
+      }
+    }
+    else if (aDoc.IsNull())
+    {
+      Standard_CString aNameVar = theArgVec[anArgIter];
+      DDocStd::GetDocument (aNameVar, aDoc, false);
+      if (aDoc.IsNull())
+      {
+        TopoDS_Shape aShape = DBRep::Get (aNameVar);
+        if (aShape.IsNull())
+        {
+          Message::SendFail() << "Syntax error: '" << aNameVar << "' is not a shape nor document";
+          return 1;
+        }
+
+        anApp->NewDocument (TCollection_ExtendedString ("BinXCAF"), aDoc);
+        Handle(XCAFDoc_ShapeTool) aShapeTool = XCAFDoc_DocumentTool::ShapeTool (aDoc->Main());
+        aShapeTool->AddShape (aShape);
+      }
+    }
+    else if (aGltfFilePath.IsEmpty())
+    {
+      aGltfFilePath = theArgVec[anArgIter];
+    }
+    else
+    {
+      Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
+      return 1;
+    }
+  }
+  if (aGltfFilePath.IsEmpty())
+  {
+    Message::SendFail() << "Syntax error: wrong number of arguments";
+    return 1;
+  }
+
+  Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator (theDI, 1);
+
+  TCollection_AsciiString anExt = aGltfFilePath;
+  anExt.LowerCase();
+
+  const Standard_Real aSystemUnitFactor = UnitsMethods::GetCasCadeLengthUnit() * 0.001;
+
+  RWGltf_CafWriter aWriter (aGltfFilePath, anExt.EndsWith (".glb"));
+  aWriter.SetTransformationFormat (aTrsfFormat);
+  aWriter.SetForcedUVExport (toForceUVExport);
+  aWriter.ChangeCoordinateSystemConverter().SetInputLengthUnit (aSystemUnitFactor);
+  aWriter.ChangeCoordinateSystemConverter().SetInputCoordinateSystem (RWMesh_CoordinateSystem_Zup);
+  aWriter.Perform (aDoc, aFileInfo, aProgress->Start());
   return 0;
 }
 
@@ -219,7 +333,8 @@ static Standard_Integer writestl
     }
     StlAPI_Writer aWriter;
     aWriter.ASCIIMode() = isASCIIMode;
-    Standard_Boolean isOK = aWriter.Write (aShape, argv[2]);
+    Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator (di);
+    Standard_Boolean isOK = aWriter.Write (aShape, argv[2], aProgress->Start());
     if (!isOK)
        di << "** Error **: Mesh writing has been failed.\n";
   }
@@ -252,20 +367,20 @@ static Standard_Integer readstl(Draw_Interpretor& theDI,
     {
       toCreateCompOfTris = true;
       if (anArgIter + 1 < theArgc
-       && ViewerTest::ParseOnOff (theArgv[anArgIter + 1], toCreateCompOfTris))
+       && Draw::ParseOnOff (theArgv[anArgIter + 1], toCreateCompOfTris))
       {
         ++anArgIter;
       }
     }
     else
     {
-      std::cout << "Syntax error: unknown argument '" << theArgv[anArgIter] << "'\n";
+      Message::SendFail() << "Syntax error: unknown argument '" << theArgv[anArgIter] << "'";
       return 1;
     }
   }
   if (aFilePath.IsEmpty())
   {
-    std::cout << "Syntax error: not enough arguments\n";
+    Message::SendFail() << "Syntax error: not enough arguments";
     return 1;
   }
 
@@ -274,7 +389,7 @@ static Standard_Integer readstl(Draw_Interpretor& theDI,
   {
     // Read STL file to the triangulation.
     Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator (theDI, 1);
-    Handle(Poly_Triangulation) aTriangulation = RWStl::ReadFile (aFilePath.ToCString(), aProgress);
+    Handle(Poly_Triangulation) aTriangulation = RWStl::ReadFile (aFilePath.ToCString(), aProgress->Start());
 
     TopoDS_Face aFace;
     BRep_Builder aB;
@@ -341,7 +456,7 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
       aFileUnitFactor = UnitsAPI::AnyToSI (1.0, aUnitStr.ToCString());
       if (aFileUnitFactor <= 0.0)
       {
-        std::cout << "Syntax error: wrong length unit '" << aUnitStr << "'\n";
+        Message::SendFail() << "Syntax error: wrong length unit '" << aUnitStr << "'";
         return 1;
       }
     }
@@ -352,7 +467,7 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
     {
       if (!parseCoordinateSystem (theArgVec[++anArgIter], aFileCoordSys))
       {
-        std::cout << "Syntax error: unknown coordinate system '" << theArgVec[anArgIter] << "'\n";
+        Message::SendFail() << "Syntax error: unknown coordinate system '" << theArgVec[anArgIter] << "'";
         return 1;
       }
     }
@@ -364,7 +479,7 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
     {
       if (!parseCoordinateSystem (theArgVec[++anArgIter], aResultCoordSys))
       {
-        std::cout << "Syntax error: unknown coordinate system '" << theArgVec[anArgIter] << "'\n";
+        Message::SendFail() << "Syntax error: unknown coordinate system '" << theArgVec[anArgIter] << "'";
         return 1;
       }
     }
@@ -373,7 +488,7 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
     {
       isSinglePrecision = Standard_True;
       if (anArgIter + 1 < theNbArgs
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], isSinglePrecision))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], isSinglePrecision))
       {
         ++anArgIter;
       }
@@ -390,7 +505,7 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
     {
       toUseExistingDoc = Standard_True;
       if (anArgIter + 1 < theNbArgs
-       && ViewerTest::ParseOnOff (theArgVec[anArgIter + 1], toUseExistingDoc))
+       && Draw::ParseOnOff (theArgVec[anArgIter + 1], toUseExistingDoc))
       {
         ++anArgIter;
       }
@@ -413,13 +528,13 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Syntax error at '" << theArgVec[anArgIter] << "'\n";
+      Message::SendFail() << "Syntax error at '" << theArgVec[anArgIter] << "'";
       return 1;
     }
   }
   if (aFilePath.IsEmpty())
   {
-    std::cout << "Syntax error: wrong number of arguments\n";
+    Message::SendFail() << "Syntax error: wrong number of arguments";
     return 1;
   }
 
@@ -435,14 +550,14 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
     {
       if (toUseExistingDoc)
       {
-        std::cout << "Error: document with name " << aDestName << " does not exist\n";
+        Message::SendFail() << "Error: document with name " << aDestName << " does not exist";
         return 1;
       }
       anApp->NewDocument (TCollection_ExtendedString ("BinXCAF"), aDoc);
     }
     else if (!toUseExistingDoc)
     {
-      std::cout << "Error: document with name " << aDestName << " already exists\n";
+      Message::SendFail() << "Error: document with name " << aDestName << " already exists";
       return 1;
     }
   }
@@ -460,7 +575,7 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
     aSimpleReader.SetSinglePrecision (isSinglePrecision);
     aSimpleReader.SetCreateShapes (Standard_False);
     aSimpleReader.SetTransformation (aReader.CoordinateSystemConverter());
-    aSimpleReader.Read (aFilePath.ToCString(), aProgress);
+    aSimpleReader.Read (aFilePath.ToCString(), aProgress->Start());
 
     Handle(Poly_Triangulation) aTriangulation = aSimpleReader.GetTriangulation();
     TopoDS_Face aFace;
@@ -481,7 +596,7 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
   }
   else
   {
-    aReader.Perform (aFilePath, aProgress);
+    aReader.Perform (aFilePath, aProgress->Start());
     if (isNoDoc)
     {
       DBRep::Set (aDestName.ToCString(), aReader.SingleShape());
@@ -489,7 +604,7 @@ static Standard_Integer ReadObj (Draw_Interpretor& theDI,
     else
     {
       Handle(DDocStd_DrawDocument) aDrawDoc = new DDocStd_DrawDocument (aDoc);
-      TDataStd_Name::Set (aDoc->GetData()->Root(), aDestName.ToCString());
+      TDataStd_Name::Set (aDoc->GetData()->Root(), aDestName);
       Draw::Set (aDestName.ToCString(), aDrawDoc);
     }
   }
@@ -647,7 +762,7 @@ static Standard_Integer createmesh
   // Progress indicator
   OSD_Path aFile( argv[2] );
   Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator (di, 1);
-  Handle(Poly_Triangulation) aSTLMesh = RWStl::ReadFile (aFile, aProgress);
+  Handle(Poly_Triangulation) aSTLMesh = RWStl::ReadFile (aFile, aProgress->Start());
 
   di << "Reading OK...\n";
   Handle( XSDRAWSTLVRML_DataSource ) aDS = new XSDRAWSTLVRML_DataSource( aSTLMesh );
@@ -1287,7 +1402,11 @@ static Standard_Integer meshvectors( Draw_Interpretor& di,
       }
       else if (aParam == "-color")
       {
-        aColor      = ViewerTest::GetColorFromName(argv[anIdx]);
+        if (!Quantity_Color::ColorFromName (argv[anIdx], aColor))
+        {
+          Message::SendFail() << "Syntax error at " << aParam;
+          return 1;
+        }
       }
       else if (aParam == "-arrowpart")
       {
@@ -1604,6 +1723,15 @@ void  XSDRAWSTLVRML::InitCommands (Draw_Interpretor& theCommands)
                    "readgltf shape file"
                    "\n\t\t: Same as ReadGltf but reads glTF file into a shape instead of a document.",
                    __FILE__, ReadGltf, g);
+  theCommands.Add ("WriteGltf",
+                   "WriteGltf Doc file [-trsfFormat {compact|TRS|mat4}=compact] [-comments Text] [-author Name] [-forceUVExport]"
+                   "\n\t\t: Write XDE document into glTF file."
+                   "\n\t\t:   -trsfFormat preferred transformation format"
+                   "\n\t\t:   -forceUVExport always export UV coordinates",
+                   __FILE__, WriteGltf, g);
+  theCommands.Add ("writegltf",
+                   "writegltf shape file",
+                   __FILE__, WriteGltf, g);
   theCommands.Add ("writevrml", "shape file [version VRML#1.0/VRML#2.0 (1/2): 2 by default] [representation shaded/wireframe/both (0/1/2): 1 by default]",__FILE__,writevrml,g);
   theCommands.Add ("writestl",  "shape file [ascii/binary (0/1) : 1 by default] [InParallel (0/1) : 0 by default]",__FILE__,writestl,g);
   theCommands.Add ("readstl",

@@ -29,6 +29,7 @@
 #include <Interface_SignLabel.hxx>
 #include <Interface_Static.hxx>
 #include <Message_Messenger.hxx>
+#include <Message_ProgressScope.hxx>
 #include <ShapeFix.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_Failure.hxx>
@@ -52,6 +53,7 @@
 #include <XSControl_Controller.hxx>
 #include <XSControl_TransferReader.hxx>
 #include <XSControl_Utils.hxx>
+#include <Message.hxx>
 
 #include <stdio.h>
 IMPLEMENT_STANDARD_RTTIEXT(XSControl_TransferReader,Standard_Transient)
@@ -779,13 +781,15 @@ Standard_Boolean XSControl_TransferReader::Recognize
 //=======================================================================
 
 Standard_Integer XSControl_TransferReader::TransferOne
-  (const Handle(Standard_Transient)& ent, const Standard_Boolean rec)
+  (const Handle(Standard_Transient)& ent,
+   const Standard_Boolean rec,
+   const Message_ProgressRange& theProgress)
 {
   if (myActor.IsNull() || myModel.IsNull()) return 0;
 
   if (myTP.IsNull())  {  if (!BeginTransfer()) return 0;  }
 
-  Handle(Message_Messenger) sout = myTP->Messenger();
+  Message_Messenger::StreamBuffer sout = myTP->Messenger()->SendInfo();
   Standard_Integer level = myTP->TraceLevel();
   
 
@@ -798,7 +802,7 @@ Standard_Integer XSControl_TransferReader::TransferOne
     Standard_Integer num = myModel->Number(ent);
     Handle(TCollection_HAsciiString) lab = myModel->StringLabel(ent);
     sout<<"\n*******************************************************************\n";
-    sout << "******           Transferring one Entity                     ******"<<Message_EndLine;
+    sout << "******           Transferring one Entity                     ******"<<std::endl;
     if (!lab.IsNull())
       sout<<"******    N0 in file : "<<Interface_MSG::Blanks(num,5)<<num
 	  <<"      Ident : "<<lab->ToCString()
@@ -812,7 +816,9 @@ Standard_Integer XSControl_TransferReader::TransferOne
   //  seule difference entre TransferRoots et TransferOne
   Standard_Integer res = 0;
   Handle(Standard_Transient) obj = ent;
-  TP.Transfer (obj);
+  TP.Transfer (obj, theProgress);
+  if (theProgress.UserBreak())
+    return res;
   myTP->SetRoot (obj);
 
   //  Resultat ...
@@ -833,13 +839,14 @@ Standard_Integer XSControl_TransferReader::TransferOne
 //=======================================================================
 
 Standard_Integer XSControl_TransferReader::TransferList
-  (const Handle(TColStd_HSequenceOfTransient)& list, const Standard_Boolean rec)
+  (const Handle(TColStd_HSequenceOfTransient)& list,
+   const Standard_Boolean rec,
+   const Message_ProgressRange& theProgress)
 {
   if (myActor.IsNull() || myModel.IsNull()) return 0;
 
   if (myTP.IsNull())  {  if (!BeginTransfer()) return 0;  }
 
-  Handle(Message_Messenger) sout = myTP->Messenger();
   Standard_Integer level = myTP->TraceLevel();
 
   Transfer_TransferOutput TP (myTP,myModel);
@@ -850,8 +857,9 @@ Standard_Integer XSControl_TransferReader::TransferList
 
   //   Pour le log-file
   if (level > 0) {
+    Message_Messenger::StreamBuffer sout = myTP->Messenger()->SendInfo();
     sout<<"\n*******************************************************************\n";
-    sout << "******           Transferring a list of "<<Interface_MSG::Blanks(nb,5)<<" Entities       ******"<<Message_EndLine;
+    sout << "******           Transferring a list of "<<Interface_MSG::Blanks(nb,5)<<" Entities       ******"<<std::endl;
     sout<<"\n*******************************************************************\n";
 
     Handle(IFSelect_SignatureList) sl = new IFSelect_SignatureList;
@@ -866,10 +874,10 @@ Standard_Integer XSControl_TransferReader::TransferList
   Standard_Integer res = 0;
   nb = list->Length();
   Handle(Standard_Transient) obj;
-
-  for (i = 1; i <= nb; i ++) {
+  Message_ProgressScope aPS(theProgress, NULL, nb);
+  for (i = 1; i <= nb && aPS.More(); i++) {
     obj = list->Value(i);
-    TP.Transfer (obj);
+    TP.Transfer (obj, aPS.Next());
     myTP->SetRoot (obj);
 
     //  Resultat ...
@@ -892,11 +900,11 @@ Standard_Integer XSControl_TransferReader::TransferList
 //purpose  : 
 //=======================================================================
 
-Standard_Integer XSControl_TransferReader::TransferRoots(const Interface_Graph& G)
+Standard_Integer XSControl_TransferReader::TransferRoots(const Interface_Graph& G,
+                                                         const Message_ProgressRange& theProgress)
 {
   if (myModel != G.Model()) return -1;
   if (!BeginTransfer()) return -1;
-  Handle(Message_Messenger) sout = myTP->Messenger();
   Standard_Integer level = myTP->TraceLevel();
 
   Transfer_TransferOutput TP (myTP,myModel);
@@ -907,8 +915,9 @@ Standard_Integer XSControl_TransferReader::TransferRoots(const Interface_Graph& 
   if (level > 0) {
     Interface_EntityIterator roots = G.RootEntities();
     Standard_Integer nb = roots.NbEntities();
+    Message_Messenger::StreamBuffer sout = myTP->Messenger()->SendInfo();
     sout<<"\n*******************************************************************\n";
-    sout << "******           Transferring the "<<Interface_MSG::Blanks(nb,5)<<" Root Entities        ******"<<Message_EndLine;
+    sout << "******           Transferring the "<<Interface_MSG::Blanks(nb,5)<<" Root Entities        ******"<<std::endl;
     sout<<"\n*******************************************************************\n";
     Handle(IFSelect_SignatureList) sl = new IFSelect_SignatureList;
     for (roots.Start(); roots.More(); roots.Next())
@@ -918,7 +927,9 @@ Standard_Integer XSControl_TransferReader::TransferRoots(const Interface_Graph& 
     sout<<"\n*******************************************************************\n";
   }
 
-  TP.TransferRoots (G);
+  TP.TransferRoots (G, theProgress);
+  if (theProgress.UserBreak())
+    return -1;
 
   //  Les entites transferees sont notees "asmain"
   Standard_Integer i,n = myTP->NbMapped();
@@ -959,22 +970,22 @@ void XSControl_TransferReader::TransferClear(const Handle(Standard_Transient)& e
 //purpose  : 
 //=======================================================================
 
-void XSControl_TransferReader::PrintStats
-  (const Standard_Integer what, const Standard_Integer mode) const
+void XSControl_TransferReader::PrintStats (Standard_OStream& sout, 
+                                           const Standard_Integer what,
+                                           const Standard_Integer mode) const
 {
-  Handle(Message_Messenger) sout = myTP->Messenger();
   //  A ameliorer ... !
   sout<<"\n*******************************************************************\n";
-  sout << "******        Statistics on Transfer (Read)                  ******"<<Message_EndLine;
+  sout << "******        Statistics on Transfer (Read)                  ******"<<std::endl;
   sout<<"\n*******************************************************************\n";
-  if (what > 10)  {  sout<<" ***  Not yet implemented"<<Message_EndLine;  return;  }
+  if (what > 10)  {  sout<<" ***  Not yet implemented"<<std::endl;  return;  }
   if (what < 10)  {
-    sout << "******        Data recorded on Last Transfer                 ******"<<Message_EndLine;
+    sout << "******        Data recorded on Last Transfer                 ******"<<std::endl;
     PrintStatsProcess (myTP,what,mode);
   }
   //  reste  what = 10 : on liste les racines des final results
-  sout << "******        Final Results                                  ******"<<Message_EndLine;
-  if (myModel.IsNull())  {  sout<<"****    Model unknown"<<Message_EndLine;  return;  }
+  sout << "******        Final Results                                  ******"<<std::endl;
+  if (myModel.IsNull())  {  sout<<"****    Model unknown"<<std::endl;  return;  }
   Handle(TColStd_HSequenceOfTransient) list = RecordedList();
   Standard_Integer i, nb = list->Length();
   Handle(IFSelect_SignatureList) counter;
@@ -988,16 +999,16 @@ void XSControl_TransferReader::PrintStats
     if (mode == 0)  {  sout<<"  "<<myModel->Number(ent); continue;  }
     if (mode == 1 || mode == 2) {
       sout<<"[ "<<Interface_MSG::Blanks (i,6)<<" ]:";
-      myModel->Print (ent,sout);
+      myModel->Print (ent, sout);
       sout<<"  Type:"<<myModel->TypeName(ent,Standard_False);
     }
     if (mode >= 3 && mode <= 6) {
       counter->Add (ent,myModel->TypeName(ent,Standard_False));
     }
   }
-  if (!counter.IsNull()) counter->PrintList(sout,myModel,pcm);
+  if (!counter.IsNull()) counter->PrintList (sout, myModel, pcm);
 
-  sout<<Message_EndLine;
+  sout<<std::endl;
 }
 
 
@@ -1109,10 +1120,11 @@ static void PrintPercent(const Handle(Message_Messenger)& sout, const Standard_C
                          const Standard_Integer nb, const Standard_Integer nl)
 {
   if (nb <= 0 || nl == 0) return;
-  sout<<"******      "<<mess<<": ";
-  if      (nb == nl)       sout<<"100 %"<<Message_EndLine;
-  else if (nb*100/nl == 0) sout<<"< 1 %"<<Message_EndLine;
-  else            sout<<(nb*100/nl < 10 ? "  " : " ")<<nb*100/nl<<" %"<<Message_EndLine;
+  Message_Messenger::StreamBuffer aSender = sout->SendInfo();
+  aSender<<"******      "<<mess<<": ";
+  if      (nb == nl)       aSender<<"100 %"<<std::endl;
+  else if (nb*100/nl == 0) aSender<<"< 1 %"<<std::endl;
+  else            aSender<<(nb*100/nl < 10 ? "  " : " ")<<nb*100/nl<<" %"<<std::endl;
 }
 
 
@@ -1140,13 +1152,14 @@ void XSControl_TransferReader::PrintStatsOnList(const Handle(Transfer_TransientP
                                                 const Standard_Integer what,
                                                 const Standard_Integer mode)
 {
-  Handle(Message_Messenger) sout = TP->Messenger();
+  Message_Messenger::StreamBuffer sout = TP->Messenger()->SendInfo();
+
   char mess[250];
   if (TP.IsNull()) return;
   if (what == 0) {  TP->PrintStats(0,sout);  return;  }
 
   sout<<"\n*******************************************************************\n";
-  sout << "******        Statistics on Transfer Process (Read)          ******"<<Message_EndLine;
+  sout << "******        Statistics on Transfer Process (Read)          ******"<<std::endl;
   if (what == 1) sout << "******        Individual Transfers  (Roots)                  ******\n";
   if (what == 2) sout << "******        All recorded data about Transfer               ******\n";
   if (what == 3) sout << "******        Abnormal records                               ******\n";
@@ -1184,10 +1197,10 @@ void XSControl_TransferReader::PrintStatsOnList(const Handle(Transfer_TransientP
     IFSelect_PrintCount pcm = IFSelect_CountByItem;
     if (mode == 6) pcm = IFSelect_ListByItem;
 
-    sout  <<"****        Entities in Model   : "<<model->NbEntities()<<Message_EndLine;
-    sout  <<"****        Nb Items (Transfer) : "<<nb<<Message_EndLine;
+    sout  <<"****        Entities in Model   : "<<model->NbEntities()<<std::endl;
+    sout  <<"****        Nb Items (Transfer) : "<<nb<<std::endl;
     if (!nolist)
-      sout<<"****        Nb Items (Listed)   : "<<nl<<Message_EndLine;
+      sout<<"****        Nb Items (Listed)   : "<<nl<<std::endl;
 
     for (itrp.Start(); itrp.More(); itrp.Next()) {
       nbi ++;
@@ -1198,8 +1211,8 @@ void XSControl_TransferReader::PrintStatsOnList(const Handle(Transfer_TransientP
 	if (notrec) counter->Add(ent,"(not recorded)");
 	else if (mode == 1 || mode == 2) {
 	  sout<<"["<<Interface_MSG::Blanks (nbi,4)<<nbi<<" ]:";
-	  model->Print (ent,sout);
-	  sout<<"   "<<model->TypeName(ent,Standard_False)<<"  (not recorded)"<<Message_EndLine;
+	  model->Print (ent, sout);
+	  sout<<"   "<<model->TypeName(ent,Standard_False)<<"  (not recorded)"<<std::endl;
 	  continue;
 	}
       }
@@ -1219,9 +1232,9 @@ void XSControl_TransferReader::PrintStatsOnList(const Handle(Transfer_TransientP
       //  mode : 0 list num;  1 : num+label + type + result (abrege);  2 : complet
       if (mode == 1 || mode == 2) {
 	sout<<"["<<Interface_MSG::Blanks (i,4)<<i<<" ]:";
-	model->Print (ent,sout);
+	model->Print (ent, sout);
 	sout<<"   "<<model->TypeName(ent,Standard_False);
-	sout<<"	Result:"<<mess<<Message_EndLine;
+	sout<<"	Result:"<<mess<<std::endl;
 	if (mode == 1) continue;
 
 	const Handle(Interface_Check)& ch = binder->Check();
@@ -1229,11 +1242,11 @@ void XSControl_TransferReader::PrintStatsOnList(const Handle(Transfer_TransientP
 
 	if (newnbw > 0) {
 	  sout<<" - Warnings : "<<newnbw<<":\n";
-	  for (newi = 1; newi <= newnbw; newi ++) sout<<ch->CWarning(newi)<<Message_EndLine;
+	  for (newi = 1; newi <= newnbw; newi ++) sout<<ch->CWarning(newi)<<std::endl;
 	}
 	if (newnbf > 0) {
 	  sout<<" - Fails : "<<newnbf<<":\n";
-	  for (newi = 1; newi <= newnbf; newi ++) sout<<ch->CFail(newi)<<Message_EndLine;
+	  for (newi = 1; newi <= newnbf; newi ++) sout<<ch->CFail(newi)<<std::endl;
 	}
 	continue;
       }
@@ -1259,16 +1272,16 @@ void XSControl_TransferReader::PrintStatsOnList(const Handle(Transfer_TransientP
 
       //    Fin de l iteration
     }
-    if (!counter.IsNull()) counter->PrintList(sout,model,pcm);
-    else sout<<Message_EndLine;
+    if (!counter.IsNull()) counter->PrintList (sout, model, pcm);
+    else sout<<std::endl;
     //    Pourcentages
     if (mode != 3 && nbi > 0) {
-      sout << "******        Percentages according Transfer Status          ******"<<Message_EndLine;
-      PrintPercent (sout,"Result          ",nbr+nbrw,nl);
-      PrintPercent (sout,"Result + FAIL   ",nbrf,nl);
-      PrintPercent (sout,"FAIL, no Result ",nbf,nl);
-      PrintPercent (sout,"Just Warning    ",nbw,nl);
-      PrintPercent (sout,"Nothing Recorded",nbnr,nl);
+      sout << "******        Percentages according Transfer Status          ******"<<std::endl;
+      PrintPercent (TP->Messenger(),"Result          ",nbr+nbrw,nl);
+      PrintPercent (TP->Messenger(),"Result + FAIL   ",nbrf,nl);
+      PrintPercent (TP->Messenger(),"FAIL, no Result ",nbf,nl);
+      PrintPercent (TP->Messenger(),"Just Warning    ",nbw,nl);
+      PrintPercent (TP->Messenger(),"Nothing Recorded",nbnr,nl);
 /*      if (nbr+nbrw > 0)
 	sout<<"******      Result          : "<< (nbr+nbrw)*100/nl<<" %"<<std::endl;
       if (nbrf > 0)
@@ -1289,13 +1302,16 @@ void XSControl_TransferReader::PrintStatsOnList(const Handle(Transfer_TransientP
 
     Interface_CheckIterator chl = TP->CheckList(Standard_False);
     chl.SetName("** TRANSFER READ CHECK **");
-    if (mode == 0) chl.Print (sout,model,(what == 5));
+    if (mode == 0)
+    {
+      chl.Print (sout, model, (what == 5));
+    }
     else {
       IFSelect_PrintCount pcm = IFSelect_CountByItem;
       if (mode == 2) pcm = IFSelect_ListByItem;
       Handle(IFSelect_CheckCounter) counter = new IFSelect_CheckCounter(Standard_True);
       counter->Analyse   (chl,model,Standard_True,(what == 5));
-      counter->PrintList (sout,model,pcm);
+      counter->PrintList (sout, model, pcm);
     }
   }
 

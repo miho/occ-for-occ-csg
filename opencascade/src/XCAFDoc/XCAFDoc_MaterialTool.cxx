@@ -11,6 +11,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <XCAFDoc_MaterialTool.hxx>
 
 #include <Standard_GUID.hxx>
 #include <Standard_Type.hxx>
@@ -24,10 +25,9 @@
 #include <XCAFDoc.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_Material.hxx>
-#include <XCAFDoc_MaterialTool.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_MaterialTool,TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE_WITH_TYPE(XCAFDoc_MaterialTool,TDataStd_GenericEmpty,"xcaf","MaterialTool")
 
 //=======================================================================
 //function : XCAFDoc_MaterialTool
@@ -234,35 +234,15 @@ const Standard_GUID& XCAFDoc_MaterialTool::ID() const
   return GetID();
 }
 
-
 //=======================================================================
-//function : Restore
+//function : DumpJson
 //purpose  : 
 //=======================================================================
-
-void XCAFDoc_MaterialTool::Restore(const Handle(TDF_Attribute)& /*with*/) 
+void XCAFDoc_MaterialTool::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, TDF_Attribute)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myShapeTool.get())
 }
-
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-
-Handle(TDF_Attribute) XCAFDoc_MaterialTool::NewEmpty() const
-{
-  return new XCAFDoc_MaterialTool;
-}
-
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_MaterialTool::Paste(const Handle(TDF_Attribute)& /*into*/,
-                                 const Handle(TDF_RelocationTable)& /*RT*/) const
-{
-}
-

@@ -32,8 +32,7 @@
 #include <TNaming_Tool.hxx>
 #include <TDataStd_Name.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_Dimension,TDF_Attribute)
-
+IMPLEMENT_DERIVED_ATTRIBUTE(XCAFDoc_Dimension,TDataStd_GenericEmpty)
 enum ChildLab
 {
   ChildLab_Type = 1,
@@ -429,35 +428,4 @@ Handle(XCAFDimTolObjects_DimensionObject) XCAFDoc_Dimension::GetObject()  const
 const Standard_GUID& XCAFDoc_Dimension::ID() const
 {
   return GetID();
-}
-
-//=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_Dimension::Restore(const Handle(TDF_Attribute)& /*With*/) 
-{
-}
-
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-
-Handle(TDF_Attribute) XCAFDoc_Dimension::NewEmpty() const
-{
-  return new XCAFDoc_Dimension();
-}
-
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_Dimension::Paste(const Handle(TDF_Attribute)& /*Into*/,
-                           const Handle(TDF_RelocationTable)& /*RT*/) const
-{
 }

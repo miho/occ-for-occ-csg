@@ -23,6 +23,7 @@
 #include <Draw_ProgressIndicator.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
+#include <Message_PrinterOStream.hxx>
 #include <OSD.hxx>
 #include <OSD_Chronometer.hxx>
 #include <OSD_Environment.hxx>
@@ -258,9 +259,9 @@ static Standard_Integer dlog(Draw_Interpretor& di, Standard_Integer n, const cha
 {
   if (n != 2 && n != 3)
   {
-    std::cout << "Enable or disable logging: " << a[0] << " {on|off}" << std::endl;
-    std::cout << "Reset log: " << a[0] << " reset" << std::endl;
-    std::cout << "Get log content: " << a[0] << " get" << std::endl;
+    Message::SendFail() << "Enable or disable logging: " << a[0] << " {on|off}\n"
+                        << "Reset log: " << a[0] << " reset\n"
+                        << "Get log content: " << a[0] << " get";
     return 1;
   }
 
@@ -291,7 +292,7 @@ static Standard_Integer dlog(Draw_Interpretor& di, Standard_Integer n, const cha
     di << (di.GetDoLog() ? "on" : "off");
   }
   else {
-    std::cout << "Unrecognized option(s): " << a[1] << std::endl;
+    Message::SendFail() << "Unrecognized option(s): " << a[1];
     return 1;
   }
   return 0;
@@ -301,7 +302,7 @@ static Standard_Integer decho(Draw_Interpretor& di, Standard_Integer n, const ch
 {
   if (n != 2)
   {
-    std::cout << "Enable or disable echoing: " << a[0] << " {on|off}" << std::endl;
+    Message::SendFail() << "Enable or disable echoing: " << a[0] << " {on|off}";
     return 1;
   }
 
@@ -314,7 +315,7 @@ static Standard_Integer decho(Draw_Interpretor& di, Standard_Integer n, const ch
     di.SetDoEcho (Standard_False);
   }
   else {
-    std::cout << "Unrecognized option: " << a[1] << std::endl;
+    Message::SendFail() << "Unrecognized option: " << a[1];
     return 1;
   }
   return 0;
@@ -361,6 +362,11 @@ static Standard_Integer dversion(Draw_Interpretor& di, Standard_Integer, const c
   di << "OpenGL: ES2\n";
 #else
   di << "OpenGL: desktop\n";
+#endif
+#ifdef HAVE_OPENVR
+  di << "OpenVR enabled (HAVE_OPENVR)\n";
+#else
+  di << "OpenVR disabled\n";
 #endif
 #ifdef HAVE_RAPIDJSON
   di << "RapidJSON enabled (HAVE_RAPIDJSON)\n";
@@ -537,13 +543,24 @@ static void *CpuFunc(void* /*threadarg*/)
 }
 #endif
 
-#ifdef _WIN32
-static Standard_Integer cpulimit(Draw_Interpretor&, Standard_Integer n, const char** a)
+// Returns time in seconds defined by the argument string,
+// multiplied by factor defined in environment variable
+// CSF_CPULIMIT_FACTOR (if it exists, 1 otherwise)
+static clock_t GetCpuLimit (const Standard_CString theParam)
 {
-#else
+  clock_t aValue = Draw::Atoi (theParam);
+
+  OSD_Environment aEnv("CSF_CPULIMIT_FACTOR");
+  TCollection_AsciiString aEnvStr = aEnv.Value();
+  if (!aEnvStr.IsEmpty())
+  {
+    aValue *= Draw::Atoi (aEnvStr.ToCString());
+  }
+  return aValue;
+}
+
 static Standard_Integer cpulimit(Draw_Interpretor& di, Standard_Integer n, const char** a)
 {
-#endif
   static int aFirst = 1;
 #ifdef _WIN32
   // Windows specific code
@@ -553,7 +570,7 @@ static Standard_Integer cpulimit(Draw_Interpretor& di, Standard_Integer n, const
   if (n <= 1){
     CPU_LIMIT = RLIM_INFINITY;
   } else {
-    CPU_LIMIT = Draw::Atoi (a[1]);
+    CPU_LIMIT = GetCpuLimit (a[1]);
     Standard_Real anUserSeconds, aSystemSeconds;
     OSD_Chronometer::GetProcessCPU (anUserSeconds, aSystemSeconds);
     CPU_CURRENT = clock_t(anUserSeconds + aSystemSeconds);
@@ -573,7 +590,7 @@ static Standard_Integer cpulimit(Draw_Interpretor& di, Standard_Integer n, const
   if (n <= 1)
     rlp.rlim_cur = RLIM_INFINITY;
   else
-    rlp.rlim_cur = Draw::Atoi(a[1]);
+    rlp.rlim_cur = GetCpuLimit (a[1]);
   CPU_LIMIT = rlp.rlim_cur;
 
   int status;
@@ -597,9 +614,9 @@ static Standard_Integer cpulimit(Draw_Interpretor& di, Standard_Integer n, const
     pthread_create(&cpulimitThread, NULL, CpuFunc, NULL);
   }
 #endif
+  di << "CPU and elapsed time limit set to " << (double)CPU_LIMIT << " seconds";
   return 0;
 }
-
 
 //=======================================================================
 //function : mallochook
@@ -745,7 +762,7 @@ static int dlocale (Draw_Interpretor& di, Standard_Integer n, const char** argv)
     else if ( ! strcmp (cat, "LC_TIME") ) category = LC_TIME;
     else 
     {
-      std::cout << "Error: cannot recognize argument " << cat << " as one of LC_ macros" << std::endl;
+      Message::SendFail() << "Error: cannot recognize argument " << cat << " as one of LC_ macros";
       return 1;
     }
   }
@@ -767,49 +784,63 @@ static int dmeminfo (Draw_Interpretor& theDI,
                      Standard_Integer  theArgNb,
                      const char**      theArgVec)
 {
-  OSD_MemInfo aMemInfo;
   if (theArgNb <= 1)
   {
+    OSD_MemInfo aMemInfo;
     theDI << aMemInfo.ToString();
     return 0;
   }
 
+  NCollection_Map<OSD_MemInfo::Counter> aCounters;
   for (Standard_Integer anIter = 1; anIter < theArgNb; ++anIter)
   {
     TCollection_AsciiString anArg (theArgVec[anIter]);
     anArg.LowerCase();
     if (anArg == "virt" || anArg == "v")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemVirtual)) << " ";
+      aCounters.Add (OSD_MemInfo::MemVirtual);
     }
     else if (anArg == "heap" || anArg == "h")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemHeapUsage)) << " ";
+      aCounters.Add (OSD_MemInfo::MemHeapUsage);
     }
     else if (anArg == "wset" || anArg == "w")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemWorkingSet)) << " ";
+      aCounters.Add (OSD_MemInfo::MemWorkingSet);
     }
     else if (anArg == "wsetpeak")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemWorkingSetPeak)) << " ";
+      aCounters.Add (OSD_MemInfo::MemWorkingSetPeak);
     }
     else if (anArg == "swap")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemSwapUsage)) << " ";
+      aCounters.Add (OSD_MemInfo::MemSwapUsage);
     }
     else if (anArg == "swappeak")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemSwapUsagePeak)) << " ";
+      aCounters.Add (OSD_MemInfo::MemSwapUsagePeak);
     }
     else if (anArg == "private")
     {
-      theDI << Standard_Real (aMemInfo.Value (OSD_MemInfo::MemPrivate)) << " ";
+      aCounters.Add (OSD_MemInfo::MemPrivate);
     }
     else
     {
       std::cerr << "Unknown argument '" << theArgVec[anIter] << "'!\n";
     }
+  }
+
+  OSD_MemInfo aMemInfo (Standard_False);
+  aMemInfo.SetActive (Standard_False);
+  for (NCollection_Map<OSD_MemInfo::Counter>::Iterator aCountersIt (aCounters); aCountersIt.More(); aCountersIt.Next())
+  {
+    aMemInfo.SetActive (aCountersIt.Value(), Standard_True);
+  }
+  aMemInfo.Update();
+
+  for (NCollection_Map<OSD_MemInfo::Counter>::Iterator aCountersIt (aCounters); aCountersIt.More(); aCountersIt.Next())
+  {
+    theDI << Standard_Real (aMemInfo.Value (aCountersIt.Value())) << " ";
   }
   theDI << "\n";
   return 0;
@@ -853,7 +884,7 @@ static int dparallel (Draw_Interpretor& theDI,
       const Standard_Integer aVal = Draw::Atoi (theArgVec[++anIter]);
       if (aVal <= 0 || aVal > aDefPool->NbThreads())
       {
-        std::cout << "Syntax error: maximum number of threads to use should be <= of threads in the pool\n";
+        Message::SendFail() << "Syntax error: maximum number of threads to use should be <= of threads in the pool";
         return 1;
       }
       aDefPool->SetNbDefaultThreadsToLaunch (aVal);
@@ -884,7 +915,7 @@ static int dparallel (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Syntax error: unknown argument '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error: unknown argument '" << anArg << "'";
       return 1;
     }
   }
@@ -958,7 +989,7 @@ static int dsetsignal (Draw_Interpretor& theDI, Standard_Integer theArgNb, const
     }
     else
     {
-      std::cout << "Syntax error: unknown argument '" << anArg << "'\n";
+      Message::SendFail() << "Syntax error: unknown argument '" << anArg << "'";
       return 1;
     }
   }
@@ -992,7 +1023,7 @@ static int dtracelevel (Draw_Interpretor& theDI,
   Message_Gravity aLevel = Message_Info;
   if (theArgNb < 1 || theArgNb > 2)
   {
-    std::cout << "Error: wrong number of arguments! See usage:\n";
+    Message::SendFail() << "Error: wrong number of arguments! See usage:";
     theDI.PrintHelp (theArgVec[0]);
     return 1;
   }
@@ -1023,7 +1054,7 @@ static int dtracelevel (Draw_Interpretor& theDI,
     }
     else
     {
-      std::cout << "Error: unknown gravity '" << theArgVec[1] << "'!\n";
+      Message::SendFail() << "Error: unknown gravity '" << theArgVec[1] << "'";
       return 1;
     }
   }
@@ -1031,14 +1062,14 @@ static int dtracelevel (Draw_Interpretor& theDI,
   Handle(Message_Messenger) aMessenger = Message::DefaultMessenger();
   if (aMessenger.IsNull())
   {
-    std::cout << "Error: default messenger is unavailable!\n";
+    Message::SendFail() << "Error: default messenger is unavailable";
     return 1;
   }
 
   Message_SequenceOfPrinters& aPrinters = aMessenger->ChangePrinters();
   if (aPrinters.Length() < 1)
   {
-    std::cout << "Error: no printers registered in default Messenger!\n";
+    Message::SendFail() << "Error: no printers registered in default Messenger";
     return 0;
   }
 
@@ -1071,6 +1102,104 @@ static int dtracelevel (Draw_Interpretor& theDI,
   }
 
   return 0;
+}
+
+//==============================================================================
+//function : dputs
+//purpose  :
+//==============================================================================
+static int dputs (Draw_Interpretor& theDI,
+                  Standard_Integer theArgNb,
+                  const char** theArgVec)
+{
+  Standard_OStream* aStream = &std::cout;
+  bool isNoNewline = false, toIntense = false;
+  Message_ConsoleColor aColor = Message_ConsoleColor_Default;
+  for (Standard_Integer anArgIter = 1; anArgIter < theArgNb; ++anArgIter)
+  {
+    TCollection_AsciiString anArg (theArgVec[anArgIter]);
+    anArg.LowerCase();
+    if (anArg == "-nonewline")
+    {
+      isNoNewline = true;
+    }
+    else if (anArg == "stdcout")
+    {
+      aStream = &std::cout;
+    }
+    else if (anArg == "stdcerr")
+    {
+      aStream = &std::cerr;
+    }
+    else if (anArg == "-intense")
+    {
+      toIntense = true;
+    }
+    else if (anArg == "-black")
+    {
+      aColor = Message_ConsoleColor_Black;
+    }
+    else if (anArg == "-white")
+    {
+      aColor = Message_ConsoleColor_White;
+    }
+    else if (anArg == "-red")
+    {
+      aColor = Message_ConsoleColor_Red;
+    }
+    else if (anArg == "-blue")
+    {
+      aColor = Message_ConsoleColor_Blue;
+    }
+    else if (anArg == "-green")
+    {
+      aColor = Message_ConsoleColor_Green;
+    }
+    else if (anArg == "-yellow")
+    {
+      aColor = Message_ConsoleColor_Yellow;
+    }
+    else if (anArg == "-cyan")
+    {
+      aColor = Message_ConsoleColor_Cyan;
+    }
+    else if (anArg == "-magenta")
+    {
+      aColor = Message_ConsoleColor_Magenta;
+    }
+    else if (anArgIter + 1 == theArgNb)
+    {
+      if (!theDI.ToColorize())
+      {
+        toIntense = false;
+        aColor = Message_ConsoleColor_Default;
+      }
+      if (toIntense || aColor != Message_ConsoleColor_Default)
+      {
+        Message_PrinterOStream::SetConsoleTextColor (aStream, aColor, toIntense);
+      }
+
+      *aStream << theArgVec[anArgIter];
+      if (!isNoNewline)
+      {
+        *aStream << std::endl;
+      }
+
+      if (toIntense || aColor != Message_ConsoleColor_Default)
+      {
+        Message_PrinterOStream::SetConsoleTextColor (aStream, Message_ConsoleColor_Default, false);
+      }
+      return 0;
+    }
+    else
+    {
+      Message::SendFail() << "Syntax error at '" << anArg << "'";
+      return 1;
+    }
+  }
+
+  Message::SendFail() << "Syntax error: wrong number of arguments";
+  return 1;
 }
 
 void Draw::BasicCommands(Draw_Interpretor& theCommands)
@@ -1134,4 +1263,10 @@ void Draw::BasicCommands(Draw_Interpretor& theCommands)
 		  __FILE__,dversion,g);
   theCommands.Add("dlocale", "set and / or query locate of C subsystem (function setlocale())",
 		  __FILE__,dlocale,g);
+
+  theCommands.Add("dputs",
+            "dputs [-intense] [-black|-white|-red|-green|-blue|-yellow|-cyan|-magenta]"
+    "\n\t\t:       [-nonewline] [stdcout|stdcerr] text"
+    "\n\t\t: Puts text into console output",
+                  __FILE__,dputs,g);
 }

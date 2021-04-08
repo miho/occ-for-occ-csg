@@ -21,13 +21,14 @@
 #include <gp_XY.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
-#include <Message_ProgressSentry.hxx>
+#include <Message_ProgressScope.hxx>
 #include <NCollection_IncAllocator.hxx>
 #include <OSD_OpenFile.hxx>
 #include <OSD_Path.hxx>
 #include <OSD_Timer.hxx>
 #include <Precision.hxx>
 #include <Standard_CLocaleSentry.hxx>
+#include <Standard_ReadLineBuffer.hxx>
 
 #include <algorithm>
 #include <limits>
@@ -44,25 +45,18 @@ IMPLEMENT_STANDARD_RTTIEXT(RWObj_Reader, Standard_Transient)
 
 namespace
 {
+  // The length of buffer to read (in bytes)
+  static const size_t THE_BUFFER_SIZE = 4 * 1024;
 
   //! Simple wrapper.
   struct RWObj_ReaderFile
   {
     FILE*   File;
-    NCollection_Array1<char> Line;
-    Standard_Integer LineBuffLen;
-    Standard_Integer MaxLineLen;
-    int64_t Position;
     int64_t FileLen;
 
     //! Constructor opening the file.
-    RWObj_ReaderFile (const TCollection_AsciiString& theFile,
-                      const Standard_Integer theMaxLineLen = 256)
+    RWObj_ReaderFile (const TCollection_AsciiString& theFile)
     : File (OSD_OpenFile (theFile.ToCString(), "rb")),
-      Line (0, theMaxLineLen - 1),
-      LineBuffLen (theMaxLineLen),
-      MaxLineLen (theMaxLineLen),
-      Position (0),
       FileLen (0)
     {
       if (this->File != NULL)
@@ -82,59 +76,6 @@ namespace
         ::fclose (File);
       }
     }
-
-    //! Read line, also considers multi-line syntax (when last line symbol is slash).
-    bool ReadLine()
-    {
-      int64_t aPosPrev = this->Position;
-      char* aLine = &Line.ChangeFirst();
-      for (; ::feof (this->File) == 0 && ::fgets (aLine, MaxLineLen - 1, this->File) != NULL; )
-      {
-        const int64_t aPosNew = ::ftell64 (this->File);
-        if (aLine[0] == '#')
-        {
-          Position = aPosNew;
-          return true;
-        }
-
-        const Standard_Integer aNbRead = Standard_Integer(aPosNew - aPosPrev);
-        bool toReadMore = false;
-        for (int aTailIter = aNbRead - 1; aTailIter >= 0; --aTailIter)
-        {
-          if (aLine[aTailIter] != '\n'
-           && aLine[aTailIter] != '\r'
-           && aLine[aTailIter] != '\0')
-          {
-            if (aLine[aTailIter] == '\\')
-            {
-              // multi-line syntax
-              aLine[aTailIter] = ' ';
-              const ptrdiff_t aFullLen = aLine + aTailIter + 1 - &this->Line.First();
-              if (LineBuffLen < aFullLen + MaxLineLen)
-              {
-                LineBuffLen += MaxLineLen;
-                this->Line.Resize (0, LineBuffLen - 1, true);
-              }
-              aLine = &this->Line.ChangeFirst() + aFullLen;
-              toReadMore = true;
-              break;
-            }
-            break;
-          }
-        }
-
-        if (toReadMore)
-        {
-          aPosPrev = aPosNew;
-          continue;
-        }
-
-        Position = aPosNew;
-        return true;
-      }
-      return false;
-    }
-
   };
 
   //! Return TRUE if given polygon has clockwise node order.
@@ -176,7 +117,7 @@ RWObj_Reader::RWObj_Reader()
 // Purpose  :
 // ================================================================
 Standard_Boolean RWObj_Reader::read (const TCollection_AsciiString& theFile,
-                                     const Handle(Message_ProgressIndicator)& theProgress,
+                                     const Message_ProgressRange& theProgress,
                                      const Standard_Boolean theToProbe)
 {
   myMemEstim = 0;
@@ -203,7 +144,7 @@ Standard_Boolean RWObj_Reader::read (const TCollection_AsciiString& theFile,
   RWObj_ReaderFile aFile (theFile);
   if (aFile.File == NULL)
   {
-    Message::DefaultMessenger()->Send (TCollection_AsciiString ("Error: file '") + theFile + "' is not found!", Message_Fail);
+    Message::SendFail (TCollection_AsciiString ("Error: file '") + theFile + "' is not found");
     return Standard_False;
   }
 
@@ -211,30 +152,43 @@ Standard_Boolean RWObj_Reader::read (const TCollection_AsciiString& theFile,
   const int64_t aFileLen = aFile.FileLen;
   if (aFileLen <= 0L)
   {
-    Message::DefaultMessenger()->Send (TCollection_AsciiString ("Error: file '") + theFile + "' is empty!", Message_Fail);
+    Message::SendFail (TCollection_AsciiString ("Error: file '") + theFile + "' is empty");
     return Standard_False;
   }
 
+  Standard_ReadLineBuffer aBuffer (THE_BUFFER_SIZE);
+  aBuffer.SetMultilineMode (true);
+
   const Standard_Integer aNbMiBTotal  = Standard_Integer(aFileLen / (1024 * 1024));
   Standard_Integer       aNbMiBPassed = 0;
-  Message_ProgressSentry aPSentry (theProgress, "Reading text OBJ file", 0, aNbMiBTotal, 1);
+  Message_ProgressScope aPS (theProgress, "Reading text OBJ file", aNbMiBTotal);
   OSD_Timer aTimer;
   aTimer.Start();
 
   bool isStart = true;
-  for (; aFile.ReadLine(); )
+  int64_t aPosition = 0;
+  size_t aLineLen = 0;
+  int64_t aReadBytes = 0;
+  const char* aLine = NULL;
+  for (;;)
   {
+    aLine = aBuffer.ReadLine (aFile.File, aLineLen, aReadBytes);
+    if (aLine == NULL)
+    {
+      break;
+    }
     ++myNbLines;
-    const char* aLine = &aFile.Line.First();
+    aPosition += aReadBytes;
     if (aTimer.ElapsedTime() > 1.0)
     {
-      if (!aPSentry.More())
+      if (!aPS.More())
       {
         return false;
       }
 
-      const Standard_Integer aNbMiBRead = Standard_Integer(aFile.Position / (1024 * 1024));
-      for (; aNbMiBPassed < aNbMiBRead; ++aNbMiBPassed) { aPSentry.Next(); }
+      const Standard_Integer aNbMiBRead = Standard_Integer(aPosition / (1024 * 1024));
+      aPS.Next (aNbMiBRead - aNbMiBPassed);
+      aNbMiBPassed = aNbMiBRead;
       aTimer.Reset();
       aTimer.Start();
     }
@@ -267,9 +221,9 @@ Standard_Boolean RWObj_Reader::read (const TCollection_AsciiString& theFile,
 
     if (theToProbe)
     {
-      if (::memcmp (aLine, "mtllib", 6) == 0)
+      if (::strncmp (aLine, "mtllib", 6) == 0)
       {
-        readMaterialLib (aLine + 7);
+        readMaterialLib (IsSpace (aLine[6]) ? aLine + 7 : "");
       }
       else if (aLine[0] == 'v' && RWObj_Tools::isSpaceChar (aLine[1]))
       {
@@ -316,13 +270,13 @@ Standard_Boolean RWObj_Reader::read (const TCollection_AsciiString& theFile,
     {
       pushObject (aLine + 2);
     }
-    else if (::memcmp (aLine, "mtllib", 6) == 0)
+    else if (::strncmp (aLine, "mtllib", 6) == 0)
     {
-      readMaterialLib (aLine + 7);
+      readMaterialLib (IsSpace (aLine[6]) ? aLine + 7 : "");
     }
-    else if (::memcmp (aLine, "usemtl", 6) == 0)
+    else if (::strncmp (aLine, "usemtl", 6) == 0)
     {
-      pushMaterial (aLine + 7);
+      pushMaterial (IsSpace (aLine[6]) ? aLine + 7 : "");
     }
 
     if (!checkMemory())
@@ -357,11 +311,9 @@ Standard_Boolean RWObj_Reader::read (const TCollection_AsciiString& theFile,
   }
   if (myNbElemsBig != 0)
   {
-    Message::DefaultMessenger()->Send (TCollection_AsciiString("Warning: OBJ reader, ") + myNbElemsBig
-                                       + " polygon(s) have been split into triangles.", Message_Warning);
+    Message::SendWarning (TCollection_AsciiString("Warning: OBJ reader, ") + myNbElemsBig + " polygon(s) have been split into triangles");
   }
 
-  for (; aNbMiBPassed < aNbMiBTotal; ++aNbMiBPassed) { aPSentry.Next(); }
   return true;
 }
 
@@ -433,8 +385,7 @@ void RWObj_Reader::pushIndices (const char* thePos)
       if (a3Indices[0] < myObjVerts.Lower() || a3Indices[0] > myObjVerts.Upper())
       {
         myToAbort = true;
-        Message::DefaultMessenger()->Send (TCollection_AsciiString("Error: invalid OBJ syntax at line ") + myNbLines
-                                           + ": vertex index is out of range.", Message_Fail);
+        Message::SendFail (TCollection_AsciiString("Error: invalid OBJ syntax at line ") + myNbLines + ": vertex index is out of range");
         return;
       }
 
@@ -444,13 +395,13 @@ void RWObj_Reader::pushIndices (const char* thePos)
       {
         if (myObjVertsUV.IsEmpty())
         {
-          Message::DefaultMessenger()->Send (TCollection_AsciiString("Warning: invalid OBJ syntax at line ") + myNbLines
-                                             + ": UV index is specified but no UV nodes are defined.", Message_Warning);
+          Message::SendWarning (TCollection_AsciiString("Warning: invalid OBJ syntax at line ") + myNbLines
+                              + ": UV index is specified but no UV nodes are defined");
         }
         else if (a3Indices[1] < myObjVertsUV.Lower() || a3Indices[1] > myObjVertsUV.Upper())
         {
-          Message::DefaultMessenger()->Send (TCollection_AsciiString("Warning: invalid OBJ syntax at line ") + myNbLines
-                                             + ": UV index is out of range.", Message_Warning);
+          Message::SendWarning (TCollection_AsciiString("Warning: invalid OBJ syntax at line ") + myNbLines
+                              + ": UV index is out of range");
           setNodeUV (anIndex,Graphic3d_Vec2 (0.0f, 0.0f));
         }
         else
@@ -462,13 +413,13 @@ void RWObj_Reader::pushIndices (const char* thePos)
       {
         if (myObjNorms.IsEmpty())
         {
-          Message::DefaultMessenger()->Send (TCollection_AsciiString("Warning: invalid OBJ syntax at line ") + myNbLines
-                                             + ": Normal index is specified but no Normals nodes are defined.", Message_Warning);
+          Message::SendWarning (TCollection_AsciiString("Warning: invalid OBJ syntax at line ") + myNbLines
+                              + ": Normal index is specified but no Normals nodes are defined");
         }
         else if (a3Indices[2] < myObjNorms.Lower() || a3Indices[2] > myObjNorms.Upper())
         {
-          Message::DefaultMessenger()->Send (TCollection_AsciiString("Warning: invalid OBJ syntax at line ") + myNbLines
-                                             + ": Normal index is out of range.", Message_Warning);
+          Message::SendWarning (TCollection_AsciiString("Warning: invalid OBJ syntax at line ") + myNbLines
+                              + ": Normal index is out of range");
           setNodeNormal (anIndex, Graphic3d_Vec3 (0.0f, 0.0f, 1.0f));
         }
         else
@@ -696,8 +647,7 @@ Standard_Integer RWObj_Reader::triangulatePolygon (const NCollection_Array1<Stan
   }
   catch (Standard_Failure const& theFailure)
   {
-    Message::DefaultMessenger()->Send (TCollection_AsciiString ("Error: exception raised during polygon split\n[")
-                                       + theFailure.GetMessageString() + "]", Message_Warning);
+    Message::SendWarning (TCollection_AsciiString ("Error: exception raised during polygon split\n[") + theFailure.GetMessageString() + "]");
   }
   return triangulatePolygonFan (theIndices);
 }
@@ -751,6 +701,14 @@ void RWObj_Reader::pushSmoothGroup (const char* theSmoothGroupIndex)
   {
     aNewSmoothGroup.Clear();
   }
+  if (myActiveSubMesh.SmoothGroup.IsEqual (aNewSmoothGroup))
+  {
+    // Ignore duplicated statements to workaround some weird OBJ files.
+    // Note that smooth groups are handled in different manner than groups and objects,
+    // which always flushed even with equal names.
+    return;
+  }
+
   if (addMesh (myActiveSubMesh, RWObj_SubMeshReason_NewSmoothGroup))
   {
     myPackedIndices.Clear(); // vertices might be duplicated after this point...
@@ -771,8 +729,7 @@ void RWObj_Reader::pushMaterial (const char* theMaterialName)
   }
   else if (!myMaterials.IsBound (aNewMat))
   {
-    Message::DefaultMessenger()->Send (TCollection_AsciiString("Warning: use of undefined OBJ material at line ")
-                                       + myNbLines, Message_Warning);
+    Message::SendWarning (TCollection_AsciiString("Warning: use of undefined OBJ material at line ") + myNbLines);
     return;
   }
   if (myActiveSubMesh.Material.IsEqual (aNewMat))
@@ -797,8 +754,7 @@ void RWObj_Reader::readMaterialLib (const char* theFileName)
   TCollection_AsciiString aMatPath;
   if (!RWObj_Tools::ReadName (theFileName, aMatPath))
   {
-    Message::DefaultMessenger()->Send (TCollection_AsciiString("Warning: invalid OBJ syntax at line ")
-                                       + myNbLines, Message_Warning);
+    Message::SendWarning (TCollection_AsciiString("Warning: invalid OBJ syntax at line ") + myNbLines);
     return;
   }
 
@@ -821,9 +777,9 @@ bool RWObj_Reader::checkMemory()
     return true;
   }
 
-  Message::DefaultMessenger()->Send (TCollection_AsciiString("Error: OBJ file content does not fit into ")
-                                     + Standard_Integer(myMemLimitBytes / (1024 * 1024)) + " MiB limit."
-                                   + "\nMesh data will be truncated.", Message_Fail);
+  Message::SendFail (TCollection_AsciiString("Error: OBJ file content does not fit into ")
+                   + Standard_Integer(myMemLimitBytes / (1024 * 1024)) + " MiB limit."
+                   + "\nMesh data will be truncated.");
   myToAbort = true;
   return false;
 }

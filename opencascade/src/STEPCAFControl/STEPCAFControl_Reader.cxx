@@ -13,6 +13,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <STEPCAFControl_Reader.hxx>
 
 #include <BRep_Builder.hxx>
 #include <Geom_Axis2Placement.hxx>
@@ -23,6 +24,7 @@
 #include <StepData_StepModel.hxx>
 #include <HeaderSection_FileSchema.hxx>
 #include <Interface_Static.hxx>
+#include <Message_ProgressScope.hxx>
 #include <NCollection_DataMap.hxx>
 #include <OSD_Path.hxx>
 #include <Quantity_Color.hxx>
@@ -44,13 +46,13 @@
 #include <StepBasic_SiUnit.hxx>
 #include <StepBasic_SiUnitAndLengthUnit.hxx>
 #include <StepBasic_Unit.hxx>
+#include <StepBasic_DocumentFile.hxx>
 #include <STEPCAFControl_Controller.hxx>
 #include <STEPCAFControl_DataMapIteratorOfDataMapOfShapePD.hxx>
 #include <STEPCAFControl_DataMapOfPDExternFile.hxx>
 #include <STEPCAFControl_DataMapOfSDRExternFile.hxx>
 #include <STEPCAFControl_DataMapOfShapePD.hxx>
 #include <STEPCAFControl_ExternFile.hxx>
-#include <STEPCAFControl_Reader.hxx>
 #include <STEPConstruct.hxx>
 #include <STEPConstruct_Assembly.hxx>
 #include <STEPConstruct_ExternRefs.hxx>
@@ -279,7 +281,6 @@
 #include <Transfer_ActorOfTransientProcess.hxx>
 #include <Bnd_Box.hxx>
 #include <BRepBndLib.hxx>
-#include <Resource_Unicode.hxx>
 
 // skl 21.08.2003 for reading G&DT
 //#include <StepRepr_CompoundItemDefinition.hxx>
@@ -319,8 +320,7 @@ TCollection_AsciiString AddrToString(const TopoDS_Shape& theShape)
 //=======================================================================
 
 STEPCAFControl_Reader::STEPCAFControl_Reader()
-: mySourceCodePage (Resource_FormatType_UTF8),
-  myColorMode(Standard_True),
+: myColorMode(Standard_True),
   myNameMode(Standard_True),
   myLayerMode(Standard_True),
   myPropsMode(Standard_True),
@@ -330,7 +330,6 @@ STEPCAFControl_Reader::STEPCAFControl_Reader()
   myViewMode(Standard_True)
 {
   STEPCAFControl_Controller::Init();
-  mySourceCodePage = (Resource_FormatType )Interface_Static::IVal ("read.stepcaf.codepage");
 }
 
 
@@ -341,8 +340,7 @@ STEPCAFControl_Reader::STEPCAFControl_Reader()
 
 STEPCAFControl_Reader::STEPCAFControl_Reader(const Handle(XSControl_WorkSession)& WS,
   const Standard_Boolean scratch)
-: mySourceCodePage (Resource_FormatType_UTF8),
-  myColorMode(Standard_True),
+: myColorMode(Standard_True),
   myNameMode(Standard_True),
   myLayerMode(Standard_True),
   myPropsMode(Standard_True),
@@ -352,10 +350,17 @@ STEPCAFControl_Reader::STEPCAFControl_Reader(const Handle(XSControl_WorkSession)
   myViewMode(Standard_True)
 {
   STEPCAFControl_Controller::Init();
-  mySourceCodePage = (Resource_FormatType )Interface_Static::IVal ("read.stepcaf.codepage");
   Init(WS, scratch);
 }
 
+//=======================================================================
+//function : ~STEPCAFControl_Reader
+//purpose  :
+//=======================================================================
+STEPCAFControl_Reader::~STEPCAFControl_Reader()
+{
+  //
+}
 
 //=======================================================================
 //function : Init
@@ -376,9 +381,10 @@ void STEPCAFControl_Reader::Init(const Handle(XSControl_WorkSession)& WS,
 //=======================================================================
 TCollection_ExtendedString STEPCAFControl_Reader::convertName (const TCollection_AsciiString& theName) const
 {
-  TCollection_ExtendedString aName;
-  Resource_Unicode::ConvertFormatToUnicode (mySourceCodePage, theName.ToCString(), aName);
-  return aName;
+  // If source code page is not a NoConversion
+  // the string is treated as having UTF-8 coding,
+  // else each character is copied to ExtCharacter.
+  return TCollection_ExtendedString (theName, myReader.StepModel()->SourceCodePage() != Resource_FormatType_NoConversion);
 }
 
 //=======================================================================
@@ -408,11 +414,12 @@ Standard_Integer STEPCAFControl_Reader::NbRootsForTransfer()
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean STEPCAFControl_Reader::TransferOneRoot(const Standard_Integer num,
-  Handle(TDocStd_Document) &doc)
+Standard_Boolean STEPCAFControl_Reader::TransferOneRoot (const Standard_Integer num,
+                                                         Handle(TDocStd_Document) &doc,
+                                                         const Message_ProgressRange& theProgress)
 {
   TDF_LabelSequence Lseq;
-  return Transfer(myReader, num, doc, Lseq);
+  return Transfer (myReader, num, doc, Lseq, Standard_False, theProgress);
 }
 
 
@@ -421,10 +428,11 @@ Standard_Boolean STEPCAFControl_Reader::TransferOneRoot(const Standard_Integer n
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean STEPCAFControl_Reader::Transfer(Handle(TDocStd_Document) &doc)
+Standard_Boolean STEPCAFControl_Reader::Transfer (Handle(TDocStd_Document) &doc,
+                                                  const Message_ProgressRange& theProgress)
 {
   TDF_LabelSequence Lseq;
-  return Transfer(myReader, 0, doc, Lseq);
+  return Transfer (myReader, 0, doc, Lseq, Standard_False, theProgress);
 }
 
 
@@ -433,11 +441,15 @@ Standard_Boolean STEPCAFControl_Reader::Transfer(Handle(TDocStd_Document) &doc)
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean STEPCAFControl_Reader::Perform(const Standard_CString filename,
-  Handle(TDocStd_Document) &doc)
+Standard_Boolean STEPCAFControl_Reader::Perform (const Standard_CString filename,
+                                                 Handle(TDocStd_Document) &doc,
+                                                 const Message_ProgressRange& theProgress)
 {
-  if (ReadFile(filename) != IFSelect_RetDone) return Standard_False;
-  return Transfer(doc);
+  if (ReadFile (filename) != IFSelect_RetDone)
+  {
+    return Standard_False;
+  }
+  return Transfer (doc, theProgress);
 }
 
 
@@ -446,11 +458,15 @@ Standard_Boolean STEPCAFControl_Reader::Perform(const Standard_CString filename,
 //purpose  : 
 //=======================================================================
 
-Standard_Boolean STEPCAFControl_Reader::Perform(const TCollection_AsciiString &filename,
-  Handle(TDocStd_Document) &doc)
+Standard_Boolean STEPCAFControl_Reader::Perform (const TCollection_AsciiString &filename,
+                                                 Handle(TDocStd_Document) &doc,
+                                                 const Message_ProgressRange& theProgress)
 {
-  if (ReadFile(filename.ToCString()) != IFSelect_RetDone) return Standard_False;
-  return Transfer(doc);
+  if ( ReadFile (filename.ToCString()) != IFSelect_RetDone)
+  {
+    return Standard_False;
+  }
+  return Transfer (doc, theProgress);
 }
 
 
@@ -525,25 +541,34 @@ static void FillShapesMap(const TopoDS_Shape &S, TopTools_MapOfShape &map)
 //purpose  : basic working method
 //=======================================================================
 
-Standard_Boolean STEPCAFControl_Reader::Transfer(STEPControl_Reader &reader,
-  const Standard_Integer nroot,
-  Handle(TDocStd_Document) &doc,
-  TDF_LabelSequence &Lseq,
-  const Standard_Boolean asOne)
+Standard_Boolean STEPCAFControl_Reader::Transfer (STEPControl_Reader &reader,
+                                                  const Standard_Integer nroot,
+                                                  Handle(TDocStd_Document) &doc,
+                                                  TDF_LabelSequence &Lseq,
+                                                  const Standard_Boolean asOne,
+                                                  const Message_ProgressRange& theProgress)
 {
   reader.ClearShapes();
   Standard_Integer i;
 
   // Read all shapes
   Standard_Integer num = reader.NbRootsForTransfer();
-  if (num <= 0) return Standard_False;
+  if (num <=0) return Standard_False;
+
+  Message_ProgressScope aPSRoot (theProgress, NULL, 2);
+
   if (nroot) {
     if (nroot > num) return Standard_False;
-    reader.TransferOneRoot(nroot);
+    reader.TransferOneRoot (nroot, aPSRoot.Next());
   }
   else {
-    for (i = 1; i <= num; i++) reader.TransferOneRoot(i);
+    Message_ProgressScope aPS (aPSRoot.Next(), NULL, num);
+    for (i = 1; i <= num && aPS.More(); i++)
+      reader.TransferOneRoot (i, aPS.Next());
   }
+  if (aPSRoot.UserBreak())
+    return Standard_False;
+
   num = reader.NbShapes();
   if (num <= 0) return Standard_False;
 
@@ -595,8 +620,10 @@ Standard_Boolean STEPCAFControl_Reader::Transfer(STEPControl_Reader &reader,
     }
   }
 
-  // get directory name of the main file
+  // get file name and directory name of the main file
   OSD_Path mainfile(reader.WS()->LoadedFile());
+  TCollection_AsciiString aMainName;
+  aMainName = mainfile.Name() + mainfile.Extension();
   mainfile.SetName("");
   mainfile.SetExtension("");
   TCollection_AsciiString dpath;
@@ -606,7 +633,10 @@ Standard_Boolean STEPCAFControl_Reader::Transfer(STEPControl_Reader &reader,
   // and fill map SDR -> extern file
   STEPConstruct_ExternRefs ExtRefs(reader.WS());
   ExtRefs.LoadExternRefs();
-  for (i = 1; i <= ExtRefs.NbExternRefs(); i++) {
+  Message_ProgressScope aPSE (aPSRoot.Next(), NULL, ExtRefs.NbExternRefs());
+  for (i = 1; i <= ExtRefs.NbExternRefs() && aPSE.More(); i++)
+  {
+    Message_ProgressRange aRange = aPSE.Next();
     // check extern ref format
     Handle(TCollection_HAsciiString) format = ExtRefs.Format(i);
     if (!format.IsNull()) {
@@ -643,6 +673,13 @@ Standard_Boolean STEPCAFControl_Reader::Transfer(STEPControl_Reader &reader,
     TCollection_AsciiString fullname = OSD_Path::AbsolutePath(dpath, filename);
     if (fullname.Length() <= 0) fullname = filename;
 
+    // check for not the same file
+    TCollection_AsciiString aMainFullName = OSD_Path::AbsolutePath(dpath, aMainName);
+    if (TCollection_AsciiString::IsSameString(aMainFullName,fullname,Standard_False)) {
+      TP->AddWarning(ExtRefs.DocFile(i), "External reference file is the same main file");
+      continue; // not a valid extern ref
+    }
+
     /*
         char fullname[1024];
         char *mainfile = reader.WS()->LoadedFile();
@@ -660,9 +697,9 @@ Standard_Boolean STEPCAFControl_Reader::Transfer(STEPControl_Reader &reader,
     if (!PDFileMap.IsBound(PD)) continue; // this PD is not concerned by current transfer
 
     // read extern file (or use existing data) and record its data
-    Handle(STEPCAFControl_ExternFile) EF =
-      ReadExternFile(filename, fullname.ToCString(), doc);
-    PDFileMap.Bind(PD, EF);
+    Handle(STEPCAFControl_ExternFile) EF = 
+      ReadExternFile (filename, fullname.ToCString(), doc, aRange);
+    PDFileMap.Bind (PD, EF);
   }
 
   // and insert them to the document
@@ -810,7 +847,9 @@ TDF_Label STEPCAFControl_Reader::AddShape(const TopoDS_Shape &S,
     TDF_Label subL = AddShape(Sub0, STool, NewShapesMap, ShapePDMap, PDFileMap, ShapeLabelMap);
     if (!subL.IsNull()) {
       TDF_Label instL = STool->AddComponent(L, subL, it.Value().Location());
-      ShapeLabelMap.Bind(it.Value(), instL);
+      if (!ShapeLabelMap.IsBound(it.Value())) {
+        ShapeLabelMap.Bind(it.Value(), instL);
+      }
     }
   }
   if (SHAS.Length() > 0) STool->SetExternRefs(L, SHAS);
@@ -825,9 +864,10 @@ TDF_Label STEPCAFControl_Reader::AddShape(const TopoDS_Shape &S,
 //purpose  : 
 //=======================================================================
 
-Handle(STEPCAFControl_ExternFile) STEPCAFControl_Reader::ReadExternFile(const Standard_CString file,
-  const Standard_CString fullname,
-  Handle(TDocStd_Document)& doc)
+Handle(STEPCAFControl_ExternFile) STEPCAFControl_Reader::ReadExternFile (const Standard_CString file, 
+                                                                         const Standard_CString fullname,
+                                                                         Handle(TDocStd_Document)& doc,
+                                                                         const Message_ProgressRange& theProgress)
 {
   // if the file is already read, associate it with SDR
   if (myFiles.IsBound(file)) {
@@ -854,8 +894,8 @@ Handle(STEPCAFControl_ExternFile) STEPCAFControl_Reader::ReadExternFile(const St
   // transfer in single-result mode
   if (EF->GetLoadStatus() == IFSelect_RetDone) {
     TDF_LabelSequence labels;
-    EF->SetTransferStatus(Transfer(sr, 0, doc, labels, Standard_True));
-    if (labels.Length() > 0) EF->SetLabel(labels.Value(1));
+    EF->SetTransferStatus (Transfer (sr, 0, doc, labels, Standard_False, theProgress));
+    if (labels.Length() > 0) EF->SetLabel (labels.Value(1));
   }
 
   // add read file to dictionary
@@ -968,10 +1008,11 @@ Standard_Boolean STEPCAFControl_Reader::ReadColors(const Handle(XSControl_WorkSe
       break;
     }
 
-    Handle(StepVisual_Colour) SurfCol, BoundCol, CurveCol;
+    Handle(StepVisual_Colour) SurfCol, BoundCol, CurveCol, RenderCol;
+    Standard_Real RenderTransp;
     // check if it is component style
     Standard_Boolean IsComponent = Standard_False;
-    if (!Styles.GetColors(style, SurfCol, BoundCol, CurveCol, IsComponent) && IsVisible)
+    if (!Styles.GetColors(style, SurfCol, BoundCol, CurveCol, RenderCol, RenderTransp, IsComponent) && IsVisible)
       continue;
 
     // collect styled items
@@ -1042,23 +1083,30 @@ Standard_Boolean STEPCAFControl_Reader::ReadColors(const Handle(XSControl_WorkSe
       if (S.IsNull())
         continue;
 
-      if (!SurfCol.IsNull() || !BoundCol.IsNull() || !CurveCol.IsNull() || !IsVisible)
+      if (!SurfCol.IsNull() || !BoundCol.IsNull() || !CurveCol.IsNull() || !RenderCol.IsNull() || !IsVisible)
       {
         TDF_Label aL;
         Standard_Boolean isFound = STool->SearchUsingMap(S, aL, Standard_False, Standard_True);
-        if (!SurfCol.IsNull() || !BoundCol.IsNull() || !CurveCol.IsNull())
+        if (!SurfCol.IsNull() || !BoundCol.IsNull() || !CurveCol.IsNull() || !RenderCol.IsNull())
         {
-          Quantity_Color aSCol, aBCol, aCCol;
-          if (!SurfCol.IsNull())
+          Quantity_Color aSCol, aBCol, aCCol, aRCol;
+          Quantity_ColorRGBA aFullSCol;
+          if (!SurfCol.IsNull()) {
             Styles.DecodeColor(SurfCol, aSCol);
+            aFullSCol = Quantity_ColorRGBA(aSCol);
+          }
           if (!BoundCol.IsNull())
             Styles.DecodeColor(BoundCol, aBCol);
           if (!CurveCol.IsNull())
             Styles.DecodeColor(CurveCol, aCCol);
+          if (!RenderCol.IsNull()) {
+            Styles.DecodeColor(RenderCol, aRCol);
+            aFullSCol = Quantity_ColorRGBA(aRCol, static_cast<float>(1.0f - RenderTransp));
+          }
           if (isFound)
           {
-            if (!SurfCol.IsNull())
-              CTool->SetColor(aL, aSCol, XCAFDoc_ColorSurf);
+            if (!SurfCol.IsNull() || !RenderCol.IsNull())
+              CTool->SetColor(aL, aFullSCol, XCAFDoc_ColorSurf);
             if (!BoundCol.IsNull())
               CTool->SetColor(aL, aBCol, XCAFDoc_ColorCurv);
             if (!CurveCol.IsNull())
@@ -1071,8 +1119,8 @@ Standard_Boolean STEPCAFControl_Reader::ReadColors(const Handle(XSControl_WorkSe
               TDF_Label aL1;
               if (STool->SearchUsingMap(it.Value(), aL1, Standard_False, Standard_True))
               {
-                if (!SurfCol.IsNull())
-                  CTool->SetColor(aL1, aSCol, XCAFDoc_ColorSurf);
+                if (!SurfCol.IsNull() || !RenderCol.IsNull())
+                  CTool->SetColor(aL1, aFullSCol, XCAFDoc_ColorSurf);
                 if (!BoundCol.IsNull())
                   CTool->SetColor(aL1, aBCol, XCAFDoc_ColorCurv);
                 if (!CurveCol.IsNull())
@@ -1622,10 +1670,11 @@ Standard_Boolean STEPCAFControl_Reader::ReadSHUOs(const Handle(XSControl_WorkSes
       break;
     }
 
-    Handle(StepVisual_Colour) SurfCol, BoundCol, CurveCol;
+    Handle(StepVisual_Colour) SurfCol, BoundCol, CurveCol, RenderCol;
+    Standard_Real RenderTransp;
     // check if it is component style
     Standard_Boolean IsComponent = Standard_False;
-    if (!Styles.GetColors(style, SurfCol, BoundCol, CurveCol, IsComponent) && IsVisible)
+    if (!Styles.GetColors(style, SurfCol, BoundCol, CurveCol, RenderCol, RenderTransp, IsComponent) && IsVisible)
       continue;
     if (!IsComponent)
       continue;
@@ -1660,10 +1709,18 @@ Standard_Boolean STEPCAFControl_Reader::ReadSHUOs(const Handle(XSControl_WorkSes
         continue;
       }
       // now set the style to the SHUO main label.
-      if (!SurfCol.IsNull()) {
+      if (!SurfCol.IsNull() || !RenderCol.IsNull()) {
         Quantity_Color col;
-        Styles.DecodeColor(SurfCol, col);
-        CTool->SetColor(aLabelForStyle, col, XCAFDoc_ColorSurf);
+        Quantity_ColorRGBA colRGBA;
+        if (!SurfCol.IsNull()) {
+            Styles.DecodeColor(SurfCol, col);
+            colRGBA = Quantity_ColorRGBA(col);
+        }
+        if (!RenderCol.IsNull()) {
+            Styles.DecodeColor(RenderCol, col);
+            colRGBA = Quantity_ColorRGBA(col, static_cast<float>(1.0 - RenderTransp));
+        }
+        CTool->SetColor(aLabelForStyle, colRGBA, XCAFDoc_ColorSurf);
       }
       if (!BoundCol.IsNull()) {
         Quantity_Color col;
@@ -2339,7 +2396,10 @@ Standard_Boolean STEPCAFControl_Reader::setDatumToXCAF(const Handle(StepDimTol_D
     Handle(XCAFDimTolObjects_DatumObject) aDatTargetObj = new XCAFDimTolObjects_DatumObject();
     XCAFDimTolObjects_DatumTargetType aType;
     if (!STEPCAFControl_GDTProperty::GetDatumTargetType(aDT->Description(), aType))
+    {
+      aTP->AddWarning(aDT, "Unknown datum target type");
       continue;
+    }
     aDatTargetObj->SetDatumTargetType(aType);
     Standard_Boolean isValidDT = Standard_False;
 
@@ -2385,13 +2445,16 @@ Standard_Boolean STEPCAFControl_Reader::setDatumToXCAF(const Handle(StepDimTol_D
 
     if (aType == XCAFDimTolObjects_DatumTargetType_Area) {
       // Area datum target
-      Interface_EntityIterator anIterDTF = aGraph.Shareds(aDT);
+      if (aRelationship.IsNull())
+        continue;
+      Handle(StepRepr_ShapeAspect) aSA = aRelationship->RelatingShapeAspect();
+      Interface_EntityIterator aSAIter = aGraph.Sharings(aSA);
       Handle(StepAP242_GeometricItemSpecificUsage) aGISU;
-      for (; anIterDTF.More() && aGISU.IsNull(); anIterDTF.Next()) {
-        aGISU = Handle(StepAP242_GeometricItemSpecificUsage)::DownCast(anIterDTF.Value());
+      for (; aSAIter.More() && aGISU.IsNull(); aSAIter.Next()) {
+        aGISU = Handle(StepAP242_GeometricItemSpecificUsage)::DownCast(aSAIter.Value());
       }
       Handle(StepRepr_RepresentationItem) anItem;
-      if (aGISU->NbIdentifiedItem() > 0)
+      if (!aGISU.IsNull() && aGISU->NbIdentifiedItem() > 0)
         anItem = aGISU->IdentifiedItemValue(1);
       if (anItem.IsNull())
         continue;
@@ -2464,7 +2527,7 @@ Standard_Boolean STEPCAFControl_Reader::setDatumToXCAF(const Handle(StepDimTol_D
 
     // Create datum target object
     if (isValidDT) {
-      TDF_Label aDatL = aDGTTool->AddDatum();
+      TDF_Label aDatL = aDGTTool->AddDatum(theDat->Name(), theDat->Description(), theDat->Identification());
       myGDTMap.Bind(aDT, aDatL);
       aDGTTool->Lock(aDatL);
       aDat = XCAFDoc_Datum::Set(aDatL);
@@ -2486,7 +2549,7 @@ Standard_Boolean STEPCAFControl_Reader::setDatumToXCAF(const Handle(StepDimTol_D
 
   if (aShapeLabels.Length() > 0 || !isExistDatumTarget) {
     // Create object for datum
-    TDF_Label aDatL = aDGTTool->AddDatum();
+    TDF_Label aDatL = aDGTTool->AddDatum(theDat->Name(), theDat->Description(), theDat->Identification());
     myGDTMap.Bind(theDat, aDatL);
     // bind datum label with all reference datum_feature entities
     for (Standard_Integer i = 1; i <= aSAs.Length(); i++) {
@@ -4354,8 +4417,10 @@ Standard_Boolean STEPCAFControl_Reader::ReadViews(const Handle(XSControl_WorkSes
     for (; anIter.More(); anIter.Next()) {
       if (anIter.Value()->IsKind(STANDARD_TYPE(StepRepr_MappedItem))) {
         Handle(StepRepr_MappedItem) anItem = Handle(StepRepr_MappedItem)::DownCast(anIter.Value());
-        Handle(StepRepr_Representation) aRepr = anItem->MappingSource()->MappedRepresentation();
-        collectViewShapes(theWS, theDoc, aRepr, aShapes);
+        if (Handle(StepRepr_Representation) aRepr = anItem->MappingSource()->MappedRepresentation())
+        {
+          collectViewShapes(theWS, theDoc, aRepr, aShapes);
+        }
       }
       else if (anIter.Value()->IsKind(STANDARD_TYPE(StepVisual_AnnotationOccurrence)) ||
         anIter.Value()->IsKind(STANDARD_TYPE(StepVisual_DraughtingCallout))) {

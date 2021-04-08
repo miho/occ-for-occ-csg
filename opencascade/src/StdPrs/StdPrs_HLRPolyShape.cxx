@@ -27,7 +27,7 @@
 #include <HLRBRep_PolyAlgo.hxx>
 #include <Prs3d_LineAspect.hxx>
 #include <Prs3d_Presentation.hxx>
-#include <Prs3d_Projector.hxx>
+#include <StdPrs_ToolTriangulatedShape.hxx>
 #include <StdPrs_WFShape.hxx>
 #include <TColgp_SequenceOfPnt.hxx>
 #include <TopAbs.hxx>
@@ -41,17 +41,25 @@
 #define PntY2 ((Standard_Real*)Coordinates)[4]
 #define PntZ2 ((Standard_Real*)Coordinates)[5]
 
+IMPLEMENT_STANDARD_RTTIEXT(StdPrs_HLRPolyShape, StdPrs_HLRShapeI)
+
 //=======================================================================
 //function : Add
-//purpose  : 
+//purpose  :
 //=======================================================================
-
-void StdPrs_HLRPolyShape::Add(const Handle (Prs3d_Presentation)& aPresentation,
-			      const TopoDS_Shape&                 aShape,
-			      const Handle (Prs3d_Drawer)&        aDrawer,
-			      const Handle (Prs3d_Projector)&     aProjector)
+void StdPrs_HLRPolyShape::ComputeHLR (const Handle(Prs3d_Presentation)& aPresentation,
+                                      const TopoDS_Shape& aShape,
+                                      const Handle(Prs3d_Drawer)& aDrawer,
+                                      const Handle(Graphic3d_Camera)& theProjector) const
 {
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(aPresentation);
+  gp_Dir aBackDir = -theProjector->Direction();
+  gp_Dir aXpers   = theProjector->Up().Crossed (aBackDir);
+  gp_Ax3 anAx3 (theProjector->Center(), aBackDir, aXpers);
+  gp_Trsf aTrsf;
+  aTrsf.SetTransformation (anAx3);
+  const HLRAlgo_Projector aProj (aTrsf, !theProjector->IsOrthographic(), theProjector->Scale());
+
+  Handle(Graphic3d_Group) aGroup = aPresentation->CurrentGroup();
 
   TopExp_Explorer ex;
 
@@ -66,19 +74,11 @@ void StdPrs_HLRPolyShape::Add(const Handle (Prs3d_Presentation)& aPresentation,
 
   if (aDrawer->IsAutoTriangulation())
   {
-    const Standard_Boolean aRel = aDrawer->TypeOfDeflection() == Aspect_TOD_RELATIVE;
-    Standard_Real aDef = aRel ? aDrawer->HLRDeviationCoefficient() : aDrawer->MaximalChordialDeviation();
-    IMeshTools_Parameters aMeshParams;
-    aMeshParams.Relative   = aRel;
-    aMeshParams.Angle      = aDrawer->HLRAngle();
-    aMeshParams.Deflection = aDef;
-    BRepMesh_IncrementalMesh mesh(aShape, aMeshParams);
+    StdPrs_ToolTriangulatedShape::Tessellate (aShape, aDrawer);
   }
   
   Handle(HLRBRep_PolyAlgo) hider = new HLRBRep_PolyAlgo(aShape);
-
-  hider->Projector(aProjector->Projector());
-  hider->Angle(aDrawer->HLRAngle());
+  hider->Projector (aProj);
   hider->Update();
   Standard_Real sta,end,dx,dy,dz;
   Standard_ShortReal tolsta, tolend;

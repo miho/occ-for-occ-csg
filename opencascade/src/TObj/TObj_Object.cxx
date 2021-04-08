@@ -289,7 +289,8 @@ Standard_Boolean TObj_Object::SetName(const Handle(TCollection_HExtendedString)&
 
 Standard_Boolean TObj_Object::SetName(const Handle(TCollection_HAsciiString)& theName) const
 {
-  return SetName( new TCollection_HExtendedString ( theName ) );
+  Handle(TCollection_HExtendedString) aName = new TCollection_HExtendedString(theName);
+  return SetName(aName);
 }
 
 //=======================================================================
@@ -299,7 +300,8 @@ Standard_Boolean TObj_Object::SetName(const Handle(TCollection_HAsciiString)& th
 
 Standard_Boolean TObj_Object::SetName(const Standard_CString theName) const
 {
-  return SetName ( new TCollection_HExtendedString ( theName ) );
+  Handle(TCollection_HAsciiString) aName = new TCollection_HAsciiString(theName);
+  return SetName (aName);
 }
 
 //=======================================================================
@@ -615,8 +617,12 @@ Standard_Boolean TObj_Object::GetObj(const TDF_Label& theLabel,
 Handle(TObj_Object) TObj_Object::GetFatherObject
                          (const Handle(Standard_Type)& theType) const
 {
-  Handle(TObj_Object) aFather, aSon(this);
+  Handle(TObj_Object) aFather;
 
+  if (myLabel.IsNull())
+    return aFather;
+
+  Handle(TObj_Object) aSon(this);
   while ( aSon->GetObj( aSon->GetLabel().Father(), aFather, Standard_True ) )
   {
     if (theType.IsNull() || aFather->IsKind( theType ))
@@ -1624,4 +1630,14 @@ Standard_Integer TObj_Object::GetOrder() const
   if ( !order )
     order = GetLabel().Tag();
   return order;
+}
+
+//=======================================================================
+//function : HasModifications
+//purpose  :
+//=======================================================================
+
+Standard_Boolean TObj_Object::HasModifications() const
+{
+  return (!IsAlive() ? Standard_False : GetLabel().MayBeModified() );
 }

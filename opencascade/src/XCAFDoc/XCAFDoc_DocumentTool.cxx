@@ -13,6 +13,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <XCAFDoc_DocumentTool.hxx>
 
 #include <Standard_GUID.hxx>
 #include <Standard_Type.hxx>
@@ -27,14 +28,14 @@
 #include <XCAFDoc_ColorTool.hxx>
 #include <XCAFDoc_ClippingPlaneTool.hxx>
 #include <XCAFDoc_DimTolTool.hxx>
-#include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_LayerTool.hxx>
 #include <XCAFDoc_MaterialTool.hxx>
 #include <XCAFDoc_NotesTool.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
 #include <XCAFDoc_ViewTool.hxx>
+#include <XCAFDoc_VisMaterialTool.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_DocumentTool,TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE_WITH_TYPE(XCAFDoc_DocumentTool,TDataStd_GenericEmpty,"xcaf","DocumentTool")
 
 //=======================================================================
 //function : GetID
@@ -226,6 +227,17 @@ TDF_Label XCAFDoc_DocumentTool::NotesLabel(const TDF_Label& acces)
 }
 
 //=======================================================================
+//function : VisMaterialLabel
+//purpose  :
+//=======================================================================
+TDF_Label XCAFDoc_DocumentTool::VisMaterialLabel (const TDF_Label& theLabel)
+{
+  TDF_Label aLabel = DocLabel (theLabel).FindChild (10, Standard_True);
+  TDataStd_Name::Set (aLabel, "VisMaterials");
+  return aLabel;
+}
+
+//=======================================================================
 //function : ShapeTool
 //purpose  : 
 //=======================================================================
@@ -246,6 +258,14 @@ Handle(XCAFDoc_ColorTool) XCAFDoc_DocumentTool::ColorTool (const TDF_Label& acce
   return XCAFDoc_ColorTool::Set(ColorsLabel(acces));
 }
 
+//=======================================================================
+//function : VisMaterialTool
+//purpose  :
+//=======================================================================
+Handle(XCAFDoc_VisMaterialTool) XCAFDoc_DocumentTool::VisMaterialTool (const TDF_Label& theLabel)
+{
+  return XCAFDoc_VisMaterialTool::Set (VisMaterialLabel (theLabel));
+}
 
 //=======================================================================
 //function : LayerTool
@@ -319,36 +339,15 @@ const Standard_GUID& XCAFDoc_DocumentTool::ID() const
   return GetID();
 }
 
-
 //=======================================================================
-//function : Restore
+//function : AfterRetrieval
 //purpose  : 
 //=======================================================================
 
-void XCAFDoc_DocumentTool::Restore(const Handle(TDF_Attribute)& /* with */) 
+Standard_Boolean XCAFDoc_DocumentTool::AfterRetrieval (const Standard_Boolean /* forceIt */)
 {
-}
-
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-
-Handle(TDF_Attribute) XCAFDoc_DocumentTool::NewEmpty() const
-{
-  return new XCAFDoc_DocumentTool;
-}
-
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_DocumentTool::Paste (const Handle(TDF_Attribute)& /* into */,
-				  const Handle(TDF_RelocationTable)& /* RT */) const
-{
+  Init();
+  return Standard_True;
 }
 
 

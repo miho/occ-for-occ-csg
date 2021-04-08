@@ -6,6 +6,8 @@ Prs3d_ArrowAspect.cxx
 Prs3d_ArrowAspect.hxx
 Prs3d_BasicAspect.cxx
 Prs3d_BasicAspect.hxx
+Prs3d_BndBox.cxx
+Prs3d_BndBox.hxx
 Prs3d_DatumAspect.cxx
 Prs3d_DatumAspect.hxx
 Prs3d_DatumAttribute.hxx
@@ -35,12 +37,9 @@ Prs3d_PointAspect.hxx
 Prs3d_Presentation.hxx
 Prs3d_PresentationShadow.cxx
 Prs3d_PresentationShadow.hxx
-Prs3d_Projector.cxx
-Prs3d_Projector.hxx
 Prs3d_Root.hxx
 Prs3d_ShadingAspect.cxx
 Prs3d_ShadingAspect.hxx
-Prs3d_ShapeTool.cxx
 Prs3d_ShapeTool.hxx
 Prs3d_Text.cxx
 Prs3d_Text.hxx
@@ -56,6 +55,8 @@ Prs3d_ToolSector.hxx
 Prs3d_ToolSector.cxx
 Prs3d_ToolSphere.hxx
 Prs3d_ToolSphere.cxx
+Prs3d_ToolTorus.hxx
+Prs3d_ToolTorus.cxx
 Prs3d_TypeOfHighlight.hxx
 Prs3d_TypeOfHLR.hxx
 Prs3d_TypeOfLinePicking.hxx

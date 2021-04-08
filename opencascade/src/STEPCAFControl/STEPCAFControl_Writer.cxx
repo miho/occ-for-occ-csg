@@ -20,6 +20,8 @@
 // (analysis of SDRs which the CDSR links should be done)
 // Names and validation props are supported for top-level shapes only
 
+#include <STEPCAFControl_Writer.hxx>
+
 #include <BRep_Builder.hxx>
 #include <GeomToStep_MakeAxis2Placement3d.hxx>
 #include <GeomToStep_MakeCartesianPoint.hxx>
@@ -27,8 +29,8 @@
 #include <Interface_EntityIterator.hxx>
 #include <Interface_Static.hxx>
 #include <Message_Messenger.hxx>
+#include <Message_ProgressScope.hxx>
 #include <MoniTool_DataMapIteratorOfDataMapOfShapeTransient.hxx>
-#include <NCollection_Vector.hxx>
 #include <OSD_Path.hxx>
 #include <Quantity_TypeOfColor.hxx>
 #include <StepAP214_Protocol.hxx>
@@ -51,7 +53,6 @@
 #include <STEPCAFControl_ActorWrite.hxx>
 #include <STEPCAFControl_Controller.hxx>
 #include <STEPCAFControl_ExternFile.hxx>
-#include <STEPCAFControl_Writer.hxx>
 #include <STEPConstruct.hxx>
 #include <STEPConstruct_DataMapOfAsciiStringTransient.hxx>
 #include <STEPConstruct_DataMapOfPointTransient.hxx>
@@ -60,7 +61,6 @@
 #include <STEPConstruct_Styles.hxx>
 #include <STEPConstruct_ValidationProps.hxx>
 #include <STEPControl_StepModelType.hxx>
-#include <STEPControl_Writer.hxx>
 #include <StepData_Logical.hxx>
 #include <StepData_StepModel.hxx>
 #include <StepDimTol_AngularityTolerance.hxx>
@@ -233,6 +233,8 @@
 #include <XCAFDoc_MaterialTool.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
 #include <XCAFDoc_Volume.hxx>
+#include <XCAFDoc_VisMaterial.hxx>
+#include <XCAFDoc_VisMaterialTool.hxx>
 #include <XCAFPrs.hxx>
 #include <XCAFPrs_DataMapIteratorOfDataMapOfStyleShape.hxx>
 #include <XCAFPrs_IndexedDataMapOfShapeStyle.hxx>
@@ -256,11 +258,10 @@ static Standard_Boolean GetLabelName (const TDF_Label &L, Handle(TCollection_HAs
   TCollection_ExtendedString name = N->Get();
   if ( name.Length() <=0 ) return Standard_False;
 
-  // set name, converting it to Ascii and removing spaces
-  TCollection_AsciiString buf ( name, '?' );
+  // set name, removing spaces around it
+  TCollection_AsciiString buf(name);
   buf.LeftAdjust();
   buf.RightAdjust();
-  buf.ChangeAll(' ','_');
   str->AssignCat ( buf.ToCString() );
   return Standard_True;
 }
@@ -364,16 +365,17 @@ IFSelect_ReturnStatus STEPCAFControl_Writer::Write (const Standard_CString filen
 //purpose  :
 //=======================================================================
 
-Standard_Boolean STEPCAFControl_Writer::Transfer( const Handle(TDocStd_Document) &doc,
-						  const STEPControl_StepModelType mode,
-						  const Standard_CString multi )
+Standard_Boolean STEPCAFControl_Writer::Transfer(const Handle(TDocStd_Document) &doc,
+                                                 const STEPControl_StepModelType mode,
+                                                 const Standard_CString multi,
+                                                 const Message_ProgressRange& theProgress)
 {
   Handle(XCAFDoc_ShapeTool) STool = XCAFDoc_DocumentTool::ShapeTool( doc->Main() );
   if ( STool.IsNull() ) return Standard_False;
 
   TDF_LabelSequence labels;
   STool->GetFreeShapes ( labels );
-  return Transfer ( myWriter, labels, mode, multi );
+  return Transfer(myWriter, labels, mode, multi, Standard_False, theProgress);
 }
 
 
@@ -382,13 +384,14 @@ Standard_Boolean STEPCAFControl_Writer::Transfer( const Handle(TDocStd_Document)
 //purpose  :
 //=======================================================================
 
-Standard_Boolean STEPCAFControl_Writer::Transfer( const TDF_Label& L,
-						  const STEPControl_StepModelType mode,
-						  const Standard_CString multi )
+Standard_Boolean STEPCAFControl_Writer::Transfer(const TDF_Label& L,
+                                                 const STEPControl_StepModelType mode,
+                                                 const Standard_CString multi,
+                                                 const Message_ProgressRange& theProgress)
 {
   TDF_LabelSequence labels;
   labels.Append ( L );
-  return Transfer ( myWriter, labels, mode, multi );
+  return Transfer(myWriter, labels, mode, multi, Standard_False, theProgress);
 }
 
 //=======================================================================
@@ -396,11 +399,12 @@ Standard_Boolean STEPCAFControl_Writer::Transfer( const TDF_Label& L,
 //purpose  :
 //=======================================================================
 
-Standard_Boolean STEPCAFControl_Writer::Transfer( const TDF_LabelSequence& labels,
-						  const STEPControl_StepModelType mode,
-						  const Standard_CString multi )
+Standard_Boolean STEPCAFControl_Writer::Transfer(const TDF_LabelSequence& labels,
+                                                 const STEPControl_StepModelType mode,
+                                                 const Standard_CString multi,
+                                                 const Message_ProgressRange& theProgress)
 {
-  return Transfer( myWriter, labels, mode, multi );
+  return Transfer(myWriter, labels, mode, multi, Standard_False, theProgress);
 }
 
 //=======================================================================
@@ -409,9 +413,10 @@ Standard_Boolean STEPCAFControl_Writer::Transfer( const TDF_LabelSequence& label
 //=======================================================================
 
 Standard_Boolean STEPCAFControl_Writer::Perform (const Handle(TDocStd_Document) &doc,
-						 const Standard_CString filename)
+                                                 const Standard_CString filename,
+                                                 const Message_ProgressRange& theProgress)
 {
-  if ( ! Transfer ( doc ) ) return Standard_False;
+  if (!Transfer(doc, STEPControl_AsIs, 0L, theProgress)) return Standard_False;
   return Write ( filename ) == IFSelect_RetDone;
 }
 
@@ -422,9 +427,10 @@ Standard_Boolean STEPCAFControl_Writer::Perform (const Handle(TDocStd_Document) 
 //=======================================================================
 
 Standard_Boolean STEPCAFControl_Writer::Perform (const Handle(TDocStd_Document) &doc,
-						 const TCollection_AsciiString &filename)
+                                                 const TCollection_AsciiString &filename,
+                                                 const Message_ProgressRange& theProgress)
 {
-  if ( ! Transfer ( doc ) ) return Standard_False;
+  if ( ! Transfer ( doc, STEPControl_AsIs, 0L, theProgress ) ) return Standard_False;
   return Write ( filename.ToCString() ) == IFSelect_RetDone;
 }
 
@@ -499,10 +505,11 @@ const STEPControl_Writer &STEPCAFControl_Writer::Writer () const
 //=======================================================================
 
 Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
-						  const TDF_LabelSequence &labels,
-						  const STEPControl_StepModelType mode,
-						  const Standard_CString multi,
-                                                  const Standard_Boolean isExternFile)
+                                                  const TDF_LabelSequence &labels,
+                                                  const STEPControl_StepModelType mode,
+                                                  const Standard_CString multi,
+                                                  const Standard_Boolean isExternFile,
+                                                  const Message_ProgressRange& theProgress)
 {
   if ( labels.Length() <=0 ) return Standard_False;
 
@@ -512,7 +519,10 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
   // translate free top-level shapes of the DECAF document
   Standard_Integer ap = Interface_Static::IVal ("write.step.schema");
   TDF_LabelSequence sublabels;
-  for ( Standard_Integer i=1; i <= labels.Length(); i++ ) {
+  Message_ProgressScope aPS(theProgress, "Labels", labels.Length());
+  for ( Standard_Integer i=1; i <= labels.Length() && aPS.More(); i++)
+  {
+    Message_ProgressRange aRange = aPS.Next();
     TDF_Label L = labels.Value(i);
     if ( myLabels.IsBound ( L ) ) continue; // already processed
 
@@ -575,12 +585,15 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
       if ( XCAFDoc_ShapeTool::IsAssembly ( L ) || XCAFDoc_ShapeTool::IsReference ( L ) )
         Actor->RegisterAssembly ( shape );
 
-      writer.Transfer(shape,mode,Standard_False);
+      writer.Transfer(shape, mode, Standard_False, aRange);
       Actor->SetStdMode ( Standard_True ); // restore default behaviour
     }
     else {
       // translate final solids
-      TopoDS_Shape Sass = TransferExternFiles ( L, mode, sublabels, multi );
+      Message_ProgressScope aPS1 (aRange, NULL, 2);
+      TopoDS_Shape Sass = TransferExternFiles(L, mode, sublabels, multi, aPS1.Next());
+      if (aPS1.UserBreak())
+        return Standard_False;
 
       // translate main assembly structure
 /*
@@ -602,11 +615,13 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
 */      
       Standard_Integer assemblymode = Interface_Static::IVal ("write.step.assembly");
       Interface_Static::SetCVal ("write.step.assembly", "On");
-      writer.Transfer ( Sass, STEPControl_AsIs );
+      writer.Transfer ( Sass, STEPControl_AsIs, Standard_True, aPS1.Next());
       Interface_Static::SetIVal ("write.step.assembly", assemblymode);
       Interface_Static::SetIVal ("write.step.schema", ap);
     }
   }
+  if (aPS.UserBreak())
+    return Standard_False;
 
   writer.WS()->ComputeGraph(Standard_True );// added by skl 03.11.2003 since we use
                                             // writer.Transfer() wihtout compute graph
@@ -715,9 +730,10 @@ Standard_Boolean STEPCAFControl_Writer::Transfer (STEPControl_Writer &writer,
 //=======================================================================
 
 TopoDS_Shape STEPCAFControl_Writer::TransferExternFiles (const TDF_Label &L,
-							 const STEPControl_StepModelType mode,
-							 TDF_LabelSequence &labels,
-							 const Standard_CString prefix)
+                                                         const STEPControl_StepModelType mode,
+                                                         TDF_LabelSequence &labels,
+                                                         const Standard_CString prefix,
+                                                         const Message_ProgressRange& theProgress)
 {
   // if label already translated, just return the shape
   if ( myLabels.IsBound ( L ) ) {
@@ -762,7 +778,7 @@ TopoDS_Shape STEPCAFControl_Writer::TransferExternFiles (const TDF_Label &L,
     Standard_Integer assemblymode = Interface_Static::IVal ("write.step.assembly");
     Interface_Static::SetCVal ("write.step.assembly", "Off");
     const Standard_CString multi = 0;
-    EF->SetTransferStatus ( Transfer ( sw, Lseq, mode, multi, Standard_True ) );
+    EF->SetTransferStatus ( Transfer ( sw, Lseq, mode, multi, Standard_True, theProgress) );
     Interface_Static::SetIVal ("write.step.assembly", assemblymode);
     myLabEF.Bind ( L, EF );
     myFiles.Bind ( name->ToCString(), EF );
@@ -786,11 +802,12 @@ TopoDS_Shape STEPCAFControl_Writer::TransferExternFiles (const TDF_Label &L,
     XCAFDoc_ShapeTool::GetComponents ( L, comp, Standard_False );
 
   labels.Append ( aCurL );
-  for ( Standard_Integer k=1; k <= comp.Length(); k++ ) {
+  Message_ProgressScope aPS(theProgress, NULL, comp.Length());
+  for ( Standard_Integer k=1; k <= comp.Length() && aPS.More(); k++ ) {
     TDF_Label lab = comp(k);
     TDF_Label ref;
     if ( ! XCAFDoc_ShapeTool::GetReferredShape ( lab, ref ) ) continue;
-    TopoDS_Shape Scomp = TransferExternFiles ( ref, mode, labels, prefix );
+    TopoDS_Shape Scomp = TransferExternFiles(ref, mode, labels, prefix, aPS.Next());
     Scomp.Location ( XCAFDoc_ShapeTool::GetLocation ( lab ) );
     B.Add ( C, Scomp );
   }
@@ -1060,13 +1077,17 @@ static void MakeSTEPStyles (STEPConstruct_Styles &Styles,
     XCAFPrs_Style own = settings.FindFromKey(S);
     if ( !own.IsVisible() ) style.SetVisibility ( Standard_False );
     if ( own.IsSetColorCurv() ) style.SetColorCurv ( own.GetColorCurv() );
-    if ( own.IsSetColorSurf() ) style.SetColorSurf ( own.GetColorSurf() );
+    if ( own.IsSetColorSurf() ) style.SetColorSurf ( own.GetColorSurfRGBA() );
   }
 
   // translate colors to STEP
   Handle(StepVisual_Colour) surfColor, curvColor;
-  if ( style.IsSetColorSurf() )
-    surfColor = Styles.EncodeColor(style.GetColorSurf(),DPDCs,ColRGBs);
+  Standard_Real RenderTransp = 0.0;
+  if ( style.IsSetColorSurf() ) {
+    Quantity_ColorRGBA sCol = style.GetColorSurfRGBA();
+    RenderTransp = 1.0 - sCol.Alpha();
+    surfColor = Styles.EncodeColor(sCol.GetRGB(),DPDCs,ColRGBs);
+  }
   if ( style.IsSetColorCurv() )
     curvColor = Styles.EncodeColor(style.GetColorCurv(),DPDCs,ColRGBs);
   
@@ -1094,12 +1115,12 @@ static void MakeSTEPStyles (STEPConstruct_Styles &Styles,
           Handle(StepRepr_RepresentationItem)::DownCast(seqRI(i));
         Handle(StepVisual_PresentationStyleAssignment) PSA;
         if ( style.IsVisible() || !surfColor.IsNull() || !curvColor.IsNull() ) {
-          PSA = Styles.MakeColorPSA ( item, surfColor, curvColor, isComponent );
+          PSA = Styles.MakeColorPSA ( item, surfColor, curvColor, surfColor, RenderTransp, isComponent );
         }
         else {
           // default white color
-          surfColor = Styles.EncodeColor(Quantity_Color(1,1,1,Quantity_TOC_RGB),DPDCs,ColRGBs);
-          PSA = Styles.MakeColorPSA ( item, surfColor, curvColor, isComponent );
+          surfColor = Styles.EncodeColor(Quantity_Color(Quantity_NOC_WHITE),DPDCs,ColRGBs);
+          PSA = Styles.MakeColorPSA ( item, surfColor, curvColor, surfColor, 0.0, isComponent );
           if ( isComponent ) 
             setDefaultInstanceColor( override, PSA);
           
@@ -1163,6 +1184,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteColors (const Handle(XSControl_Work
 
   // Iterate on shapes in the document
   Handle(XCAFDoc_ColorTool) CTool = XCAFDoc_DocumentTool::ColorTool( labels(1) );
+  Handle(XCAFDoc_VisMaterialTool) aMatTool = XCAFDoc_DocumentTool::VisMaterialTool( labels(1) );
   if ( CTool.IsNull() ) return Standard_False;
 
   STEPConstruct_Styles Styles ( WS );
@@ -1216,7 +1238,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteColors (const Handle(XSControl_Work
     for ( Standard_Integer j = 1; j <= seq.Length(); j++ ) {
       TDF_Label lab = seq.Value(j);
       XCAFPrs_Style style;
-      Quantity_Color C;
+      Quantity_ColorRGBA C;
       if ( lab == L ) {
         // check for invisible status of object on label
         if ( !CTool->IsVisible( lab ) ) {
@@ -1225,13 +1247,23 @@ Standard_Boolean STEPCAFControl_Writer::WriteColors (const Handle(XSControl_Work
         }
       }
       if ( CTool->GetColor ( lab, XCAFDoc_ColorGen, C ) ) {
-        style.SetColorCurv ( C );
+        style.SetColorCurv ( C.GetRGB() );
         style.SetColorSurf ( C );
       }
       if ( CTool->GetColor ( lab, XCAFDoc_ColorSurf, C ) )
         style.SetColorSurf ( C );
       if ( CTool->GetColor ( lab, XCAFDoc_ColorCurv, C ) )
-        style.SetColorCurv ( C );
+        style.SetColorCurv ( C.GetRGB() );
+      if (!style.IsSetColorSurf())
+      {
+        Handle(XCAFDoc_VisMaterial) aVisMat = aMatTool->GetShapeMaterial (lab);
+        if (!aVisMat.IsNull()
+         && !aVisMat->IsEmpty())
+        {
+          // only color can be stored in STEP
+          style.SetColorSurf (aVisMat->BaseColor());
+        }
+      }
       
       // commented, cause we are need to take reference from 
 //       if ( isComponent && lab == L && !isVisible)
@@ -1607,7 +1639,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteLayers (const Handle(XSControl_Work
       Standard_Integer nb = 
 	FindEntities ( FP, oneShape, Loc, seqRI );
       if ( nb <=0 ) 
-	FP->Messenger() << "Warning: Cannot find RI for " << oneShape.TShape()->DynamicType()->Name() << Message_EndLine;
+	FP->Messenger()->SendInfo() << "Warning: Cannot find RI for " << oneShape.TShape()->DynamicType()->Name() << std::endl;
     }
     if ( seqRI.Length() <= 0 ) continue;
 
@@ -1619,7 +1651,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteLayers (const Handle(XSControl_Work
     if (L.FindAttribute(XCAFDoc::InvisibleGUID(), aUAttr)) {
       descr = new TCollection_HAsciiString ("invisible");
 #ifdef OCCT_DEBUG
-      FP->Messenger() << "\tLayer \"" << hName->String().ToCString() << "\" is invisible"<<Message_EndLine;
+      std::cout << "\tLayer \"" << hName->String().ToCString() << "\" is invisible"<<std::endl;
 #endif
       isLinv = Standard_True;
     }
@@ -1659,6 +1691,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteLayers (const Handle(XSControl_Work
 //=======================================================================
 static Standard_Boolean getSHUOstyle(const TDF_Label& aSHUOlab,
                                      const Handle(XCAFDoc_ColorTool)& CTool,
+                                     const Handle(XCAFDoc_VisMaterialTool)& theMatTool,
                                      XCAFPrs_Style& SHUOstyle)
 {
   Quantity_Color C;
@@ -1673,6 +1706,16 @@ static Standard_Boolean getSHUOstyle(const TDF_Label& aSHUOlab,
       SHUOstyle.SetColorSurf ( C );
     if ( CTool->GetColor ( aSHUOlab, XCAFDoc_ColorCurv, C ) )
       SHUOstyle.SetColorCurv ( C );
+    if (!SHUOstyle.IsSetColorSurf())
+    {
+      Handle(XCAFDoc_VisMaterial) aVisMat = theMatTool->GetShapeMaterial (aSHUOlab);
+      if (!aVisMat.IsNull()
+       && !aVisMat->IsEmpty())
+      {
+        // only color can be stored in STEP
+        SHUOstyle.SetColorSurf (aVisMat->BaseColor());
+      }
+    }
   }
   if ( !SHUOstyle.IsSetColorCurv() && 
       !SHUOstyle.IsSetColorSurf() &&
@@ -1848,8 +1891,12 @@ static Standard_Boolean createSHUOStyledItem (const XCAFPrs_Style& style,
   STEPConstruct_Styles Styles( WS );
   // translate colors to STEP
   Handle(StepVisual_Colour) surfColor, curvColor;
-  if ( style.IsSetColorSurf() )
-    surfColor = Styles.EncodeColor ( style.GetColorSurf() );
+  Standard_Real RenderTransp = 0.0;
+  if ( style.IsSetColorSurf() ) {
+    Quantity_ColorRGBA sCol = style.GetColorSurfRGBA();
+    RenderTransp = 1.0 - sCol.Alpha();
+    surfColor = Styles.EncodeColor ( sCol.GetRGB() );
+  }
   if ( style.IsSetColorCurv() )
     curvColor = Styles.EncodeColor ( style.GetColorCurv() );
   Standard_Boolean isComponent = Standard_True;// cause need to get PSBC
@@ -1857,11 +1904,11 @@ static Standard_Boolean createSHUOStyledItem (const XCAFPrs_Style& style,
   // set default color for invisible SHUO.
   Standard_Boolean isSetDefaultColor = Standard_False;
   if (surfColor.IsNull() && curvColor.IsNull() && !style.IsVisible() ) {
-    surfColor = Styles.EncodeColor ( Quantity_Color( 1, 1, 1, Quantity_TOC_RGB ) );
+    surfColor = Styles.EncodeColor ( Quantity_Color(Quantity_NOC_WHITE) );
     isSetDefaultColor = Standard_True;
   }
   Handle(StepVisual_PresentationStyleAssignment) PSA =
-    Styles.MakeColorPSA ( item, surfColor, curvColor, isComponent );
+    Styles.MakeColorPSA ( item, surfColor, curvColor, surfColor, RenderTransp, isComponent );
   Handle(StepVisual_StyledItem) override; //null styled item
   
   // find the repr item of the shape
@@ -1892,7 +1939,7 @@ static Standard_Boolean createSHUOStyledItem (const XCAFPrs_Style& style,
   FindEntities ( FP, Sh, L, seqRI );
 #ifdef OCCT_DEBUG
   if ( seqRI.Length() <=0 ) 
-    FP->Messenger() << "Warning: Cannot find RI for " << Sh.TShape()->DynamicType()->Name() << Message_EndLine;
+    std::cout << "Warning: Cannot find RI for " << Sh.TShape()->DynamicType()->Name() << std::endl;
 #endif
   item = Handle(StepRepr_RepresentationItem)::DownCast(seqRI(1));
   //get overridden styled item
@@ -1977,6 +2024,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteSHUOs (const Handle(XSControl_WorkS
 
   // get working data
   Handle(XCAFDoc_ColorTool) CTool = XCAFDoc_DocumentTool::ColorTool( labels(1) );
+  Handle(XCAFDoc_VisMaterialTool) aMatTool = XCAFDoc_DocumentTool::VisMaterialTool( labels(1) );
   if (CTool.IsNull() )
     return Standard_False;
   // map of transfered SHUO
@@ -2009,7 +2057,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteSHUOs (const Handle(XSControl_WorkS
           aMapOfMainSHUO.Add( aSHUO );
           // check if it is styled SHUO
           XCAFPrs_Style SHUOstyle;
-          if ( !getSHUOstyle ( aSHUOlab, CTool, SHUOstyle ) ) {
+          if ( !getSHUOstyle ( aSHUOlab, CTool, aMatTool, SHUOstyle ) ) {
 #ifdef OCCT_DEBUG
             std::cout << "Warning: " << __FILE__ << ": do not store SHUO without any style to the STEP model" << std::endl;
 #endif
@@ -2320,7 +2368,7 @@ Handle(StepRepr_ShapeAspect) STEPCAFControl_Writer::WriteShapeAspect (const Hand
   TColStd_SequenceOfTransient aSeqRI;
   FindEntities( FP, theShape, aLoc, aSeqRI );
   if ( aSeqRI.Length() <= 0 ) {
-    FP->Messenger() << "Warning: Cannot find RI for "<<theShape.TShape()->DynamicType()->Name()<<Message_EndLine;
+    FP->Messenger()->SendInfo() << "Warning: Cannot find RI for "<<theShape.TShape()->DynamicType()->Name()<<std::endl;
     return NULL;
   }
 
@@ -2336,7 +2384,7 @@ Handle(StepRepr_ShapeAspect) STEPCAFControl_Writer::WriteShapeAspect (const Hand
   Handle(TCollection_HAsciiString) aName = new TCollection_HAsciiString();
   Handle(TDataStd_Name) aNameAttr;
   if (theLabel.FindAttribute(TDataStd_Name::GetID(), aNameAttr)) {
-    aName = new TCollection_HAsciiString(TCollection_AsciiString(aNameAttr->Get(), '?'));
+    aName = new TCollection_HAsciiString(TCollection_AsciiString(aNameAttr->Get()));
     Standard_Integer aFirstSpace = aName->Search(" ");
     if (aFirstSpace != -1)
       aName = aName->SubString(aFirstSpace + 1, aName->Length());
@@ -2492,7 +2540,7 @@ Handle(StepDimTol_Datum) STEPCAFControl_Writer::WriteDatumAP242(const Handle(XSC
     aShape = XCAFDoc_ShapeTool::GetShape(theShapeL.Value(i));
     FindEntities(FP, aShape, aLoc, aSeqRI);
     if (aSeqRI.Length() <= 0) {
-      FP->Messenger() << "Warning: Cannot find RI for " << aShape.TShape()->DynamicType()->Name() << Message_EndLine;
+      FP->Messenger()->SendInfo() << "Warning: Cannot find RI for " << aShape.TShape()->DynamicType()->Name() << std::endl;
       continue;
     }
     anEnt = aSeqRI.Value(1);
@@ -3404,7 +3452,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSe
     TColStd_SequenceOfTransient seqRI;
     FindEntities( FP, aShape, Loc, seqRI );
     if ( seqRI.Length() <= 0 ) {
-      FP->Messenger() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<Message_EndLine;
+      FP->Messenger()->SendInfo() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<std::endl;
       continue;
     }
     Handle(StepRepr_ProductDefinitionShape) PDS;
@@ -3418,8 +3466,12 @@ Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSe
     Handle(XCAFDoc_Datum) DatumAttr;
     if(!DatumL.FindAttribute(XCAFDoc_Datum::GetID(),DatumAttr)) continue;
     Handle(TCollection_HAsciiString) aName = DatumAttr->GetName();
-    Handle(TCollection_HAsciiString) aDescription = DatumAttr->GetDescription();
     Handle(TCollection_HAsciiString) anIdentification = DatumAttr->GetIdentification();
+    Handle(TCollection_HAsciiString) aDescription = DatumAttr->GetDescription();
+    if (aDescription.IsNull())
+    {
+      aDescription = new TCollection_HAsciiString();
+    }
     Handle(StepDimTol_DatumFeature) DF = new StepDimTol_DatumFeature;
     Handle(StepDimTol_Datum) aDatum = new StepDimTol_Datum;
     DF->Init(aName, new TCollection_HAsciiString, PDS, StepData_LTrue);
@@ -3486,7 +3538,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteDGTs (const Handle(XSControl_WorkSe
     TColStd_SequenceOfTransient seqRI;
     FindEntities( FP, aShape, Loc, seqRI );
     if ( seqRI.Length() <= 0 ) {
-      FP->Messenger() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<Message_EndLine;
+      FP->Messenger()->SendInfo() << "Warning: Cannot find RI for "<<aShape.TShape()->DynamicType()->Name()<<std::endl;
       continue;
     }
     Handle(StepRepr_ProductDefinitionShape) PDS;
@@ -3717,7 +3769,7 @@ Standard_Boolean STEPCAFControl_Writer::WriteDGTsAP242 (const Handle(XSControl_W
   STEPConstruct_Styles aStyles (WS);
   Handle(StepVisual_Colour) aCurvColor = aStyles.EncodeColor(Quantity_NOC_WHITE);
   Handle(StepRepr_RepresentationItem) anItem = NULL;
-  myGDTPrsCurveStyle->SetValue(1, aStyles.MakeColorPSA(anItem, aCurvColor, aCurvColor));
+  myGDTPrsCurveStyle->SetValue(1, aStyles.MakeColorPSA(anItem, aCurvColor, aCurvColor, aCurvColor, 0.0));
   Interface_EntityIterator aModelIter = aModel->Entities();
   for (; aModelIter.More() && myGDTCommonPDS.IsNull(); aModelIter.Next())
     myGDTCommonPDS = Handle(StepRepr_ProductDefinitionShape)::DownCast(aModelIter.Value());

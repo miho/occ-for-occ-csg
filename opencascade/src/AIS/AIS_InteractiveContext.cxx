@@ -65,13 +65,15 @@ namespace
   typedef NCollection_DataMap<Handle(SelectMgr_SelectableObject), Handle(SelectMgr_IndexedMapOfOwner)>::Iterator AIS_MapIteratorOfMapOfObjectOwners;
 
   //! Initialize default highlighting attributes.
-  static void initDefaultHilightAttributes (const Handle(Prs3d_Drawer)& theDrawer)
+  static void initDefaultHilightAttributes (const Handle(Prs3d_Drawer)& theDrawer,
+                                            const Quantity_Color& theColor)
   {
     theDrawer->SetMethod (Aspect_TOHM_COLOR);
     theDrawer->SetDisplayMode (0);
+    theDrawer->SetColor (theColor);
 
-    theDrawer->SetPointAspect (new Prs3d_PointAspect (Aspect_TOM_POINT, Quantity_NOC_BLACK, 1.0));
-    *theDrawer->PointAspect()->Aspect() = *theDrawer->Link()->PointAspect()->Aspect();
+    theDrawer->SetupOwnShadingAspect();
+    theDrawer->SetupOwnPointAspect();
     theDrawer->SetLineAspect (new Prs3d_LineAspect (Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1.0));
     *theDrawer->LineAspect()->Aspect() = *theDrawer->Link()->LineAspect()->Aspect();
     theDrawer->SetWireAspect (new Prs3d_LineAspect (Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1.0));
@@ -82,6 +84,24 @@ namespace
     *theDrawer->FreeBoundaryAspect()->Aspect() = *theDrawer->Link()->FreeBoundaryAspect()->Aspect();
     theDrawer->SetUnFreeBoundaryAspect (new Prs3d_LineAspect (Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1.0));
     *theDrawer->UnFreeBoundaryAspect()->Aspect() = *theDrawer->Link()->UnFreeBoundaryAspect()->Aspect();
+    theDrawer->SetDatumAspect (new Prs3d_DatumAspect());
+
+    theDrawer->ShadingAspect()->SetColor (theColor);
+    theDrawer->WireAspect()->SetColor (theColor);
+    theDrawer->LineAspect()->SetColor (theColor);
+    theDrawer->PlaneAspect()->ArrowAspect()->SetColor (theColor);
+    theDrawer->PlaneAspect()->IsoAspect()->SetColor (theColor);
+    theDrawer->PlaneAspect()->EdgesAspect()->SetColor (theColor);
+    theDrawer->FreeBoundaryAspect()->SetColor (theColor);
+    theDrawer->UnFreeBoundaryAspect()->SetColor (theColor);
+    theDrawer->PointAspect()->SetColor (theColor);
+    for (Standard_Integer aPartIter = 0; aPartIter < Prs3d_DP_None; ++aPartIter)
+    {
+      if (Handle(Prs3d_LineAspect) aLineAsp = theDrawer->DatumAspect()->LineAspect ((Prs3d_DatumParts )aPartIter))
+      {
+        aLineAsp->SetColor (theColor);
+      }
+    }
 
     theDrawer->WireAspect()->SetWidth (2.0);
     theDrawer->LineAspect()->SetWidth (2.0);
@@ -108,7 +128,7 @@ myMainVwr(MainViewer),
 myMainSel(new StdSelect_ViewerSelector3d()),
 myToHilightSelected(Standard_True),
 mySelection(new AIS_Selection()),
-myFilters(new SelectMgr_OrFilter()),
+myFilters (new SelectMgr_AndOrFilter(SelectMgr_FilterType_OR)),
 myDefaultDrawer(new Prs3d_Drawer()),
 myCurDetected(0),
 myCurHighlighted(0),
@@ -130,30 +150,26 @@ myIsAutoActivateSelMode(Standard_True)
   {
     const Handle(Prs3d_Drawer)& aStyle = myStyles[Prs3d_TypeOfHighlight_Dynamic];
     aStyle->Link (myDefaultDrawer);
-    initDefaultHilightAttributes (aStyle);
+    initDefaultHilightAttributes (aStyle, Quantity_NOC_CYAN1);
     aStyle->SetZLayer(Graphic3d_ZLayerId_Top);
-    aStyle->SetColor (Quantity_NOC_CYAN1);
   }
   {
     const Handle(Prs3d_Drawer)& aStyle = myStyles[Prs3d_TypeOfHighlight_LocalDynamic];
     aStyle->Link (myDefaultDrawer);
-    initDefaultHilightAttributes (aStyle);
+    initDefaultHilightAttributes (aStyle, Quantity_NOC_CYAN1);
     aStyle->SetZLayer(Graphic3d_ZLayerId_Topmost);
-    aStyle->SetColor (Quantity_NOC_CYAN1);
   }
   {
     const Handle(Prs3d_Drawer)& aStyle = myStyles[Prs3d_TypeOfHighlight_Selected];
     aStyle->Link (myDefaultDrawer);
-    initDefaultHilightAttributes (aStyle);
+    initDefaultHilightAttributes (aStyle, Quantity_NOC_GRAY80);
     aStyle->SetZLayer(Graphic3d_ZLayerId_UNKNOWN);
-    aStyle->SetColor (Quantity_NOC_GRAY80);
   }
   {
     const Handle(Prs3d_Drawer)& aStyle = myStyles[Prs3d_TypeOfHighlight_LocalSelected];
     aStyle->Link (myDefaultDrawer);
-    initDefaultHilightAttributes (aStyle);
+    initDefaultHilightAttributes (aStyle, Quantity_NOC_GRAY80);
     aStyle->SetZLayer(Graphic3d_ZLayerId_UNKNOWN);
-    aStyle->SetColor (Quantity_NOC_GRAY80);
   }
   {
     const Handle(Prs3d_Drawer)& aStyle = myStyles[Prs3d_TypeOfHighlight_SubIntensity];
@@ -1158,57 +1174,6 @@ Standard_Real AIS_InteractiveContext::DeviationCoefficient() const
 }
 
 //=======================================================================
-//function : SetHLRDeviationCoefficient
-//purpose  :
-//=======================================================================
-void AIS_InteractiveContext::SetHLRDeviationCoefficient (const Standard_Real theCoefficient)
-{
-  myDefaultDrawer->SetHLRDeviationCoefficient (theCoefficient);
-}
-
-//=======================================================================
-//function : HLRDeviationCoefficient
-//purpose  :
-//=======================================================================
-Standard_Real AIS_InteractiveContext::HLRDeviationCoefficient() const
-{
-  return myDefaultDrawer->HLRDeviationCoefficient();
-}
-
-//=======================================================================
-//function : SetHLRAngle
-//purpose  :
-//=======================================================================
-void AIS_InteractiveContext::SetHLRAngle (const Standard_Real theAngle)
-{
-  myDefaultDrawer->SetHLRAngle (theAngle);
-}
-
-//=======================================================================
-//function : SetHLRAngleAndDeviation
-//purpose  : compute with anangle a HLRAngle and a HLRDeviationCoefficient 
-//           and set them in myHLRAngle and in myHLRDeviationCoefficient
-//           of myDefaultDrawer 
-//=======================================================================
-void AIS_InteractiveContext::SetHLRAngleAndDeviation (const Standard_Real theAngle)
-{
-  Standard_Real anOutAngl, anOutDefl;
-  HLRBRep::PolyHLRAngleAndDeflection (theAngle, anOutAngl, anOutDefl);
-
-  myDefaultDrawer->SetHLRAngle                (anOutAngl);
-  myDefaultDrawer->SetHLRDeviationCoefficient (anOutDefl);
-}
-
-//=======================================================================
-//function : HLRAngle
-//purpose  :
-//=======================================================================
-Standard_Real AIS_InteractiveContext::HLRAngle() const 
-{
-  return myDefaultDrawer->HLRAngle();
-}
-
-//=======================================================================
 //function : SetDisplayMode
 //purpose  :
 //=======================================================================
@@ -1457,40 +1422,6 @@ void AIS_InteractiveContext::SetDeviationCoefficient (const Handle(AIS_Interacti
 }
 
 //=======================================================================
-//function : SetHLRDeviationCoefficient
-//purpose  :
-//=======================================================================
-void AIS_InteractiveContext::SetHLRDeviationCoefficient (const Handle(AIS_InteractiveObject)& theIObj,
-                                                         const Standard_Real                  theCoefficient,
-                                                         const Standard_Boolean               theToUpdateViewer)
-{
-  if (theIObj.IsNull())
-  {
-    return;
-  }
-
-  // To be modified after the related methods of AIS_Shape are passed to InteractiveObject
-  setContextToObject (theIObj);
-  if (theIObj->Type() != AIS_KOI_Object
-   && theIObj->Type() != AIS_KOI_Shape)
-  {
-    return;
-  }
-  else if (theIObj->Signature() != 0)
-  {
-    return;
-  }
-
-  Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast (theIObj);
-  aShape->SetOwnHLRDeviationCoefficient (theCoefficient);
-  aShape->UpdatePresentations();
-  if (theToUpdateViewer)
-  {
-    UpdateCurrentViewer();
-  }
-}
-
-//=======================================================================
 //function : SetDeviationAngle
 //purpose  :
 //=======================================================================
@@ -1549,70 +1480,6 @@ void AIS_InteractiveContext::SetAngleAndDeviation (const Handle(AIS_InteractiveO
 
   Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast (theIObj);
   aShape->SetAngleAndDeviation (theAngle);
-  aShape->UpdatePresentations();
-  if (theToUpdateViewer)
-  {
-    UpdateCurrentViewer();
-  }
-}
-
-//=======================================================================
-//function : SetHLRAngleAndDeviation
-//purpose  :
-//=======================================================================
-void AIS_InteractiveContext::SetHLRAngleAndDeviation (const Handle(AIS_InteractiveObject)& theIObj,
-                                                      const Standard_Real                  theAngle,
-                                                      const Standard_Boolean               theToUpdateViewer)
-{
-  if (theIObj.IsNull())
-  {
-    return;
-  }
-
-  // To be modified after the related methods of AIS_Shape are passed to InteractiveObject
-  setContextToObject (theIObj);
-  if (theIObj->Type() != AIS_KOI_Shape)
-  {
-    return;
-  }
-  if (theIObj->Signature() != 0)
-  {
-    return;
-  }
-  Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast (theIObj);
-  aShape->SetHLRAngleAndDeviation (theAngle);
-  aShape->UpdatePresentations();
-  if (theToUpdateViewer)
-  {
-    UpdateCurrentViewer();
-  }
-}
-
-//=======================================================================
-//function : SetHLRDeviationAngle
-//purpose  :
-//=======================================================================
-void AIS_InteractiveContext::SetHLRDeviationAngle (const Handle(AIS_InteractiveObject)& theIObj,
-                                                   const Standard_Real                  theAngle,
-                                                   const Standard_Boolean               theToUpdateViewer)
-{
-  if (theIObj.IsNull())
-  {
-    return;
-  }
-
-  // To be modified after the related methods of AIS_Shape are passed to InteractiveObject
-  setContextToObject (theIObj);
-  if (theIObj->Type() != AIS_KOI_Shape)
-  {
-    return;
-  }
-  if (theIObj->Signature() != 0)
-  {
-    return;
-  }
-  Handle(AIS_Shape) aShape = Handle(AIS_Shape)::DownCast (theIObj);
-  aShape->SetOwnHLRDeviationAngle (theAngle);
   aShape->UpdatePresentations();
   if (theToUpdateViewer)
   {
@@ -2313,7 +2180,7 @@ void AIS_InteractiveContext::SetSelectionSensitivity (const Handle(AIS_Interacti
 //=======================================================================
 void AIS_InteractiveContext::InitAttributes()
 {
-  Graphic3d_MaterialAspect aMat (Graphic3d_NOM_BRASS);
+  Graphic3d_MaterialAspect aMat (Graphic3d_NameOfMaterial_Brass);
   myDefaultDrawer->ShadingAspect()->SetMaterial (aMat);
 
 //  myDefaultDrawer->ShadingAspect()->SetColor(Quantity_NOC_GRAY70);

@@ -532,8 +532,12 @@
 #include <RWStepVisual_RWSurfaceStyleControlGrid.hxx>
 #include <RWStepVisual_RWSurfaceStyleFillArea.hxx>
 #include <RWStepVisual_RWSurfaceStyleParameterLine.hxx>
+#include <RWStepVisual_RWSurfaceStyleReflectanceAmbient.hxx>
+#include <RWStepVisual_RWSurfaceStyleRendering.hxx>
+#include <RWStepVisual_RWSurfaceStyleRenderingWithProperties.hxx>
 #include <RWStepVisual_RWSurfaceStyleSegmentationCurve.hxx>
 #include <RWStepVisual_RWSurfaceStyleSilhouette.hxx>
+#include <RWStepVisual_RWSurfaceStyleTransparent.hxx>
 #include <RWStepVisual_RWSurfaceStyleUsage.hxx>
 #include <RWStepVisual_RWTemplate.hxx>
 #include <RWStepVisual_RWTemplateInstance.hxx>
@@ -1084,8 +1088,12 @@
 #include <StepVisual_SurfaceStyleControlGrid.hxx>
 #include <StepVisual_SurfaceStyleFillArea.hxx>
 #include <StepVisual_SurfaceStyleParameterLine.hxx>
+#include <StepVisual_SurfaceStyleReflectanceAmbient.hxx>
+#include <StepVisual_SurfaceStyleRendering.hxx>
+#include <StepVisual_SurfaceStyleRenderingWithProperties.hxx>
 #include <StepVisual_SurfaceStyleSegmentationCurve.hxx>
 #include <StepVisual_SurfaceStyleSilhouette.hxx>
+#include <StepVisual_SurfaceStyleTransparent.hxx>
 #include <StepVisual_SurfaceStyleUsage.hxx>
 #include <StepVisual_Template.hxx>
 #include <StepVisual_TemplateInstance.hxx>
@@ -1343,8 +1351,8 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <RWStepVisual_RWCoordinatesList.hxx>
 #include <StepRepr_CharacterizedRepresentation.hxx>
 #include <RWStepRepr_RWCharacterizedRepresentation.hxx>
-#include <StepVisual_CharacterizedObjectAndCharacterizedRepresentationAndDraughtingModelAndRepresentation.hxx>
-#include <RWStepVisual_RWCharacterizedObjectAndCharacterizedRepresentationAndDraughtingModelAndRepresentation.hxx>
+#include <StepVisual_CharacterizedObjAndRepresentationAndDraughtingModel.hxx>
+#include <RWStepVisual_RWCharacterizedObjAndRepresentationAndDraughtingModel.hxx>
 #include <StepVisual_AnnotationFillArea.hxx>
 #include <StepVisual_AnnotationFillAreaOccurrence.hxx>
 #include <RWStepVisual_RWAnnotationFillArea.hxx>
@@ -1355,8 +1363,8 @@ IMPLEMENT_STANDARD_RTTIEXT(RWStepAP214_GeneralModule,StepData_GeneralModule)
 #include <RWStepVisual_RWCameraModelD3MultiClipping.hxx>
 #include <RWStepVisual_RWCameraModelD3MultiClippingIntersection.hxx>
 #include <RWStepVisual_RWCameraModelD3MultiClippingUnion.hxx>
-#include <StepVisual_AnnotationCurveOccurrenceAndAnnotationOccurrenceAndGeomReprItemAndReprItemAndStyledItem.hxx>
-#include <RWStepVisual_RWAnnotationCurveOccurrenceAndAnnotationOccurrenceAndGeomReprItemAndReprItemAndStyledItem.hxx>
+#include <StepVisual_AnnotationCurveOccurrenceAndGeomReprItem.hxx>
+#include <RWStepVisual_RWAnnotationCurveOccurrenceAndGeomReprItem.hxx>
 
 static Standard_Integer catsh,catdr,catstr,catdsc,cataux;
 
@@ -5124,8 +5132,8 @@ void RWStepAP214_GeneralModule::FillSharedCase(const Standard_Integer CN,
   break;
   case 715:
   {
-    DeclareAndCast(StepVisual_CharacterizedObjectAndCharacterizedRepresentationAndDraughtingModelAndRepresentation, anent, ent);
-    RWStepVisual_RWCharacterizedObjectAndCharacterizedRepresentationAndDraughtingModelAndRepresentation tool;
+    DeclareAndCast(StepVisual_CharacterizedObjAndRepresentationAndDraughtingModel, anent, ent);
+    RWStepVisual_RWCharacterizedObjAndRepresentationAndDraughtingModel tool;
     tool.Share(anent, iter);
   }
   break;
@@ -5152,8 +5160,36 @@ void RWStepAP214_GeneralModule::FillSharedCase(const Standard_Integer CN,
   break;
   case 719:
   {
-    DeclareAndCast(StepVisual_AnnotationCurveOccurrenceAndAnnotationOccurrenceAndGeomReprItemAndReprItemAndStyledItem, anent, ent);
-    RWStepVisual_RWAnnotationCurveOccurrenceAndAnnotationOccurrenceAndGeomReprItemAndReprItemAndStyledItem tool;
+    DeclareAndCast(StepVisual_AnnotationCurveOccurrenceAndGeomReprItem, anent, ent);
+    RWStepVisual_RWAnnotationCurveOccurrenceAndGeomReprItem tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 720:
+  {
+    DeclareAndCast(StepVisual_SurfaceStyleTransparent, anent, ent);
+    RWStepVisual_RWSurfaceStyleTransparent tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 721:
+  {
+    DeclareAndCast(StepVisual_SurfaceStyleReflectanceAmbient, anent, ent);
+    RWStepVisual_RWSurfaceStyleReflectanceAmbient tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 722:
+  {
+    DeclareAndCast(StepVisual_SurfaceStyleRendering, anent, ent);
+    RWStepVisual_RWSurfaceStyleRendering tool;
+    tool.Share(anent, iter);
+  }
+  break;
+  case 723:
+  {
+    DeclareAndCast(StepVisual_SurfaceStyleRenderingWithProperties, anent, ent);
+    RWStepVisual_RWSurfaceStyleRenderingWithProperties tool;
     tool.Share(anent, iter);
   }
   break;
@@ -7155,7 +7191,7 @@ Standard_Boolean RWStepAP214_GeneralModule::NewVoid
    ent = new StepRepr_CharacterizedRepresentation;
    break;
    case 715:
-   ent = new StepVisual_CharacterizedObjectAndCharacterizedRepresentationAndDraughtingModelAndRepresentation;
+   ent = new StepVisual_CharacterizedObjAndRepresentationAndDraughtingModel;
    break;
    case 716:
      ent = new StepVisual_CameraModelD3MultiClipping;
@@ -7167,10 +7203,20 @@ Standard_Boolean RWStepAP214_GeneralModule::NewVoid
      ent = new StepVisual_CameraModelD3MultiClippingUnion;
    break;
    case 719:
-     ent = new StepVisual_AnnotationCurveOccurrenceAndAnnotationOccurrenceAndGeomReprItemAndReprItemAndStyledItem;
+     ent = new StepVisual_AnnotationCurveOccurrenceAndGeomReprItem;
    break;
-
-    
+   case 720:
+     ent = new StepVisual_SurfaceStyleTransparent;
+   break;
+   case 721:
+     ent = new StepVisual_SurfaceStyleReflectanceAmbient;
+   break;
+   case 722:
+     ent = new StepVisual_SurfaceStyleRendering;
+   break;
+   case 723:
+     ent = new StepVisual_SurfaceStyleRenderingWithProperties;
+   break;
   default: 
     return Standard_False;
   }
@@ -7769,7 +7815,11 @@ Standard_Integer  RWStepAP214_GeneralModule::CategoryNumber
   case 717:
   case 718: return cataux;
   case 719: return catdr;
-    
+  case 720:
+  case 721:
+  case 722:
+  case 723: return catdr;
+
   default : break;
   }
   return 0;

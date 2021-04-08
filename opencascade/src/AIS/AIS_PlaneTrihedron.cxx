@@ -29,7 +29,6 @@
 #include <Geom_CartesianPoint.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Plane.hxx>
-#include <Geom_Transformation.hxx>
 #include <gp_Ax2.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>
@@ -42,7 +41,6 @@
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_LineAspect.hxx>
 #include <Prs3d_Presentation.hxx>
-#include <Prs3d_Projector.hxx>
 #include <Quantity_Color.hxx>
 #include <Select3D_SensitivePoint.hxx>
 #include <Select3D_SensitiveSegment.hxx>
@@ -181,12 +179,6 @@ void AIS_PlaneTrihedron::Compute(const Handle(PrsMgr_PresentationManager3d)&,
   aPresentation->SetInfiniteState (Standard_True);
 }
 
-void AIS_PlaneTrihedron::Compute(const Handle(Prs3d_Projector)& aProjector, const Handle(Geom_Transformation)& aTransformation, const Handle(Prs3d_Presentation)& aPresentation)
-{
-// throw Standard_NotImplemented("AIS_PlaneTrihedron::Compute(const Handle(Prs3d_Projector)&, const Handle(Geom_Transformation)&, const Handle(Prs3d_Presentation)&)");
- PrsMgr_PresentableObject::Compute( aProjector , aTransformation , aPresentation) ;
-}
-
 //=======================================================================
 //function : ComputeSelection
 //purpose  : 
@@ -250,13 +242,6 @@ void AIS_PlaneTrihedron::SetColor(const Quantity_Color &aCol)
   myDrawer->DatumAspect()->LineAspect(Prs3d_DP_YAxis)->SetColor(aCol);
   SynchronizeAspects();
 }
-
-
-void AIS_PlaneTrihedron::Compute(const Handle(Prs3d_Projector)&, 
-			       const Handle(Prs3d_Presentation)&)
-{
-}
-
 
 //=======================================================================
 //function : ExtremityPoints

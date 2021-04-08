@@ -2716,7 +2716,7 @@ template<typename T> void AllocDummyArr (Draw_Interpretor& theDI, int theN1, int
   
   if (aMem1 > aMem0)
     theDI << "Error: memory increased by " << (int)(aMem1 - aMem0) << " bytes\n";
-};
+}
 
 static Standard_Integer OCC29064 (Draw_Interpretor& theDI, Standard_Integer theArgc, const char** theArgv)
 {
@@ -2976,6 +2976,216 @@ static Standard_Integer OCC30391(Draw_Interpretor& theDI,
   return 0;
 }
 
+#include <Standard_Mutex.hxx>
+#include <NCollection_Sequence.hxx>
+#include <BinLDrivers.hxx>
+#include <BinDrivers.hxx>
+#include <XmlLDrivers.hxx>
+#include <XmlDrivers.hxx>
+#include <StdLDrivers.hxx>
+#include <StdDrivers.hxx>
+#include <TDF_ChildIterator.hxx>
+#include <TDocStd_PathParser.hxx>
+#include <OSD.hxx>
+#include <OSD_Thread.hxx>
+#include <OSD_Environment.hxx>
+typedef NCollection_Sequence <TCollection_AsciiString> SequenceOfDocNames;
+
+typedef struct
+{
+  Standard_ThreadId ID;
+  int iThread;  
+  TCollection_AsciiString inFile[3];
+  TCollection_AsciiString outFile[2];
+  bool finished;
+  int* res;
+} Args;
+
+static void printMsg(const char* msg)
+{
+  printf("%s\n", msg);
+}
+
+static Standard_Integer nbREP(50);
+
+void* threadFunction(void* theArgs)
+{
+  Args* args = (Args*)theArgs;
+  try
+  {
+    if(args->inFile[0].IsEmpty())
+    {
+      *(args->res) = -1;
+      return args->res;
+    }
+
+    Handle(TDocStd_Application) anApp = new TDocStd_Application();
+    OCC_CATCH_SIGNALS;
+    BinLDrivers::DefineFormat(anApp);
+    BinDrivers::DefineFormat(anApp);
+    XmlLDrivers::DefineFormat(anApp);
+    XmlDrivers::DefineFormat(anApp);
+    StdLDrivers::DefineFormat(anApp);
+    StdDrivers::DefineFormat(anApp);
+
+    for (int aFileIndex = 0; aFileIndex < 3; aFileIndex++)
+    {
+      TCollection_AsciiString aDocName = args->inFile[aFileIndex];
+      Handle(TDocStd_Document) aDoc;
+      for (int i = 1; i <= nbREP; i++) {
+
+        PCDM_ReaderStatus aStatus = anApp->Open(aDocName, aDoc);
+        if (aStatus != PCDM_RS_OK) {
+          args->finished = true;
+          *(args->res) = -1;
+          return args->res;
+        }
+        else {
+          TDF_Label aLabel = aDoc->Main();
+          TDF_ChildIterator anIt(aLabel, Standard_True);
+          for (; anIt.More(); anIt.Next()) {
+            const TDF_Label& aLab = anIt.Value();
+            Handle(TDataStd_AsciiString) anAtt;
+            aLab.FindAttribute(TDataStd_AsciiString::GetID(), anAtt);
+            if (!anAtt.IsNull()) {
+              TCollection_AsciiString aStr = anAtt->Get();
+              if (aStr.IsEqual(aDocName)) {
+                *(args->res) = (int)aLab.Tag();
+                break;
+              }
+            }
+          }
+
+          if (aFileIndex != 2) {
+            TCollection_AsciiString anOutDocName = args->outFile[aFileIndex];
+            anApp->SaveAs(aDoc, anOutDocName);
+          }
+          anApp->Close(aDoc);
+        }
+      }
+    }
+    args->finished = true;
+  }
+  catch (...)
+  {
+    args->finished = true;
+    *(args->res) = -1;
+    return args->res;
+  }
+  args->finished = true;
+  return args->res;
+}
+
+int getNumCores()
+{
+#ifdef WIN32
+  SYSTEM_INFO sysinfo;
+  GetSystemInfo(&sysinfo);
+  return sysinfo.dwNumberOfProcessors;
+#elif MACOS
+  int nm[2];
+  size_t len = 4;
+  uint32_t count;
+
+  nm[0] = CTL_HW; nm[1] = HW_AVAILCPU;
+  sysctl(nm, 2, &count, &len, NULL, 0);
+
+  if (count < 1) {
+    nm[1] = HW_NCPU;
+    sysctl(nm, 2, &count, &len, NULL, 0);
+    if (count < 1) { count = 1; }
+  }
+  return count;
+#else
+  return sysconf(_SC_NPROCESSORS_ONLN);
+#endif
+}
+
+//=======================================================================
+//function : OCC29195
+//purpose  : 
+//=======================================================================
+static Standard_Integer OCC29195(Draw_Interpretor&, Standard_Integer theArgC, const char** theArgV)
+{
+  if (theArgC < 2)
+  {
+    std::cout << "\nOCC29195 [nbRep] doc1.cbf doc1.xml doc1.std outDoc1.cbf outDoc1.xml doc2.cbf doc2.xml doc2.std outDoc2.cbf outDoc2.xml ...], where:";
+    std::cout << "\nnbRep - number repetitions of a thread function (by default - 50)";
+    std::cout << "\ndocN - names (5 in each group) of OCAF documents names (3 input files, 2 output)\n" << std::endl;
+    return 1;
+  }
+  int iThread(0), nbThreads(0), off(0);
+  if (TCollection_AsciiString(theArgV[1]).IsIntegerValue())
+  {
+    nbREP = TCollection_AsciiString(theArgV[1]).IntegerValue();
+    off = 1;
+  }
+  if (theArgC - off - 1 < 5 || (theArgC - off - 1) % 5 != 0 )
+  {
+    printMsg("TEST is FAILED: number of arguments is invalid\n");
+    return 0;
+  }
+  Standard_Integer aNbFiles = (theArgC - off - 1) / 5;
+  nbThreads = getNumCores();
+  if (aNbFiles < nbThreads)
+  {
+    nbThreads = aNbFiles;
+  }
+  // Allocate data
+  Args* args = new Args[nbThreads];
+  OSD_Thread* threads = new OSD_Thread[nbThreads];
+  while (iThread < nbThreads)
+  {
+    if (iThread < aNbFiles)
+    {      
+      args[iThread].inFile[0] = theArgV[iThread * 5 + off + 1];
+      args[iThread].inFile[1] = theArgV[iThread * 5 + off + 2];
+      args[iThread].inFile[2] = theArgV[iThread * 5 + off + 3];
+      args[iThread].outFile[0] = theArgV[iThread * 5 + off + 4];
+      args[iThread].outFile[1] = theArgV[iThread * 5 + off + 5];
+    }
+    args[iThread].iThread = iThread;
+    args[iThread].ID = threads[iThread].GetId();
+    args[iThread].finished = false;
+    args[iThread].res = new int;
+    threads[iThread].SetFunction(&threadFunction);
+    iThread++;
+  }
+  for (iThread = 0; iThread < nbThreads; iThread++)
+  {
+    args[iThread].finished = false;
+    threads[iThread].Run((void*)&(args[iThread]));
+  }
+  // Sleep while the threads are run.
+  bool finished = false;
+  while (!finished)
+  {
+    OSD::MilliSecSleep(100);
+    finished = true;
+    for (iThread = 0; iThread < nbThreads && finished; iThread++)
+    {
+      finished = args[iThread].finished;
+    }
+  }
+  OSD_Environment anEnv("Result29195");
+  for (iThread = 0; iThread < nbThreads; iThread++)
+  {
+    if (*(args[iThread].res) == -1)
+    {
+      printMsg("OCC29195 is FAILED\n");
+      anEnv.SetValue("FAILED_ERR");
+      break;
+    }
+  }
+  if (iThread == nbThreads)
+  {
+    printMsg("OCC29195 is finished OK\n");
+    anEnv.SetValue("OK");
+  }
+  anEnv.Build();
+  return 0;
+}
+
 //=======================================================================
 //function : QAStartsWith string startstring
 //=======================================================================
@@ -3154,7 +3364,7 @@ static Standard_Integer OCC30708_1 (Draw_Interpretor& di, Standard_Integer, cons
     it.Initialize (empty);
 
   }
-  catch (Standard_Failure)
+  catch (const Standard_Failure&)
   {
     di << "Cannot initialize TopoDS_Iterator with null shape\n";
     return 0;
@@ -3179,7 +3389,7 @@ static Standard_Integer OCC30708_2 (Draw_Interpretor& di, Standard_Integer, cons
     TopoDS_Wire empty;
     BRepLib_MakeWire aWBuilder (empty);
   }
-  catch (Standard_Failure)
+  catch (const Standard_Failure&)
   {
     di << "Cannot initialize BRepLib_MakeWire with null wire\n";
   }
@@ -3447,6 +3657,219 @@ static Standard_Integer OCC30990 (Draw_Interpretor& theDI, Standard_Integer theN
   return 0;
 }
 
+//=======================================================================
+//function : OCC31294
+//purpose  : check list of shapes generated from shape, which is not any subshape
+//           of input shape for prism algorithm  
+//=======================================================================
+#include <BRepPrimAPI_MakePrism.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
+static Standard_Integer OCC31294(Draw_Interpretor& di, Standard_Integer, const char**)
+{
+  BRepBuilderAPI_MakeVertex mkVert(gp_Pnt(0., 0., 0.));
+  BRepBuilderAPI_MakeVertex mkDummy(gp_Pnt(0., 0., 0.));
+  BRepPrimAPI_MakePrism mkPrism(mkVert.Shape(), gp_Vec(0., 0., 1.));
+
+  Standard_Integer nbgen = mkPrism.Generated(mkVert.Shape()).Extent();
+  Standard_Integer nbdummy = mkPrism.Generated(mkDummy.Shape()).Extent();
+
+  if (nbgen != 1 || nbdummy != 0)
+  {
+    di << "Error: wrong generated list \n";
+  }
+
+  return 0;
+}
+
+#include <ExprIntrp_GenExp.hxx>
+#include <Expr_GeneralExpression.hxx>
+#include <Expr_NamedUnknown.hxx>
+//=======================================================================
+//function :  OCC31697
+//purpose  : 
+//=======================================================================
+static Standard_Integer OCC31697(Draw_Interpretor& di, Standard_Integer argc, const char ** argv)
+{
+  if (argc < 3)
+  {
+    di << "Usage : " << argv[0] << " expression  variable\n";
+    return 1;
+  }
+
+  TCollection_AsciiString  anExpStr(argv[1]);
+  TCollection_AsciiString  aVarStr(argv[2]);
+
+  Handle(ExprIntrp_GenExp) exprIntrp = ExprIntrp_GenExp::Create();
+
+  //
+  // Create the expression
+  exprIntrp->Process(anExpStr);
+
+  if (!exprIntrp->IsDone())
+  {
+    di << "Interpretation of expression " << argv[1] << " failed\n";
+    return 1;
+  }
+
+  Handle(Expr_GeneralExpression) anExpr = exprIntrp->Expression();
+  Handle(Expr_NamedUnknown) aVar = new Expr_NamedUnknown(aVarStr);
+
+  if (!anExpr->Contains(aVar))
+  {
+    di << "Expression " << argv[1] << " does not contain variable " << argv[2] << "\n";
+    return 1;
+  }
+
+  Handle(Expr_GeneralExpression) aDer = anExpr->Derivative(aVar);
+
+  TCollection_AsciiString  aDerStr = aDer->String();
+
+  di << "The derivative of the " << argv[1] << " by " << argv[2] << " is equal to " << aDerStr << "\n";
+
+  return 0;
+}
+
+#include <TObj_Model.hxx>
+#include <TObj_TModel.hxx>
+#include <TObj_ObjectIterator.hxx>
+//=======================================================================
+//function :  OCC31320
+//purpose  : 
+//=======================================================================
+static Standard_Integer OCC31320(Draw_Interpretor& di, Standard_Integer argc, const char ** argv)
+{
+  if (argc < 3)
+  {
+    di << "Usage : " << argv[0] << " DocName ObjName\n";
+    return 1;
+  }
+  Handle(TObj_Model) aModel;
+  Handle(TDocStd_Document) D;
+  if (!DDocStd::GetDocument (argv[1], D)) 
+  {
+    di << "Error: document " << argv[1] << " not found\n";
+    return 1;
+  }
+
+  TDF_Label aLabel = D->Main();
+  Handle(TObj_TModel) aModelAttr;
+  if (!aLabel.IsNull() && aLabel.FindAttribute (TObj_TModel::GetID(), aModelAttr))
+    aModel = aModelAttr->Model();
+
+  if (aModel.IsNull())
+  {
+    di << "Error: TObj model " << argv[1] << " not found\n";
+    return 1;
+  }
+
+  Handle(TCollection_HExtendedString) aName = new TCollection_HExtendedString (argv[2]);
+  Handle(TObj_TNameContainer) aDict;
+  Handle(TObj_Object) anObj = aModel->FindObject (aName, aDict);
+
+  if (aModel.IsNull())
+  {
+    di << "Error: object " << argv[2] << " not found\n";
+    return 1;
+  }
+
+  // do a test: find the first child of an object, remove object and get the father of this child
+  Handle(TObj_ObjectIterator) aChildrenIter = anObj->GetChildren();
+  if (!aChildrenIter->More())
+  {
+    di << "Error: object " << argv[2] << " has no children\n";
+    return 1;
+  }
+
+  Handle(TObj_Object) aChild = aChildrenIter->Value();
+  anObj->Detach();
+  Handle(TObj_Object) aFather = aChild->GetFatherObject();
+  if (!aFather.IsNull())
+  {
+    di << "Error: father is not null\n";
+    return 1;
+  }
+
+  return 0;
+
+}
+
+#include <BinXCAFDrivers.hxx>
+#include <Message.hxx>
+namespace
+{
+  class QABugs_XdeLoader : public OSD_Thread
+  {
+  public:
+    QABugs_XdeLoader (const Handle(TDocStd_Application)& theXdeApp,
+                      const Handle(TDocStd_Document)&    theXdeDoc,
+                      const TCollection_AsciiString&     theFilePath)
+    : OSD_Thread (performThread),
+      myXdeApp (theXdeApp), myXdeDoc (theXdeDoc), myFilePath (theFilePath) {}
+
+  private:
+    void perform()
+    {
+      Handle(TDocStd_Document) aNewDoc;
+      const PCDM_ReaderStatus aReaderStatus = myXdeApp->Open (myFilePath, aNewDoc);
+      if (aReaderStatus != PCDM_RS_OK)
+      {
+        Message::SendFail ("Error occurred while reading the file");
+        return;
+      }
+      myXdeDoc = aNewDoc;
+      Message::SendInfo() << "Info: document has been opened";
+    }
+
+    static Standard_Address performThread (Standard_Address theData)
+    {
+      QABugs_XdeLoader* aLoader = (QABugs_XdeLoader* )theData;
+      OSD::SetThreadLocalSignal (OSD_SignalMode_Set, false);
+      try
+      {
+        OCC_CATCH_SIGNALS
+        aLoader->perform();
+      }
+      catch (Standard_Failure const& theExcep)
+      {
+        Message::SendFail() << "Error: unexpected exception " << theExcep;
+        return 0;
+      }
+      return 0;
+    }
+  private:
+    Handle(TDocStd_Application) myXdeApp;
+    Handle(TDocStd_Document)    myXdeDoc;
+    TCollection_AsciiString     myFilePath;
+  };
+}
+
+//=======================================================================
+//function : OCC31785
+//purpose  : Try reading XBF file in background thread
+//=======================================================================
+static Standard_Integer OCC31785 (Draw_Interpretor& theDI,
+                                  Standard_Integer theNbArgs,
+                                  const char** theArgVec)
+{
+  if (theNbArgs != 2)
+  {
+    theDI << "Syntax error: wrong number of arguments\n";
+    return 1;
+  }
+
+  TCollection_AsciiString aFileName (theArgVec[1]);
+
+  Handle(TDocStd_Application) anXdeApp = new TDocStd_Application();
+  BinXCAFDrivers::DefineFormat (anXdeApp);
+
+  Handle(TDocStd_Document) anXdeDoc;
+  anXdeApp->NewDocument (TCollection_ExtendedString ("BinXCAF"), anXdeDoc);
+  QABugs_XdeLoader aLoader (anXdeApp, anXdeDoc, aFileName);
+  aLoader.Run (&aLoader);
+  aLoader.Wait();
+  return 0;
+}
+
 void QABugs::Commands_20(Draw_Interpretor& theCommands) {
   const char *group = "QABugs";
 
@@ -3484,6 +3907,7 @@ void QABugs::Commands_20(Draw_Interpretor& theCommands) {
   theCommands.Add("OCC29807", "OCC29807 surface1 surface2 u1 v1 u2 v2", __FILE__, OCC29807, group);
   theCommands.Add("OCC29311", "OCC29311 shape counter nbiter: check performance of OBB calculation", __FILE__, OCC29311, group);
   theCommands.Add("OCC30391", "OCC30391 result face LenBeforeUfirst LenAfterUlast LenBeforeVfirst LenAfterVlast", __FILE__, OCC30391, group);
+  theCommands.Add("OCC29195", "OCC29195 [nbRep] doc1 [doc2 [doc3 [doc4]]]", __FILE__, OCC29195, group);
   theCommands.Add("OCC30435", "OCC30435 result curve inverse nbit", __FILE__, OCC30435, group);
   theCommands.Add("OCC30990", "OCC30990 surface", __FILE__, OCC30990, group);
 
@@ -3511,6 +3935,15 @@ void QABugs::Commands_20(Draw_Interpretor& theCommands) {
 
   theCommands.Add("OCC30704", "OCC30704", __FILE__, OCC30704, group);
   theCommands.Add("OCC30704_1", "OCC30704_1", __FILE__, OCC30704_1, group);
+  theCommands.Add("OCC31294", "OCC31294", __FILE__, OCC31294, group);
+
+  theCommands.Add("OCC31697", "OCC31697 expression variable", __FILE__, OCC31697, group);
+
+  theCommands.Add("OCC31320", "OCC31320 DocName ObjName : tests remove of the children GetFather method if father is removed", __FILE__, OCC31320, group);
+
+  theCommands.Add("OCC31785",
+                  "OCC31785 file.xbf : test reading XBF file in another thread",
+                  __FILE__, OCC31785, group);
 
   return;
 }

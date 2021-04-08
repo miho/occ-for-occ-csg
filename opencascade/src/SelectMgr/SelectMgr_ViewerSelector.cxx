@@ -35,27 +35,35 @@
 
 IMPLEMENT_STANDARD_RTTIEXT(SelectMgr_ViewerSelector, Standard_Transient)
 
-namespace {
-  // Comparison operator for sorting selection results
+namespace
+{
+  //! Comparison operator for sorting selection results
   class CompareResults
   {
   public:
-   
-    CompareResults (const SelectMgr_IndexedDataMapOfOwnerCriterion& aMapOfCriterion)
-      : myMapOfCriterion (aMapOfCriterion)
-    {
-    }
+
+    CompareResults (const SelectMgr_IndexedDataMapOfOwnerCriterion& theMapOfCriterion,
+                    bool theToPreferClosest)
+    : myMapOfCriterion (&theMapOfCriterion),
+      myToPreferClosest (theToPreferClosest) {}
 
     Standard_Boolean operator() (Standard_Integer theLeft, Standard_Integer theRight) const
     {
-      return myMapOfCriterion.FindFromIndex(theLeft) > myMapOfCriterion.FindFromIndex(theRight);
+      const SelectMgr_SortCriterion& anElemLeft  = myMapOfCriterion->FindFromIndex (theLeft);
+      const SelectMgr_SortCriterion& anElemRight = myMapOfCriterion->FindFromIndex (theRight);
+      if (myToPreferClosest)
+      {
+        return anElemLeft.IsCloserDepth (anElemRight);
+      }
+      else
+      {
+        return anElemLeft.IsHigherPriority (anElemRight);
+      }
     }
 
   private:
-    void operator = (const CompareResults&);
-
-  private:
-    const SelectMgr_IndexedDataMapOfOwnerCriterion&  myMapOfCriterion;
+    const SelectMgr_IndexedDataMapOfOwnerCriterion* myMapOfCriterion;
+    bool myToPreferClosest;
   };
 
   static const Graphic3d_Mat4d SelectMgr_ViewerSelector_THE_IDENTITY_MAT;
@@ -76,9 +84,17 @@ void SelectMgr_ViewerSelector::updatePoint3d (SelectMgr_SortCriterion& theCriter
     return;
   }
 
+  bool hasNormal = false;
   if (thePickResult.HasPickedPoint())
   {
-    theCriterion.Point = thePickResult.PickedPoint();
+    theCriterion.Point  = thePickResult.PickedPoint();
+    theCriterion.Normal = thePickResult.SurfaceNormal();
+    const float aNormLen2 = theCriterion.Normal.SquareModulus();
+    if (aNormLen2 > ShortRealEpsilon())
+    {
+      hasNormal = true;
+      theCriterion.Normal *= 1.0f / sqrtf (aNormLen2);
+    }
   }
   else if (!thePickResult.IsValid())
   {
@@ -97,21 +113,44 @@ void SelectMgr_ViewerSelector::updatePoint3d (SelectMgr_SortCriterion& theCriter
   }
   if (anInvTrsf.Form() != gp_Identity)
   {
-    anInvTrsf.Inverted().Transforms (theCriterion.Point.ChangeCoord());
+    const gp_GTrsf anInvInvTrsd = anInvTrsf.Inverted();
+    anInvInvTrsd.Transforms (theCriterion.Point.ChangeCoord());
+    if (hasNormal)
+    {
+      Graphic3d_Mat4d aMat4;
+      anInvInvTrsd.GetMat4 (aMat4);
+      const Graphic3d_Vec4d aNormRes = aMat4 * Graphic3d_Vec4d (Graphic3d_Vec3d (theCriterion.Normal), 0.0);
+      theCriterion.Normal = Graphic3d_Vec3 (aNormRes.xyz());
+    }
   }
 
-  if (mySelectingVolumeMgr.Camera().IsNull())
+  const Standard_Real aSensFactor = myDepthTolType == SelectMgr_TypeOfDepthTolerance_SensitivityFactor ? theEntity->SensitivityFactor() : myDepthTolerance;
+  switch (myDepthTolType)
   {
-    theCriterion.Tolerance = theEntity->SensitivityFactor() / 33.0;
-  }
-  else if (mySelectingVolumeMgr.Camera()->IsOrthographic())
-  {
-    theCriterion.Tolerance = myCameraScale * theEntity->SensitivityFactor();
-  }
-  else
-  {
-    const Standard_Real aDistFromEye = Abs ((theCriterion.Point.XYZ() - myCameraEye.XYZ()).Dot (myCameraDir.XYZ()));
-    theCriterion.Tolerance = aDistFromEye * myCameraScale * theEntity->SensitivityFactor();
+    case SelectMgr_TypeOfDepthTolerance_Uniform:
+    {
+      theCriterion.Tolerance = myDepthTolerance;
+      break;
+    }
+    case SelectMgr_TypeOfDepthTolerance_UniformPixels:
+    case SelectMgr_TypeOfDepthTolerance_SensitivityFactor:
+    {
+      if (mySelectingVolumeMgr.Camera().IsNull())
+      {
+        // fallback for an arbitrary projection matrix
+        theCriterion.Tolerance = aSensFactor / 33.0;
+      }
+      else if (mySelectingVolumeMgr.Camera()->IsOrthographic())
+      {
+        theCriterion.Tolerance = myCameraScale * aSensFactor;
+      }
+      else
+      {
+        const Standard_Real aDistFromEye = Abs ((theCriterion.Point.XYZ() - myCameraEye.XYZ()).Dot (myCameraDir.XYZ()));
+        theCriterion.Tolerance = aDistFromEye * myCameraScale * aSensFactor;
+      }
+      break;
+    }
   }
 }
 
@@ -119,15 +158,39 @@ void SelectMgr_ViewerSelector::updatePoint3d (SelectMgr_SortCriterion& theCriter
 // Function: Initialize
 // Purpose :
 //==================================================
-SelectMgr_ViewerSelector::SelectMgr_ViewerSelector():
-preferclosest(Standard_True),
-myToUpdateTolerance (Standard_True),
-myCameraScale (1.0),
-myCurRank (0),
-myIsLeftChildQueuedFirst (Standard_False),
-myEntityIdx (0)
+SelectMgr_ViewerSelector::SelectMgr_ViewerSelector()
+: myDepthTolerance (0.0),
+  myDepthTolType (SelectMgr_TypeOfDepthTolerance_SensitivityFactor),
+  myToPreferClosest (Standard_True),
+  myToUpdateTolerance (Standard_True),
+  myCameraScale (1.0),
+  myToPrebuildBVH (Standard_False),
+  myCurRank (0),
+  myIsLeftChildQueuedFirst (Standard_False)
 {
   myEntitySetBuilder = new BVH_BinnedBuilder<Standard_Real, 3, 4> (BVH_Constants_LeafNodeSizeSingle, BVH_Constants_MaxTreeDepth, Standard_True);
+}
+
+//=======================================================================
+// Function: SetPixelTolerance
+// Purpose :
+//=======================================================================
+void SelectMgr_ViewerSelector::SetPixelTolerance (const Standard_Integer theTolerance)
+{
+  if (myTolerances.Tolerance() == theTolerance)
+  {
+    return;
+  }
+
+  myToUpdateTolerance = Standard_True;
+  if (theTolerance < 0)
+  {
+    myTolerances.ResetDefaults();
+  }
+  else
+  {
+    myTolerances.SetCustomTolerance (theTolerance);
+  }
 }
 
 //==================================================
@@ -225,7 +288,6 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(Select3D_SensitiveEnti
   aCriterion.Priority  = anOwner->Priority();
   aCriterion.Depth     = aPickResult.Depth();
   aCriterion.MinDist   = aPickResult.DistToGeomCenter();
-  aCriterion.ToPreferClosest = preferclosest;
 
   if (SelectMgr_SortCriterion* aPrevCriterion = mystored.ChangeSeek (anOwner))
   {
@@ -233,7 +295,7 @@ void SelectMgr_ViewerSelector::checkOverlap (const Handle(Select3D_SensitiveEnti
     aCriterion.NbOwnerMatches = aPrevCriterion->NbOwnerMatches;
     if (theMgr.GetActiveSelectionType() != SelectBasics_SelectingVolumeManager::Box)
     {
-      if (aCriterion > *aPrevCriterion)
+      if (aCriterion.IsCloserDepth (*aPrevCriterion))
       {
         updatePoint3d (aCriterion, aPickResult, theEntity, theInversedTrsf, theMgr);
         *aPrevCriterion = aCriterion;
@@ -348,7 +410,7 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
   if (!theObject->ClipPlanes().IsNull()
     && theObject->ClipPlanes()->ToOverrideGlobal())
   {
-    aMgr.SetViewClipping (Handle(Graphic3d_SequenceOfHClipPlane)(), theObject->ClipPlanes());
+    aMgr.SetViewClipping (Handle(Graphic3d_SequenceOfHClipPlane)(), theObject->ClipPlanes(), &theMgr);
   }
   else if (!theObject->TransformPersistence().IsNull())
   {
@@ -376,12 +438,12 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
       }
     }
 
-    aMgr.SetViewClipping (Handle(Graphic3d_SequenceOfHClipPlane)(), theObject->ClipPlanes());
+    aMgr.SetViewClipping (Handle(Graphic3d_SequenceOfHClipPlane)(), theObject->ClipPlanes(), &theMgr);
   }
   else if (!theObject->ClipPlanes().IsNull()
         && !theObject->ClipPlanes()->IsEmpty())
   {
-    aMgr.SetViewClipping (theMgr.ViewClipping(), theObject->ClipPlanes());
+    aMgr.SetViewClipping (theMgr.ViewClipping(), theObject->ClipPlanes(), &theMgr);
   }
 
   if (!theMgr.ViewClipping().IsNull() &&
@@ -543,6 +605,8 @@ void SelectMgr_ViewerSelector::traverseObject (const Handle(SelectMgr_Selectable
 //=======================================================================
 void SelectMgr_ViewerSelector::TraverseSensitives()
 {
+  SelectMgr_BVHThreadPool::Sentry aSentry (myBVHThreadPool);
+
   mystored.Clear();
 
   Standard_Integer aWidth;
@@ -848,28 +912,27 @@ TCollection_AsciiString SelectMgr_ViewerSelector::Status (const Handle(SelectMgr
 
 //=======================================================================
 //function : SortResult
-//purpose  :  there is a certain number of entities ranged by criteria
-//            (depth, size, priority, mouse distance from borders or
-//            CDG of the detected primitive. Parsing :
-//             maximum priorities .
-//             then a reasonable compromise between depth and distance...
-// finally the ranges are stored in myindexes depending on the parsing.
-// so, it is possible to only read
+//purpose  :
 //=======================================================================
 void SelectMgr_ViewerSelector::SortResult()
 {
-  if(mystored.IsEmpty()) return;
+  if (mystored.IsEmpty())
+  {
+    return;
+  }
 
   const Standard_Integer anExtent = mystored.Extent();
-  if(myIndexes.IsNull() || anExtent != myIndexes->Length())
+  if (myIndexes.IsNull() || anExtent != myIndexes->Length())
+  {
     myIndexes = new TColStd_HArray1OfInteger (1, anExtent);
+  }
 
   TColStd_Array1OfInteger& anIndexArray = myIndexes->ChangeArray1();
   for (Standard_Integer anIndexIter = 1; anIndexIter <= anExtent; ++anIndexIter)
   {
     anIndexArray.SetValue (anIndexIter, anIndexIter);
   }
-  std::sort (anIndexArray.begin(), anIndexArray.end(), CompareResults (mystored));
+  std::sort (anIndexArray.begin(), anIndexArray.end(), CompareResults (mystored, myToPreferClosest));
 }
 
 //=======================================================================
@@ -1051,21 +1114,78 @@ void SelectMgr_ViewerSelector::AllowOverlapDetection (const Standard_Boolean the
 //function : DumpJson
 //purpose  : 
 //=======================================================================
-void SelectMgr_ViewerSelector::DumpJson (Standard_OStream& theOStream, const Standard_Integer) const 
+void SelectMgr_ViewerSelector::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const 
 {
-  OCCT_DUMP_CLASS_BEGIN (theOStream, SelectMgr_ViewerSelector);
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
 
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, preferclosest);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToUpdateTolerance);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mystored.Extent());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToPreferClosest)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myToUpdateTolerance)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, mystored.Extent())
 
-  Standard_Integer aNbOfSelected = 0;
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &mySelectingVolumeMgr)
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, &mySelectableObjects)
+
+  Standard_Integer aNbOfSelectableObjects = 0;
   for (SelectMgr_SelectableObjectSet::Iterator aSelectableIt (mySelectableObjects); aSelectableIt.More(); aSelectableIt.Next())
   {
-    aNbOfSelected++;
+    aNbOfSelectableObjects++;
   }
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, aNbOfSelected);
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerances.Tolerance());
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerances.CustomTolerance());
-  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myZLayerOrderMap.Size());
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, aNbOfSelectableObjects)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerances.Tolerance())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTolerances.CustomTolerance())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myZLayerOrderMap.Extent())
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myEntitySetBuilder.get())
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCameraEye)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myCameraDir)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCameraScale)
+
+  if (!myIndexes.IsNull())
+    OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIndexes->Size())
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myCurRank)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsLeftChildQueuedFirst)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMapOfObjectSensitives.Extent())
+}
+
+//=======================================================================
+//function : SetToPrebuildBVH
+//purpose  : 
+//=======================================================================
+void SelectMgr_ViewerSelector::SetToPrebuildBVH (Standard_Boolean theToPrebuild, Standard_Integer theThreadsNum)
+{
+  if (!theToPrebuild && !myBVHThreadPool.IsNull())
+  {
+    myBVHThreadPool.Nullify();
+  }
+  else if (theToPrebuild)
+  {
+    myBVHThreadPool = new SelectMgr_BVHThreadPool (theThreadsNum);
+  }
+  myToPrebuildBVH = theToPrebuild;
+}
+
+//=======================================================================
+//function : QueueBVHBuild
+//purpose  : 
+//=======================================================================
+void SelectMgr_ViewerSelector::QueueBVHBuild (const Handle(Select3D_SensitiveEntity)& theEntity)
+{
+  if (myToPrebuildBVH)
+  {
+    myBVHThreadPool->AddEntity (theEntity);
+  }
+}
+
+//=======================================================================
+//function : WaitForBVHBuild
+//purpose  : 
+//=======================================================================
+void SelectMgr_ViewerSelector::WaitForBVHBuild()
+{
+  if (myToPrebuildBVH)
+  {
+    myBVHThreadPool->WaitThreads();
+  }
 }

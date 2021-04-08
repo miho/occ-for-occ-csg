@@ -17,7 +17,6 @@
 
 #include <OpenGl_GlCore20.hxx>
 
-
 IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Caps,Standard_Transient)
 
 // =======================================================================
@@ -25,7 +24,9 @@ IMPLEMENT_STANDARD_RTTIEXT(OpenGl_Caps,Standard_Transient)
 // purpose  :
 // =======================================================================
 OpenGl_Caps::OpenGl_Caps()
-: vboDisable        (Standard_False),
+: sRGBDisable       (Standard_False),
+  compressedTexturesDisable (Standard_False),
+  vboDisable        (Standard_False),
   pntSpritesDisable (Standard_False),
   keepArrayData     (Standard_False),
   ffpEnable         (Standard_False),
@@ -54,6 +55,7 @@ OpenGl_Caps::OpenGl_Caps()
   contextNoExtensions (Standard_False),
   contextMajorVersionUpper (-1),
   contextMinorVersionUpper (-1),
+  isTopDownTextureUV(Standard_False),
   glslWarnings      (Standard_False),
   suppressExtraMsg  (Standard_True),
   glslDumpLevel     (OpenGl_ShaderProgramDumpLevel_Off)
@@ -67,6 +69,8 @@ OpenGl_Caps::OpenGl_Caps()
 // =======================================================================
 OpenGl_Caps& OpenGl_Caps::operator= (const OpenGl_Caps& theCopy)
 {
+  sRGBDisable       = theCopy.sRGBDisable;
+  compressedTexturesDisable = theCopy.compressedTexturesDisable;
   vboDisable        = theCopy.vboDisable;
   pntSpritesDisable = theCopy.pntSpritesDisable;
   keepArrayData     = theCopy.keepArrayData;
@@ -82,6 +86,7 @@ OpenGl_Caps& OpenGl_Caps::operator= (const OpenGl_Caps& theCopy)
   contextNoExtensions = theCopy.contextNoExtensions;
   contextMajorVersionUpper = theCopy.contextMajorVersionUpper;
   contextMinorVersionUpper = theCopy.contextMinorVersionUpper;
+  isTopDownTextureUV = theCopy.isTopDownTextureUV;
   glslWarnings      = theCopy.glslWarnings;
   suppressExtraMsg  = theCopy.suppressExtraMsg;
   glslDumpLevel     = theCopy.glslDumpLevel;

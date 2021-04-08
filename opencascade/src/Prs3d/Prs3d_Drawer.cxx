@@ -59,12 +59,8 @@ Prs3d_Drawer::Prs3d_Drawer()
   myTypeOfHLR                     (Prs3d_TOH_NotSet),
   myDeviationCoefficient          (0.001),
   myHasOwnDeviationCoefficient    (Standard_False),
-  myHLRDeviationCoefficient       (0.02),
-  myHasOwnHLRDeviationCoefficient (Standard_False),
-  myDeviationAngle                (12.0 * M_PI / 180.0),
+  myDeviationAngle                (20.0 * M_PI / 180.0),
   myHasOwnDeviationAngle          (Standard_False),
-  myHLRAngle                      (20.0 * M_PI / 180.0),
-  myHasOwnHLRDeviationAngle       (Standard_False),
   myIsoOnPlane                    (Standard_False),
   myHasOwnIsoOnPlane              (Standard_False),
   myIsoOnTriangulation            (Standard_False),
@@ -224,18 +220,6 @@ void Prs3d_Drawer::SetDeviationCoefficient (const Standard_Real theCoefficient)
 }
 
 //=======================================================================
-//function : SetHLRDeviationCoefficient
-//purpose  : 
-//=======================================================================
-
-void Prs3d_Drawer::SetHLRDeviationCoefficient (const Standard_Real theCoefficient)
-{
-  myPreviousHLRDeviationCoefficient = HLRDeviationCoefficient();
-  myHLRDeviationCoefficient         = theCoefficient;
-  myHasOwnHLRDeviationCoefficient   = Standard_True;
-}
-
-//=======================================================================
 //function : SetDeviationAngle
 //purpose  : 
 //=======================================================================
@@ -245,18 +229,6 @@ void Prs3d_Drawer::SetDeviationAngle (const Standard_Real theAngle)
   myPreviousDeviationAngle = DeviationAngle();
   myDeviationAngle         = theAngle;
   myHasOwnDeviationAngle   = Standard_True;
-}
-
-//=======================================================================
-//function : SetHLRAngle
-//purpose  : 
-//=======================================================================
-
-void Prs3d_Drawer::SetHLRAngle (const Standard_Real theAngle)
-{
-  myPreviousHLRDeviationAngle = HLRAngle();
-  myHLRAngle                  = theAngle;
-  myHasOwnHLRDeviationAngle   = Standard_True;
 }
 
 // =======================================================================
@@ -1101,9 +1073,7 @@ void Prs3d_Drawer::ClearLocalAttributes()
   myHasOwnTypeOfDeflection        = Standard_False;
   myHasOwnChordialDeviation       = Standard_False;
   myHasOwnDeviationCoefficient    = Standard_False;
-  myHasOwnHLRDeviationCoefficient = Standard_False;
   myHasOwnDeviationAngle          = Standard_False;
-  myHasOwnHLRDeviationAngle       = Standard_False;
   myHasOwnIsoOnPlane              = Standard_False;
   myHasOwnIsoOnTriangulation      = Standard_False;
   myHasOwnIsAutoTriangulated      = Standard_False;
@@ -1415,8 +1385,85 @@ bool Prs3d_Drawer::SetShadingModel (Graphic3d_TypeOfShadingModel theModel,
 // function : DumpJson
 // purpose  :
 // =======================================================================
-void Prs3d_Drawer::DumpJson (Standard_OStream& theOStream, const Standard_Integer theDepth) const
+void Prs3d_Drawer::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
-  OCCT_DUMP_CLASS_BEGIN (theOStream, Prs3d_Drawer);
-  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myShadingAspect.get());
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, myLink.get())
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnNbPoints)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myMaximalParameterValue)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnMaximalParameterValue)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myChordialDeviation)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnChordialDeviation)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTypeOfDeflection)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnTypeOfDeflection)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTypeOfHLR)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDeviationCoefficient)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPreviousDeviationCoefficient)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDeviationCoefficient)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDeviationAngle)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDeviationAngle)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myPreviousDeviationAngle)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsoOnPlane)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnIsoOnPlane)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsoOnTriangulation)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnIsoOnTriangulation)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsAutoTriangulated)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnIsAutoTriangulated)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnUIsoAspect)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnVIsoAspect)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnWireAspect)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myWireDraw)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnWireDraw)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnPointAspect)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnLineAspect)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myTextAspect.get())
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myShadingAspect.get())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnShadingAspect)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnPlaneAspect)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnSeenLineAspect)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnArrowAspect)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLineArrowDraw)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnLineArrowDraw)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnHiddenLineAspect)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myDrawHiddenLine)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDrawHiddenLine)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnVectorAspect)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myVertexDrawMode)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDatumAspect)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnSectionAspect)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnFreeBoundaryAspect)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFreeBoundaryDraw)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnFreeBoundaryDraw)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnUnFreeBoundaryAspect)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUnFreeBoundaryDraw)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnUnFreeBoundaryDraw)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFaceBoundaryUpperContinuity)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnFaceBoundaryAspect)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myFaceBoundaryDraw)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnFaceBoundaryDraw)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDimensionAspect)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDimLengthModelUnits)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDimAngleModelUnits)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDimLengthDisplayUnits)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDimAngleDisplayUnits)
 }

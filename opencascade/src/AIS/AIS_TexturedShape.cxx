@@ -28,12 +28,11 @@
 #include <Precision.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_Presentation.hxx>
-#include <Prs3d_Root.hxx>
 #include <Prs3d_LineAspect.hxx>
 #include <Prs3d_ShadingAspect.hxx>
 #include <PrsMgr_PresentationManager3d.hxx>
 #include <Standard_ErrorHandler.hxx>
-#include <StdPrs_BndBox.hxx>
+#include <Prs3d_BndBox.hxx>
 #include <StdPrs_ShadedShape.hxx>
 #include <StdPrs_ToolTriangulatedShape.hxx>
 #include <StdPrs_WFShape.hxx>
@@ -76,8 +75,8 @@ void AIS_TexturedShape::SetTextureFileName (const TCollection_AsciiString& theTe
     }
     else
     {
-      Message::DefaultMessenger()->Send (TCollection_AsciiString ("Error: texture with ID ") + theTextureFileName
-                                       + " is undefined! Texture 0 will be used instead.", Message_Fail);
+      Message::SendFail (TCollection_AsciiString ("Error: texture with ID ") + theTextureFileName
+                       + " is undefined. Texture 0 will be used instead.");
       myPredefTexture = Graphic3d_NameOfTexture2D (0);
     }
     myTextureFile = "";
@@ -311,7 +310,7 @@ void AIS_TexturedShape::updateAttributes (const Handle(Prs3d_Presentation)& theP
     }
     else
     {
-      Message::DefaultMessenger()->Send (TCollection_AsciiString ("Error: texture can not be loaded ") + aTextureDesc, Message_Fail);
+      Message::SendFail (TCollection_AsciiString ("Error: texture can not be loaded ") + aTextureDesc);
     }
   }
 
@@ -433,7 +432,7 @@ void AIS_TexturedShape::Compute (const Handle(PrsMgr_PresentationManager3d)& /*t
       }
       else
       {
-        StdPrs_BndBox::Add (thePrs, BoundingBox(), myDrawer);
+        Prs3d_BndBox::Add (thePrs, BoundingBox(), myDrawer);
       }
       break;
     }

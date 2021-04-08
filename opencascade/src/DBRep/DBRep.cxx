@@ -27,6 +27,7 @@
 #include <Draw.hxx>
 #include <Draw_Appli.hxx>
 #include <Draw_ProgressIndicator.hxx>
+#include <Message_ProgressRange.hxx>
 #include <Draw_Segment3D.hxx>
 #include <gp_Ax2.hxx>
 #include <GProp.hxx>
@@ -1332,26 +1333,39 @@ TopoDS_Shape DBRep::getShape (Standard_CString& theName,
 
 static Standard_Integer XProgress (Draw_Interpretor& di, Standard_Integer argc, const char **argv)
 {
-  for ( Standard_Integer i=1; i < argc; i++ ) {
+  for ( Standard_Integer i=1; i < argc; i++ )
+  {
     Standard_Boolean turn = Standard_True;
     if ( argv[i][0] == '-' ) turn = Standard_False;
     else if ( argv[i][0] != '+' ) continue;
-    if ( argv[i][1] == 't' ) Draw_ProgressIndicator::DefaultTextMode() = turn;
+
+    TCollection_AsciiString anArgCase (argv[i]);
+    anArgCase.LowerCase();
+    if ( argv[i][1] == 't' ) Draw_ProgressIndicator::DefaultTclMode() = turn;
+    else if (argv[i][1] == 'c') Draw_ProgressIndicator::DefaultConsoleMode() = turn;
     else if ( argv[i][1] == 'g' ) Draw_ProgressIndicator::DefaultGraphMode() = turn;
-    else if ( ! strcmp ( argv[i], "-stop" ) && i+1 < argc ) {
+    else if ( ! strcmp ( argv[i], "-stop" ) && i+1 < argc )
+    {
       Standard_Address aPtr = 0;
       if (sscanf (argv[++i], "%p", &aPtr) == 1)
         Draw_ProgressIndicator::StopIndicator() = aPtr;
       return 0;
     }
   }
-  di << "Progress Indicator defaults: text mode is ";
-  if ( Draw_ProgressIndicator::DefaultTextMode() ) {
+  di << "Progress Indicator defaults: tcl mode is ";
+  if ( Draw_ProgressIndicator::DefaultTclMode() ) {
     di<<"ON";
   } else {
     di<<"OFF";
   }
-  di<<", graphical mode is ";
+  di<<", console mode is ";
+  if (Draw_ProgressIndicator::DefaultConsoleMode()) {
+    di << "ON";
+  }
+  else {
+    di << "OFF";
+  }
+  di << ", graphical mode is ";
   if ( Draw_ProgressIndicator::DefaultGraphMode() ) {
     di<<"ON";
   } else {
@@ -1403,6 +1417,39 @@ static Standard_Integer binrestore(Draw_Interpretor& di, Standard_Integer n, con
 
   DBRep::Set (a[2], aShape);
   di << a[2];
+  return 0;
+}
+
+//=======================================================================
+// removeinternals
+//=======================================================================
+static Standard_Integer removeInternals (Draw_Interpretor& di,
+                                         Standard_Integer n,
+                                         const char** a)
+{
+  if (n < 2)
+  {
+    di.PrintHelp (a[0]);
+    return 1;
+  }
+
+  TopoDS_Shape aShape = DBRep::Get (a[1]);
+  if (aShape.IsNull())
+  {
+    di << a[1] << "is a null shape\n";
+    return 1;
+  }
+
+  Standard_Boolean isForce = Standard_False;
+  if (n > 2)
+  {
+    isForce = (Draw::Atoi (a[2]) != 0);
+  }
+
+  BRepTools::RemoveInternals (aShape, isForce);
+
+  DBRep::Set (a[1], aShape);
+
   return 0;
 }
 
@@ -1463,7 +1510,13 @@ void  DBRep::BasicCommands(Draw_Interpretor& theCommands)
 		  __FILE__,purgemmgt,g);
   
   // Add command for DRAW-specific ProgressIndicator
-  theCommands.Add ( "XProgress","XProgress [+|-t] [+|-g]: switch on/off textual and graphical mode of Progress Indicator",XProgress,"DE: General");
+  theCommands.Add ( "XProgress",
+                    "XProgress [+|-t] [+|-c] [+|-g]"
+                    "\n\t\t The options are:"
+                    "\n\t\t   +|-t :  switch on/off output to tcl of Progress Indicator"
+                    "\n\t\t   +|-c :  switch on/off output to cout of Progress Indicator"
+                    "\n\t\t   +|-g :  switch on/off graphical mode of Progress Indicator",
+                    XProgress,"DE: General");
 
   theCommands.Add("binsave", "binsave shape filename\n"
                   "\t\tsave the shape in the binary format file",
@@ -1471,6 +1524,12 @@ void  DBRep::BasicCommands(Draw_Interpretor& theCommands)
   theCommands.Add("binrestore", "binrestore filename shape\n"
                   "\t\trestore the shape from the binary format file",
                   __FILE__, binrestore, g);
+
+  theCommands.Add ("removeinternals", "removeinternals shape [force flag {0/1}]"
+                   "\n\t\t             Removes sub-shapes with internal orientation from the shape.\n"
+                   "\n\t\t             Force flag disables the check on topological connectivity and"
+                                       "removes all internal sub-shapes\n",
+                  __FILE__, removeInternals, g);
 }
 
 //=======================================================================
@@ -1529,11 +1588,10 @@ static void ssave(const Handle(Draw_Drawable3D)&d, std::ostream& OS)
     N = Handle(DBRep_DrawableShape)::DownCast(d);
   BRep_Builder B;
   BRepTools_ShapeSet S(B);
-  if(!Draw::GetProgressBar().IsNull())
-    S.SetProgress(Draw::GetProgressBar());
-  S.Add(N->Shape());
-  S.Write(OS);
-  if(!Draw::GetProgressBar().IsNull() && Draw::GetProgressBar()->UserBreak())
+  S.Add (N->Shape());
+  Handle(Draw_ProgressIndicator) aProgress = Draw::GetProgressBar();
+  S.Write(OS, Message_ProgressIndicator::Start(aProgress));
+  if (! aProgress.IsNull() && aProgress->UserBreak())
     return;
   S.Write(N->Shape(),OS);
 }
@@ -1542,11 +1600,10 @@ static Handle(Draw_Drawable3D) srestore (std::istream& IS)
 {
   BRep_Builder B;
   BRepTools_ShapeSet S(B);
-  if(!Draw::GetProgressBar().IsNull())
-    S.SetProgress(Draw::GetProgressBar());
-  S.Read(IS);
+  Handle(Draw_ProgressIndicator) aProgress = Draw::GetProgressBar();
+  S.Read(IS, Message_ProgressIndicator::Start(aProgress));
   Handle(DBRep_DrawableShape) N;
-  if(!Draw::GetProgressBar().IsNull() && Draw::GetProgressBar()->UserBreak())
+  if (! aProgress.IsNull() && aProgress->UserBreak())
     return N;
   TopoDS_Shape theShape;
   S.Read(theShape,IS );

@@ -16,6 +16,7 @@
 #include <ViewerTest_CmdParser.hxx>
 
 #include <Draw.hxx>
+#include <Message.hxx>
 #include <ViewerTest.hxx>
 
 #include <algorithm>
@@ -157,7 +158,7 @@ void ViewerTest_CmdParser::Parse (const Standard_Integer theArgsNb, const char* 
       }
       else
       {
-        std::cerr << "Error: unknown argument '" << anOptionName << "'\n";
+        Message::SendFail() << "Error: unknown argument '" << anOptionName << "'";
         return;
       }
     }
@@ -261,9 +262,9 @@ bool ViewerTest_CmdParser::HasOption (const ViewerTest_CommandOptionKey theOptio
   const bool             aResult           = (anOptionArguments.size() >= theMandatoryArgsNb);
   if (isFatal && !aResult)
   {
-    std::cerr << "Error: wrong syntax at option '" << myOptionStorage[theOptionKey].Name << "'\n"
-              << "At least " << theMandatoryArgsNb << "expected, but only " << anOptionArguments.size()
-              << "provided.\n";
+    Message::SendFail() << "Error: wrong syntax at option '" << myOptionStorage[theOptionKey].Name << "'\n"
+                        << "At least " << theMandatoryArgsNb << "expected, but only " << anOptionArguments.size()
+                        << "provided.";
   }
   return aResult;
 }
@@ -305,7 +306,7 @@ bool ViewerTest_CmdParser::Arg (const std::string&     theOptionName,
                                 std::string&           theOptionArgument) const
 {
   Standard_ASSERT_RETURN (theArgumentIndex >= 0,
-                          __FUNCTION__ ": 'theArgumentIndex' must be greater than or equal to zero.",
+                          "'theArgumentIndex' must be greater than or equal to zero.",
                           false);
   ViewerTest_CommandOptionKey anOptionKey = THE_UNNAMED_COMMAND_OPTION_KEY;
   if (!theOptionName.empty() && !findOptionKey (theOptionName, anOptionKey))
@@ -324,7 +325,7 @@ bool ViewerTest_CmdParser::Arg (const ViewerTest_CommandOptionKey theOptionKey,
                                 std::string&                      theOptionArgument) const
 {
   Standard_ASSERT_RETURN (theArgumentIndex >= 0,
-                          __FUNCTION__ ": 'theArgumentIndex' must be greater than or equal to zero.",
+                          "'theArgumentIndex' must be greater than or equal to zero.",
                           false);
   std::size_t aUsedOptionIndex = 0;
   if (!findUsedOptionIndex (theOptionKey, aUsedOptionIndex))
@@ -347,7 +348,7 @@ bool ViewerTest_CmdParser::Arg (const ViewerTest_CommandOptionKey theOptionKey,
 std::string ViewerTest_CmdParser::Arg (const std::string& theOptionName, const Standard_Integer theArgumentIndex) const
 {
   Standard_ASSERT_RETURN (theArgumentIndex >= 0,
-                          __FUNCTION__ ": 'theArgumentIndex' must be greater than or equal to zero.",
+                          "'theArgumentIndex' must be greater than or equal to zero.",
                           std::string());
   std::string anOptionArgument;
   if (!Arg (theOptionName, theArgumentIndex, anOptionArgument))
@@ -501,14 +502,14 @@ bool ViewerTest_CmdParser::ArgColor (const ViewerTest_CommandOptionKey theOption
   const RawStringArguments aRawStringArguments = getRawStringArguments (aUsedOptionIndex);
   const Standard_Integer   aNumberOfArguments  = static_cast<Standard_Integer> (aRawStringArguments.size());
   Standard_ASSERT_RETURN (theArgumentIndex < aNumberOfArguments,
-                          __FUNCTION__ ": 'theArgumentIndex' must be less than the number of command-line arguments "
-                                       "passed with the option which access key is 'theOptionKey'.",
+                          "'theArgumentIndex' must be less than the number of command-line arguments "
+                          "passed with the option which access key is 'theOptionKey'.",
                           false);
   const Standard_Integer aNumberOfAvailableArguments = aNumberOfArguments - theArgumentIndex;
   TheColor               aColor;
-  const Standard_Integer aNumberOfParsedArguments = ViewerTest::ParseColor (aNumberOfAvailableArguments,
-                                                                            &aRawStringArguments[theArgumentIndex],
-                                                                            aColor);
+  const Standard_Integer aNumberOfParsedArguments = Draw::ParseColor (aNumberOfAvailableArguments,
+                                                                      &aRawStringArguments[theArgumentIndex],
+                                                                      aColor);
   if (aNumberOfParsedArguments == 0)
   {
     return false;
@@ -601,7 +602,7 @@ ViewerTest_CmdParser::RawStringArguments ViewerTest_CmdParser::getRawStringArgum
 {
   Standard_ASSERT_RETURN (
     theUsedOptionIndex < myOptionArgumentStorage.size(),
-    __FUNCTION__ ": 'theUsedOptionIndex' must be less than the size of 'myOptionArgumentStorage'.",
+    "'theUsedOptionIndex' must be less than the size of 'myOptionArgumentStorage'.",
     RawStringArguments());
   const OptionArguments& anOptionArguments = myOptionArgumentStorage[theUsedOptionIndex];
   return convertToRawStringList (anOptionArguments);

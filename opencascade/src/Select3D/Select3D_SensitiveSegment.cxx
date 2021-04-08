@@ -31,6 +31,7 @@ Select3D_SensitiveSegment::Select3D_SensitiveSegment (const Handle(SelectMgr_Ent
                                                       const gp_Pnt& theLastPnt)
 : Select3D_SensitiveEntity (theOwnerId)
 {
+  mySFactor = 3;
   myStart = theFirstPnt;
   myEnd = theLastPnt;
 }
@@ -44,6 +45,10 @@ Standard_Boolean Select3D_SensitiveSegment::Matches (SelectBasics_SelectingVolum
 {
   if (!theMgr.IsOverlapAllowed()) // check for inclusion
   {
+    if (theMgr.GetActiveSelectionType() == SelectBasics_SelectingVolumeManager::Polyline)
+    {
+      return theMgr.Overlaps (myStart, myEnd, thePickResult);
+    }
     return theMgr.Overlaps (myStart, thePickResult) && theMgr.Overlaps (myEnd, thePickResult);
   }
 
@@ -98,7 +103,23 @@ Select3D_BndBox3d Select3D_SensitiveSegment::BoundingBox()
 // function : NbSubElements
 // purpose  : Returns the amount of points
 //=======================================================================
-Standard_Integer Select3D_SensitiveSegment::NbSubElements()
+Standard_Integer Select3D_SensitiveSegment::NbSubElements() const
 {
   return 2;
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  :
+//=======================================================================
+void Select3D_SensitiveSegment::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, Select3D_SensitiveEntity)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myStart)
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myEnd)
+
+  Select3D_BndBox3d aBoundingBox = ((Select3D_SensitiveSegment*)this)->BoundingBox();
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aBoundingBox)
 }

@@ -45,7 +45,7 @@ static TCollection_ExtendedString TryXmlDriverType (Standard_IStream& theIStream
 //purpose  : 
 //=======================================================================
 
-void PCDM_ReadWriter::Open (Storage_BaseDriver&                 aDriver,
+void PCDM_ReadWriter::Open (const Handle(Storage_BaseDriver)&   aDriver,
                             const TCollection_ExtendedString&   aFileName,
                             const Storage_OpenMode              aMode)
 {
@@ -74,8 +74,7 @@ void PCDM_ReadWriter::Open (Storage_BaseDriver&                 aDriver,
 Handle(PCDM_ReadWriter) PCDM_ReadWriter::Reader
                                            (const TCollection_ExtendedString&)
 {
-  static Handle(PCDM_ReadWriter_1) theReader=new PCDM_ReadWriter_1;
-  return theReader;
+  return (new PCDM_ReadWriter_1);
 }
 
 //=======================================================================
@@ -85,8 +84,7 @@ Handle(PCDM_ReadWriter) PCDM_ReadWriter::Reader
 
 Handle(PCDM_ReadWriter) PCDM_ReadWriter::Writer ()
 {
-  static Handle(PCDM_ReadWriter_1) theWriter=new PCDM_ReadWriter_1;
-  return theWriter;
+  return (new PCDM_ReadWriter_1);
 }
  
 //=======================================================================
@@ -113,23 +111,21 @@ TCollection_ExtendedString PCDM_ReadWriter::FileFormat
 {
   TCollection_ExtendedString theFormat;
   
-  PCDM_BaseDriverPointer theFileDriver;
+  Handle(Storage_BaseDriver) theFileDriver;
 
   // conversion to UTF-8 is done inside
   TCollection_AsciiString theFileName (aFileName);
   if (PCDM::FileDriverType (theFileName, theFileDriver) == PCDM_TOFD_Unknown)
     return ::TryXmlDriverType (theFileName);
 
-  static Standard_Boolean theFileIsOpen;
-  theFileIsOpen=Standard_False;
-
+  Standard_Boolean theFileIsOpen(Standard_False);
   try {
     OCC_CATCH_SIGNALS
     
-    Open(*theFileDriver,aFileName,Storage_VSRead);
+    Open(theFileDriver,aFileName,Storage_VSRead);
     theFileIsOpen=Standard_True;
     Storage_HeaderData hd;
-    hd.Read (*theFileDriver);
+    hd.Read (theFileDriver);
     const TColStd_SequenceOfAsciiString &refUserInfo = hd.UserInfo();
     Standard_Boolean found=Standard_False;
     for (Standard_Integer i =1; !found && i<=  refUserInfo.Length() ; i++) {
@@ -142,16 +138,16 @@ TCollection_ExtendedString PCDM_ReadWriter::FileFormat
     if (!found)
     {
       Storage_TypeData td;
-      td.Read (*theFileDriver);
+      td.Read (theFileDriver);
       theFormat = td.Types()->Value(1);
     }
   }
   catch (Standard_Failure const&) {}
-
   
-  if(theFileIsOpen)theFileDriver->Close();
-
-  delete theFileDriver;
+  if(theFileIsOpen)
+  {
+    theFileDriver->Close();
+  }
 
   return theFormat;
 }
@@ -165,7 +161,7 @@ TCollection_ExtendedString PCDM_ReadWriter::FileFormat (Standard_IStream& theISt
 {
   TCollection_ExtendedString aFormat;
 
-  Storage_BaseDriver* aFileDriver = 0L;
+  Handle(Storage_BaseDriver) aFileDriver;
   if (PCDM::FileDriverType (theIStream, aFileDriver) == PCDM_TOFD_XmlFile)
   {
     return ::TryXmlDriverType (theIStream);

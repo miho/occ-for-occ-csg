@@ -23,7 +23,6 @@
 #include <ElSLib.hxx>
 #include <Geom_Axis2Placement.hxx>
 #include <Geom_Plane.hxx>
-#include <Geom_Transformation.hxx>
 #include <GeomAdaptor_Surface.hxx>
 #include <gp_Pnt.hxx>
 #include <Graphic3d_ArrayOfQuadrangles.hxx>
@@ -39,7 +38,6 @@
 #include <Prs3d_LineAspect.hxx>
 #include <Prs3d_PlaneAspect.hxx>
 #include <Prs3d_Presentation.hxx>
-#include <Prs3d_Projector.hxx>
 #include <Prs3d_ShadingAspect.hxx>
 #include <Quantity_Color.hxx>
 #include <Select3D_SensitiveTriangulation.hxx>
@@ -260,7 +258,7 @@ void AIS_Plane::Compute(const Handle(PrsMgr_PresentationManager3d)& ,
       {
         ComputeFrame();
         Handle(Prs3d_PlaneAspect) theaspect = myDrawer->PlaneAspect();
-        Handle(Graphic3d_Group) TheGroup = Prs3d_Root::CurrentGroup(aPresentation);
+        Handle(Graphic3d_Group) TheGroup = aPresentation->CurrentGroup();
         TheGroup->SetPrimitivesAspect(myDrawer->ShadingAspect()->Aspect());
         gp_Pnt p1;
         const Standard_Real Xmax = 0.5*Standard_Real(theaspect->PlaneXLength());
@@ -284,11 +282,6 @@ void AIS_Plane::Compute(const Handle(PrsMgr_PresentationManager3d)& ,
       break;
     }
   }
-}
-
-void AIS_Plane::Compute(const Handle(Prs3d_Projector)& aProjector, const Handle(Geom_Transformation)& aTransformation, const Handle(Prs3d_Presentation)& aPresentation)
-{
-  PrsMgr_PresentableObject::Compute(aProjector, aTransformation, aPresentation);
 }
 
 //=======================================================================
@@ -530,15 +523,6 @@ void AIS_Plane::ComputeFrame()
 }
 
 //=======================================================================
-//function : Compute
-//purpose  : to avoid warning
-//=======================================================================
-void AIS_Plane::Compute(const Handle(Prs3d_Projector)&, 
-			   const Handle(Prs3d_Presentation)&)
-{
-}
-
-//=======================================================================
 //function : ComputeFields
 //purpose  : 
 //=======================================================================
@@ -604,7 +588,7 @@ void AIS_Plane::ComputeFields()
 void AIS_Plane::InitDrawerAttributes()
 {
   Handle(Prs3d_ShadingAspect) shasp = new Prs3d_ShadingAspect();
-  shasp->SetMaterial(Graphic3d_NOM_PLASTIC);
+  shasp->SetMaterial(Graphic3d_NameOfMaterial_Plastified);
   shasp->SetColor(Quantity_NOC_GRAY40);
   myDrawer->SetShadingAspect(shasp);
   Handle(Graphic3d_AspectFillArea3d) asf = shasp->Aspect();

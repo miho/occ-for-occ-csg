@@ -69,15 +69,19 @@ void OpenGl_Flipper::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
   if (!myIsEnabled)
   {
     // restore matrix state
-    aContext->WorldViewState.Pop();
+    aContext->ModelWorldState.Pop();
 
     // Apply since we probably in the middle of something.
-    aContext->ApplyModelViewMatrix();
+    aContext->ApplyModelWorldMatrix();
     return;
   }
 
-  aContext->WorldViewState.Push();
-  OpenGl_Mat4 aMatrixMV = aContext->WorldViewState.Current() * aContext->ModelWorldState.Current();
+  aContext->ModelWorldState.Push();
+
+  OpenGl_Mat4 aModelWorldMatrix;
+  aModelWorldMatrix.Convert (aContext->ModelWorldState.Current());
+
+  OpenGl_Mat4 aMatrixMV = aContext->WorldViewState.Current() * aModelWorldMatrix;
 
   const OpenGl_Vec4 aMVReferenceOrigin = aMatrixMV * myReferenceOrigin;
   const OpenGl_Vec4 aMVReferenceX      = aMatrixMV * OpenGl_Vec4 (myReferenceX.xyz() + myReferenceOrigin.xyz(), 1.0f);
@@ -129,9 +133,20 @@ void OpenGl_Flipper::Render (const Handle(OpenGl_Workspace)& theWorkspace) const
   aTransform = aRefAxes * aTransform * aRefInv;
 
   // transform model-view matrix
-  aMatrixMV = aMatrixMV * aTransform;
+  aModelWorldMatrix = aModelWorldMatrix * aTransform;
 
   // load transformed model-view matrix
-  aContext->WorldViewState.SetCurrent (aMatrixMV);
-  aContext->ApplyWorldViewMatrix();
+  aContext->ModelWorldState.SetCurrent (aModelWorldMatrix);
+  aContext->ApplyModelWorldMatrix();
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void OpenGl_Flipper::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, OpenGl_Flipper)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, OpenGl_Element)
 }

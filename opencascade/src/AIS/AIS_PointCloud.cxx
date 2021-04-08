@@ -22,14 +22,13 @@
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_PointAspect.hxx>
 #include <Prs3d_Presentation.hxx>
-#include <Prs3d_Root.hxx>
 #include <Prs3d_ShadingAspect.hxx>
 #include <PrsMgr_Presentations.hxx>
 #include <Select3D_SensitiveBox.hxx>
 #include <Select3D_SensitivePrimitiveArray.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_Selection.hxx>
-#include <StdPrs_BndBox.hxx>
+#include <Prs3d_BndBox.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(AIS_PointCloudOwner, SelectMgr_EntityOwner)
 IMPLEMENT_STANDARD_RTTIEXT(AIS_PointCloud, AIS_InteractiveObject)
@@ -298,7 +297,7 @@ void AIS_PointCloud::UnsetColor()
 
   AIS_InteractiveObject::UnsetColor();
   {
-    Graphic3d_MaterialAspect aDefaultMat (Graphic3d_NOM_BRASS);
+    Graphic3d_MaterialAspect aDefaultMat (Graphic3d_NameOfMaterial_Brass);
     Graphic3d_MaterialAspect aMat = aDefaultMat;
     Quantity_Color aColor = aDefaultMat.Color();
     if (myDrawer->HasLink())
@@ -354,7 +353,7 @@ void AIS_PointCloud::UnsetMaterial()
   }
 
   {
-    Graphic3d_MaterialAspect aDefaultMat (Graphic3d_NOM_BRASS);
+    Graphic3d_MaterialAspect aDefaultMat (Graphic3d_NameOfMaterial_Brass);
     myDrawer->ShadingAspect()->SetMaterial (myDrawer->HasLink() ?
                                             myDrawer->Link()->ShadingAspect()->Material (myCurrentFacingModel) :
                                             aDefaultMat,
@@ -400,7 +399,7 @@ void AIS_PointCloud::Compute (const Handle(PrsMgr_PresentationManager3d)& /*theP
         return;
       }
 
-      StdPrs_BndBox::Add (thePrs, aBndBox, myDrawer);
+      Prs3d_BndBox::Add (thePrs, aBndBox, myDrawer);
       break;
     }
   }

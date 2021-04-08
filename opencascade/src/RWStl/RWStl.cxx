@@ -15,7 +15,7 @@
 
 #include <RWStl.hxx>
 
-#include <Message_ProgressSentry.hxx>
+#include <Message_ProgressScope.hxx>
 #include <NCollection_Vector.hxx>
 #include <OSD_File.hxx>
 #include <OSD_OpenFile.hxx>
@@ -26,6 +26,7 @@ namespace
 
   static const Standard_Integer THE_STL_SIZEOF_FACET = 50;
   static const Standard_Integer IND_THRESHOLD = 1000; // increment the indicator every 1k triangles
+  static const size_t THE_BUFFER_SIZE = 1024; // The length of buffer to read (in bytes)
 
   //! Writing a Little Endian 32 bits integer
   inline static void convertInteger (const Standard_Integer theValue,
@@ -109,7 +110,7 @@ namespace
 //purpose  :
 //=============================================================================
 Handle(Poly_Triangulation) RWStl::ReadFile (const Standard_CString theFile,
-                                            const Handle(Message_ProgressIndicator)& theProgress)
+                                            const Message_ProgressRange& theProgress)
 {
   Reader aReader;
   aReader.Read (theFile, theProgress);
@@ -123,7 +124,7 @@ Handle(Poly_Triangulation) RWStl::ReadFile (const Standard_CString theFile,
 //purpose  :
 //=============================================================================
 Handle(Poly_Triangulation) RWStl::ReadFile (const OSD_Path& theFile,
-                                            const Handle(Message_ProgressIndicator)& theProgress)
+                                            const Message_ProgressRange& theProgress)
 {
   OSD_File aFile(theFile);
   if (!aFile.Exists())
@@ -141,7 +142,7 @@ Handle(Poly_Triangulation) RWStl::ReadFile (const OSD_Path& theFile,
 //purpose  :
 //=============================================================================
 Handle(Poly_Triangulation) RWStl::ReadBinary (const OSD_Path& theFile,
-                                              const Handle(Message_ProgressIndicator)& theProgress)
+                                              const Message_ProgressRange& theProgress)
 {
   OSD_File aFile(theFile);
   if (!aFile.Exists())
@@ -174,7 +175,7 @@ Handle(Poly_Triangulation) RWStl::ReadBinary (const OSD_Path& theFile,
 //purpose  :
 //=============================================================================
 Handle(Poly_Triangulation) RWStl::ReadAscii (const OSD_Path& theFile,
-                                             const Handle(Message_ProgressIndicator)& theProgress)
+                                             const Message_ProgressRange& theProgress)
 {
   OSD_File aFile (theFile);
   if (!aFile.Exists())
@@ -199,7 +200,8 @@ Handle(Poly_Triangulation) RWStl::ReadAscii (const OSD_Path& theFile,
   aStream.seekg (0, aStream.beg);
 
   Reader aReader;
-  if (!aReader.ReadAscii (aStream, theEnd, theProgress))
+  Standard_ReadLineBuffer aBuffer (THE_BUFFER_SIZE);
+  if (!aReader.ReadAscii (aStream, aBuffer, theEnd, theProgress))
   {
     return Handle(Poly_Triangulation)();
   }
@@ -213,7 +215,7 @@ Handle(Poly_Triangulation) RWStl::ReadAscii (const OSD_Path& theFile,
 //=============================================================================
 Standard_Boolean RWStl::WriteBinary (const Handle(Poly_Triangulation)& theMesh,
                                      const OSD_Path& thePath,
-                                     const Handle(Message_ProgressIndicator)& theProgInd)
+                                     const Message_ProgressRange& theProgress)
 {
   if (theMesh.IsNull() || theMesh->NbTriangles() <= 0)
   {
@@ -229,7 +231,7 @@ Standard_Boolean RWStl::WriteBinary (const Handle(Poly_Triangulation)& theMesh,
     return Standard_False;
   }
 
-  Standard_Boolean isOK = writeBinary (theMesh, aFile, theProgInd);
+  Standard_Boolean isOK = writeBinary (theMesh, aFile, theProgress);
 
   fclose (aFile);
   return isOK;
@@ -241,7 +243,7 @@ Standard_Boolean RWStl::WriteBinary (const Handle(Poly_Triangulation)& theMesh,
 //=============================================================================
 Standard_Boolean RWStl::WriteAscii (const Handle(Poly_Triangulation)& theMesh,
                                     const OSD_Path& thePath,
-                                    const Handle(Message_ProgressIndicator)& theProgInd)
+                                    const Message_ProgressRange& theProgress)
 {
   if (theMesh.IsNull() || theMesh->NbTriangles() <= 0)
   {
@@ -257,7 +259,7 @@ Standard_Boolean RWStl::WriteAscii (const Handle(Poly_Triangulation)& theMesh,
     return Standard_False;
   }
 
-  Standard_Boolean isOK = writeASCII (theMesh, aFile, theProgInd);
+  Standard_Boolean isOK = writeASCII (theMesh, aFile, theProgress);
   fclose (aFile);
   return isOK;
 }
@@ -268,7 +270,7 @@ Standard_Boolean RWStl::WriteAscii (const Handle(Poly_Triangulation)& theMesh,
 //=============================================================================
 Standard_Boolean RWStl::writeASCII (const Handle(Poly_Triangulation)& theMesh,
                                     FILE* theFile,
-                                    const Handle(Message_ProgressIndicator)& theProgInd)
+                                    const Message_ProgressRange& theProgress)
 {
   // note that space after 'solid' is necessary for many systems
   if (fwrite ("solid \n", 1, 7, theFile) != 7)
@@ -279,12 +281,11 @@ Standard_Boolean RWStl::writeASCII (const Handle(Poly_Triangulation)& theMesh,
   char aBuffer[512];
   memset (aBuffer, 0, sizeof(aBuffer));
 
-  Message_ProgressSentry aPS (theProgInd, "Triangles", 0,
-                              theMesh->NbTriangles(), IND_THRESHOLD);
+  const Standard_Integer NBTriangles = theMesh->NbTriangles();
+  Message_ProgressScope aPS (theProgress, "Triangles", NBTriangles);
 
   const TColgp_Array1OfPnt& aNodes = theMesh->Nodes();
   const Poly_Array1OfTriangle& aTriangles = theMesh->Triangles();
-  const Standard_Integer NBTriangles = theMesh->NbTriangles();
   Standard_Integer anElem[3] = {0, 0, 0};
   for (Standard_Integer aTriIter = 1; aTriIter <= NBTriangles; ++aTriIter)
   {
@@ -328,7 +329,9 @@ Standard_Boolean RWStl::writeASCII (const Handle(Poly_Triangulation)& theMesh,
     // update progress only per 1k triangles
     if ((aTriIter % IND_THRESHOLD) == 0)
     {
-      aPS.Next();
+      if (!aPS.More())
+        return Standard_False;
+      aPS.Next(IND_THRESHOLD);
     }
   }
 
@@ -346,16 +349,16 @@ Standard_Boolean RWStl::writeASCII (const Handle(Poly_Triangulation)& theMesh,
 //=============================================================================
 Standard_Boolean RWStl::writeBinary (const Handle(Poly_Triangulation)& theMesh,
                                      FILE* theFile,
-                                     const Handle(Message_ProgressIndicator)& theProgInd)
+                                     const Message_ProgressRange& theProgress)
 {
   char aHeader[80] = "STL Exported by OpenCASCADE [www.opencascade.com]";
   if (fwrite (aHeader, 1, 80, theFile) != 80)
   {
     return Standard_False;
   }
-
-  Message_ProgressSentry aPS (theProgInd, "Triangles", 0,
-                              theMesh->NbTriangles(), IND_THRESHOLD);
+  
+  const Standard_Integer aNBTriangles = theMesh->NbTriangles();
+  Message_ProgressScope aPS (theProgress, "Triangles", aNBTriangles);
 
   const Standard_Size aNbChunkTriangles = 4096;
   const Standard_Size aChunkSize = aNbChunkTriangles * THE_STL_SIZEOF_FACET;
@@ -364,7 +367,6 @@ Standard_Boolean RWStl::writeBinary (const Handle(Poly_Triangulation)& theMesh,
 
   const TColgp_Array1OfPnt& aNodes = theMesh->Nodes();
   const Poly_Array1OfTriangle& aTriangles = theMesh->Triangles();
-  const Standard_Integer aNBTriangles = theMesh->NbTriangles();
 
   Standard_Character aConv[4];
   convertInteger (aNBTriangles, aConv);
@@ -429,7 +431,9 @@ Standard_Boolean RWStl::writeBinary (const Handle(Poly_Triangulation)& theMesh,
     // update progress only per 1k triangles
     if ((aTriIter % IND_THRESHOLD) == 0)
     {
-      aPS.Next();
+      if (!aPS.More())
+        return Standard_False;
+      aPS.Next(IND_THRESHOLD);
     }
   }
 

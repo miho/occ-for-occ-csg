@@ -17,6 +17,7 @@
 #include <Draw.hxx>
 #include <Draw_Interpretor.hxx>
 #include <Draw_Viewer.hxx>
+#include <Draw_ProgressIndicator.hxx>
 #include <DDocStd_DrawDocument.hxx>
 #include <TDocStd_Application.hxx>
 #include <TDocStd_Document.hxx>
@@ -64,12 +65,8 @@ static Standard_Integer DDocStd_ListDocuments (Draw_Interpretor& di,
       A->GetDocument(i,D);
       di <<"document " << i;
       if (D->IsSaved()) {
-	TCollection_AsciiString GetNameAsciiString(D->GetName().ToExtString(),'?');
-	TCollection_AsciiString GetPathAsciiString(D->GetPath().ToExtString(),'?');
-	//std::cout << " name : " << D->GetName();
-	//std::cout << " path : " << D->GetPath();
-	di << " name : " << GetNameAsciiString.ToCString();
-	di << " path : " << GetPathAsciiString.ToCString();
+	di << " name : " << D->GetName();
+	di << " path : " << D->GetPath();
       }
       else di << " not saved";
       di << "\n";
@@ -126,11 +123,11 @@ static Standard_Integer DDocStd_NewDocument (Draw_Interpretor& di,
 //=======================================================================
 
 static Standard_Integer DDocStd_Open (Draw_Interpretor& di,
-				      Standard_Integer nb,
-				      const char** a)
+                                      Standard_Integer nb,
+                                      const char** a)
 {   
   if (nb >= 3) {
-    TCollection_ExtendedString path (a[1]); 
+    TCollection_ExtendedString path (a[1], Standard_True); 
     Handle(TDocStd_Application) A = DDocStd::GetApplication();
     Handle(TDocStd_Document) D;
     Standard_Integer insession = A->IsInSession(path);
@@ -151,53 +148,61 @@ static Standard_Integer DDocStd_Open (Draw_Interpretor& di,
       }
     }
 
+    Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator(di, 1);
     if (anUseStream)
     {
       std::ifstream aFileStream;
       OSD_OpenStream (aFileStream, path, std::ios::in | std::ios::binary);
 
-      theStatus = A->Open (aFileStream, D);
+      theStatus = A->Open (aFileStream, D, aProgress->Start());
     }
     else
     {
-      theStatus = A->Open(path,D);
+      theStatus = A->Open (path, D, aProgress->Start());
     }
-    if (theStatus == PCDM_RS_OK && !D.IsNull()) {
+    if (theStatus == PCDM_RS_OK && !D.IsNull())
+    {
       Handle(DDocStd_DrawDocument) DD = new DDocStd_DrawDocument(D);
       TDataStd_Name::Set(D->GetData()->Root(),a[2]);
       Draw::Set(a[2],DD);
       return 0; 
-    } else {
+    } 
+    else
+    {
       switch ( theStatus ) {
+      case PCDM_RS_UserBreak: {
+        di << " could not retrieve , user break \n";
+        break;
+      }
       case PCDM_RS_AlreadyRetrieved: 
       case PCDM_RS_AlreadyRetrievedAndModified: {
-	di << " already retrieved \n" ;  
-	break;
+        di << " already retrieved \n" ;  
+        break;
       }
       case PCDM_RS_NoDriver: {
-	di << " could not retrieve , no Driver to make it \n" ;
-	break ;
+        di << " could not retrieve , no Driver to make it \n" ;
+        break ;
       }
       case PCDM_RS_UnknownDocument:
       case PCDM_RS_NoModel: {
-	di << " could not retrieve , Unknown Document or No Model \n";
-	break ; 
+        di << " could not retrieve , Unknown Document or No Model \n";
+        break ; 
       }
       case PCDM_RS_TypeNotFoundInSchema:
       case PCDM_RS_UnrecognizedFileFormat: {
-	di << " could not retrieve , Type not found or Unrecognized File Format\n";
-	break ;
+        di << " could not retrieve , Type not found or Unrecognized File Format\n";
+        break ;
       }
       case PCDM_RS_PermissionDenied: {
-	di << " could not retrieve , permission denied \n" ;  
-	break;
+        di << " could not retrieve , permission denied \n" ;  
+        break;
       }
       default:
-	di << " could not retrieve \n" ;  
-	break;
+        di << " could not retrieve \n" ;  
+        break;
       }
       di << "DDocStd_Open : Error\n";
-    }	
+    }
   }
   return 1;
 }
@@ -208,8 +213,8 @@ static Standard_Integer DDocStd_Open (Draw_Interpretor& di,
 //=======================================================================
 
 static Standard_Integer DDocStd_Save (Draw_Interpretor& di,
-				      Standard_Integer nb,
-				      const char** a)
+                                      Standard_Integer nb,
+                                      const char** a)
 {  
   if (nb == 2) {
     Handle(TDocStd_Document) D;    
@@ -219,7 +224,9 @@ static Standard_Integer DDocStd_Save (Draw_Interpretor& di,
       di << "this document has never been saved\n";
       return 0;
     }
-    A->Save(D);
+
+    Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator(di, 1);
+    A->Save (D, aProgress->Start());
     return 0; 
   }
   di << "DDocStd_Save : Error\n";
@@ -238,7 +245,7 @@ static Standard_Integer DDocStd_SaveAs (Draw_Interpretor& di,
   if (nb >= 3) {
     Handle(TDocStd_Document) D;    
     if (!DDocStd::GetDocument(a[1],D)) return 1;  
-    TCollection_ExtendedString path (a[2]); 
+    TCollection_ExtendedString path (a[2], Standard_True); 
     Handle(TDocStd_Application) A = DDocStd::GetApplication();
     PCDM_StoreStatus theStatus;
 
@@ -255,15 +262,17 @@ static Standard_Integer DDocStd_SaveAs (Draw_Interpretor& di,
         D->SetEmptyLabelsSavingMode(isSaveEmptyLabels);
       }
     }
+
+    Handle(Draw_ProgressIndicator) aProgress = new Draw_ProgressIndicator(di, 1);
     if (anUseStream)
     {
       std::ofstream aFileStream;
       OSD_OpenStream (aFileStream, path, std::ios::out | std::ios::binary);
-      theStatus = A->SaveAs (D, aFileStream);
+      theStatus = A->SaveAs (D, aFileStream, aProgress->Start());
     }
     else
     {
-      theStatus = A->SaveAs(D,path);
+      theStatus = A->SaveAs(D,path, aProgress->Start());
     }
 
     if (theStatus != PCDM_SS_OK ) {
@@ -292,6 +301,10 @@ static Standard_Integer DDocStd_SaveAs (Draw_Interpretor& di,
         di << "Error saving document: Write info section failure\n" ;
         break;
                                        }
+      case PCDM_SS_UserBreak: {
+        di << "Error saving document: User break \n" ;
+        break;
+      }
       default:
         break;
       }
@@ -309,13 +322,13 @@ static Standard_Integer DDocStd_SaveAs (Draw_Interpretor& di,
 //purpose  : 
 //=======================================================================
 
-static Standard_Integer DDocStd_Close (Draw_Interpretor& /*theDI*/,
+static Standard_Integer DDocStd_Close (Draw_Interpretor& theDI,
                                        Standard_Integer  theArgNb,
                                        const char**      theArgVec)
 {   
   if (theArgNb != 2)
   {
-    std::cout << "DDocStd_Close : Error\n";
+    theDI << "DDocStd_Close : Error\n";
     return 1;
   }
 
@@ -410,19 +423,11 @@ static Standard_Integer DDocStd_Path (Draw_Interpretor& di,
 				       const char** a)
 {   
   if (nb == 2) { 
-    TDocStd_PathParser path (a[1]);
-    //std::cout << "Trek      : " << path.Trek() << std::endl;  
-    //std::cout << "Name      : " << path.Name() << std::endl; 
-    //std::cout << "Extension : " << path.Extension() << std::endl;
-    //std::cout << "Path      : " << path.Path() << std::endl;
-    TCollection_AsciiString TrekAsciiString(path.Trek().ToExtString(),'?');
-    TCollection_AsciiString NameAsciiString(path.Name().ToExtString(),'?');
-    TCollection_AsciiString ExtensionAsciiString(path.Extension().ToExtString(),'?');
-    TCollection_AsciiString PathAsciiString(path.Path().ToExtString(),'?');
-    di << "Trek      : " << TrekAsciiString.ToCString() << "\n";  
-    di << "Name      : " << NameAsciiString.ToCString() << "\n"; 
-    di << "Extension : " << ExtensionAsciiString.ToCString() << "\n";
-    di << "Path      : " << PathAsciiString.ToCString() << "\n";
+    TDocStd_PathParser path (TCollection_ExtendedString (a[1], Standard_True));
+    di << "Trek      : " << path.Trek() << "\n";  
+    di << "Name      : " << path.Name() << "\n"; 
+    di << "Extension : " << path.Extension() << "\n";
+    di << "Path      : " << path.Path() << "\n";
     return 0;
   }
   di << "DDocStd_Path : Error\n";
@@ -440,7 +445,7 @@ static Standard_Integer DDocStd_AddComment (Draw_Interpretor& di,
   if (nb == 3) {
     Handle(TDocStd_Document) D;    
     if (!DDocStd::GetDocument(a[1],D)) return 1;  
-    TCollection_ExtendedString comment (a[2]); 
+    TCollection_ExtendedString comment (a[2], Standard_True); 
 //    Handle(TDocStd_Application) A = DDocStd::GetApplication();
 //    A->AddComment(D,comment);
     D->AddComment(comment);
@@ -467,9 +472,7 @@ static Standard_Integer DDocStd_PrintComments (Draw_Interpretor& di,
 
     for (int i = 1; i <= comments.Length(); i++)
     {
-      //std::cout << comments(i) << std::endl;
-      TCollection_AsciiString commentAsciiString(comments(i).ToExtString(),'?');
-      di << commentAsciiString.ToCString() << "\n";
+      di << comments(i) << "\n";
     }
 
     return 0; 

@@ -29,7 +29,7 @@
 #include <TCollection_ExtendedString.hxx>
 #include <TDataStd_Name.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_GeomTolerance,TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE(XCAFDoc_GeomTolerance,TDataStd_GenericEmpty)
 
 enum ChildLab
 {
@@ -399,35 +399,4 @@ Handle(XCAFDimTolObjects_GeomToleranceObject) XCAFDoc_GeomTolerance::GetObject()
 const Standard_GUID& XCAFDoc_GeomTolerance::ID() const
 {
   return GetID();
-}
-
-//=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_GeomTolerance::Restore(const Handle(TDF_Attribute)& /*With*/) 
-{
-}
-
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-
-Handle(TDF_Attribute) XCAFDoc_GeomTolerance::NewEmpty() const
-{
-  return new XCAFDoc_GeomTolerance();
-}
-
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_GeomTolerance::Paste(const Handle(TDF_Attribute)& /*Into*/,
-                           const Handle(TDF_RelocationTable)& /*RT*/) const
-{
 }

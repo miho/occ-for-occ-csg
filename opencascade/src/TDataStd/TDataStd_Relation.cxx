@@ -14,19 +14,20 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <TDataStd_Relation.hxx>
 
+#include <Standard_Dump.hxx>
 #include <Standard_GUID.hxx>
 #include <Standard_Type.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
-#include <TDataStd_Relation.hxx>
 #include <TDataStd_Variable.hxx>
 #include <TDF_Attribute.hxx>
 #include <TDF_Label.hxx>
 #include <TDF_ListIteratorOfAttributeList.hxx>
 #include <TDF_RelocationTable.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(TDataStd_Relation,TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE(TDataStd_Relation,TDF_Attribute)
 
 //=======================================================================
 //function : GetID
@@ -62,16 +63,6 @@ TDataStd_Relation::TDataStd_Relation()
 {
 }
 
-
-//=======================================================================
-//function : Name
-//purpose  : 
-//=======================================================================
-TCollection_ExtendedString TDataStd_Relation::Name () const 
-{  
-  return myRelation;  // ->String();
-}
-
 //=======================================================================
 //function : SetRelation
 //purpose  : 
@@ -79,11 +70,7 @@ TCollection_ExtendedString TDataStd_Relation::Name () const
 
 void TDataStd_Relation::SetRelation(const TCollection_ExtendedString& R)
 {
-  // OCC2932 correction
-  if(myRelation == R) return;
-
-  Backup();
-  myRelation = R;
+  SetExpression(R);
 }
 
 //=======================================================================
@@ -93,17 +80,7 @@ void TDataStd_Relation::SetRelation(const TCollection_ExtendedString& R)
 
 const TCollection_ExtendedString& TDataStd_Relation::GetRelation() const
 {
-  return myRelation;
-}
-
-//=======================================================================
-//function : GetVariables
-//purpose  : 
-//=======================================================================
-
-TDF_AttributeList& TDataStd_Relation::GetVariables()
-{
-  return myVariables;
+  return GetExpression();
 }
 
 //=======================================================================
@@ -117,52 +94,6 @@ const Standard_GUID& TDataStd_Relation::ID() const
 }
 
 //=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-
-void TDataStd_Relation::Restore(const Handle(TDF_Attribute)& With) 
-{  
-  Handle(TDataStd_Relation) REL = Handle(TDataStd_Relation)::DownCast (With);
-  myRelation = REL->GetRelation();
-  Handle(TDataStd_Variable) V;
-  myVariables.Clear();
-  for (TDF_ListIteratorOfAttributeList it (REL->GetVariables()); it.More(); it.Next()) {
-    V = Handle(TDataStd_Variable)::DownCast(it.Value());
-    myVariables.Append(V);
-  }
-}
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-
-Handle(TDF_Attribute) TDataStd_Relation::NewEmpty() const
-{
-  return new TDataStd_Relation();
-}
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void TDataStd_Relation::Paste(const Handle(TDF_Attribute)& Into,
-				     const Handle(TDF_RelocationTable)& RT) const
-{  
-  Handle(TDataStd_Relation) REL = Handle(TDataStd_Relation)::DownCast (Into); 
-  REL->SetRelation(myRelation);  
-  Handle(TDataStd_Variable) V1;
-  for (TDF_ListIteratorOfAttributeList it (myVariables); it.More(); it.Next()) {
-    V1 = Handle(TDataStd_Variable)::DownCast(it.Value());
-    Handle(TDF_Attribute) V2;
-    RT->HasRelocation (V1,V2);
-    REL->GetVariables().Append(V2);
-  }
-}
-
-//=======================================================================
 //function : Dump
 //purpose  : 
 //=======================================================================
@@ -173,3 +104,21 @@ Standard_OStream& TDataStd_Relation::Dump(Standard_OStream& anOS) const
   return anOS;
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void TDataStd_Relation::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, TDF_Attribute)
+
+  OCCT_DUMP_FIELD_VALUE_STRING (theOStream, GetRelation())
+
+  for (TDF_AttributeList::Iterator aVariableIt (myVariables); aVariableIt.More(); aVariableIt.Next())
+  {
+    const Handle(TDF_Attribute)& aVariable = aVariableIt.Value();
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, aVariable.get())
+  }
+}

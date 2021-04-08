@@ -452,6 +452,19 @@ void Graphic3d_Layer::updateBVH() const
   }
 }
 
+namespace
+{
+  //! This structure describes the node in BVH
+  struct NodeInStack
+  {
+    NodeInStack (Standard_Integer theId = 0,
+                 Standard_Boolean theIsFullInside = false) : Id (theId), IsFullInside (theIsFullInside) {}
+
+    Standard_Integer Id;           //!< node identifier
+    Standard_Boolean IsFullInside; //!< if the node is completely inside
+  };
+}
+
 // =======================================================================
 // function : UpdateCulling
 // purpose  :
@@ -517,33 +530,54 @@ void Graphic3d_Layer::UpdateCulling (Standard_Integer theViewId,
       aBVHTree = myBVHPrimitives.BVH();
     }
 
-    if (theSelector.IsCulled (aCullCtx, aBVHTree->MinPoint (0), aBVHTree->MaxPoint (0)))
+    const bool toCheckFullInside = true;
+    NodeInStack aNode (0, toCheckFullInside); // a root node
+    if (theSelector.IsCulled (aCullCtx, aBVHTree->MinPoint (0), aBVHTree->MaxPoint (0), toCheckFullInside ? &aNode.IsFullInside : NULL))
     {
       continue;
     }
 
-    Standard_Integer aStack[BVH_Constants_MaxTreeDepth];
+    NodeInStack aStack[BVH_Constants_MaxTreeDepth];
     Standard_Integer aHead = -1;
-    Standard_Integer aNode = 0; // a root node
     for (;;)
     {
-      if (!aBVHTree->IsOuter (aNode))
+      if (!aBVHTree->IsOuter (aNode.Id))
       {
-        const Standard_Integer aLeftChildIdx  = aBVHTree->Child<0> (aNode);
-        const Standard_Integer aRightChildIdx = aBVHTree->Child<1> (aNode);
-        const Standard_Boolean isLeftChildIn  = !theSelector.IsCulled (aCullCtx, aBVHTree->MinPoint (aLeftChildIdx),  aBVHTree->MaxPoint (aLeftChildIdx));
-        const Standard_Boolean isRightChildIn = !theSelector.IsCulled (aCullCtx, aBVHTree->MinPoint (aRightChildIdx), aBVHTree->MaxPoint (aRightChildIdx));
+        NodeInStack aLeft (aBVHTree->Child<0> (aNode.Id), toCheckFullInside);
+        NodeInStack aRight(aBVHTree->Child<1> (aNode.Id), toCheckFullInside);
+        bool isLeftChildIn = true, isRightChildIn = true;
+        if (aNode.IsFullInside)
+        {
+          // small size should be always checked
+          isLeftChildIn  = !theSelector.IsTooSmall (aCullCtx, aBVHTree->MinPoint (aLeft.Id),  aBVHTree->MaxPoint (aLeft.Id));
+          isRightChildIn = !theSelector.IsTooSmall (aCullCtx, aBVHTree->MinPoint (aRight.Id), aBVHTree->MaxPoint (aRight.Id));
+        }
+        else
+        {
+          isLeftChildIn = !theSelector.IsCulled (aCullCtx, aBVHTree->MinPoint (aLeft.Id),  aBVHTree->MaxPoint (aLeft.Id), toCheckFullInside ? &aLeft.IsFullInside : NULL);
+          if (!isLeftChildIn)
+          {
+            aLeft.IsFullInside = false;
+          }
+
+          isRightChildIn = !theSelector.IsCulled (aCullCtx, aBVHTree->MinPoint (aRight.Id), aBVHTree->MaxPoint (aRight.Id), toCheckFullInside ? &aRight.IsFullInside : NULL);
+          if (!isRightChildIn)
+          {
+            aRight.IsFullInside = false;
+          }
+        }
+
         if (isLeftChildIn
          && isRightChildIn)
         {
-          aNode = myBVHIsLeftChildQueuedFirst ? aLeftChildIdx : aRightChildIdx;
-          aStack[++aHead] = myBVHIsLeftChildQueuedFirst ? aRightChildIdx : aLeftChildIdx;
+          aNode = myBVHIsLeftChildQueuedFirst ? aLeft : aRight;
+          aStack[++aHead] = myBVHIsLeftChildQueuedFirst ? aRight : aLeft;
           myBVHIsLeftChildQueuedFirst = !myBVHIsLeftChildQueuedFirst;
         }
         else if (isLeftChildIn
               || isRightChildIn)
         {
-          aNode = isLeftChildIn ? aLeftChildIdx : aRightChildIdx;
+          aNode = isLeftChildIn ? aLeft : aRight;
         }
         else
         {
@@ -557,14 +591,18 @@ void Graphic3d_Layer::UpdateCulling (Standard_Integer theViewId,
       }
       else
       {
-        Standard_Integer aIdx = aBVHTree->BegPrimitive (aNode);
-        const Graphic3d_CStructure* aStruct = isTrsfPers
-                                            ? myBVHPrimitivesTrsfPers.GetStructureById (aIdx)
-                                            : myBVHPrimitives.GetStructureById (aIdx);
-        if (aStruct->IsVisible (theViewId))
+        const Standard_Integer aStartIdx = aBVHTree->BegPrimitive (aNode.Id);
+        const Standard_Integer anEndIdx  = aBVHTree->EndPrimitive (aNode.Id);
+        for (Standard_Integer anIdx = aStartIdx; anIdx <= anEndIdx; ++anIdx)
         {
-          aStruct->MarkAsNotCulled();
-          ++myNbStructuresNotCulled;
+          const Graphic3d_CStructure* aStruct = isTrsfPers
+                                              ? myBVHPrimitivesTrsfPers.GetStructureById (anIdx)
+                                              : myBVHPrimitives.GetStructureById (anIdx);
+          if (aStruct->IsVisible (theViewId))
+          {
+            aStruct->MarkAsNotCulled();
+            ++myNbStructuresNotCulled;
+          }
         }
         if (aHead < 0)
         {
@@ -625,4 +663,39 @@ void Graphic3d_Layer::SetLayerSettings (const Graphic3d_ZLayerSettings& theSetti
       aStructure->updateLayerTransformation();
     }
   }
+}
+
+// =======================================================================
+// function : DumpJson
+// purpose  :
+// =======================================================================
+void Graphic3d_Layer::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, this)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myLayerId)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNbStructures)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myNbStructuresNotCulled)
+
+  const Standard_Integer aNbPriorities = myArray.Length();
+  for (Standard_Integer aPriorityIter = 0; aPriorityIter < aNbPriorities; ++aPriorityIter)
+  {
+    const Graphic3d_IndexedMapOfStructure& aStructures = myArray (aPriorityIter);
+    for (Graphic3d_IndexedMapOfStructure::Iterator aStructIter (aStructures); aStructIter.More(); aStructIter.Next())
+    {
+      const Graphic3d_CStructure* aStructure = aStructIter.Value();
+      OCCT_DUMP_FIELD_VALUE_POINTER (theOStream, aStructure)
+    }
+  }
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myLayerSettings)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myBVHIsLeftChildQueuedFirst)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsBVHPrimitivesNeedsReset)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsBoundingBoxNeedsReset[0])
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsBoundingBoxNeedsReset[1])
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBoundingBox[0])
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &myBoundingBox[1])
 }

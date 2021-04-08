@@ -19,7 +19,6 @@
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_TrihedronOwner.hxx>
 #include <Geom_Axis2Placement.hxx>
-#include <Geom_Transformation.hxx>
 #include <gp_Pnt.hxx>
 #include <Graphic3d_ArrayOfPoints.hxx>
 #include <Graphic3d_ArrayOfSegments.hxx>
@@ -32,8 +31,8 @@
 #include <Prs3d_DatumAspect.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_LineAspect.hxx>
+#include <Prs3d_PointAspect.hxx>
 #include <Prs3d_Presentation.hxx>
-#include <Prs3d_Projector.hxx>
 #include <Prs3d_ShadingAspect.hxx>
 #include <Prs3d_Text.hxx>
 #include <Prs3d_TextAspect.hxx>
@@ -59,6 +58,8 @@ AIS_Trihedron::AIS_Trihedron (const Handle(Geom_Axis2Placement)& theComponent)
   myTrihDispMode (Prs3d_DM_WireFrame),
   myComponent (theComponent)
 {
+  myAutoHilight = Standard_False;
+
   // selection priorities
   mySelectionPriority.Bind (Prs3d_DP_None,   5); // complete triedron: priority 5 (same as faces)
   mySelectionPriority.Bind (Prs3d_DP_Origin, 8); // origin: priority 8
@@ -70,6 +71,7 @@ AIS_Trihedron::AIS_Trihedron (const Handle(Geom_Axis2Placement)& theComponent)
   {
     mySelectionPriority.Bind ((Prs3d_DatumParts )aPartIter, 5); // planes: priority: 5
   }
+  myHiddenLineAspect = new Graphic3d_AspectLine3d (Quantity_NOC_WHITE, Aspect_TOL_EMPTY, 1.0f);
 
   // trihedron labels
   myLabel.Bind (Prs3d_DP_XAxis, "X");
@@ -135,7 +137,6 @@ void AIS_Trihedron::SetSize(const Standard_Real aValue)
   myDrawer->DatumAspect()->SetAxisLength(aValue, aValue, aValue);
 
   SetToUpdate();
-  UpdatePresentations();
   UpdateSelection();
 }
 
@@ -163,7 +164,6 @@ void AIS_Trihedron::UnsetSize()
   else
   {
     SetToUpdate();
-    UpdatePresentations();
   }
   UpdateSelection();
 }
@@ -196,17 +196,6 @@ void AIS_Trihedron::Compute (const Handle(PrsMgr_PresentationManager3d)& thePrsM
   updatePrimitives (myDrawer->DatumAspect(), myTrihDispMode, anAxis.Location(),
                     anAxis.XDirection(), anAxis.YDirection(), anAxis.Direction());
   computePresentation (thePrsMgr, thePrs);
-}
-
-//=======================================================================
-//function : Compute
-//purpose  :
-//=======================================================================
-void AIS_Trihedron::Compute (const Handle(Prs3d_Projector)& theProjector,
-                             const Handle(Geom_Transformation)& theTrsf,
-                             const Handle(Prs3d_Presentation)& thePrs)
-{
-  PrsMgr_PresentableObject::Compute (theProjector, theTrsf, thePrs);
 }
 
 //=======================================================================
@@ -309,37 +298,38 @@ void AIS_Trihedron::HilightOwnerWithColor (const Handle(PrsMgr_PresentationManag
 
   aPresentation->Clear();
   const Prs3d_DatumParts aPart = anOwner->DatumPart();
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup (aPresentation);
-  Handle(Prs3d_DatumAspect) anAspect = myDrawer->DatumAspect();
+  Handle(Graphic3d_Group) aGroup = aPresentation->CurrentGroup();
   if (aPart >= Prs3d_DP_XOYAxis && aPart <= Prs3d_DP_XOZAxis)
   {
     // planes selection is equal in both shading and wireframe mode
-    aGroup->SetGroupPrimitivesAspect (getHighlightLineAspect()->Aspect());
+    aGroup->SetGroupPrimitivesAspect (theStyle->LineAspect()->Aspect());
   }
   else
   {
     if (myTrihDispMode == Prs3d_DM_Shaded)
     {
-      aGroup->SetGroupPrimitivesAspect (anAspect->ShadingAspect(aPart)->Aspect());
+      aGroup->SetGroupPrimitivesAspect (theStyle->ShadingAspect()->Aspect());
     }
     else
     {
       if (aPart == Prs3d_DP_Origin)
       {
-        aGroup->SetGroupPrimitivesAspect (getHighlightPointAspect()->Aspect());
+        aGroup->SetGroupPrimitivesAspect (theStyle->PointAspect()->Aspect());
       }
       else
       {
-        aGroup->SetGroupPrimitivesAspect (anAspect->LineAspect(aPart)->Aspect());
+        aGroup->SetGroupPrimitivesAspect(theStyle->LineAspect()->Aspect());
       }
     }
   }
   aGroup->AddPrimitiveArray (arrayOfPrimitives(aPart));
 
-  if (aPresentation->GetZLayer() != theStyle->ZLayer())
+  const Graphic3d_ZLayerId aLayer = theStyle->ZLayer() != Graphic3d_ZLayerId_UNKNOWN ? theStyle->ZLayer() : myDrawer->ZLayer();
+  if (aPresentation->GetZLayer() != aLayer)
   {
-    aPresentation->SetZLayer (theStyle->ZLayer());
+    aPresentation->SetZLayer (aLayer);
   }
+
   aPresentation->Highlight (theStyle);
   thePM->AddToImmediateList (aPresentation);
 }
@@ -356,25 +346,22 @@ void AIS_Trihedron::HilightSelected (const Handle(PrsMgr_PresentationManager3d)&
     return;
   }
 
-  Handle(Prs3d_DatumAspect) anAspect = myDrawer->DatumAspect();
   const bool isShadingMode = myTrihDispMode == Prs3d_DM_Shaded;
 
-  const Handle(Prs3d_Drawer)& aContextSelStyle = GetContext()->SelectionStyle();
-  const Quantity_Color& aSelectionColor = aContextSelStyle->Color();
+  Handle(Prs3d_Drawer) anAspect = !myHilightDrawer.IsNull() ? myHilightDrawer : GetContext()->SelectionStyle();
   for (SelectMgr_SequenceOfOwner::Iterator anIterator (theOwners); anIterator.More(); anIterator.Next())
   {
     const Handle(SelectMgr_EntityOwner)& anOwner = anIterator.Value();
     Handle(AIS_TrihedronOwner) aTrihedronOwner = Handle(AIS_TrihedronOwner)::DownCast(anOwner);
     if (aTrihedronOwner.IsNull())
     {
-      thePM->Color (this, aContextSelStyle, 0);
+      thePM->Color (this, anAspect, 0);
       continue;
     }
       
     const Prs3d_DatumParts aPart = aTrihedronOwner->DatumPart();
     Handle(Graphic3d_Group) aGroup;
-    if (mySelectedParts.Contains (aPart)
-    || !myPartToGroup.Find (aPart, aGroup))
+    if (mySelectedParts.Contains (aPart) || !myPartToGroup.Find (aPart, aGroup))
     {
       continue;
     }
@@ -382,27 +369,23 @@ void AIS_Trihedron::HilightSelected (const Handle(PrsMgr_PresentationManager3d)&
     if (aPart >= Prs3d_DP_XOYAxis
      && aPart <= Prs3d_DP_XOZAxis)
     {
-      getHighlightLineAspect()->SetColor (aSelectionColor);
-      aGroup->SetGroupPrimitivesAspect (getHighlightLineAspect()->Aspect());
+      aGroup->SetGroupPrimitivesAspect (anAspect->LineAspect()->Aspect());
     }
     else
     {
       if (isShadingMode)
       {
-        getHighlightAspect()->SetColor (aSelectionColor);
-        aGroup->SetGroupPrimitivesAspect (getHighlightAspect()->Aspect());
+        aGroup->SetGroupPrimitivesAspect (anAspect->ShadingAspect()->Aspect());
       }
       else
       {
         if (aPart == Prs3d_DP_Origin)
         {
-          getHighlightPointAspect()->SetColor (aSelectionColor);
-          aGroup->SetGroupPrimitivesAspect (getHighlightPointAspect()->Aspect());
+          aGroup->SetGroupPrimitivesAspect (anAspect->PointAspect()->Aspect());
         }
         else
         {
-          getHighlightLineAspect()->SetColor (aSelectionColor);
-          aGroup->SetGroupPrimitivesAspect (getHighlightLineAspect()->Aspect());
+          aGroup->SetGroupPrimitivesAspect (anAspect->LineAspect()->Aspect());
         }
       }
     }
@@ -426,9 +409,9 @@ void AIS_Trihedron::ClearSelected()
     if (aPart >= Prs3d_DP_XOYAxis
      && aPart <= Prs3d_DP_XOZAxis)
     {
-      aGroup->SetGroupPrimitivesAspect (anAspect->LineAspect (aPart)->Aspect());
+      aGroup->SetGroupPrimitivesAspect (myHiddenLineAspect);
     }
-    if (isShadingMode)
+    else if (isShadingMode)
     {
       aGroup->SetGroupPrimitivesAspect (anAspect->ShadingAspect (aPart)->Aspect());
     }
@@ -460,7 +443,7 @@ void AIS_Trihedron::computePresentation (const Handle(PrsMgr_PresentationManager
   // display origin
   {
     // Origin is visualized only in shading mode
-    Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup (thePrs);
+    Handle(Graphic3d_Group) aGroup = thePrs->NewGroup();
     const Prs3d_DatumParts aPart = Prs3d_DP_Origin;
     if (anAspect->DrawDatumPart(aPart))
     {
@@ -487,7 +470,7 @@ void AIS_Trihedron::computePresentation (const Handle(PrsMgr_PresentationManager
         continue;
       }
 
-      Handle(Graphic3d_Group) anAxisGroup = Prs3d_Root::NewGroup (thePrs);
+      Handle(Graphic3d_Group) anAxisGroup = thePrs->NewGroup();
       myPartToGroup.Bind (aPart, anAxisGroup);
       if (isShadingMode)
       {
@@ -506,7 +489,7 @@ void AIS_Trihedron::computePresentation (const Handle(PrsMgr_PresentationManager
         continue;
       }
 
-      Handle(Graphic3d_Group) anArrowGroup = Prs3d_Root::NewGroup (thePrs);
+      Handle(Graphic3d_Group) anArrowGroup = thePrs->NewGroup();
       anArrowGroup->SetGroupPrimitivesAspect (anAspect->ArrowAspect()->Aspect());
       anArrowGroup->AddPrimitiveArray (arrayOfPrimitives (anArrowPart));
     }
@@ -535,7 +518,7 @@ void AIS_Trihedron::computePresentation (const Handle(PrsMgr_PresentationManager
         case Prs3d_DP_ZAxis: aDir = aComponent->Direction();  break;
         default: break;
       }
-      Handle(Graphic3d_Group) aLabelGroup = Prs3d_Root::NewGroup (thePrs);
+      Handle(Graphic3d_Group) aLabelGroup = thePrs->NewGroup();
       const gp_Pnt aPoint = anOrigin.XYZ() + aDir.XYZ() * anAxisLength;
       Prs3d_Text::Draw (aLabelGroup, anAspect->TextAspect(), aLabel, aPoint);
     }
@@ -550,14 +533,11 @@ void AIS_Trihedron::computePresentation (const Handle(PrsMgr_PresentationManager
       continue;
     }
 
-    Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup (thePrs);
+    Handle(Graphic3d_Group) aGroup = thePrs->NewGroup();
     myPartToGroup.Bind (aPart, aGroup);
 
-    const Handle(Graphic3d_AspectLine3d)& aLineAspect = anAspect->LineAspect (aPart)->Aspect();
-    aLineAspect->SetType (Aspect_TOL_EMPTY);
-
     aGroup->AddPrimitiveArray (arrayOfPrimitives (aPart));
-    aGroup->SetGroupPrimitivesAspect (aLineAspect);
+    aGroup->SetGroupPrimitivesAspect (myHiddenLineAspect);
   }
 }
 
@@ -934,64 +914,19 @@ void AIS_Trihedron::updatePrimitives(const Handle(Prs3d_DatumAspect)& theAspect,
   }
 }
 
-// =======================================================================
-// function : getHighlightAspect
-// purpose  :
-// =======================================================================
-Handle(Prs3d_ShadingAspect) AIS_Trihedron::getHighlightAspect()
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void AIS_Trihedron::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
-  if (!myHighlightAspect.IsNull())
-    return myHighlightAspect;
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
 
-  Quantity_Color aHighlightColor = Quantity_NOC_GRAY80;
-  if (!myHilightDrawer.IsNull())
-    aHighlightColor = myHilightDrawer->Color();
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, AIS_InteractiveObject)
 
-  myHighlightAspect = new Prs3d_ShadingAspect();
-  myHighlightAspect->Aspect()->SetInteriorStyle (Aspect_IS_SOLID);
-  myHighlightAspect->SetColor (aHighlightColor);
-
-  Graphic3d_MaterialAspect aHighlightMaterial;
-  aHighlightMaterial.SetColor (aHighlightColor);
-  myHighlightAspect->SetMaterial (aHighlightMaterial);
-
-  return myHighlightAspect;
-}
-
-// =======================================================================
-// function : getHighlightLineAspect
-// purpose  :
-// =======================================================================
-Handle(Prs3d_LineAspect) AIS_Trihedron::getHighlightLineAspect()
-{
-  if (!myHighlightLineAspect.IsNull())
-    return myHighlightLineAspect;
-
-  Quantity_Color aHighlightColor = Quantity_NOC_GRAY80;
-  if (!myHilightDrawer.IsNull())
-    aHighlightColor = myHilightDrawer->Color();
-
-  Handle(Prs3d_DatumAspect) aDatumAspect = Attributes()->DatumAspect();
-  Handle(Prs3d_LineAspect) aLineAspect = aDatumAspect->LineAspect(Prs3d_DP_XAxis);
-  myHighlightLineAspect = new Prs3d_LineAspect (aHighlightColor, aLineAspect->Aspect()->Type(),
-                                                aLineAspect->Aspect()->Width());
-
-  return myHighlightLineAspect;
-}
-
-// =======================================================================
-// function : getHighlightPointAspect
-// purpose  :
-// =======================================================================
-Handle(Prs3d_PointAspect) AIS_Trihedron::getHighlightPointAspect()
-{
-  if (!myHighlightPointAspect.IsNull())
-    return myHighlightPointAspect;
-
-  Quantity_Color aHighlightColor = Quantity_NOC_GRAY80;
-  if (!myHilightDrawer.IsNull())
-    aHighlightColor = myHilightDrawer->Color();
-  myHighlightPointAspect = new Prs3d_PointAspect (Aspect_TOM_PLUS, aHighlightColor, 1.0);
-
-  return myHighlightPointAspect;
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnSize)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnTextColor)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnArrowColor)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myHasOwnDatumAspect)
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myTrihDispMode)
 }

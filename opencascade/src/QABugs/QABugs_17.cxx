@@ -56,8 +56,8 @@
 #include <Geom_Axis2Placement.hxx>
 #include <V3d_View.hxx>
 #include <BRepBuilderAPI_MakeVertex.hxx>
-#include <AIS_LengthDimension.hxx>
-#include <AIS_RadiusDimension.hxx>
+#include <PrsDim_LengthDimension.hxx>
+#include <PrsDim_RadiusDimension.hxx>
 #include <BRepPrimAPI_MakeBox.hxx>
 #include <GeomAdaptor_Surface.hxx>
 #include <Extrema_ExtPS.hxx>
@@ -68,8 +68,6 @@
 
 #include <TopoDS_Compound.hxx>
 #include <TopoDS_CompSolid.hxx>
-#include <StdSelect_ShapeTypeFilter.hxx>
-#include <Prs3d_Projector.hxx>
 #include <HLRAlgo_Projector.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Font_NameOfFont.hxx>
@@ -287,14 +285,14 @@ static Standard_Integer BUC60915_1(Draw_Interpretor& di, Standard_Integer argc, 
   /***************************************/
   //dimension "L 502.51"
   /***************************************/
-  Handle(AIS_LengthDimension) len = new AIS_LengthDimension(V2, V3, pln->Pln());
+  Handle(PrsDim_LengthDimension) len = new PrsDim_LengthDimension(V2, V3, pln->Pln());
   anAspect->ArrowAspect()->SetLength (30.0);
   len->SetDimensionAspect (anAspect);
   context->Display (len, Standard_False);
   /***************************************/
   //dimension "L 90"
   /***************************************/
-  Handle(AIS_LengthDimension) len1 = new AIS_LengthDimension(V7, V4, pln->Pln());
+  Handle(PrsDim_LengthDimension) len1 = new PrsDim_LengthDimension(V7, V4, pln->Pln());
   len1->SetDimensionAspect (anAspect);
   len1->SetFlyout (30.0);
   anAspect->ArrowAspect()->SetLength (100.0);
@@ -302,7 +300,7 @@ static Standard_Integer BUC60915_1(Draw_Interpretor& di, Standard_Integer argc, 
   /***************************************/
   //dimension "L 150"
   /***************************************/
-  Handle(AIS_LengthDimension) len2 = new AIS_LengthDimension(V1, V2, pln->Pln());
+  Handle(PrsDim_LengthDimension) len2 = new PrsDim_LengthDimension(V1, V2, pln->Pln());
   len2->SetDimensionAspect (anAspect);
   context->Display (len2, Standard_False);
   /***************************************/
@@ -310,7 +308,7 @@ static Standard_Integer BUC60915_1(Draw_Interpretor& di, Standard_Integer argc, 
   /***************************************/
   gp_Circ cir = gp_Circ(gp_Ax2(gp_Pnt(191.09, -88.58, 0), gp_Dir(0, 0, 1)), 88.58);
   TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(cir,gp_Pnt(191.09,0,0.),gp_Pnt(191.09,-177.16,0.) );
-  Handle(AIS_RadiusDimension) dim1 = new AIS_RadiusDimension(E1);
+  Handle(PrsDim_RadiusDimension) dim1 = new PrsDim_RadiusDimension(E1);
   dim1->SetDimensionAspect (anAspect);
   context->Display (dim1, Standard_False);
   /***************************************/
@@ -318,7 +316,7 @@ static Standard_Integer BUC60915_1(Draw_Interpretor& di, Standard_Integer argc, 
   /***************************************/
   gp_Circ cir1 = gp_Circ(gp_Ax2(gp_Pnt(191.09, -88.58, 0), gp_Dir(0, 0, 1)), 43.80);
   TopoDS_Edge E_cir1 = BRepBuilderAPI_MakeEdge(cir1);
-  dim1 = new AIS_RadiusDimension(E_cir1);
+  dim1 = new PrsDim_RadiusDimension(E_cir1);
   anAspect->ArrowAspect()->SetLength (60.0);
   dim1->SetDimensionAspect (anAspect);
   context->Display (dim1, Standard_False);
@@ -327,7 +325,7 @@ static Standard_Integer BUC60915_1(Draw_Interpretor& di, Standard_Integer argc, 
   /***************************************/
   gp_Circ cir2 = gp_Circ(gp_Ax2(gp_Pnt(566.11, -88.58, 0), gp_Dir(0, 0, -1)), 17.86);
   TopoDS_Edge E_cir2 = BRepBuilderAPI_MakeEdge(cir2);
-  dim1 = new AIS_RadiusDimension(E_cir2);
+  dim1 = new PrsDim_RadiusDimension(E_cir2);
   anAspect->ArrowAspect()->SetLength (40.0);
   dim1->SetDimensionAspect (anAspect);
   context->Display (dim1, Standard_True);
@@ -1103,8 +1101,8 @@ static Standard_Integer OCC1174_1 (Draw_Interpretor& di, Standard_Integer argc, 
 
   Handle(AIS_Shape) anAisIO = new AIS_Shape(aShape);
 
-  Quantity_Color aColF(0.0, 0.4, 0.0, Quantity_TOC_RGB);
-  Quantity_Color aColB(0.0, 0.0, 0.6, Quantity_TOC_RGB);
+  Quantity_Color aColF(0.0, 0.4, 0.0, Quantity_TOC_sRGB);
+  Quantity_Color aColB(0.0, 0.0, 0.6, Quantity_TOC_sRGB);
 
   Handle(Prs3d_Drawer) aDrawer = anAisIO->Attributes();
   Handle(Prs3d_ShadingAspect) aShadingAspect = aDrawer->ShadingAspect();
@@ -1130,9 +1128,9 @@ static Standard_Integer OCC1174_1 (Draw_Interpretor& di, Standard_Integer argc, 
   anAISContext->Display (anAisIO, 1, 0, Standard_True);
 
   Standard_Real r, g, b; 
-  aShadingAspect->Color(Aspect_TOFM_FRONT_SIDE).Values(r,g,b, Quantity_TOC_RGB);
+  aShadingAspect->Color(Aspect_TOFM_FRONT_SIDE).Values(r,g,b, Quantity_TOC_sRGB);
   di << "Info: color on front side (" << r << "," << g << "," << b << ")\n";
-  aShadingAspect->Color(Aspect_TOFM_BACK_SIDE).Values(r,g,b, Quantity_TOC_RGB);
+  aShadingAspect->Color(Aspect_TOFM_BACK_SIDE).Values(r,g,b, Quantity_TOC_sRGB);
   di << "Info: color on back side (" << r << "," << g << "," << b << ")\n";
 
   return 0;
@@ -1161,10 +1159,10 @@ static Standard_Integer OCC1174_2 (Draw_Interpretor& di, Standard_Integer argc, 
 
   Handle(AIS_Shape) ais = new AIS_Shape(sh); 
   AISContext->Display (ais, 1, 0, Standard_False);
-  AISContext->SetMaterial (ais, Graphic3d_NOM_SHINY_PLASTIC, Standard_False);
+  AISContext->SetMaterial (ais, Graphic3d_NameOfMaterial_ShinyPlastified, Standard_False);
 
-  Quantity_Color colf(0.0, 0.4, 0.0, Quantity_TOC_RGB); 
-  Quantity_Color colb(0.0, 0.0, 0.6, Quantity_TOC_RGB); 
+  Quantity_Color colf(0.0, 0.4, 0.0, Quantity_TOC_sRGB);
+  Quantity_Color colb(0.0, 0.0, 0.6, Quantity_TOC_sRGB);
   Handle(Prs3d_ShadingAspect) sa = ais->Attributes()->ShadingAspect(); 
 
   Graphic3d_MaterialAspect front = sa->Material(Aspect_TOFM_FRONT_SIDE); 

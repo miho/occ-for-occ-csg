@@ -42,14 +42,15 @@ IMPLEMENT_STANDARD_RTTIEXT(PCDM_StorageDriver,PCDM_Writer)
 
 
 
-void PCDM_StorageDriver::Write(const Handle(CDM_Document)& aDocument, const TCollection_ExtendedString&  aFileName) 
+void PCDM_StorageDriver::Write (const Handle(CDM_Document)& aDocument,
+                                const TCollection_ExtendedString&  aFileName, 
+                                const Message_ProgressRange &/*theRange*/) 
 {
   Handle(Storage_Schema) theSchema = new Storage_Schema;
 
   Handle(Storage_Data) theData = new Storage_Data;
 
-  static Standard_Boolean Failure;
-  Failure=Standard_False;
+  Standard_Boolean Failure(Standard_False);
   Standard_SStream aMsg; aMsg << "error during Make:";
   PCDM_SequenceOfDocument thePersistentDocuments;
   {
@@ -91,10 +92,10 @@ void PCDM_StorageDriver::Write(const Handle(CDM_Document)& aDocument, const TCol
     theData->AddToComments(aComments(i));
   }
 
-  FSD_CmpFile theFile;
+  Handle(FSD_CmpFile) theFile = new FSD_CmpFile;
   PCDM_ReadWriter::Open(theFile,aFileName,Storage_VSWrite);
   theSchema->Write(theFile,theData);
-  theFile.Close();
+  theFile->Close();
 
   if ( theData->ErrorStatus() != Storage_VSOk )
     throw PCDM_DriverError(theData->ErrorStatusExtension().ToCString());
@@ -105,7 +106,9 @@ void PCDM_StorageDriver::Write(const Handle(CDM_Document)& aDocument, const TCol
 //function : Write
 //purpose  : 
 //=======================================================================
-void PCDM_StorageDriver::Write (const Handle(CDM_Document)& /*aDocument*/, Standard_OStream& /*theOStream*/) 
+void PCDM_StorageDriver::Write (const Handle(CDM_Document)&              /*aDocument*/, 
+                                Standard_OStream&                        /*theOStream*/, 
+                                const Message_ProgressRange&             /*theRange*/)
 {
   
 }

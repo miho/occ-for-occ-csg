@@ -13,6 +13,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <XCAFDoc_ShapeTool.hxx>
 
 #include <BRep_Builder.hxx>
 #include <gp_Pnt.hxx>
@@ -51,9 +52,8 @@
 #include <XCAFDoc_GraphNode.hxx>
 #include <XCAFDoc_Location.hxx>
 #include <XCAFDoc_ShapeMapTool.hxx>
-#include <XCAFDoc_ShapeTool.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_ShapeTool,TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE_WITH_TYPE(XCAFDoc_ShapeTool,TDataStd_GenericEmpty,"xcaf","ShapeTool")
 
 static Standard_Boolean theAutoNaming = Standard_True;
 
@@ -107,35 +107,6 @@ XCAFDoc_ShapeTool::XCAFDoc_ShapeTool()
 const Standard_GUID& XCAFDoc_ShapeTool::ID() const
 {
   return GetID();
-}
-
-//=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_ShapeTool::Restore(const Handle(TDF_Attribute)& /*with*/) 
-{
-}
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-
-Handle(TDF_Attribute) XCAFDoc_ShapeTool::NewEmpty() const
-{
-  return new XCAFDoc_ShapeTool;
-}
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_ShapeTool::Paste (const Handle(TDF_Attribute)& /*into*/,
-			       const Handle(TDF_RelocationTable)& /*RT*/) const
-{
 }
 
 // Auxiliary methods //////////////////////////////////////////////////
@@ -1012,6 +983,7 @@ void XCAFDoc_ShapeTool::UpdateAssemblies()
   GetFreeShapes(aRootLabels);
 
   // Iterate over the free shapes
+  TDF_LabelMap anUpdated;
   for ( TDF_LabelSequence::Iterator anIt(aRootLabels); anIt.More(); anIt.Next() )
   {
     TDF_Label aRefLabel = anIt.Value();
@@ -1021,7 +993,7 @@ void XCAFDoc_ShapeTool::UpdateAssemblies()
     }
     const TDF_Label& aRootLab = aRefLabel;
     TopoDS_Shape anAssemblyShape;
-    updateComponent(aRootLab, anAssemblyShape);
+    updateComponent(aRootLab, anAssemblyShape, anUpdated);
   }
 }
 
@@ -1444,7 +1416,7 @@ void XCAFDoc_ShapeTool::GetExternRefs(const TDF_Label& L,
     if(tmplbl.FindAttribute(TDataStd_Name::GetID(),TDN)) {
       TCollection_ExtendedString extstr = TDN->Get();
       Handle(TCollection_HAsciiString) str = 
-	new TCollection_HAsciiString(TCollection_AsciiString(extstr, '?')); 
+	new TCollection_HAsciiString(TCollection_AsciiString(extstr)); 
       SHAS.Append(str);
     }
   }
@@ -2003,7 +1975,8 @@ void XCAFDoc_ShapeTool::makeSubShape (const TDF_Label& theMainShapeL,
 //=======================================================================
 
 Standard_Boolean XCAFDoc_ShapeTool::updateComponent(const TDF_Label& theItemLabel,
-                                                    TopoDS_Shape&    theUpdatedShape) const
+                                                    TopoDS_Shape&    theUpdatedShape,
+                                                    TDF_LabelMap&    theUpdated) const
 {
   if ( !IsAssembly(theItemLabel) )
     return Standard_False; // Do nothing for non-assemblies
@@ -2011,6 +1984,13 @@ Standard_Boolean XCAFDoc_ShapeTool::updateComponent(const TDF_Label& theItemLabe
   // Get the currently stored compound for the assembly
   TopoDS_Shape aCurrentRootShape;
   GetShape(theItemLabel, aCurrentRootShape);
+
+  // Check if the given assembly is already updated
+  if (theUpdated.Contains(theItemLabel)) {
+    theUpdatedShape = aCurrentRootShape;
+    return Standard_True;
+  }
+  
   TopTools_MapOfOrientedShape aCurrentRootShapeMap (aCurrentRootShape.NbChildren());
 
   // Get components of the assembly
@@ -2051,11 +2031,9 @@ Standard_Boolean XCAFDoc_ShapeTool::updateComponent(const TDF_Label& theItemLabe
     if ( IsAssembly(aComponentRefLab) )
     {
       // Recursive call
-      if ( updateComponent(aComponentRefLab, aComponentShape) )
+      if ( updateComponent(aComponentRefLab, aComponentShape, theUpdated) )
       {
-        if ( !isModified )
-          isModified = Standard_True;
-
+        isModified = Standard_True;
         aComponentShape.Location(aComponentLoc); // Apply placement
       }
     }
@@ -2106,6 +2084,9 @@ Standard_Boolean XCAFDoc_ShapeTool::updateComponent(const TDF_Label& theItemLabe
     NB.Generated(theUpdatedShape);
   }
 
+  if (isModified)
+    theUpdated.Add(theItemLabel);
+
   return isModified;
 }
 
@@ -2142,4 +2123,44 @@ Handle(TDataStd_NamedData) XCAFDoc_ShapeTool::GetNamedProperties (const TopoDS_S
   aNamedProperty = GetNamedProperties (aLabel, theToCreate);
 
   return aNamedProperty;
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void XCAFDoc_ShapeTool::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, TDF_Attribute)
+
+  for (XCAFDoc_DataMapOfShapeLabel::Iterator aShapeLabelIt (myShapeLabels); aShapeLabelIt.More(); aShapeLabelIt.Next())
+  {
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aShapeLabelIt.Key())
+
+    TCollection_AsciiString aShapeLabel;
+    TDF_Tool::Entry (aShapeLabelIt.Value(), aShapeLabel);
+    OCCT_DUMP_FIELD_VALUE_STRING (theOStream, aShapeLabel)
+  }
+  
+  for (XCAFDoc_DataMapOfShapeLabel::Iterator aSubShapeIt (mySubShapes); aSubShapeIt.More(); aSubShapeIt.Next())
+  {
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aSubShapeIt.Key())
+
+    TCollection_AsciiString aSubShape;
+    TDF_Tool::Entry (aSubShapeIt.Value(), aSubShape);
+    OCCT_DUMP_FIELD_VALUE_STRING (theOStream, aSubShape)
+  }
+  
+  for (XCAFDoc_DataMapOfShapeLabel::Iterator aSimpleShapeIt (mySimpleShapes); aSimpleShapeIt.More(); aSimpleShapeIt.Next())
+  {
+    OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, &aSimpleShapeIt.Key())
+
+    TCollection_AsciiString aSimpleShape;
+    TDF_Tool::Entry (aSimpleShapeIt.Value(), aSimpleShape);
+    OCCT_DUMP_FIELD_VALUE_STRING (theOStream, aSimpleShape)
+  }
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, hasSimpleShapes)
 }

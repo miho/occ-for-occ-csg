@@ -21,7 +21,7 @@
 #include <BRep_Tool.hxx>
 #include <Message.hxx>
 #include <Message_Messenger.hxx>
-#include <Message_ProgressSentry.hxx>
+#include <Message_ProgressScope.hxx>
 #include <OSD_OpenFile.hxx>
 #include <OSD_ThreadPool.hxx>
 
@@ -42,13 +42,13 @@ public:
   //! Main constructor.
   CafReader_GltfReaderFunctor (RWGltf_CafReader* myCafReader,
                                NCollection_Vector<TopoDS_Face>& theFaceList,
-                               Message_ProgressSentry& theSentry,
+                               const Message_ProgressRange& theProgress,
                                const OSD_ThreadPool::Launcher& theThreadPool,
                                const TCollection_AsciiString& theErrPrefix)
   : myCafReader (myCafReader),
     myFaceList  (&theFaceList),
-    mySentry    (&theSentry),
     myErrPrefix (theErrPrefix),
+    myProgress  (theProgress, "Loading glTF triangulation", Max (1, theFaceList.Size())),
     myThreadPool(theThreadPool),
     myTlsData   (theThreadPool.LowerThreadIndex(), theThreadPool.UpperThreadIndex())
   {
@@ -77,11 +77,11 @@ public:
     if (myThreadPool.HasThreads())
     {
       Standard_Mutex::Sentry aLock (&myMutex);
-      mySentry->Next();
+      myProgress.Next();
     }
     else
     {
-      mySentry->Next();
+      myProgress.Next();
     }
   }
 
@@ -89,13 +89,11 @@ private:
 
   RWGltf_CafReader* myCafReader;
   NCollection_Vector<TopoDS_Face>* myFaceList;
-  Message_ProgressSentry*   mySentry;
   TCollection_AsciiString   myErrPrefix;
   mutable Standard_Mutex    myMutex;
+  mutable Message_ProgressScope myProgress;
   const OSD_ThreadPool::Launcher& myThreadPool;
-  mutable NCollection_Array1<GltfReaderTLS>
-                            myTlsData;
-
+  mutable NCollection_Array1<GltfReaderTLS> myTlsData;
 };
 
 //================================================================
@@ -116,15 +114,18 @@ RWGltf_CafReader::RWGltf_CafReader()
 // Purpose  :
 //================================================================
 Standard_Boolean RWGltf_CafReader::performMesh (const TCollection_AsciiString& theFile,
-                                                const Handle(Message_ProgressIndicator)& theProgress,
+                                                const Message_ProgressRange& theProgress,
                                                 const Standard_Boolean theToProbe)
 {
+  Message_ProgressScope aPSentry (theProgress, "Reading glTF", 2);
+  aPSentry.Show();
+
   std::ifstream aFile;
   OSD_OpenStream (aFile, theFile.ToCString(), std::ios::in | std::ios::binary);
   if (!aFile.is_open()
    || !aFile.good())
   {
-    Message::DefaultMessenger()->Send (TCollection_AsciiString ("File '") + theFile + "' is not found!", Message_Fail);
+    Message::SendFail (TCollection_AsciiString ("File '") + theFile + "' is not found");
     return false;
   }
 
@@ -144,7 +145,7 @@ Standard_Boolean RWGltf_CafReader::performMesh (const TCollection_AsciiString& t
     {
       if (*aLen < 20)
       {
-        Message::DefaultMessenger()->Send (TCollection_AsciiString ("File '") + theFile + "' has broken glTF format!", Message_Fail);
+        Message::SendFail (TCollection_AsciiString ("File '") + theFile + "' has broken glTF format");
         return false;
       }
 
@@ -160,7 +161,7 @@ Standard_Boolean RWGltf_CafReader::performMesh (const TCollection_AsciiString& t
       aBinBodyLen    = int64_t(*aLen) - aBinBodyOffset;
       if (*aSceneFormat != 0)
       {
-        Message::DefaultMessenger()->Send (TCollection_AsciiString ("File '") + theFile + "' is written using unsupported Scene format!", Message_Fail);
+        Message::SendFail (TCollection_AsciiString ("File '") + theFile + "' is written using unsupported Scene format");
         return false;
       }
     }
@@ -168,7 +169,7 @@ Standard_Boolean RWGltf_CafReader::performMesh (const TCollection_AsciiString& t
     {
       if (*aVer != 2)
       {
-        Message::DefaultMessenger()->Send (TCollection_AsciiString ("File '") + theFile + "' is written using unknown version " + int(*aVer) + "!", Message_Warning);
+        Message::SendWarning (TCollection_AsciiString ("File '") + theFile + "' is written using unknown version " + int(*aVer));
       }
 
       for (int aChunkIter = 0; !aFile.eof() && aChunkIter < 2; ++aChunkIter)
@@ -182,7 +183,7 @@ Standard_Boolean RWGltf_CafReader::performMesh (const TCollection_AsciiString& t
         aFile.read (aChunkHeader2, sizeof(aChunkHeader2));
         if (!aFile.good())
         {
-          Message::DefaultMessenger()->Send (TCollection_AsciiString ("File '") + theFile + "' is written using unsupported format!", Message_Fail);
+          Message::SendFail (TCollection_AsciiString ("File '") + theFile + "' is written using unsupported format");
           return false;
         }
 
@@ -246,23 +247,23 @@ Standard_Boolean RWGltf_CafReader::performMesh (const TCollection_AsciiString& t
   {
     if (aRes.Code() == rapidjson::kParseErrorDocumentEmpty)
     {
-      Message::DefaultMessenger()->Send (TCollection_AsciiString ("File '") + theFile + "' is empty!", Message_Fail);
+      Message::SendFail (TCollection_AsciiString ("File '") + theFile + "' is empty");
       return false;
     }
     TCollection_AsciiString anErrDesc (RWGltf_GltfJsonParser::FormatParseError (aRes.Code()));
-    Message::DefaultMessenger()->Send (TCollection_AsciiString ("File '") + theFile + "' defines invalid JSON document!\n"
-                                     + anErrDesc + " [at offset " + (int )aRes.Offset() + "].", Message_Fail);
+    Message::SendFail (TCollection_AsciiString ("File '") + theFile + "' defines invalid JSON document!\n"
+                     + anErrDesc + " [at offset " + (int )aRes.Offset() + "].");
     return false;
   }
 #endif
 
-  if (!aDoc.Parse (theProgress))
+  if (!aDoc.Parse (aPSentry.Next()))
   {
     return false;
   }
 
   if (!theToProbe
-   && !readLateData (aDoc.FaceList(), theFile, theProgress))
+   && !readLateData (aDoc.FaceList(), theFile, aPSentry.Next()))
   {
     return false;
   }
@@ -286,14 +287,13 @@ Handle(RWGltf_PrimitiveArrayReader) RWGltf_CafReader::createMeshReaderContext()
 //================================================================
 Standard_Boolean RWGltf_CafReader::readLateData (NCollection_Vector<TopoDS_Face>& theFaces,
                                                  const TCollection_AsciiString& theFile,
-                                                 const Handle(Message_ProgressIndicator)& theProgress)
+                                                 const Message_ProgressRange& theProgress)
 {
-  Message_ProgressSentry aPSentryTris (theProgress, "Loading glTF triangulation", 0, Max (1, theFaces.Size()), 1);
   const Handle(OSD_ThreadPool)& aThreadPool = OSD_ThreadPool::DefaultPool();
   const int aNbThreads = myToParallel ? Min (theFaces.Size(), aThreadPool->NbDefaultThreadsToLaunch()) : 1;
   OSD_ThreadPool::Launcher aLauncher (*aThreadPool, aNbThreads);
 
-  CafReader_GltfReaderFunctor aFunctor (this, theFaces, aPSentryTris, aLauncher,
+  CafReader_GltfReaderFunctor aFunctor (this, theFaces, theProgress, aLauncher,
                                         TCollection_AsciiString ("File '") + theFile + "' defines invalid glTF!\n");
   aLauncher.Perform (theFaces.Lower(), theFaces.Upper() + 1, aFunctor);
   return Standard_True;

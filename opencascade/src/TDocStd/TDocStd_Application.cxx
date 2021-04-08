@@ -14,10 +14,10 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <TDocStd_Application.hxx>
 
 #include <CDF_Directory.hxx>
 #include <CDF_DirectoryIterator.hxx>
-#include <CDF_Session.hxx>
 #include <CDF_Store.hxx>
 #include <PCDM_RetrievalDriver.hxx>
 #include <PCDM_StorageDriver.hxx>
@@ -25,14 +25,15 @@
 #include <Plugin_Failure.hxx>
 #include <Resource_Manager.hxx>
 #include <Standard_DomainError.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_ErrorHandler.hxx>
 #include <Standard_NoSuchObject.hxx>
 #include <Standard_NotImplemented.hxx>
 #include <TCollection_ExtendedString.hxx>
-#include <TDocStd_Application.hxx>
 #include <TDocStd_Document.hxx>
 #include <TDocStd_Owner.hxx>
 #include <TDocStd_PathParser.hxx>
+#include <OSD_Thread.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(TDocStd_Application,CDF_Application)
 
@@ -44,22 +45,9 @@ IMPLEMENT_STANDARD_RTTIEXT(TDocStd_Application,CDF_Application)
 TDocStd_Application::TDocStd_Application()
         : myIsDriverLoaded (Standard_True)
 {
-  myMessageDriver = CDM_Application::MessageDriver();
-  Handle(CDF_Session) S;
-  if (!CDF_Session::Exists()) S = new CDF_Session();
-  else S = CDF_Session::CurrentSession();
-  S->SetCurrentApplication(this);
-  try
-  {
-    OCC_CATCH_SIGNALS
-    S->LoadDriver();
-  }
-  catch (Plugin_Failure const&)
-  {
+  if(myMetaDataDriver.IsNull())
     myIsDriverLoaded = Standard_False;
-  }
 }
-
 
 //=======================================================================
 //function : IsDriverLoaded
@@ -68,15 +56,6 @@ TDocStd_Application::TDocStd_Application()
 Standard_Boolean TDocStd_Application::IsDriverLoaded() const
 {
   return myIsDriverLoaded;
-}
-
-//=======================================================================
-//function : MessageDriver
-//purpose  :
-//=======================================================================
-Handle(Message_Messenger) TDocStd_Application::MessageDriver()
-{
-  return myMessageDriver;
 }
 
 //=======================================================================
@@ -174,10 +153,7 @@ void TDocStd_Application::WritingFormats(TColStd_SequenceOfAsciiString &theForma
 
 Standard_Integer TDocStd_Application::NbDocuments() const
 {
-  if (!CDF_Session::Exists())
-    throw Standard_DomainError("TDocStd_Application::NbDocuments");
-  Handle(CDF_Session) S = CDF_Session::CurrentSession();
-  return S->Directory()->Length();
+  return myDirectory->Length();
 }
 
 //=======================================================================
@@ -187,10 +163,7 @@ Standard_Integer TDocStd_Application::NbDocuments() const
 
 void TDocStd_Application::GetDocument(const Standard_Integer index,Handle(TDocStd_Document)& aDoc) const
 {
-  if (!CDF_Session::Exists())
-    throw Standard_DomainError("TDocStd_Application::NbDocuments");
-  Handle(CDF_Session) S = CDF_Session::CurrentSession();
-  CDF_DirectoryIterator it (S->Directory());
+  CDF_DirectoryIterator it (myDirectory);
   Standard_Integer current = 0;
   for (;it.MoreDocument();it.NextDocument()) {
     current++;
@@ -280,35 +253,46 @@ Standard_Integer TDocStd_Application::IsInSession (const TCollection_ExtendedStr
 //purpose  :
 //=======================================================================
 
-PCDM_ReaderStatus TDocStd_Application::Open(const TCollection_ExtendedString& path,Handle(TDocStd_Document)& aDoc) {
+PCDM_ReaderStatus TDocStd_Application::Open (const TCollection_ExtendedString& path, 
+                                             Handle(TDocStd_Document)& aDoc, 
+                                             const Message_ProgressRange& theRange)
+{
   PCDM_ReaderStatus status = PCDM_RS_DriverFailure;
   TDocStd_PathParser tool (path);
   TCollection_ExtendedString directory = tool.Trek();
   TCollection_ExtendedString file = tool.Name();
-  file+=".";
-  file+=tool.Extension();
-  status = CanRetrieve(directory,file);
-  if (status != PCDM_RS_OK) return status;
-  try {
+  file += ".";
+  file += tool.Extension();
+  status = CanRetrieve(directory, file);
+
+  if (status != PCDM_RS_OK)
+  {
+    return status;
+  }
+
+  try
+  {
     OCC_CATCH_SIGNALS
     Handle(TDocStd_Document) D =
-      Handle(TDocStd_Document)::DownCast(Retrieve(directory,file));
+      Handle(TDocStd_Document)::DownCast(Retrieve(directory, file, Standard_True, theRange));
     CDF_Application::Open(D);
     aDoc = D;
   }
-  catch (Standard_Failure const& anException) {
-//    status = GetRetrieveStatus();
-    if (!MessageDriver().IsNull()) {
-//      Standard_SStream aMsg;
-//      aMsg << Standard_Failure::Caught() << std::endl;
-//      std::cout << "TDocStd_Application::Open(): " << aMsg.rdbuf()->str() << std::endl;
+  catch (Standard_Failure const& anException)
+  {
+    //    status = GetRetrieveStatus();
+    if (!MessageDriver().IsNull())
+    {
+      //      Standard_SStream aMsg;
+      //      aMsg << Standard_Failure::Caught() << std::endl;
+      //      std::cout << "TDocStd_Application::Open(): " << aMsg.rdbuf()->str() << std::endl;
       TCollection_ExtendedString aString (anException.GetMessageString());
       MessageDriver()->Send(aString.ToExtString(), Message_Fail);
     }
   }
   status = GetRetrieveStatus();
 #ifdef OCCT_DEBUG
-  std::cout<<"TDocStd_Application::Open(): The status = "<<status<<std::endl;
+  std::cout << "TDocStd_Application::Open(): The status = " << status << std::endl;
 #endif
   return status;
 }
@@ -317,19 +301,22 @@ PCDM_ReaderStatus TDocStd_Application::Open(const TCollection_ExtendedString& pa
 //function : Open
 //purpose  :
 //=======================================================================
-PCDM_ReaderStatus TDocStd_Application::Open (Standard_IStream& theIStream, Handle(TDocStd_Document)& theDoc)
+PCDM_ReaderStatus TDocStd_Application::Open (Standard_IStream& theIStream,
+                                             Handle(TDocStd_Document)& theDoc,
+                                             const Message_ProgressRange& theRange)
 { 
   try
   {
     OCC_CATCH_SIGNALS
+    Handle(TDocStd_Document) D = Handle(TDocStd_Document)::DownCast(Read(theIStream, theRange));
 
-    Handle(TDocStd_Document) D = Handle(TDocStd_Document)::DownCast (Read (theIStream));
     if (!D.IsNull())
     {
       CDF_Application::Open(D);
       theDoc = D;
     }
   }
+
   catch (Standard_Failure const& anException)
   {
     if (!MessageDriver().IsNull())
@@ -338,7 +325,6 @@ PCDM_ReaderStatus TDocStd_Application::Open (Standard_IStream& theIStream, Handl
       MessageDriver()->Send (aFailureMessage.ToExtString(), Message_Fail);
     }
   }
-
   return GetRetrieveStatus();
 }
 
@@ -347,7 +333,10 @@ PCDM_ReaderStatus TDocStd_Application::Open (Standard_IStream& theIStream, Handl
 //purpose  :
 //=======================================================================
 
-PCDM_StoreStatus TDocStd_Application::SaveAs(const Handle(TDocStd_Document)& D,const TCollection_ExtendedString& path) {
+PCDM_StoreStatus TDocStd_Application::SaveAs (const Handle(TDocStd_Document)& D, 
+                                              const TCollection_ExtendedString& path,
+                                              const Message_ProgressRange& theRange)
+{
   TDocStd_PathParser tool (path);
   TCollection_ExtendedString directory = tool.Trek();
   TCollection_ExtendedString file = tool.Name();
@@ -367,7 +356,7 @@ PCDM_StoreStatus TDocStd_Application::SaveAs(const Handle(TDocStd_Document)& D,c
   storer.SetName (file);
   try {
     OCC_CATCH_SIGNALS
-    storer.Realize();
+    storer.Realize (theRange);
   }
   catch (Standard_Failure const& anException) {
     if (!MessageDriver().IsNull()) {
@@ -387,7 +376,9 @@ PCDM_StoreStatus TDocStd_Application::SaveAs(const Handle(TDocStd_Document)& D,c
 //function : SaveAs
 //purpose  :
 //=======================================================================
-PCDM_StoreStatus TDocStd_Application::SaveAs (const Handle(TDocStd_Document)& theDoc, Standard_OStream& theOStream)
+PCDM_StoreStatus TDocStd_Application::SaveAs(const Handle(TDocStd_Document)& theDoc, 
+                                             Standard_OStream& theOStream,
+                                             const Message_ProgressRange& theRange)
 {
   try
   {
@@ -399,7 +390,7 @@ PCDM_StoreStatus TDocStd_Application::SaveAs (const Handle(TDocStd_Document)& th
     }
 
     aDocStorageDriver->SetFormat(theDoc->StorageFormat());
-    aDocStorageDriver->Write(theDoc, theOStream);
+    aDocStorageDriver->Write(theDoc, theOStream, theRange);
 
     if (aDocStorageDriver->GetStoreStatus() == PCDM_SS_OK)
     {
@@ -424,13 +415,15 @@ PCDM_StoreStatus TDocStd_Application::SaveAs (const Handle(TDocStd_Document)& th
 //purpose  :
 //=======================================================================
 
-PCDM_StoreStatus TDocStd_Application::Save (const Handle(TDocStd_Document)& D) {
+PCDM_StoreStatus TDocStd_Application::Save (const Handle(TDocStd_Document)& D,
+                                            const Message_ProgressRange&    theRange)
+{
   PCDM_StoreStatus status = PCDM_SS_OK;
   if (D->IsSaved()) {
     CDF_Store storer (D);
     try{
       OCC_CATCH_SIGNALS
-      storer.Realize();
+      storer.Realize (theRange);
     }
     catch (Standard_Failure const& anException) {
       if (!MessageDriver().IsNull()) {
@@ -461,7 +454,8 @@ PCDM_StoreStatus TDocStd_Application::Save (const Handle(TDocStd_Document)& D) {
 
 PCDM_StoreStatus TDocStd_Application::SaveAs(const Handle(TDocStd_Document)& D,
                                              const TCollection_ExtendedString& path,
-                                             TCollection_ExtendedString& theStatusMessage) 
+                                             TCollection_ExtendedString& theStatusMessage,
+                                             const Message_ProgressRange& theRange)
 { 
   TDocStd_PathParser tool (path);
   PCDM_StoreStatus aStatus = PCDM_SS_Failure;
@@ -475,7 +469,7 @@ PCDM_StoreStatus TDocStd_Application::SaveAs(const Handle(TDocStd_Document)& D,
     storer.SetName (file);
     try {
       OCC_CATCH_SIGNALS
-      storer.Realize();
+      storer.Realize (theRange);
     }
     catch (Standard_Failure const& anException) {
       if (!MessageDriver().IsNull()) {
@@ -503,7 +497,8 @@ PCDM_StoreStatus TDocStd_Application::SaveAs(const Handle(TDocStd_Document)& D,
 
 PCDM_StoreStatus TDocStd_Application::SaveAs (const Handle(TDocStd_Document)& theDoc,
                                               Standard_OStream&               theOStream,
-                                              TCollection_ExtendedString&     theStatusMessage) 
+                                              TCollection_ExtendedString&     theStatusMessage,
+                                              const Message_ProgressRange&    theRange)
 { 
   try
   {
@@ -515,7 +510,7 @@ PCDM_StoreStatus TDocStd_Application::SaveAs (const Handle(TDocStd_Document)& th
     }
 
     aDocStorageDriver->SetFormat(theDoc->StorageFormat());
-    aDocStorageDriver->Write(theDoc, theOStream);
+    aDocStorageDriver->Write(theDoc, theOStream, theRange);
         
     if (aDocStorageDriver->GetStoreStatus() == PCDM_SS_OK)
     {
@@ -541,14 +536,15 @@ PCDM_StoreStatus TDocStd_Application::SaveAs (const Handle(TDocStd_Document)& th
 //=======================================================================
 
 PCDM_StoreStatus TDocStd_Application::Save (const Handle(TDocStd_Document)& D,
-                                            TCollection_ExtendedString& theStatusMessage)
+                                            TCollection_ExtendedString&     theStatusMessage, 
+                                            const Message_ProgressRange&    theRange)
 {  
   PCDM_StoreStatus status = PCDM_SS_OK;
   if (D->IsSaved()) {  
     CDF_Store storer (D);  
     try {
       OCC_CATCH_SIGNALS
-      storer.Realize(); 
+      storer.Realize (theRange);
     }
     catch (Standard_Failure const& anException) {
       if (!MessageDriver().IsNull()) {
@@ -596,4 +592,15 @@ void TDocStd_Application::OnAbortTransaction (const Handle(TDocStd_Document)&)
 void TDocStd_Application::OnCommitTransaction (const Handle(TDocStd_Document)&)
 {
   // nothing to do on this level
+}
+
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void TDocStd_Application::DumpJson (Standard_OStream& theOStream, Standard_Integer) const
+{
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myIsDriverLoaded)
 }

@@ -14,19 +14,19 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <TDataStd_Directory.hxx>
 
 #include <Standard_DomainError.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_GUID.hxx>
 #include <Standard_Type.hxx>
 #include <TDataStd.hxx>
-#include <TDataStd_Directory.hxx>
-#include <TDF_Attribute.hxx>
 #include <TDF_DataSet.hxx>
 #include <TDF_Label.hxx>
 #include <TDF_RelocationTable.hxx>
 #include <TDF_TagSource.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(TDataStd_Directory,TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE(TDataStd_Directory,TDataStd_GenericEmpty)
 
 //=======================================================================
 //function : Find
@@ -114,7 +114,6 @@ TDataStd_Directory::TDataStd_Directory()
 {
 }
 
-
 //=======================================================================
 //function : ID
 //purpose  : 
@@ -129,38 +128,10 @@ const Standard_GUID& TDataStd_Directory::ID() const
 //purpose  : 
 //=======================================================================
 
-Handle(TDF_Attribute) TDataStd_Directory::NewEmpty () const
-{  
-  return new TDataStd_Directory(); 
-}
-
-//=======================================================================
-//function : Restore
-//purpose  : 
-//=======================================================================
-
-void TDataStd_Directory::Restore(const Handle(TDF_Attribute)&) 
-{  
-}
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void TDataStd_Directory::Paste (const Handle(TDF_Attribute)&,
-			                    const Handle(TDF_RelocationTable)& ) const
-{  
-}
-
-//=======================================================================
-//function : References
-//purpose  : 
-//=======================================================================
-
-void TDataStd_Directory::References (const Handle(TDF_DataSet)&) const
-{  
-}
+//Handle(TDF_Attribute) TDataStd_Directory::NewEmpty () const
+//{  
+//  return new TDataStd_Directory(); 
+//}
 
 //=======================================================================
 //function : Dump
@@ -172,5 +143,3 @@ Standard_OStream& TDataStd_Directory::Dump (Standard_OStream& anOS) const
   anOS << "Directory";
   return anOS;
 }
-
-

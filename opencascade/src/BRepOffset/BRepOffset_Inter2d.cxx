@@ -34,6 +34,7 @@
 #include <BRepAlgo_AsDes.hxx>
 #include <BRepLib.hxx>
 #include <BRepLib_MakeVertex.hxx>
+#include <BRepOffset_Analyse.hxx>
 #include <BRepOffset_Inter2d.hxx>
 #include <BRepOffset_Offset.hxx>
 #include <BRepOffset_Tool.hxx>
@@ -585,6 +586,17 @@ static void RefEdgeInter(const TopoDS_Face&              F,
   Handle(Geom2d_Curve) pcurve2 = BRep_Tool::CurveOnSurface(E2, F, f[2], l[2]);
   Geom2dAdaptor_Curve GAC1(pcurve1, f[1], l[1]);
   Geom2dAdaptor_Curve GAC2(pcurve2, f[2], l[2]);
+  if ((GAC1.GetType() == GeomAbs_Line) &&
+      (GAC2.GetType() == GeomAbs_Line))
+  {
+    // Just quickly check if lines coincide
+    if (GAC1.Line().Direction().IsParallel (GAC2.Line().Direction(), 1.e-8))
+    {
+      theCoincide = Standard_True;
+      return;
+    }
+  }
+
   Geom2dInt_GInter Inter2d( GAC1, GAC2, TolDub, TolDub );
   //
   if (!Inter2d.IsDone() || !Inter2d.NbPoints()) {
@@ -911,7 +923,7 @@ static Standard_Boolean ExtendPCurve(const Handle(Geom2d_Curve)& aPCurve,
 
 //  Modified by skv - Fri Dec 26 17:00:55 2003 OCC4455 Begin
 //static void ExtentEdge(const TopoDS_Edge& E,TopoDS_Edge& NE) 
-void BRepOffset_Inter2d::ExtentEdge(const TopoDS_Edge& E,TopoDS_Edge& NE, const Standard_Real theOffset)
+Standard_Boolean BRepOffset_Inter2d::ExtentEdge(const TopoDS_Edge& E,TopoDS_Edge& NE, const Standard_Real theOffset)
 {
   //BRepLib::BuildCurve3d(E);
 
@@ -1249,13 +1261,19 @@ void BRepOffset_Inter2d::ExtentEdge(const TopoDS_Edge& E,TopoDS_Edge& NE, const 
                                   }
                               }
                           }
-
-                        Handle(Geom2d_Curve) ProjPCurve =
-                          GeomProjLib::Curve2d( C3d, FirstParOnPC, LastParOnPC, theSurf );
-                        if (ProjPCurve.IsNull())
-                          ProjectionSuccess = Standard_False;
+                        if (!C3d.IsNull() && FirstParOnPC < LastParOnPC)
+                        {
+                          Handle(Geom2d_Curve) ProjPCurve =
+                            GeomProjLib::Curve2d(C3d, FirstParOnPC, LastParOnPC, theSurf);
+                          if (ProjPCurve.IsNull())
+                            ProjectionSuccess = Standard_False;
+                          else
+                            CurveRep->PCurve(ProjPCurve);
+                        }
                         else
-                          CurveRep->PCurve( ProjPCurve );
+                        {
+                          return Standard_False;
+                        }
                       }
                   }
               }
@@ -1299,7 +1317,7 @@ void BRepOffset_Inter2d::ExtentEdge(const TopoDS_Edge& E,TopoDS_Edge& NE, const 
             aSegment = new Geom_TrimmedCurve(aLin, 0, aDelta);
             
             if (!aCompCurve.Add(aSegment, aTol))
-              return;
+              return Standard_True;
           }
           
           if (LastPar < anEl + a2Offset) {
@@ -1309,7 +1327,7 @@ void BRepOffset_Inter2d::ExtentEdge(const TopoDS_Edge& E,TopoDS_Edge& NE, const 
             aSegment = new Geom_TrimmedCurve(aLin, 0, aDelta);
             
             if (!aCompCurve.Add(aSegment, aTol))
-              return;
+              return Standard_True;
           }
           
           C3d = aCompCurve.BSplineCurve();
@@ -1329,6 +1347,7 @@ void BRepOffset_Inter2d::ExtentEdge(const TopoDS_Edge& E,TopoDS_Edge& NE, const 
       
       BB.Range( NE, FirstPar, LastPar );
     }
+  return Standard_True;
 }
 //  Modified by skv - Fri Dec 26 17:00:57 2003 OCC4455 End
 
@@ -1443,7 +1462,7 @@ void BRepOffset_Inter2d::Compute (const Handle(BRepAlgo_AsDes)&     AsDes,
 //function : ConnexIntByInt
 //purpose  : 
 //=======================================================================
-void BRepOffset_Inter2d::ConnexIntByInt
+Standard_Boolean BRepOffset_Inter2d::ConnexIntByInt
  (const TopoDS_Face&            FI,
   BRepOffset_Offset&            OFI,
   TopTools_DataMapOfShapeShape& MES,
@@ -1451,6 +1470,7 @@ void BRepOffset_Inter2d::ConnexIntByInt
   const Handle(BRepAlgo_AsDes)& AsDes2d,
   const Standard_Real           Offset,
   const Standard_Real           Tol,
+  const BRepOffset_Analyse&     Analyse,
   TopTools_IndexedMapOfShape&   FacesWithVerts,
   TopTools_IndexedDataMapOfShapeListOfShape& theDMVV)
 {  
@@ -1480,7 +1500,10 @@ void BRepOffset_Inter2d::ConnexIntByInt
         TopoDS_Shape aLocalShape = OFI.Generated(EI);
         const TopoDS_Edge& OE = TopoDS::Edge(aLocalShape);
         if (!MES.IsBound(OE) && !Build.IsBound(EI)) {
-          ExtentEdge(OE,NE, Offset);
+          if (!ExtentEdge(OE, NE, Offset))
+          {
+            return Standard_False;
+          }
           MES.Bind  (OE,NE);
         }
       }
@@ -1522,6 +1545,9 @@ void BRepOffset_Inter2d::ConnexIntByInt
 
       TopoDS_Vertex Vref = CommonVertex(CurE, NextE); 
       gp_Pnt Pref = BRep_Tool::Pnt(Vref);
+
+      CurE = Analyse.EdgeReplacement (FI, CurE);
+      NextE = Analyse.EdgeReplacement (FI, NextE);
 
       TopoDS_Shape aLocalShape = OFI.Generated(CurE);
       TopoDS_Edge CEO = TopoDS::Edge(aLocalShape);
@@ -1582,21 +1608,24 @@ void BRepOffset_Inter2d::ConnexIntByInt
         }
       }
       else {
-        if (MES.IsBound(CEO)) {
-          TopoDS_Vertex  V = CommonVertex(CEO,NEO);
-          UpdateVertex  (V,CEO,TopoDS::Edge(MES(CEO)),Tol);
-          AsDes2d->Add     (MES(CEO),V);
-        }
-        else if (MES.IsBound(NEO)) {
-          TopoDS_Vertex V = CommonVertex(CEO,NEO);
-          UpdateVertex (V,NEO,TopoDS::Edge(MES(NEO)),Tol);
-          AsDes2d->Add    (MES(NEO),V);
+        TopoDS_Vertex  V = CommonVertex(CEO,NEO);
+        if (!V.IsNull())
+        {
+          if (MES.IsBound(CEO)) {
+            UpdateVertex  (V,CEO,TopoDS::Edge(MES(CEO)),Tol);
+            AsDes2d->Add     (MES(CEO),V);
+          }
+          if (MES.IsBound(NEO)) {
+            UpdateVertex (V,NEO,TopoDS::Edge(MES(NEO)),Tol);
+            AsDes2d->Add    (MES(NEO),V);
+          }
         }
       }
-      CurE = NextE;
+      CurE = wexp.Current();
       ToReverse1 = ToReverse2;
     }
   }
+  return Standard_True;
 }
 
 //=======================================================================
@@ -1611,6 +1640,7 @@ void BRepOffset_Inter2d::ConnexIntByIntInVert
   const Handle(BRepAlgo_AsDes)& AsDes,
   const Handle(BRepAlgo_AsDes)& AsDes2d,
   const Standard_Real           Tol,
+  const BRepOffset_Analyse&     Analyse,
   TopTools_IndexedDataMapOfShapeListOfShape& theDMVV)
 {
   TopoDS_Face           FIO = TopoDS::Face(OFI.Face());
@@ -1657,7 +1687,10 @@ void BRepOffset_Inter2d::ConnexIntByIntInVert
         CurE = NextE;
         continue;
       }
-      //
+
+      CurE = Analyse.EdgeReplacement (FI, CurE);
+      NextE = Analyse.EdgeReplacement (FI, NextE);
+
       TopoDS_Shape aLocalShape = OFI.Generated(CurE);
       TopoDS_Edge CEO = TopoDS::Edge(aLocalShape);
       aLocalShape = OFI.Generated(NextE);
@@ -1678,7 +1711,7 @@ void BRepOffset_Inter2d::ConnexIntByIntInVert
         NE2 = MES(CEO);
       }
       else {
-        CurE = NextE;
+        CurE = wexp.Current();
         continue;
       }
       //
@@ -1731,7 +1764,7 @@ void BRepOffset_Inter2d::ConnexIntByIntInVert
           }
         }
       }
-      CurE = NextE;
+      CurE = wexp.Current();
     }
   }
 }
@@ -1761,8 +1794,8 @@ static void MakeChain(const TopoDS_Shape& theV,
 //function : FuseVertices
 //purpose  : 
 //=======================================================================
-void BRepOffset_Inter2d::FuseVertices(const TopTools_IndexedDataMapOfShapeListOfShape& theDMVV,
-                                      const Handle(BRepAlgo_AsDes)& theAsDes)
+Standard_Boolean BRepOffset_Inter2d::FuseVertices (const TopTools_IndexedDataMapOfShapeListOfShape& theDMVV,
+                                                   const Handle(BRepAlgo_AsDes)& theAsDes)
 {
   BRep_Builder aBB;
   TopTools_MapOfShape aMVDone;
@@ -1795,11 +1828,16 @@ void BRepOffset_Inter2d::FuseVertices(const TopTools_IndexedDataMapOfShapeListOf
       for (; aItLE.More(); aItLE.Next()) {
         const TopoDS_Edge& aE = TopoDS::Edge(aItLE.Value());
         Standard_Real aTolE = BRep_Tool::Tolerance(aE);
-        Standard_Real aT = BRep_Tool::Parameter(aVOldInt, aE);
+        Standard_Real aT; 
+        if (!BRep_Tool::Parameter(aVOldInt, aE, aT))
+        {
+          return Standard_False;
+        }
         aBB.UpdateVertex(aVNewInt, aT, aE, aTolE);
       }
       // and replace the vertex
       theAsDes->Replace(aVOld, aVNew);
     }
   }
+  return Standard_True;
 }

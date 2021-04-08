@@ -19,6 +19,7 @@
 //		0.0	Oct  1 1997	Creation
 
 #include <Standard_DomainError.hxx>
+#include <Standard_Dump.hxx>
 #include <Standard_NullObject.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TDF_Data.hxx>
@@ -40,19 +41,9 @@
 
 TDF_Transaction::TDF_Transaction
 (const TCollection_AsciiString& aName)
-: myUntilTransaction(0),
-  myName(aName)
+: myName(aName),
+  myUntilTransaction(0)
 {}
-
-
-//=======================================================================
-//function : TDF_Transaction
-//purpose  : Private copy constructor.
-//=======================================================================
-
-TDF_Transaction::TDF_Transaction(const TDF_Transaction& /*aTrans*/)
-{}
-
 
 //=======================================================================
 //function : TDF_Transaction
@@ -63,8 +54,8 @@ TDF_Transaction::TDF_Transaction
 (const Handle(TDF_Data)& aDF,
  const TCollection_AsciiString& aName)
 : myDF(aDF),
-  myUntilTransaction(0),
-  myName(aName)
+  myName(aName),
+  myUntilTransaction(0)
 {}
 
 
@@ -159,3 +150,15 @@ void TDF_Transaction::Abort()
   }
 }
 
+//=======================================================================
+//function : DumpJson
+//purpose  : 
+//=======================================================================
+void TDF_Transaction::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
+{
+  OCCT_DUMP_CLASS_BEGIN (theOStream, TDF_Transaction)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myDF.get())
+  OCCT_DUMP_FIELD_VALUE_NUMERICAL (theOStream, myUntilTransaction)
+  OCCT_DUMP_FIELD_VALUE_STRING (theOStream, myName)
+}

@@ -105,7 +105,7 @@ Standard_Boolean OpenGl_Sampler::Init (const Handle(OpenGl_Context)& theCtx,
     }
     else if (!myIsImmutable)
     {
-      applySamplerParams (theCtx, myParams, this, theTexture.GetTarget(), theTexture.HasMipmaps());
+      applySamplerParams (theCtx, myParams, this, theTexture.GetTarget(), theTexture.MaxMipmapLevel());
       return Standard_True;
     }
     Release (theCtx.get());
@@ -116,7 +116,7 @@ Standard_Boolean OpenGl_Sampler::Init (const Handle(OpenGl_Context)& theCtx,
     return Standard_False;
   }
 
-  applySamplerParams (theCtx, myParams, this, theTexture.GetTarget(), theTexture.HasMipmaps());
+  applySamplerParams (theCtx, myParams, this, theTexture.GetTarget(), theTexture.MaxMipmapLevel());
   return Standard_True;
 }
 
@@ -187,7 +187,7 @@ void OpenGl_Sampler::applySamplerParams (const Handle(OpenGl_Context)& theCtx,
                                          const Handle(Graphic3d_TextureParams)& theParams,
                                          OpenGl_Sampler* theSampler,
                                          const GLenum theTarget,
-                                         const bool theHasMipMaps)
+                                         const Standard_Integer theMaxMipLevels)
 {
   if (theSampler != NULL && theSampler->Parameters() == theParams)
   {
@@ -197,7 +197,7 @@ void OpenGl_Sampler::applySamplerParams (const Handle(OpenGl_Context)& theCtx,
   // setup texture filtering
   const GLenum aFilter = (theParams->Filter() == Graphic3d_TOTF_NEAREST) ? GL_NEAREST : GL_LINEAR;
   GLenum aFilterMin = aFilter;
-  if (theHasMipMaps)
+  if (theMaxMipLevels > 0)
   {
     aFilterMin = GL_NEAREST_MIPMAP_NEAREST;
     if (theParams->Filter() == Graphic3d_TOTF_BILINEAR)
@@ -223,9 +223,13 @@ void OpenGl_Sampler::applySamplerParams (const Handle(OpenGl_Context)& theCtx,
   }
 #endif
   setParameter (theCtx, theSampler, theTarget, GL_TEXTURE_WRAP_T, aWrapMode);
-  if (theTarget == GL_TEXTURE_3D)
+  if (theTarget == GL_TEXTURE_3D
+   || theTarget == GL_TEXTURE_CUBE_MAP)
   {
-    setParameter (theCtx, theSampler, theTarget, GL_TEXTURE_WRAP_R, aWrapMode);
+    if (theCtx->HasTextureBaseLevel())
+    {
+      setParameter (theCtx, theSampler, theTarget, GL_TEXTURE_WRAP_R, aWrapMode);
+    }
     return;
   }
 
@@ -260,6 +264,14 @@ void OpenGl_Sampler::applySamplerParams (const Handle(OpenGl_Context)& theCtx,
     }
 
     setParameter (theCtx, theSampler, theTarget, GL_TEXTURE_MAX_ANISOTROPY_EXT, aDegree);
+  }
+
+  if (theCtx->HasTextureBaseLevel()
+   && (theSampler == NULL || !theSampler->isValidSampler()))
+  {
+    const Standard_Integer aMaxLevel = Min (theMaxMipLevels, theParams->MaxLevel());
+    setParameter (theCtx, theSampler, theTarget, GL_TEXTURE_BASE_LEVEL, theParams->BaseLevel());
+    setParameter (theCtx, theSampler, theTarget, GL_TEXTURE_MAX_LEVEL,  aMaxLevel);
   }
 }
 
@@ -418,7 +430,8 @@ void OpenGl_Sampler::resetGlobalTextureParams (const Handle(OpenGl_Context)& the
       {
         theCtx->core11fwd->glDisable (GL_TEXTURE_GEN_S);
         theCtx->core11fwd->glDisable (GL_TEXTURE_GEN_T);
-        if (theParams->GenMode() == Graphic3d_TOTM_SPRITE)
+        if (theParams->GenMode() == Graphic3d_TOTM_SPRITE
+         && theCtx->core20fwd != NULL)
         {
           theCtx->core11fwd->glDisable (GL_POINT_SPRITE);
         }

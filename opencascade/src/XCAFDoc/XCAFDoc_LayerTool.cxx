@@ -13,6 +13,7 @@
 // Alternatively, this file may be used under the terms of Open CASCADE
 // commercial license or contractual agreement.
 
+#include <XCAFDoc_LayerTool.hxx>
 
 #include <Standard_GUID.hxx>
 #include <Standard_Type.hxx>
@@ -28,10 +29,9 @@
 #include <XCAFDoc.hxx>
 #include <XCAFDoc_DocumentTool.hxx>
 #include <XCAFDoc_GraphNode.hxx>
-#include <XCAFDoc_LayerTool.hxx>
 #include <XCAFDoc_ShapeTool.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(XCAFDoc_LayerTool,TDF_Attribute)
+IMPLEMENT_DERIVED_ATTRIBUTE_WITH_TYPE(XCAFDoc_LayerTool,TDataStd_GenericEmpty,"xcaf","LayerTool")
 
 //=======================================================================
 //function : Constructor
@@ -449,7 +449,6 @@ Standard_Boolean XCAFDoc_LayerTool::SetLayer(const TopoDS_Shape& Sh,
 					     const Standard_Boolean shapeInOneLayer)
 {
   TDF_Label aLab;
-//   if (! myShapeTool->FindShape(Sh, aLab) ) return Standard_False;
   // PTV 22.01.2003 set layer for shape with location if it is necessary
   if (! myShapeTool->Search( Sh, aLab ) ) return Standard_False;
   SetLayer(aLab, LayerL, shapeInOneLayer);
@@ -479,7 +478,8 @@ Standard_Boolean XCAFDoc_LayerTool::SetLayer(const TopoDS_Shape& Sh,
 Standard_Boolean XCAFDoc_LayerTool::UnSetLayers(const TopoDS_Shape& Sh) 
 {
   TDF_Label aLab;
-  if (! myShapeTool->FindShape(Sh, aLab) ) return Standard_False;
+  if (!myShapeTool->Search(Sh, aLab) )
+    return Standard_False;
   UnSetLayers(aLab);
   return Standard_True;
 }
@@ -494,7 +494,8 @@ Standard_Boolean XCAFDoc_LayerTool::UnSetOneLayer(const TopoDS_Shape& Sh,
 						  const TCollection_ExtendedString& aLayer)
 {
   TDF_Label aLab;
-  if (! myShapeTool->FindShape(Sh, aLab) ) return Standard_False;
+  if (!myShapeTool->Search(Sh, aLab) )
+    return Standard_False;
   return UnSetOneLayer(aLab, aLayer);
 }
 
@@ -507,7 +508,8 @@ Standard_Boolean XCAFDoc_LayerTool::UnSetOneLayer(const TopoDS_Shape& Sh,
 						  const TDF_Label& aLayerL)
 {
   TDF_Label aLab;
-  if (! myShapeTool->FindShape(Sh, aLab) ) return Standard_False;
+  if (!myShapeTool->Search(Sh, aLab) )
+    return Standard_False;
   return UnSetOneLayer(aLab, aLayerL);
 }
 
@@ -520,7 +522,8 @@ Standard_Boolean XCAFDoc_LayerTool::IsSet(const TopoDS_Shape& Sh,
 					  const TCollection_ExtendedString& aLayer) 
 {
   TDF_Label aLab;
-  if (! myShapeTool->FindShape(Sh, aLab) ) return Standard_False;
+  if (! myShapeTool->Search(Sh, aLab) )
+    return Standard_False;
   return IsSet(aLab, aLayer);
 }
 
@@ -534,7 +537,8 @@ Standard_Boolean XCAFDoc_LayerTool::IsSet(const TopoDS_Shape& Sh,
 					  const TDF_Label& aLayerL) 
 {
   TDF_Label aLab;
-  if (! myShapeTool->FindShape(Sh, aLab) ) return Standard_False;
+  if (!myShapeTool->Search(Sh, aLab) )
+    return Standard_False;
   return IsSet(aLab, aLayerL);
 }
 
@@ -547,7 +551,8 @@ Standard_Boolean XCAFDoc_LayerTool::GetLayers(const TopoDS_Shape& Sh,
 					      Handle(TColStd_HSequenceOfExtendedString)& aLayerS) 
 {
   TDF_Label aLab;
-  if (! myShapeTool->FindShape(Sh, aLab) ) return Standard_False;
+  if (!myShapeTool->Search(Sh, aLab))
+    return Standard_False;
   return GetLayers(aLab, aLayerS);
 }
 
@@ -560,7 +565,8 @@ Standard_Boolean XCAFDoc_LayerTool::GetLayers(const TopoDS_Shape& Sh,
 					      TDF_LabelSequence& aLayerLS) 
 {
   TDF_Label aLab;
-  if (! myShapeTool->FindShape(Sh, aLab) ) return Standard_False;
+  if (!myShapeTool->Search(Sh, aLab))
+    return Standard_False;
   return GetLayers(aLab, aLayerLS);
 }
 
@@ -574,7 +580,7 @@ Handle(TColStd_HSequenceOfExtendedString) XCAFDoc_LayerTool::GetLayers(const Top
 {
   Handle(TColStd_HSequenceOfExtendedString) aLayerS = new TColStd_HSequenceOfExtendedString;
   TDF_Label aLab;
-  if ( myShapeTool->FindShape(Sh, aLab) )
+  if (myShapeTool->Search(Sh, aLab))
     aLayerS = GetLayers(aLab);
   return aLayerS;
 }
@@ -590,35 +596,15 @@ const Standard_GUID& XCAFDoc_LayerTool::ID() const
   return GetID();
 }
 
-
 //=======================================================================
-//function : Restore
+//function : DumpJson
 //purpose  : 
 //=======================================================================
-
-void XCAFDoc_LayerTool::Restore(const Handle(TDF_Attribute)& /* with */) 
+void XCAFDoc_LayerTool::DumpJson (Standard_OStream& theOStream, Standard_Integer theDepth) const
 {
+  OCCT_DUMP_TRANSIENT_CLASS_BEGIN (theOStream)
+
+  OCCT_DUMP_BASE_CLASS (theOStream, theDepth, TDF_Attribute)
+
+  OCCT_DUMP_FIELD_VALUES_DUMPED (theOStream, theDepth, myShapeTool.get())
 }
-
-
-//=======================================================================
-//function : NewEmpty
-//purpose  : 
-//=======================================================================
-
-Handle(TDF_Attribute) XCAFDoc_LayerTool::NewEmpty() const
-{
-  return new XCAFDoc_LayerTool;
-}
-
-
-//=======================================================================
-//function : Paste
-//purpose  : 
-//=======================================================================
-
-void XCAFDoc_LayerTool::Paste(const Handle(TDF_Attribute)& /* into */,
-			      const Handle(TDF_RelocationTable)& /* RT */) const
-{
-}
-

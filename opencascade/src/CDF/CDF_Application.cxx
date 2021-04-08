@@ -18,8 +18,7 @@
 
 #include <CDF_Application.hxx>
 #include <CDF_Directory.hxx>
-#include <CDF_MetaDataDriver.hxx>
-#include <CDF_Session.hxx>
+#include <CDF_FWOSDriver.hxx>
 #include <CDM_CanCloseStatus.hxx>
 #include <CDM_Document.hxx>
 #include <CDM_MetaData.hxx>
@@ -35,15 +34,15 @@
 #include <UTL.hxx>
 
 IMPLEMENT_STANDARD_RTTIEXT(CDF_Application,CDM_Application)
-
-#define theMetaDataDriver CDF_Session::CurrentSession()->MetaDataDriver()
-
-
 //=======================================================================
 //function : 
 //purpose  : 
 //=======================================================================
-CDF_Application::CDF_Application():myRetrievableStatus(PCDM_RS_OK) {}
+CDF_Application::CDF_Application():myRetrievableStatus(PCDM_RS_OK) 
+{
+  myDirectory      = new CDF_Directory();
+  myMetaDataDriver = new CDF_FWOSDriver (MetaDataLookUpTable());
+}
 
 //=======================================================================
 //function : Load
@@ -58,7 +57,7 @@ Handle(CDF_Application) CDF_Application::Load(const Standard_GUID& aGUID) {
 //purpose  : 
 //=======================================================================
 void CDF_Application::Open(const Handle(CDM_Document)& aDocument) {
-  CDF_Session::CurrentSession()->Directory()->Add(aDocument);
+  myDirectory->Add(aDocument);
   aDocument->Open(this);
   Activate(aDocument,CDF_TOA_New);
 }
@@ -76,7 +75,7 @@ CDM_CanCloseStatus CDF_Application::CanClose(const Handle(CDM_Document)& aDocume
 //purpose  : 
 //=======================================================================
 void CDF_Application::Close(const Handle(CDM_Document)& aDocument) {
-  CDF_Session::CurrentSession()->Directory()->Remove(aDocument);
+  myDirectory->Remove(aDocument);
   aDocument->Close();
 }
 
@@ -84,33 +83,37 @@ void CDF_Application::Close(const Handle(CDM_Document)& aDocument) {
 //function : Retrieve
 //purpose  : 
 //=======================================================================
-Handle(CDM_Document) CDF_Application::Retrieve(const TCollection_ExtendedString& aFolder, 
-				     const TCollection_ExtendedString& aName, 
-				     const Standard_Boolean UseStorageConfiguration) {
+Handle(CDM_Document) CDF_Application::Retrieve (const TCollection_ExtendedString& aFolder, 
+                                                const TCollection_ExtendedString& aName,
+                                                const Standard_Boolean UseStorageConfiguration,
+                                                const Message_ProgressRange& theRange)
+{
   TCollection_ExtendedString nullVersion;
-  return Retrieve(aFolder,aName,nullVersion,UseStorageConfiguration);
+  return Retrieve(aFolder, aName, nullVersion, UseStorageConfiguration, theRange);
 }
 
 //=======================================================================
 //function : Retrieve
 //purpose  : 
 //=======================================================================
-Handle(CDM_Document)  CDF_Application::Retrieve(const TCollection_ExtendedString& aFolder, 
-				     const TCollection_ExtendedString& aName,
-				     const TCollection_ExtendedString& aVersion,
-				     const Standard_Boolean UseStorageConfiguration)
+Handle(CDM_Document)  CDF_Application::Retrieve (const TCollection_ExtendedString& aFolder, 
+                                                const TCollection_ExtendedString& aName,
+                                                const TCollection_ExtendedString& aVersion,
+                                                const Standard_Boolean UseStorageConfiguration,
+                                                const Message_ProgressRange& theRange)
 {
   Handle(CDM_MetaData) theMetaData; 
   
   if(aVersion.Length() == 0) 
-    theMetaData=theMetaDataDriver->MetaData(aFolder,aName);
+    theMetaData=myMetaDataDriver->MetaData(aFolder,aName);
   else 
-    theMetaData=theMetaDataDriver->MetaData(aFolder,aName,aVersion);
+    theMetaData=myMetaDataDriver->MetaData(aFolder,aName,aVersion);
 
   CDF_TypeOfActivation theTypeOfActivation=TypeOfActivation(theMetaData);
-  Handle(CDM_Document) theDocument=Retrieve(theMetaData,UseStorageConfiguration,Standard_False);
+  Handle(CDM_Document) theDocument = Retrieve(theMetaData, UseStorageConfiguration,
+                                              Standard_False, theRange);
 
-  CDF_Session::CurrentSession()->Directory()->Add(theDocument);
+  myDirectory->Add(theDocument);
   Activate(theDocument,theTypeOfActivation);
 
   theDocument->Open(this);
@@ -132,12 +135,12 @@ PCDM_ReaderStatus CDF_Application::CanRetrieve(const TCollection_ExtendedString&
 //=======================================================================
 PCDM_ReaderStatus CDF_Application::CanRetrieve(const TCollection_ExtendedString&  aFolder, const TCollection_ExtendedString&  aName, const TCollection_ExtendedString&  aVersion) {
   
-  if (!theMetaDataDriver->Find(aFolder,aName,aVersion))
+  if (!myMetaDataDriver->Find(aFolder,aName,aVersion))
     return PCDM_RS_UnknownDocument;
-  else if (!theMetaDataDriver->HasReadPermission(aFolder,aName,aVersion))
+  else if (!myMetaDataDriver->HasReadPermission(aFolder,aName,aVersion))
     return PCDM_RS_PermissionDenied;
   else {
-    Handle(CDM_MetaData) theMetaData = theMetaDataDriver->MetaData(aFolder,aName,aVersion);
+    Handle(CDM_MetaData) theMetaData = myMetaDataDriver->MetaData(aFolder,aName,aVersion);
 
     if(theMetaData->IsRetrieved()) {
       return theMetaData->Document()->IsModified()
@@ -185,7 +188,7 @@ void CDF_Application::Activate(const Handle(CDM_Document)& ,const CDF_TypeOfActi
 //=======================================================================
 Standard_ExtString CDF_Application::DefaultFolder(){
   if(myDefaultFolder.Length() == 0) {
-    myDefaultFolder=CDF_Session::CurrentSession()->MetaDataDriver()->DefaultFolder();
+    myDefaultFolder=myMetaDataDriver->DefaultFolder();
   }
   return myDefaultFolder.ToExtString();
 }
@@ -195,7 +198,7 @@ Standard_ExtString CDF_Application::DefaultFolder(){
 //purpose  : 
 //=======================================================================
 Standard_Boolean CDF_Application::SetDefaultFolder(const Standard_ExtString aFolder) {
-  Standard_Boolean found = CDF_Session::CurrentSession()->MetaDataDriver()->FindFolder(aFolder);
+  Standard_Boolean found = myMetaDataDriver->FindFolder(aFolder);
   if(found) myDefaultFolder=aFolder;
   return found;
 }
@@ -204,15 +207,20 @@ Standard_Boolean CDF_Application::SetDefaultFolder(const Standard_ExtString aFol
 //function : Retrieve
 //purpose  : 
 //=======================================================================
-Handle(CDM_Document) CDF_Application::Retrieve(const Handle(CDM_MetaData)& aMetaData,const Standard_Boolean UseStorageConfiguration) {
-  return Retrieve(aMetaData,UseStorageConfiguration,Standard_True);
+Handle(CDM_Document) CDF_Application::Retrieve(const Handle(CDM_MetaData)& aMetaData,
+                                               const Standard_Boolean UseStorageConfiguration, 
+                                               const Message_ProgressRange& theRange) {
+  return Retrieve(aMetaData, UseStorageConfiguration, Standard_True, theRange);
 } 
 
 //=======================================================================
 //function : Retrieve
 //purpose  : 
 //=======================================================================
-Handle(CDM_Document) CDF_Application::Retrieve(const Handle(CDM_MetaData)& aMetaData,const Standard_Boolean UseStorageConfiguration, const Standard_Boolean IsComponent) {
+Handle(CDM_Document) CDF_Application::Retrieve (const Handle(CDM_MetaData)& aMetaData, 
+                                                const Standard_Boolean UseStorageConfiguration, 
+                                                const Standard_Boolean IsComponent, 
+                                                const Message_ProgressRange& theRange) {
   
   Handle(CDM_Document) theDocumentToReturn;
   myRetrievableStatus = PCDM_RS_DriverFailure;
@@ -261,11 +269,11 @@ Handle(CDM_Document) CDF_Application::Retrieve(const Handle(CDM_MetaData)& aMeta
     SetReferenceCounter(theDocument,PCDM_RetrievalDriver::ReferenceCounter(aMetaData->FileName(), MessageDriver()));
     
     SetDocumentVersion(theDocument,aMetaData);
-    theMetaDataDriver->ReferenceIterator()->LoadReferences(theDocument,aMetaData,this,UseStorageConfiguration);
+    myMetaDataDriver->ReferenceIterator(MessageDriver())->LoadReferences(theDocument,aMetaData,this,UseStorageConfiguration);
 
     try {    
       OCC_CATCH_SIGNALS
-      theReader->Read(aMetaData->FileName(),theDocument,this);
+      theReader->Read (aMetaData->FileName(), theDocument, this, theRange);
     } 
     catch (Standard_Failure const& anException) {
       myRetrievableStatus = theReader->GetStatus();
@@ -275,7 +283,8 @@ Handle(CDM_Document) CDF_Application::Retrieve(const Handle(CDM_MetaData)& aMeta
 	throw Standard_Failure(aMsg.str().c_str());
       }	
     }
-    myRetrievableStatus = theReader->GetStatus();    
+    myRetrievableStatus = theReader->GetStatus();
+    theDocument->Open (this); // must be done before SetMetaData
     theDocument->SetMetaData(aMetaData);
 
     theDocumentToReturn=theDocument;
@@ -320,7 +329,8 @@ CDF_TypeOfActivation CDF_Application::TypeOfActivation(const Handle(CDM_MetaData
 //function : Read
 //purpose  : 
 //=======================================================================
-Handle(CDM_Document) CDF_Application::Read (Standard_IStream& theIStream)
+Handle(CDM_Document) CDF_Application::Read (Standard_IStream& theIStream,
+                                            const Message_ProgressRange& theRange)
 {
   Handle(CDM_Document) aDoc;
   Handle(Storage_Data) dData;
@@ -358,8 +368,7 @@ Handle(CDM_Document) CDF_Application::Read (Standard_IStream& theIStream)
   try
   {
     OCC_CATCH_SIGNALS
-  
-    aReader->Read (theIStream, dData, aDoc, this);
+    aReader->Read (theIStream, dData, aDoc, this, theRange);
   }
   catch (Standard_Failure const& anException)
   {
@@ -519,4 +528,13 @@ PCDM_ReaderStatus CDF_Application::CanRetrieve(const Handle(CDM_MetaData)& aMeta
     return CanRetrieve(aMetaData->Folder(),aMetaData->Name(),aMetaData->Version());
   else
     return CanRetrieve(aMetaData->Folder(),aMetaData->Name());
+}
+
+//=======================================================================
+//function : MetaDataDriver
+//purpose  :
+//=======================================================================
+Handle(CDF_MetaDataDriver) CDF_Application::MetaDataDriver() const {
+  Standard_NoSuchObject_Raise_if(myMetaDataDriver.IsNull(), "no metadatadriver has been provided; this application is not able to store or retrieve files.");
+  return myMetaDataDriver;
 }
